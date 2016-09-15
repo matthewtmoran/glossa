@@ -1,0 +1,73 @@
+$blue: #607d8b;
+$aBlue: #57717D;
+$lBlue: #698898;
+$pink: #ff4081;
+
+
+@font-face {
+	font-family: "DejaVu Mono";
+	src: url(../fonts/DejaVuSansMono.ttf);
+}
+
+@font-face {
+	font-family: "Cutive Mono";
+	src: url(../fonts/CutiveMono-Regular.ttf);
+}
+
+@font-face {
+	font-family: "Roboto Mono";
+	src: url(../fonts/RobotoMono-Regular.ttf);
+}
+
+md-toolbar.nav-content {
+	height: 64px;
+	overflow: hidden;
+	//background: $blue;
+
+	md-icon {
+		//color: white;
+		//font-size: 2.2em;
+
+		//height: 32px;
+		//width: 32px;
+
+
+	}
+	md-input-container {
+		margin: 0;
+
+		input {
+			margin-top: 20px;
+			margin-left:5px;
+			padding-left:25px;
+		}
+
+		md-icon {
+			padding: 8px;
+		}
+	}
+
+
+}
+
+.md-nav-bar {
+	border: none;
+
+	nav {
+		ul {
+			overflow: hidden;
+		}
+	}
+}
+
+.static-left {
+	height: 100%;
+}
+
+md-sidenav,
+md-sidenav.md-locked-open,
+md-sidenav.md-closed.md-locked-open-add-active {
+	min-width: 200px !important;
+	width: 85vw !important;
+	max-width: 250px !important;
+}

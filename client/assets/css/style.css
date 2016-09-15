@@ -1,0 +1,37 @@
+@font-face {
+  font-family: "DejaVu Mono";
+  src: url(../fonts/DejaVuSansMono.ttf); }
+@font-face {
+  font-family: "Cutive Mono";
+  src: url(../fonts/CutiveMono-Regular.ttf); }
+@font-face {
+  font-family: "Roboto Mono";
+  src: url(../fonts/RobotoMono-Regular.ttf); }
+md-toolbar.nav-content {
+  height: 64px;
+  overflow: hidden; }
+  md-toolbar.nav-content md-input-container {
+    margin: 0; }
+    md-toolbar.nav-content md-input-container input {
+      margin-top: 20px;
+      margin-left: 5px;
+      padding-left: 25px; }
+    md-toolbar.nav-content md-input-container md-icon {
+      padding: 8px; }
+
+.md-nav-bar {
+  border: none; }
+  .md-nav-bar nav ul {
+    overflow: hidden; }
+
+.static-left {
+  height: 100%; }
+
+md-sidenav,
+md-sidenav.md-locked-open,
+md-sidenav.md-closed.md-locked-open-add-active {
+  min-width: 200px !important;
+  width: 85vw !important;
+  max-width: 250px !important; }
+
+/*# sourceMappingURL=style.css.map */
