@@ -39,7 +39,7 @@ function apsUploadFile(nodeSrvc) {
                 scope.fileName = null;
             }
 
-            nodeSrvc.readfiles(files);
+            nodeSrvc.addFiles(files);
             scope.$apply();
         });
     }

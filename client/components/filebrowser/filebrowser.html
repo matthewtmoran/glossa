@@ -1,4 +1,4 @@
-<md-sidenav class="md-sidenav-left static-left" md-component-id="left2" md-is-locked-open="true" md-whiteframe="" layout="column">
+<md-sidenav class="md-sidenav-left static-left" md-component-id="left2" md-is-locked-open="true" md-whiteframe="4" layout="column">
 
 	<md-toolbar class="md-theme-indigo">
 		<h1 class="md-toolbar-tools">Sidenav Left</h1>
@@ -14,18 +14,22 @@
 	</md-content>
 
 	<md-list>
-		<md-item ng-repeat="item in menu">
-			<a>
+		<md-item ng-repeat="file in vm.fileList">
+			<a ng-click="vm.fileClicked(file)">
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="inset">
-						<ng-md-icon icon="{{item.icon}}"></ng-md-icon>
+						<md-icon md-font-library="material-icons">file</md-icon>
 					</div>
-					<div class="inset">{{item.title}}
+					<div class="inset">{{file.fileName}}
 					</div>
 				</md-item-content>
 			</a>
 		</md-item>
 	</md-list>
+
+	<pre>
+		{{vm.fileList | json}}
+	</pre>
 
 </md-sidenav>
 
