@@ -60,8 +60,9 @@ md-toolbar.nav-content {
 	}
 }
 
+//64 us the height of the navbar
 .static-left {
-	height: 100%;
+	height: -webkit-calc(100% - 64px);
 }
 
 md-sidenav,

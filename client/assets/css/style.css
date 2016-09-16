@@ -25,7 +25,7 @@ md-toolbar.nav-content {
     overflow: hidden; }
 
 .static-left {
-  height: 100%; }
+  height: -webkit-calc(100% - 64px); }
 
 md-sidenav,
 md-sidenav.md-locked-open,

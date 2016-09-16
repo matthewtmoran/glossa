@@ -17,7 +17,11 @@
 
 <div ui-view></div>
 
+<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
 <!-- Angular Material requires Angular.js Libraries -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-animate/angular-animate.js"></script>
 <script src="bower_components/angular-aria/angular-aria.js"></script>
@@ -31,6 +35,8 @@
 <script type="text/javascript" src="app/main/main.js"></script>
 <script type="text/javascript" src="app/main/main.controller.js"></script>
 <script type="text/javascript" src="components/navbar/navbar.controller.js"></script>
+<script type="text/javascript" src="components/uploadbutton/uploadbtn.directive.js"></script>
+<script type="text/javascript" src="components/node/node.service.js"></script>
 
 
 
