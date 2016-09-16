@@ -23,7 +23,7 @@ function nodeSrvc() {
         console.log('readFiles', files);
         var filePath = files[0].path;
         console.log('filePath', filePath);
-        fs.createReadStream(filePath).pipe(fs.createWriteStream('uploads/newLog.log'));
+        fs.createReadStream(filePath).pipe(fs.createWriteStream('uploads/' + files[0].name));
 
         // if (files.length > 1) {
         //     files.forEach(function(file) {

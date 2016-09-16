@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corpus [v00.21] • Linguistic Corpus Processing</title>
+<link href="css/mui.min.css" rel="stylesheet" type="text/css" />
+<link href="css/custom.css" rel="stylesheet" type="text/css" />
+<script src="js/mui.min.js", "mui"></script>
+
+<script type="text/javascript">
+
+<!-- .js -->
+
+function REload() {
+    location.reload();
+}
+
+var Corpus = function() {
+
+  // instantiate general properties on the object that we will always need:
+
+  rawText = document.getElementById("inputTextbox").value;
+
+  this.lines = rawText.replace(/[\"\,\.\-\!\?\“\”]/g, "") // " , . ! ? - (and smart quotes)
+                      .replace(/\n\s*\n/g, "\n")      // multiple line breaks with potential whitespace between
+                      .replace(/^\s+|\s+$/gm, "")     // whitespace at beginning/end of lines
+                      .split("\n");
+
+  var pureLines = this.lines.filter(function(elem) {
+    return elem.charAt(0) != "#"; // exclude MD headers
+  });
+
+  this.words = pureLines.reduce(function(a, b) {
+    return a.concat(b.split(" "));
+  }, []);
+
+  this.uniqueWords = this.words.filter(function(value, index, self) {
+    return self.indexOf(value) === index;
+  });
+
+  // object with count of each word: http://stackoverflow.com/a/11649321/1417584
+  this.count = { };
+  for (var i = 0, j = this.words.length; i < j; i++) {
+    this.count[this.words[i]] = (this.count[this.words[i]] || 0) + 1;
+  }
+}
+
+
+function setOutputText(val) {
+  outputTextbox = document.getElementById("outputTextbox");
+  outputTextbox.value = val;
+}
+
+
+function sortedWordList() {
+
+}
+
+
+function concordance() {
+  var corpus = new Corpus(),
+      stream = [],
+      formattedOutput = ["#New words, by story, with total count for this document"],
+      n = 1;
+
+  // Procedural style favored in the main processing loop, because it's basically stream processing
+  for (i = 0; i < corpus.lines.length; i++) {
+    // if the line has a MD header:
+    if (corpus.lines[i].charAt(0) == "#") {
+      formattedOutput.push(""); // spacer for MD headers
+      formattedOutput.push("#".concat(corpus.lines[i]));
+      n = 1;
+    } else {
+      var words = corpus.lines[i].split(" ");
+      var newWords = words.filter(function(elem) {
+        return stream.indexOf(elem) == -1;
+      });
+      newWords.forEach(function(elem) {
+        var freq = corpus.count[elem];
+        stream.push(elem);
+        formattedOutput.push(n + ". " + elem + "     (" + freq + ")");
+        n++;
+      });
+
+    }
+  }
+
+  var finalOutput = formattedOutput.join("\n");
+  setOutputText(finalOutput);
+}
+
+</script>
+
+</head>
+
+<body>
+<div class="mui-container">
+<div class="mui-row">
+<div class="mui-col-md-6"><h1>Input</h1>
+<div id="mui-panel" class="mui-panel" style="min-height:100px;">
+<div class="mui-text-center">
+<div class="mui-text-display1 mui-text-accent">Drag Corpus file(s) Here</div>
+<div class="mui-text-subhead mui-text-accent">(.rtf, .doc, .txt, .md)</div>
+</div>
+</div>
+<div class="mui-panel">
+<form>
+<!-- <legend>Paste Text</legend> -->
+<div class="mui-form-group">
+<textarea id="inputTextbox" class="mui-form-control" placeholder="Drop file(s) above, or paste stories (with Markdown (#) headings) in this box. Select a report to generate, and your corpus will be processed." style="min-height:300px;"></textarea>
+</div>
+</form>
+<div class="mui-dropdown" style="float:right;">
+<button class="mui-btn mui-btn-primary" data-mui-toggle="dropdown">Generate A Report
+<span class="mui-caret"></span>
+</button>
+<ul class="mui-dropdown-menu">
+<li><a onclick="concordance()">Concordance</a></li>
+<li><a href="sortedWordList()">Dictionary Base</a></li>
+<li><a href="#">Character Frequency</a></li>
+<li><a href="#">Persistent Word Patterns</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="mui-col-md-6"><h1>Output</h1><div class="mui-panel">
+<form>
+<!-- <legend>Report</legend> -->
+<div class="mui-form-group">
+<textarea id="outputTextbox" class="mui-form-control" placeholder="Markdown Report will load here after processing." style="min-height:420px;" readonly="readonly"></textarea>
+</div>
+<button type="submit" class="mui-btn mui-btn-accent mui-btn-flat" disabled="">Copy</button>
+<div class="mui-dropdown" style="float:right;">
+<button class="mui-btn mui-btn-primary" data-mui-toggle="dropdown">Download Report
+<span class="mui-caret"></span>
+</button>
+<ul class="mui-dropdown-menu">
+<li><a href="#">Markdown</a></li>
+<li><a href="#">CSV</a></li>
+<li><a href="#">JSON</a></li>
+</ul>
+</div>
+</form>
+</div>
+</div>
+<div class="mui-text-center">
+<button class="mui-btn mui-btn-floating mui-btn-floating-mini" onclick="REload()">⟳</button>
+</div>
+</div>
+</div>
+</body>
+
+</html>
