@@ -11,6 +11,7 @@ function MainCtrl($scope, nodeSrvc) {
         choices: ["Option1", "I'm an option", "This is materialize", "No, this is Patrick."]
     };
     vm.fileList = [];
+    vm.aceContent = "";
 
     vm.uploadFiles = uploadFiles;
     vm.fileClicked = fileClicked;
@@ -19,7 +20,6 @@ function MainCtrl($scope, nodeSrvc) {
 
     function activate() {
         buildFileList();
-        // nodeSrvc.createEditor();
     }
 
     function buildFileList() {
@@ -37,7 +37,7 @@ function MainCtrl($scope, nodeSrvc) {
     }
 
     function fileClicked(file) {
-        console.log('clicked', file)
+        vm.aceContent = nodeSrvc.getFileContent(file.filePath);
     }
 
 

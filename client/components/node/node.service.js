@@ -14,7 +14,8 @@ function nodeSrvc() {
     var service = {
         addFiles: addFiles,
         getFiles: getFiles,
-        createEditor: createEditor
+        getFileContent: getFileContent
+        // createEditor: createEditor
     };
 
     return service;
@@ -69,20 +70,29 @@ function nodeSrvc() {
         return fileArray;
     }
 
-    function createEditor(){
-        // Set up ace editor
-        var editor = ace.edit('editor');
-        // Add line wrapping
-        editor.getSession().setUseWrapMode(true);
-        var textfield = editor.textInput.getElement();
-        editor.getSession().setMode("ace/mode/markdown");
-        editor.on('change', function(){
-            render(editor.getValue());
-            Util.session.save();
-        });
-        editorInstance = editor;
-        return editor;
+    /**
+     * Reads the content of file and returns that content.
+     * @param srcpath - the source of the file.  Will be passed during click event
+     * @returns content of file as string
+     */
+    function getFileContent(srcpath) {
+        return fs.readFileSync(srcpath, {encoding: 'utf-8'});
     }
+
+    // function createEditor(){
+    //     // Set up ace editor
+    //     var editor = ace.edit('editor');
+    //     // Add line wrapping
+    //     editor.getSession().setUseWrapMode(true);
+    //     var textfield = editor.textInput.getElement();
+    //     editor.getSession().setMode("ace/mode/markdown");
+    //     editor.on('change', function(){
+    //         render(editor.getValue());
+    //         Util.session.save();
+    //     });
+    //     editorInstance = editor;
+    //     return editor;
+    // }
 
 
     // function getDirectories(srcpath) {
@@ -99,9 +109,7 @@ function nodeSrvc() {
     //     });
     // }
     //
-    // function getFileContent(srcpath) {
-    //     return fs.readFileSync(srcpath, {encoding: 'utf-8'});
-    // }
+
     //
     // function writeFile(srcpath,content) {
     //     fs.writeFile( srcpath, content, function(err) {
