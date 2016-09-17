@@ -9,10 +9,12 @@ function nodeSrvc() {
 
     var uploadPath = 'uploads/';
     var fileArray = [];
+    var editorInstance = {};
 
     var service = {
         addFiles: addFiles,
-        getFiles: getFiles
+        getFiles: getFiles,
+        createEditor: createEditor
     };
 
     return service;
@@ -65,6 +67,21 @@ function nodeSrvc() {
             }
         });
         return fileArray;
+    }
+
+    function createEditor(){
+        // Set up ace editor
+        var editor = ace.edit('editor');
+        // Add line wrapping
+        editor.getSession().setUseWrapMode(true);
+        var textfield = editor.textInput.getElement();
+        editor.getSession().setMode("ace/mode/markdown");
+        editor.on('change', function(){
+            render(editor.getValue());
+            Util.session.save();
+        });
+        editorInstance = editor;
+        return editor;
     }
 
 

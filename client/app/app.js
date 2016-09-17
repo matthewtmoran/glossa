@@ -2,7 +2,8 @@
 
 angular.module('glossa', [
     'ngMaterial',
-    'ui.router'
+    'ui.router',
+    'ui.ace'
     ])
     .config(config);
 

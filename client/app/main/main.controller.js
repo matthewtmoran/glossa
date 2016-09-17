@@ -19,6 +19,7 @@ function MainCtrl($scope, nodeSrvc) {
 
     function activate() {
         buildFileList();
+        // nodeSrvc.createEditor();
     }
 
     function buildFileList() {

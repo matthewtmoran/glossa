@@ -46,8 +46,6 @@ md-toolbar.nav-content {
 			padding: 8px;
 		}
 	}
-
-
 }
 
 .md-nav-bar {
@@ -72,4 +70,12 @@ md-sidenav.md-closed.md-locked-open-add-active {
 	min-width: 200px !important;
 	width: 85vw !important;
 	max-width: 250px !important;
+}
+
+.ace_editor {
+	height: -webkit-calc(100% - 116px);
+	width: 100%;
+}
+.tabs-area {
+	padding-left: 2px;
 }

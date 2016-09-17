@@ -35,4 +35,11 @@ md-sidenav.md-closed.md-locked-open-add-active {
   width: 85vw !important;
   max-width: 250px !important; }
 
+.ace_editor {
+  height: -webkit-calc(100% - 116px);
+  width: 100%; }
+
+.tabs-area {
+  padding-left: 2px; }
+
 /*# sourceMappingURL=style.css.map */
