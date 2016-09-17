@@ -1,20 +1,28 @@
-<md-sidenav class="md-sidenav-left static-left" md-component-id="left2" md-is-locked-open="true" md-whiteframe="4" layout="column">
+<md-sidenav class="md-sidenav-left static-left md-whiteframe-z2" md-component-id="left2" md-is-locked-open="true"  layout="column">
+<!--<md-sidenav class="md-sidenav-left static-left " md-component-id="left2" md-is-locked-open="true" md-whiteframe="4" layout="column">-->
 
-	<md-toolbar class="md-theme-indigo">
-		<h1 class="md-toolbar-tools">Sidenav Left</h1>
+	<md-toolbar class="">
+		<span flex></span>
+		<div layout="column" class="md-toolbar-tools-bottom inset">
+			<h1 class="md-toolbar-tools">Glossa</h1>
+
+		</div>
 	</md-toolbar>
-	<md-content layout-padding="" >
-		<md-button ng-click="close()" class="md-primary" hide-gt-md="">
-			Close Sidenav Left
-		</md-button>
-		<p hide="" show-gt-md="">
-			This sidenav is locked open on your device. To go back to the default behavior,
-			narrow your display.
-		</p>
-	</md-content>
+
+
+
+	<!--<md-content layout-padding="" >-->
+		<!--<md-button ng-click="close()" class="md-primary" hide-gt-md="">-->
+			<!--Close Sidenav Left-->
+		<!--</md-button>-->
+		<!--<p hide="" show-gt-md="">-->
+			<!--This sidenav is locked open on your device. To go back to the default behavior,-->
+			<!--narrow your display.-->
+		<!--</p>-->
+	<!--</md-content>-->
 
 	<md-list>
-		<md-item ng-repeat="file in vm.fileList">
+		<md-list-item ng-repeat="file in vm.fileList">
 			<a ng-click="vm.fileClicked(file)">
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="inset">
@@ -24,12 +32,8 @@
 					</div>
 				</md-item-content>
 			</a>
-		</md-item>
+		</md-list-item>
 	</md-list>
-
-	<pre>
-		{{vm.fileList | json}}
-	</pre>
 
 </md-sidenav>
 
