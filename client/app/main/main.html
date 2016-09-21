@@ -1,10 +1,12 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
-<div ng-include="'components/sidebar/sidebar.html'"></div>
+<div ng-controller="drawerCrtl as dVm" ng-include="'components/sidebar/sidebar.html'"></div>
 
 <div flex layout="row">
 
 	<div ng-include="'components/filebrowser/filebrowser.html'"></div>
 	<div class="tabs-area" flex ng-include="'components/tabbar/tabbar.html'"></div>
+
+	<aps-upload-file></aps-upload-file>
 
 </div>
 
