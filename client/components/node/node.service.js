@@ -7,7 +7,7 @@ angular.module('glossa')
 
 function nodeSrvc() {
 
-    var uploadPath = 'uploads/';
+    var uploadPath = './uploads/';
     var fileArray = [];
     var editorInstance = {};
 
