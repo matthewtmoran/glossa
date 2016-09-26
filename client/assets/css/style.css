@@ -115,15 +115,15 @@ md-sidenav {
         -webkit-transform: rotate(0deg); }
     md-sidenav .side-menu .menu-toggle-list {
       background: #fff;
-      max-height: 1300px;
+      max-height: 120px;
       overflow: hidden;
       position: relative;
       z-index: 1;
-      -webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+      -webkit-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
       -webkit-transition-property: max-height;
-      -moz-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+      -moz-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
       -moz-transition-property: max-height;
-      transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+      transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
       transition-property: max-height; }
       md-sidenav .side-menu .menu-toggle-list.ng-hide {
         max-height: 0; }

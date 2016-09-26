@@ -209,17 +209,23 @@ md-sidenav {
 			}
 		}
 
+		//this max=-height property is what's being modified on toggel somewhat.  What happend is the max-height must be set higher or equal to the height the list items create otherwise they get cut off.  The animation shows a delay, but it isn't actually delyed, you just can see it since it's happening 1300px down. So I have made the max-height equal ot the height of the items and I expect to modify this in the futre.  It would be ideal to find a way to dynamically set the max-height based on the amount of items in the list.
+
 		.menu-toggle-list {
 			background: #fff;
-			max-height: 1300px;
+			max-height: 120px;
+			//max-height: 13000px;
 			overflow: hidden;
 			position: relative;
 			z-index: 1;
-			-webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+			-webkit-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
+			//-webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			-webkit-transition-property: max-height;
-			-moz-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+			-moz-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
+			//-moz-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			-moz-transition-property: max-height;
-			transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
+			transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
+			//transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			transition-property: max-height;
 
 			&.ng-hide {

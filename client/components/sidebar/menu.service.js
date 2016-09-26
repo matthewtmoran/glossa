@@ -60,7 +60,7 @@ function drawerMenu() {
     ///////////////
 
     function toggleSelectSection(section) {
-        service.openedSection = (self.openedSection === section ? null : section);
+        service.openedSection = (service.openedSection === section ? null : section);
     };
     function isSectionSelected(section) {
         return service.openedSection === section;
