@@ -8,6 +8,11 @@ angular.module('glossa')
 function nodeSrvc() {
 
     var uploadPath = './uploads/';
+
+    if (!fs.existsSync(uploadPath)){
+        fs.mkdirSync(uploadPath);
+    }
+
     var fileArray = [];
     var editorInstance = {};
 
