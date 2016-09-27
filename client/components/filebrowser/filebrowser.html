@@ -21,6 +21,9 @@
 		<!--</p>-->
 	<!--</md-content>-->
 
+
+<!-- THIS LIST SHOULD LIST ALL THE FILES IN THE COPRUS SELECTED IN THE DRAWER. MAIN TITLE OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1, UNLESS THERE ISN'T ONE... THEN IT SHOULD BE THE NAME OF THE ACTUAL TXT FILE (WITHOUT .EXT) IF THAT IS WHAT THESE WILL BE... TEXT FILES OR DATA ON A DATABASE SOMEWHERE? SHOULD BE A DENSE VIEW, NO ICONS, JUST THE TITLE AND A FEW (LIKE 3) LINES OF THE ACTUAL TEXT. SHOULD HIGHLIGHT ON HOVER I THINK. -->
+
 	<md-list>
 		<md-list-item ng-repeat="file in vm.fileList">
 			<a ng-click="vm.fileClicked(file)">
@@ -35,7 +38,10 @@
 		</md-list-item>
 	</md-list>
 	
-	<!-- THIS ONE SHOULD ADD A NEW TEXT TO THE CORPUS WE WOULD BE BROWSING RIGHT NOW -->
+	
+	
+	<!-- THIS FAB SHOULD ADD A NEW TEXT TO THE CORPUS WE WOULD BE BROWSING RIGHT NOW. ACTIVE TAB ON ITEMS MADE HERE SHOULD BE THE META TAB. -->
+	
 	<md-button id="uploadButton"
 	           class="md-button md-fab md-fab-bottom-right"
 	           aria-label="attach_file">
