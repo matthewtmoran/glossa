@@ -7,21 +7,21 @@ function drawerMenu() {
 
     var section = [
         {
-            name: 'Beers',
+            name: 'Corpora',
             type: 'toggle',
             pages: [{
-                name: 'IPAs',
+                name: 'sub-folder 1',
                 type: 'link',
                 state: 'beers.ipas',
                 icon: 'fa fa-group'
             }, {
-                name: 'Porters',
+                name: 'Phonetics',
                 state: 'home.toollist',
                 type: 'link',
                 icon: 'fa fa-map-marker'
             },
                 {
-                    name: 'Wheat',
+                    name: 'Literacy Stories',
                     state: 'home.createTool',
                     type: 'link',
                     icon: 'fa fa-plus'
@@ -29,26 +29,84 @@ function drawerMenu() {
             ]
         },
         {
-            name: 'Munchies',
+            name: 'Lexicon',
             type: 'toggle',
             pages: [{
-                name: 'Cheetos',
+                name: 'View / Edit',
+                type: 'link',
+                state: 'beers.ipas',
+                icon: 'fa fa-group'
+            }, {
+                name: 'Export',
+                state: 'home.toollist',
+                type: 'link',
+                icon: 'fa fa-map-marker'
+            }
+            ]
+        },
+        {
+            name: 'Grammar',
+            type: 'toggle',
+            pages: [{
+                name: 'Affix Templates',
+                type: 'link',
+                state: 'beers.ipas',
+                icon: 'fa fa-group'
+            }, {
+                name: 'Categories',
+                state: 'home.toollist',
+                type: 'link',
+                icon: 'fa fa-map-marker'
+            },
+                {
+                    name: 'Rules and Features',
+                    state: 'home.createTool',
+                    type: 'link',
+                    icon: 'fa fa-plus'
+                }
+            ]
+        },
+        {
+            name: 'Notebooks',
+            type: 'toggle',
+            pages: [{
+                name: 'My Notebook',
                 type: 'link',
                 state: 'munchies.cheetos',
                 icon: 'fa fa-group'
             }, {
-                name: 'Banana Chips',
+                name: '@matthewtmoran',
                 state: 'munchies.bananachips',
                 type: 'link',
                 icon: 'fa fa-map-marker'
             },
                 {
-                    name: 'Donuts',
+                    name: '@justin_rees',
                     state: 'munchies.donuts',
                     type: 'link',
                     icon: 'fa fa-map-marker'
                 }]
-        }];
+        },        {
+                    name: 'Help',
+                    type: 'toggle',
+                    pages: [{
+                        name: 'Glossa Basics',
+                        type: 'link',
+                        state: 'munchies.cheetos',
+                        icon: 'fa fa-group'
+                    }, {
+                        name: 'Grammatical Helps',
+                        state: 'munchies.bananachips',
+                        type: 'link',
+                        icon: 'fa fa-map-marker'
+                    },
+                        {
+                            name: 'Phonology Helps',
+                            state: 'munchies.donuts',
+                            type: 'link',
+                            icon: 'fa fa-map-marker'
+                        }]
+                }];
 
     var service = {
         section: section,
