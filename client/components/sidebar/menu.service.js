@@ -17,6 +17,12 @@ function drawerMenu() {
                     icon: 'fa fa-group'
                 },
                 {
+                    name: 'His New Corpus',
+                    type: 'link',
+                    state: 'beers.ipas',
+                    icon: 'fa fa-group'
+                },
+                {
                     name: 'Phonetics',
                     state: 'home.toollist',
                     type: 'link',
@@ -31,15 +37,28 @@ function drawerMenu() {
             ],
             settings: [
                 {
-                    name: 'Corpora settings 1',
+                    name: 'Add Corpus',
                     type: ''
                 },
                 {
-                    name: 'Corpora settings 2',
+                  // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
+                    name: 'Duplicate',
+                    type: ''
+                }, 
+                {
+                    name: 'Bulk-Edit Word Forms',
                     type: ''
                 },
                 {
-                    name: 'Corpora settings 3',
+                    name: 'Phonology Assistant',
+                    type: ''
+                },
+                {
+                    name: 'Primer Assistant',
+                    type: ''
+                },
+                {
+                    name: 'Export',
                     type: ''
                 }
             ]
@@ -55,7 +74,7 @@ function drawerMenu() {
                     icon: 'fa fa-group'
                 },
                 {
-                    name: 'Export',
+                    name: 'Concordance',
                     state: 'home.toollist',
                     type: 'link',
                     icon: 'fa fa-map-marker'
@@ -63,15 +82,15 @@ function drawerMenu() {
             ],
             settings: [
                 {
-                    name: 'Lexicon settings 1',
+                    name: 'Export Dictionary',
                     type: ''
                 },
                 {
-                    name: 'Lexicon settings 2',
+                    name: 'Export Lexicon',
                     type: ''
                 },
                 {
-                    name: 'Lexicon settings 3',
+                    name: 'Export Concordance',
                     type: ''
                 }
             ]
