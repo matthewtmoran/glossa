@@ -5,45 +5,32 @@ function drawerCrtl(drawerMenu) {
     var dVm = this;
 
     dVm.isOpen = isOpen;
-
     dVm.toggleOpen = toggleOpen;
+
+    dVm.isSettingsOpen = isSettingsOpen;
+    dVm.toggleSettingsOpen = toggleSettingsOpen;
+
     dVm.autoFocusContent = false;
     dVm.menu = drawerMenu;
+
 
     dVm.status = {
         isFirstOpen: true,
         isFirstDisabled: false
     };
 
-    // dvm.section = [
-    //     {
-    //         name: 'Beers',
-    //         type: 'toggle',
-    //         pages: [{
-    //             name: 'IPAs',
-    //             type: 'link',
-    //             state: 'beers.ipas',
-    //             icon: 'fa fa-group'
-    //         }, {
-    //             name: 'Porters',
-    //             state: 'home.toollist',
-    //             type: 'link',
-    //             icon: 'fa fa-map-marker'
-    //         },
-    //             {
-    //                 name: 'Wheat',
-    //                 state: 'home.createTool',
-    //                 type: 'link',
-    //                 icon: 'fa fa-plus'
-    //             }
-    //         ]
-    // }];
-
     function isOpen(section) {
         return dVm.menu.isSectionSelected(section);
     }
     function toggleOpen(section) {
         dVm.menu.toggleSelectSection(section);
+    }
+
+    function isSettingsOpen(section) {
+        return dVm.menu.isSectionSettingsSelected(section);
+    }
+    function toggleSettingsOpen(section) {
+        dVm.menu.toggleSettingsSection(section);
     }
 
 

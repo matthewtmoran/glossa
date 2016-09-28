@@ -1,24 +1,3 @@
-
-
-<!--<md-button class="md-button-toggle"-->
-           <!--ng-class="{'toggled' : isOpen()}"-->
-           <!--ng-click="toggle()"-->
-           <!--aria-controls="docs-menu-{{section.name | nospace}}"-->
-           <!--flex layout="row"-->
-           <!--aria-expanded="{{isOpen()}}"> {{section.name}}-->
-	<!--<span class="md-toggle-icon" aria-hidden="true" ng-class="{'toggled' : isOpen()}">-->
-        <!--&lt;!&ndash;<md-icon md-font-set="fa fa-chevron-down"></md-icon>&ndash;&gt;-->
-		<!--<md-icon md-font-library="material-icons">keyboard_arrow_down</md-icon>-->
-	<!--</span>-->
-<!--</md-button>-->
-<!--<ul ng-show="isOpen()" id="docs-menu-{{section.name | nospace}}" class="menu-toggle-list">-->
-	<!--<li ng-repeat="page in section.pages">-->
-		<!--<menu-link section="page"></menu-link>-->
-	<!--</li>-->
-<!--</ul>-->
-
-
-
 <md-button class="md-button-toggle"
            ng-click="toggle()"
            aria-controls="docs-menu-{{section.name | nospace}}"
@@ -26,6 +5,9 @@
 	<div flex layout="row">
 		{{section.name}}
 		<span flex></span>
+
+		<settings-toggle section="section" ng-show="section.settings"></settings-toggle>
+
 		<span aria-hidden="true"
 		      class="md-toggle-icon"
 		      ng-class="{'toggled' : isOpen()}">
@@ -42,3 +24,4 @@
 		<menu-link section="page"></menu-link>
 	</li>
 </ul>
+

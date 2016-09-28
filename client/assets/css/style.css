@@ -48,26 +48,10 @@ md-sidenav.md-closed.md-locked-open-add-active {
 .logo-container {
   padding-top: 40px;
   padding-left: 20px;
-  padding-bottom: 40px;}
+  padding-bottom: 40px; }
   .logo-container img {
     display: block;
-    width: 66%; }
-
-.test {
-  color: #b80000;
-  color: #d10000;
-  color: #eb0000;
-  color: #ff0505;
-  color: #ff1f1f;
-  color: #ff3838;
-  color: #ff6b6b;
-  color: #ff8585;
-  color: #ff9e9e;
-  color: #ffb8b8;
-  color: #ff6b6b;
-  color: #FF5252;
-  color: #ff3838;
-  color: #ffd1d1; }
+    width: 60%; }
 
 md-sidenav {
   overflow: visible; }

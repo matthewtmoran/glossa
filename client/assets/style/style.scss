@@ -5,7 +5,6 @@ $dGrey: #616161; // - dark primary
 $black: #212121; // - text/icons
 
 $red: #FF5252; // - accent color
-//#212121 - primary text
 $lBlack: #757575; // secondary text
 $lGrey: #BDBDBD; // - divider color
 
@@ -18,9 +17,6 @@ $accent-color: $red;
 $primary-text: $black;
 $secondary-text: $lBlack;
 
-//p, h1, h2, h3, h4 {
-//	color: $primary-text;
-//}
 
 @font-face {
 	font-family: "DejaVu Mono";
@@ -40,17 +36,7 @@ $secondary-text: $lBlack;
 md-toolbar.nav-content {
 	height: 64px;
 	overflow: hidden;
-	//background: $blue;
 
-	md-icon {
-		//color: white;
-		//font-size: 2.2em;
-
-		//height: 32px;
-		//width: 32px;
-
-
-	}
 	md-input-container {
 		margin: 0;
 
@@ -112,37 +98,6 @@ md-sidenav.md-closed.md-locked-open-add-active {
 		width: 60%;
 	}
 }
-
-.test {
-
-	color: #b80000;
-	color: #d10000;
-	color: #eb0000;
-
-	color: #ff0505;
-
-	color: #ff1f1f;
-
-	color: #ff3838;
-
-	color: #ff6b6b;
-
-	color: #ff8585;
-
-	color: #ff9e9e;
-
-	color: #ffb8b8;
-
-	color: #ff6b6b;
-
-	color: #FF5252;
-
-	color: #ff3838;
-
-	color: #ffd1d1;
-
-}
-
 
 md-sidenav {
 	overflow: visible;
@@ -249,6 +204,11 @@ md-sidenav {
 					font-weight: 500;
 				}
 			}
+
+
 		}
 	}
 }
+
+
+
