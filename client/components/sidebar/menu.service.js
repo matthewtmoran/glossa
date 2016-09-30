@@ -7,6 +7,10 @@ function drawerMenu() {
 
     var section = [
         {
+            name: 'Test Heading',
+            type: 'heading'
+        },
+        {
             name: 'Corpora',
             type: 'toggle',
             pages: [
@@ -118,6 +122,10 @@ function drawerMenu() {
                     icon: 'fa fa-plus'
                 }
             ]
+        },
+        {
+            name: 'Test Heading 2',
+            type: 'heading'
         },
         {
             name: 'Notebooks',

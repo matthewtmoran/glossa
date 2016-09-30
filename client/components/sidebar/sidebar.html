@@ -11,10 +11,12 @@
 			<ul class="side-menu">
 				<li ng-repeat="section in dVm.menu.section" class="parent-list-item"
 				    ng-class="{'parentActive' : dVm.isSectionSelected(section)}">
+
 					<h2 class="menu-heading" ng-if="section.type === 'heading'"
 					    id="heading_{{ section.name | nospace }}">
-						{{section}}
+						{{section.name}}
 					</h2>
+
 					<menu-link section="section" ng-if="section.type === 'link'"></menu-link>
 					<menu-toggle section="section" ng-if="section.type === 'toggle'"></menu-toggle>
 				</li>
