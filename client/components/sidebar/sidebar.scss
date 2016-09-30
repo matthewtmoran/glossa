@@ -13,44 +13,6 @@ md-sidenav {
 		width: 100% !important;
 	}
 
-	.md-sidenav-left {
-		.bottom-button {
-			border-radius: 0;
-			color: inherit;
-			cursor: pointer;
-			font-weight: 400;
-			line-height: 40px;
-			margin: 0;
-			max-height: 40px;
-			overflow: hidden;
-			padding: 0 16px;
-			text-align: left;
-			text-decoration: none;
-			white-space: normal;
-			width: 100%;
-
-			&.active {
-				color: #FF5722; /* deep-orange 500 */
-			}
-
-			.md-toggle-icon {
-				display: block;
-				margin-left: auto;
-				speak: none;
-				vertical-align: middle;
-				transform: rotate(180deg);
-				-webkit-transform: rotate(180deg);
-				transition: transform 0.3s ease-in-out;
-				-webkit-transition: -webkit-transform 0.3s ease-in-out;
-
-				&.toggled {
-					transform: rotate(0deg);
-					-webkit-transform: rotate(0deg);
-				}
-			}
-		}
-	}
-
 	.side-menu {
 		list-style: none;
 		padding: 0;
@@ -66,11 +28,7 @@ md-sidenav {
 			}
 		}
 
-		.md-toggle-icon {
-			padding-top: 12px ;
-			padding-bottom: 12px ;
-		}
-
+		//general sidenav button styles
 		.md-button {
 			border-radius: 0;
 			color: inherit;
@@ -84,7 +42,6 @@ md-sidenav {
 			text-decoration: none;
 			white-space: normal;
 			width: 100%;
-
 			display: block;
 			padding: 0 16px 0 32px;
 			text-transform: none;
@@ -92,47 +49,28 @@ md-sidenav {
 			&.active {
 				color: #FF5722; /* deep-orange 500 */
 			}
-		}
-
-		.md-button-toggle {
-			&.toggled {
-				background-color: rgba(0, 0, 0, 0.02);
-			}
 
 			.md-toggle-icon {
-				display: block;
-				margin-left: auto;
-				speak: none;
-				vertical-align: middle;
-				transform: rotate(180deg);
-				-webkit-transform: rotate(180deg);
-				transition: transform 0.3s ease-in-out;
-				-webkit-transition: -webkit-transform 0.3s ease-in-out;
-
-				&.toggled {
-					transform: rotate(0deg);
-					-webkit-transform: rotate(0deg);
-				}
+				padding-top: 12px ;
+				padding-bottom: 12px ;
 			}
 		}
 
 		//this max=-height property is what's being modified on toggel somewhat.  What happend is the max-height must be set higher or equal to the height the list items create otherwise they get cut off.  The animation shows a delay, but it isn't actually delyed, you just can see it since it's happening 1300px down. So I have made the max-height equal ot the height of the items and I expect to modify this in the futre.  It would be ideal to find a way to dynamically set the max-height based on the amount of items in the list.
 
+		//general toggle list styles
 		.menu-toggle-list {
 			background: #fff;
 			max-height: 120px;
-			//max-height: 13000px;
+			//max-height: 1300px;
 			overflow: hidden;
 			position: relative;
 			z-index: 1;
 			-webkit-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
-			//-webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			-webkit-transition-property: max-height;
 			-moz-transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
-			//-moz-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			-moz-transition-property: max-height;
 			transition: 0.3s cubic-bezier(0.35, 0, 0.25, 1);
-			//transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
 			transition-property: max-height;
 
 			&.ng-hide {
@@ -156,6 +94,36 @@ md-sidenav {
 			}
 		}
 
+		//styles for menu toggle items
+		.md-button-toggle {
+			&.toggled {
+				background-color: rgba(0, 0, 0, 0.02);
+			}
+
+			.md-toggle-icon {
+				display: block;
+				margin-left: auto;
+				speak: none;
+				vertical-align: middle;
+				transform: rotate(180deg);
+				-webkit-transform: rotate(180deg);
+				transition: transform 0.3s ease-in-out;
+				-webkit-transition: -webkit-transform 0.3s ease-in-out;
+
+				&.toggled {
+					transform: rotate(0deg);
+					-webkit-transform: rotate(0deg);
+				}
+			}
+		}
+
+
+		//styles for menu links nested in menu toggles
+		.md-button-link {
+			padding-left: 55px !important;
+		}
+
+		//bottom of side nav section
 		.bottom-list {
 			ul {
 				> li {

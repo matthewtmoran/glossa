@@ -1,34 +1,5 @@
-<!--<md-button  ui-sref-active="active" ui-sref="{{section.state}}" ng-click="focusSection()">-->
-<!--&lt;!&ndash;<md-button ng-class="{\'{{section.icon}}\' : true}" ui-sref-active="active" ui-sref="{{section.state}}" ng-click="focusSection()">&ndash;&gt;-->
-	<!--{{section}}-->
-	<!--<span class="md-visually-hidden" ng-if="isSelected()">current page</span>-->
-<!--</md-button>-->
-
-
-<!--<md-button ng-class="{'{{section.icon}}' : true}"-->
-           <!--ui-sref-active="active"-->
-           <!--ui-sref="{{section.state}}"-->
-           <!--ng-click="focusSection()">-->
-<!--&lt;!&ndash;<md-button ng-class="{\'{{section.icon}}\' : true}" ui-sref-active="active" ui-sref="{{section.state}}" ng-click="focusSection()">&ndash;&gt;-->
-	<!--{{section.name}}-->
-	<!--<span class="md-visually-hidden" ng-if="isSelected()">current page</span>-->
-<!--</md-button>-->
-
-<!--<md-button ng-class="{'{{section.icon}}' : true}"-->
-           <!--ui-sref-active="active"-->
-           <!--ui-sref="{{section.state}}"-->
-           <!--ng-click="focusSection()">-->
-	<!--&lt;!&ndash;<md-button ng-class="{\'{{section.icon}}\' : true}" ui-sref-active="active" ui-sref="{{section.state}}" ng-click="focusSection()">&ndash;&gt;-->
-	<!--{{section.name}}-->
-
-	<!--<div flex layout="row" class="layout-row flex">-->
-		<!--<span flex></span>-->
-	<!--</div>-->
-	<!--&lt;!&ndash;<span class="md-visually-hidden" ng-if="isSelected()">current page</span>&ndash;&gt;-->
-<!--</md-button>-->
-
-
-<md-button ng-class="{'active' : isSelected()}"
+<md-button class="md-button-link"
+		ng-class="{'active' : isSelected()}"
            ui-sref="{{section.state}}"
            ng-click="focusSection()">{{section | humanizeDoc}}
 	<span class="md-visually-hidden" ng-if="isSelected()">

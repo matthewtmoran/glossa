@@ -124,10 +124,6 @@ function drawerMenu() {
             ]
         },
         {
-            name: 'Test Heading 2',
-            type: 'heading'
-        },
-        {
             name: 'Notebooks',
             type: 'toggle',
             pages: [
@@ -153,42 +149,62 @@ function drawerMenu() {
         },
         {
             name: 'Help',
+            type: 'heading'
+        },
+        {
+            name: 'Glossa Basics',
             type: 'toggle',
             pages: [
                 {
-                    name: 'Glossa Basics',
+                    name: 'Glossa Basics sub item 1',
                     type: 'link',
                     state: 'munchies.cheetos',
                     icon: 'fa fa-group'
                 },
                 {
-                    name: 'Grammatical Helps',
+                    name: 'Glossa Basics sub item 2',
                     state: 'munchies.bananachips',
                     type: 'link',
                     icon: 'fa fa-map-marker'
                 },
                 {
-                    name: 'Phonology Helps',
+                    name: 'Glossa Basics sub item 3',
                     state: 'munchies.donuts',
                     type: 'link',
                     icon: 'fa fa-map-marker'
                 }
-            ],
-            settings: [
-                {
-                    name: 'Help settings 1',
-                    type: ''
-                },
-                {
-                    name: 'Help settings 2',
-                    type: ''
-                },
-                {
-                    name: 'Help settings 3',
-                    type: ''
-                }
             ]
-        }
+
+        },
+        {
+            name: 'Grammatical Helps',
+            type: 'toggle',
+        },
+        {
+            name: 'Phonology Helps',
+            type: 'toggle',
+        },
+        // {
+        //     name: 'Help',
+        //     type: 'toggle',
+        //     pages: [
+        //
+        //     ],
+        //     settings: [
+        //         {
+        //             name: 'Help settings 1',
+        //             type: ''
+        //         },
+        //         {
+        //             name: 'Help settings 2',
+        //             type: ''
+        //         },
+        //         {
+        //             name: 'Help settings 3',
+        //             type: ''
+        //         }
+        //     ]
+        // }
     ];
 
     var service = {
