@@ -1,0 +1,34 @@
+md-toolbar.nav-content {
+	height: 64px;
+	overflow: hidden;
+
+	md-input-container {
+		margin: 0;
+
+		input {
+			margin-top: 20px;
+			margin-left:5px;
+			padding-left:25px;
+		}
+
+		md-icon {
+			padding: 8px;
+		}
+	}
+}
+
+.md-nav-bar {
+	border: none;
+
+	nav {
+		ul {
+			overflow: hidden;
+		}
+	}
+}
+
+//64 us the height of the navbar
+.static-left {
+	height: -webkit-calc(100% - 64px);
+	overflow: hidden;
+}

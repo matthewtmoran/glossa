@@ -1,3 +1,41 @@
+$mGrey: #9E9E9E; //- primary
+$white: #F5F5F5; // -light primary
+$dGrey: #616161; // - dark primary
+$black: #212121; // - text/icons
+
+$red: #FF5252; // - accent color
+$lBlack: #757575; // secondary text
+$lGrey: #BDBDBD; // - divider color
+
+$primary: $mGrey;
+$light-primary: $white;
+$dark-primary: $dGrey;
+
+$accent-color: $red;
+
+$primary-text: $black;
+$secondary-text: $lBlack;
+
+
+@font-face {
+	font-family: "DejaVu Mono";
+	src: url(../fonts/DejaVuSansMono.ttf);
+}
+
+@font-face {
+	font-family: "Cutive Mono";
+	src: url(../fonts/CutiveMono-Regular.ttf);
+}
+
+@font-face {
+	font-family: "Roboto Mono";
+	src: url(../fonts/RobotoMono-Regular.ttf);
+}
+
+
+
 /* inject:scss */
+@import '../components/navbar/navbar';
 @import '../components/sidebar/sidebar';
+@import '../components/tabbar/tabbar';
 /* endinject */

@@ -1,3 +1,10 @@
+md-sidenav,
+md-sidenav.md-locked-open,
+md-sidenav.md-closed.md-locked-open-add-active {
+	min-width: 200px !important;
+	width: 85vw !important;
+	max-width: 250px !important;
+}
 
 md-sidenav {
 	overflow: visible;
@@ -108,4 +115,28 @@ md-sidenav {
 
 		}
 	}
+}
+
+
+.logo-container {
+	padding-top: 40px;
+	padding-left: 20px;
+	padding-bottom: 40px;
+	img {
+		display: block;
+		width: 60%;
+	}
+}
+
+
+
+
+.ace_editor {
+	height: -webkit-calc(100% - 116px);
+	width: 100%;
+}
+
+
+.drawer-header {
+	background-color: #fff !important;
 }
