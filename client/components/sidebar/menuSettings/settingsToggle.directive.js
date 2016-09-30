@@ -15,7 +15,6 @@ function menuToggle($timeout) {
     return directive;
 
     function menuSettingslink(scope, element, attrs) {
-        console.log('scope.section', scope.section);
         var controller = element.parent().controller();
 
         var originatorEv;
