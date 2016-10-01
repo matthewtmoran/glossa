@@ -184,27 +184,21 @@ function drawerMenu() {
             name: 'Phonology Helps',
             type: 'toggle',
         },
-        // {
-        //     name: 'Help',
-        //     type: 'toggle',
-        //     pages: [
-        //
-        //     ],
-        //     settings: [
-        //         {
-        //             name: 'Help settings 1',
-        //             type: ''
-        //         },
-        //         {
-        //             name: 'Help settings 2',
-        //             type: ''
-        //         },
-        //         {
-        //             name: 'Help settings 3',
-        //             type: ''
-        //         }
-        //     ]
-        // }
+        {
+            name: 'Dev',
+            type: 'heading'
+        },
+        {
+            name: 'Sandbox States',
+            type: 'toggle',
+            pages: [
+                {
+                    name:'wavesurfer sandbox',
+                    type: 'link',
+                    state: 'waveform'
+                }
+            ]
+        },
     ];
 
     var service = {
