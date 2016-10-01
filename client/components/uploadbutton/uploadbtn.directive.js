@@ -6,6 +6,9 @@ angular.module('glossa')
 function apsUploadFile(nodeSrvc) {
     var directive = {
         restrict: 'E',
+        scope: {
+            buttonicon: '@buttonicon'
+        },
         templateUrl: 'components/uploadbutton/uploadbtn.html',
         link: apsUploadFileLink
     };

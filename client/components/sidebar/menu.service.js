@@ -232,5 +232,4 @@ function drawerMenu() {
     function isSectionSettingsSelected(section) {
         return service.openSetting === section;
     }
-
 }

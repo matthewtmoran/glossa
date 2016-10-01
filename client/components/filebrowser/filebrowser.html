@@ -1,26 +1,4 @@
 <md-sidenav class="md-sidenav-left static-left md-whiteframe-z2" md-component-id="left2" md-is-locked-open="true"  layout="column">
-<!--<md-sidenav class="md-sidenav-left static-left " md-component-id="left2" md-is-locked-open="true" md-whiteframe="4" layout="column">-->
-
-	<!-- <md-toolbar class="">
-		<span flex></span>
-		<div layout="column" class="md-toolbar-tools-bottom inset">
-			<h1 class="md-toolbar-tools">Glossa</h1>
-
-		</div>
-	</md-toolbar> -->
-
-
-
-	<!--<md-content layout-padding="" >-->
-		<!--<md-button ng-click="close()" class="md-primary" hide-gt-md="">-->
-			<!--Close Sidenav Left-->
-		<!--</md-button>-->
-		<!--<p hide="" show-gt-md="">-->
-			<!--This sidenav is locked open on your device. To go back to the default behavior,-->
-			<!--narrow your display.-->
-		<!--</p>-->
-	<!--</md-content>-->
-
 
 <!-- THIS LIST SHOULD LIST ALL THE FILES IN THE COPRUS SELECTED IN THE DRAWER. MAIN TITLE OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1, UNLESS THERE ISN'T ONE... THEN IT SHOULD BE THE NAME OF THE ACTUAL TXT FILE (WITHOUT .EXT) IF THAT IS WHAT THESE WILL BE... TEXT FILES OR DATA ON A DATABASE SOMEWHERE? SHOULD BE A DENSE VIEW, NO ICONS, JUST THE TITLE AND A FEW (LIKE 3) LINES OF THE ACTUAL TEXT. SHOULD HIGHLIGHT ON HOVER I THINK. -->
 
@@ -42,12 +20,8 @@
 	
 	<!-- THIS FAB SHOULD ADD A NEW TEXT TO THE CORPUS WE WOULD BE BROWSING RIGHT NOW. ACTIVE TAB ON ITEMS MADE HERE SHOULD BE THE META TAB. -->
 	
-	<md-button id="uploadButton"
-	           class="md-button md-fab md-fab-bottom-right"
-	           aria-label="attach_file">
 
-		<md-icon class="material-icons">add</md-icon>
-	</md-button>
+	<aps-upload-file buttonicon="add"></aps-upload-file>
 	
 	
 
