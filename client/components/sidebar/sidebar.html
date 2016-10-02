@@ -1,24 +1,31 @@
-<md-sidenav class="md-sidenav-left collapsable-nav" md-component-id="left"  md-whiteframe="24" layout="column" layout-align="space-between center">
+<md-sidenav class="site-sidenav md-sidenav-left collapsable-nav" md-component-id="left"  md-whiteframe="24" tabindex="-1">
 
-	<md-list>
-		<md-toolbar class="drawer-header">
-			<div class="logo-container">
-				<img src="assets/img/logo.png" alt="">
-			</div>
-		</md-toolbar>
-
-		<md-content role="navigation" >
+	<header class="nav-header logo-container">
+			<img src="assets/img/logo.svg" alt="">
+	</header>
+	<!-- <md-list>
+	<md-toolbar class="drawer-header">
+		<div class="logo-container">
+			<img src="assets/img/logo.png" alt="">
+		</div>
+	</md-toolbar> -->
+	<md-content flex="" role="navigation" class="_md flex">
 			<ul class="side-menu">
 				<li ng-repeat="section in dVm.menu.section" class="parent-list-item"
 				    ng-class="{'parentActive' : dVm.isSectionSelected(section)}">
+					<h2 class="menu-heading md-subhead ng-binding ng-scope" ng-if="section.type === 'heading'"
+					    id="heading_{{ section.name | nospace }}">{{section.name}}</h2>
 
-					<h2 class="menu-heading" ng-if="section.type === 'heading'"
-					    id="heading_{{ section.name | nospace }}">
-						{{section.name}}
-					</h2>
-
+					<!-- end ngIf: section.type === 'heading' -->
+					<!-- ngIf: section.type === 'link' && !section.hidden -->
+					<!-- ngIf: section.type === 'toggle' && !section.hidden -->
+					<!-- ngIf: section.children -->
+					
 					<menu-link section="section" ng-if="section.type === 'link'"></menu-link>
 					<menu-toggle section="section" ng-if="section.type === 'toggle'"></menu-toggle>
+							
+						</li>
+					</ul>
 				</li>
 			</ul>
 		</md-content>
