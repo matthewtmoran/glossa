@@ -13,6 +13,11 @@ md-sidenav {
 		width: 100% !important;
 	}
 
+	//header section that contains logo in sidenav
+	md-toolbar {
+		background: white !important;
+	}
+
 	.side-menu {
 		list-style: none;
 		padding: 0;
@@ -150,9 +155,4 @@ md-sidenav {
 .ace_editor {
 	height: -webkit-calc(100% - 116px);
 	width: 100%;
-}
-
-
-.drawer-header {
-	background-color: #fff !important;
 }
