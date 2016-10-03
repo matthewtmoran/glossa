@@ -3,7 +3,8 @@
 angular.module('glossa', [
     'ngMaterial',
     'ui.router',
-    'ui.ace'
+    'ui.ace',
+    // 'mdWavesurfer'
     ])
     .config(config);
 

@@ -1,9 +1,20 @@
 'use strict';
 
 angular.module('glossa')
-    .controller('Waveform', Waveform);
+    .controller('Wavesurfer', Wavesurfer);
 
-function Waveform () {
+function Wavesurfer ($scope) {
+
+
+    $scope.urls = ["../media/demo.wav", "../panner/media.wav", "../elan/transcripts/001z.mp3"];
+    $scope.longList = [];
+    for (var i = 0; i < 100; i++) {
+        $scope.longList.push({
+            title: 'Long List test: ' + i,
+            url: $scope.urls[Math.floor(3 * Math.random())]
+        });
+    }
+
 // function Waveform (attributes, $element) {
 //     var audio = this;
 //

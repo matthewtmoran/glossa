@@ -195,7 +195,7 @@ function drawerMenu() {
                 {
                     name:'wavesurfer sandbox',
                     type: 'link',
-                    state: 'waveform'
+                    state: 'wavesurfer'
                 }
             ]
         },

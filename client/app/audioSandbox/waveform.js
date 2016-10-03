@@ -5,10 +5,10 @@ angular.module('glossa')
 
 function config($stateProvider) {
     $stateProvider
-        .state('waveform', {
-            url: '/waveform',
+        .state('wavesurfer', {
+            url: '/wavesurfer',
             templateUrl: 'app/audioSandbox/waveform.html',
-            controller: 'Waveform',
+            controller: 'Wavesurfer',
             controllerAs: 'waveVm'
         });
 }
