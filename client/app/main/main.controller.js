@@ -10,11 +10,14 @@ function MainCtrl($scope, nodeSrvc) {
         value: "Option1",
         choices: ["Option1", "I'm an option", "This is materialize", "No, this is Patrick."]
     };
+
+    vm.selectedFile = {};
     vm.fileList = [];
     vm.aceContent = "";
 
     vm.uploadFiles = uploadFiles;
     vm.fileClicked = fileClicked;
+    vm.fileSelection = fileSelection;
 
     activate();
 
@@ -37,7 +40,16 @@ function MainCtrl($scope, nodeSrvc) {
     }
 
     function fileClicked(file) {
+        vm.selectedFile = file;
         vm.aceContent = nodeSrvc.getFileContent(file.filePath);
+    }
+
+    function fileSelection(file) {
+        vm.selectedFile = file;
+    }
+
+    function initWave(file) {
+
     }
 
 

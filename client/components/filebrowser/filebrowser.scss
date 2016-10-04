@@ -1,0 +1,16 @@
+.static-left {
+	md-list {
+		md-list-item {
+			.md-button {
+				width: 100%;
+				margin-left: 0 !important;
+				margin-right: 0 !important;
+
+				md-icon {
+					padding-top: 5px;
+					padding-bottom: 5px;
+				}
+			}
+		}
+	}
+}

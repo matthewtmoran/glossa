@@ -1,6 +1,9 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var _ = require('lodash');
+
+var acceptedAudio = ['mp3','wav','wma'];
 
 angular.module('glossa')
     .factory('nodeSrvc', nodeSrvc);
@@ -54,9 +57,23 @@ function nodeSrvc() {
         var filePath = path.join(uploadPath, file);
         var tObj = {
             fileName: file,
-            filePath: filePath
+            filePath: filePath,
+            fileExt: file.substr(file.lastIndexOf('.')+1)
         };
+        tObj.fileCategory = defineCategory(tObj.fileExt);
+
         fileArray.push(tObj);
+    }
+
+    function defineCategory(fileExt) {
+
+        if (_.includes(acceptedAudio, fileExt)) {
+            return 'audio';
+        } else if (fileExt === 'txt') {
+            return 'text';
+        } else {
+            return 'other';
+        }
     }
 
     /**

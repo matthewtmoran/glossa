@@ -4,15 +4,27 @@
 
 	<md-list>
 		<md-list-item ng-repeat="file in vm.fileList">
-			<a ng-click="vm.fileClicked(file)">
+			<!--<a ng-click="vm.fileSelection(file)">-->
+			<a ng-if="file.fileCategory != 'audio'" ng-click="vm.fileClicked(file)">
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="inset">
-						<md-icon md-font-library="material-icons">file</md-icon>
+						<md-icon md-font-library="material-icons">insert_drive_file</md-icon>
 					</div>
 					<div class="inset">{{file.fileName}}
 					</div>
 				</md-item-content>
 			</a>
+
+			<md-button ng-if="file.fileCategory === 'audio'" ng-click="vm.fileSelection(file)">
+				<div flex layout="row">
+					<span>
+						<md-icon md-font-library="material-icons">volume_up</md-icon>
+					</span>
+					<span flex></span>
+					{{file.fileName}}
+				</div>
+			</md-button>
+
 		</md-list-item>
 	</md-list>
 	

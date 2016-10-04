@@ -16,9 +16,6 @@ function apsUploadFile(nodeSrvc) {
 
     function apsUploadFileLink(scope, element, attrs) {
 
-        console.log('nodeSrvc typeof', typeof nodeSrvc);
-        console.log('nodeSrvc.readfiles typeof', typeof nodeSrvc.readfiles);
-
         var input = angular.element(element[0].querySelector('#fileInput'));
         var button = angular.element(element[0].querySelector('#uploadButton'));
         // var textInput = angular.element(element[0].querySelector('#textInput'));

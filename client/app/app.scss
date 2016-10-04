@@ -36,6 +36,7 @@ $secondary-text: $lBlack;
 
 /* inject:scss */
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
+@import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
 @import '../components/sidebar/sidebar';
 @import '../components/tabbar/tabbar';
