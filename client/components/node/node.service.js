@@ -10,7 +10,7 @@ angular.module('glossa')
 
 function nodeSrvc() {
 
-    var uploadPath = './uploads/';
+    var uploadPath = path.join(__dirname,'../uploads/');
 
     if (!fs.existsSync(uploadPath)){
         fs.mkdirSync(uploadPath);

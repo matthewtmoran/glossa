@@ -32,7 +32,8 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
             }, defaults = {
                 scrollParent: false,
                 waveColor: 'violet',
-                progressColor: 'purple'
+                progressColor: 'purple',
+                height: '200'
             };
 
             options = angular.extend(defaults, $attrs, (control.properties || {}), options);

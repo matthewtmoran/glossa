@@ -6,3 +6,11 @@
 	background-image: url('../../uploads/Jillain.jpg');
 	background-size: cover;
 }
+
+.audioPlayerWrapper {
+	position: relative;
+
+	.md-player-controls {
+		bottom: -40px;
+	}
+}
