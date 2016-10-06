@@ -13,36 +13,36 @@ Glossa is a culture and language documentation notebook for doing linguistic ana
 ## Quick Setup
 1.  Get this project (do how you do... download the .zip or clone the repo)
 
-- Navigate to the repository  
+2. Navigate to the repository  
 ```
 $ cd /your/path/to/glossa
 ```
 
-- Make sure you have node.js, npm, gulp, electron and bower installed
+3. Make sure you have node.js, npm, gulp, electron and bower installed
 
-- Install Glossa's dependancies  
+4. Install Glossa's dependancies  
 ```
 $ npm install && bower install
 ```
 
-- Gulp it, baby.  
+5.  Gulp it, baby.  
 ```
 $ gulp serve
 ```
 
 ## Screenshots
 
-Current iteration of the audio transcription interface in the baseline editor. ☟
+☟ Current iteration of the audio transcription interface in the baseline editor.
 
 ![It is alive.](https://dl.dropboxusercontent.com/u/538337/Glossa/Screen%20Shot%202016-10-06%20at%201.31.39%20PM.png)
 
 *It better be pretty, because you'll spend way too much time here.*
 
-Here is the fancy shmancy Project Management Drawer. ☟
+☟ Here is the fancy-shmancy Project Management Drawer.
 
 ![](https://dl.dropboxusercontent.com/u/538337/Glossa/Screen%20Shot%202016-10-06%20at%201.30.48%20PM.png)
 
-*Clone a corpus or view and edit your dictionary. Add affix templates or browse grammatical categories. Don't know what we're talking about? Neither do we (j/k). We've put hecka' helps in there to aid you on your language documentation journey.*
+*Clone a corpus or view and edit your dictionary! Add affix templates or browse grammatical categories! Don't know what we're talking about? Neither do we (j/k). We've put hecka' helps in there to aid you on your language documentation journey.*
 
 ## Features
 
