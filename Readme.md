@@ -11,21 +11,21 @@ Glossa is a culture and language documentation notebook for doing linguistic ana
 - [API](#api)
 
 ## Quick Setup
-1.  Get this project (do how you do... download the .zip or clone the repo)
+- [ ] Get this project (do how you do... download the .zip or clone the repo)
 
-2. Navigate to the repository  
+- [ ] Navigate to the repository  
 ```
 $ cd /your/path/to/glossa
 ```
 
-3. Make sure you have node.js, npm, gulp, electron and bower installed
+- [ ] Make sure you have node.js, npm, gulp, electron and bower installed
 
-4. Install Glossa's dependancies  
+- [ ] Install Glossa's dependancies  
 ```
 $ npm install && bower install
 ```
 
-5.  Gulp it, baby.  
+- [ ] Gulp it, baby.  
 ```
 $ gulp serve
 ```
@@ -36,7 +36,7 @@ $ gulp serve
 
 ![It is alive.](https://dl.dropboxusercontent.com/u/538337/Glossa/Screen%20Shot%202016-10-06%20at%201.31.39%20PM.png)
 
-*It better be pretty, because you'll spend way too much time here.*
+*"It better be pretty, because you'll spend way too much time here."*
 
 ☟ Here is the fancy-shmancy Project Management Drawer.
 
