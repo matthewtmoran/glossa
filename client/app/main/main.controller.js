@@ -17,10 +17,17 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.fileClicked = fileClicked;
     vm.fileSelection = fileSelection;
 
+    vm.createNewText = createNewText;
+
     activate();
 
     function activate() {
         buildFileList();
+    }
+
+    function createNewText() {
+        console.log('debug2');
+        fileSrvc.createNewText();
     }
 
     /**

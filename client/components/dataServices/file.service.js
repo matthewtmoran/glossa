@@ -19,11 +19,45 @@ function fileSrvc(dbSrvc) {
 
     var service = {
         uploadFile: uploadFile,
-        getAllFiles: getAllFiles
+        getAllFiles: getAllFiles,
+        createNewText: createNewText
     };
 
     return service;
     //////////////
+
+    function createNewText(val) {
+        var fileExist = true;
+        var fileNumber = 1;
+        var fileNumber_str;
+        var fileName = 'untitled';
+        var current = {};
+
+        while(fileExist) {
+            console.log("fileExists");
+            fileNumber_str = fileNumber.toString();
+            current.name = fileName + fileNumber_str + '.md';
+            console.log('cuttent.name', current.name);
+            console.log('fileList', fileList);
+            if (_.find(fileList,['name', current.name] )) {
+                console.log('here it comes:');
+                fileNumber++;
+            } else {
+                var newPath = uploadPath + current.name;
+                fs.writeFile(newPath, current.name, function (err) {
+                    if (err) {
+                        return console.log('There was an error making a new file', err);
+                    }
+                    console.log('New file created successfully');
+                    return dbSrvc.insert(fileCollection, createFileData(current)).then(function(doc) {
+                        fileList.push(doc);
+                        return doc;
+                    })
+                });
+                break;
+            }
+        }
+    }
 
     //uploads file and saves data in database
     function uploadFile(files) {
@@ -59,29 +93,33 @@ function fileSrvc(dbSrvc) {
     function createFileData(file) {
         var fileDoc = {
             name: file.name,
-            type: file.type,
             path: uploadPath + file.name,
             isLinked: false,
             linked: {}
         };
-        fileDoc.category = defineCategory(file.type);
+        if (!file.type && file.name.indexOf('.md') > -1)  {
+            fileDoc.type = 'md';
+        }
+        fileDoc.category = defineCategory(fileDoc.type);
         return fileDoc;
     }
     //adds a file category to the object
     function defineCategory(type) {
-        console.log('type', type);
-        console.log(type.indexOf('audio'));
         if (type.indexOf('audio') > -1) {
             return 'audio';
         } else if (type.indexOf('text') > 0) {
             return 'text';
-        } else {
+        } else if (type === '') {
+            return 'text';
+        }
+        else {
             return 'other';
         }
     }
     //dbSrvc takes the data collection and the query to call
     function getAllFiles() {
         return dbSrvc.find(fileCollection, {}).then(function(docs) {
+            fileList = docs;
             return docs;
         })
     }

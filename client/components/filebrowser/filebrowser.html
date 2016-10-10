@@ -9,20 +9,23 @@
 					<div class="inset">
 						<md-icon md-font-library="material-icons">insert_drive_file</md-icon>
 					</div>
-					<div class="inset">{{file.name}}
-					</div>
+					<div class="inset">{{file.name}}</div>
 				</md-item-content>
 			</a>
 
-			<md-button ng-if="file.category === 'audio'" ng-click="vm.fileSelection(file)">
-				<div flex layout="row">
-					<span>
-						<md-icon md-font-library="material-icons">volume_up</md-icon>
-					</span>
-					<span flex></span>
-					{{file.name}}
-				</div>
-			</md-button>
+			<!--<md-button ng-if="file.category === 'audio'" ng-click="vm.fileSelection(file)">-->
+				<!--<div flex layout="row">-->
+					<!--<span>-->
+						<!--<md-icon md-font-library="material-icons">volume_up</md-icon>-->
+					<!--</span>-->
+					<!--<span flex></span>-->
+					<!--{{file.name}}-->
+					<!--<span flex></span>-->
+					<!--<span>-->
+						<!--<md-icon md-font-library="material-icons">more_horiz</md-icon>-->
+					<!--</span>-->
+				<!--</div>-->
+			<!--</md-button>-->
 
 		</md-list-item>
 	</md-list>
@@ -32,7 +35,15 @@
 	<!-- THIS FAB SHOULD ADD A NEW TEXT TO THE CORPUS WE WOULD BE BROWSING RIGHT NOW. ACTIVE TAB ON ITEMS MADE HERE SHOULD BE THE META TAB. -->
 	
 
-	<aps-upload-file buttonicon="add"></aps-upload-file>
+	<!--<aps-upload-file buttonicon="add"></aps-upload-file>-->
+
+	<md-button id="uploadButton"
+	           class="md-button md-fab md-fab-bottom-right"
+	           aria-label="attach_file"
+				ng-click="vm.createNewText()">
+
+		<md-icon class="material-icons">add</md-icon>
+	</md-button>
 	
 	
 
