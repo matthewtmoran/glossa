@@ -1,15 +1,13 @@
 'use strict';
 
+// var db = require('../db/database'),
+//     guitars = db.guitars;
+
 angular.module('glossa')
     .controller('MainCtrl', MainCtrl);
 
-function MainCtrl($scope, nodeSrvc) {
+function MainCtrl($scope, nodeSrvc, fileSrvc) {
     var vm = this;
-
-    vm.select = {
-        value: "Option1",
-        choices: ["Option1", "I'm an option", "This is materialize", "No, this is Patrick."]
-    };
 
     vm.selectedFile = {};
     vm.fileList = [];
@@ -25,13 +23,25 @@ function MainCtrl($scope, nodeSrvc) {
         buildFileList();
     }
 
+    /**
+     * Queries for all files in db.
+     * Returns a promise object
+     */
     function buildFileList() {
-        vm.fileList = nodeSrvc.getFiles();
+        fileSrvc.getAllFiles().then(function(docs) {
+            vm.fileList = docs;
+        });
     }
 
+    /**
+     * Uploads the file
+     * Saves data in db
+     * pushes file to fileList array
+     * @param files - the files selected
+     */
     function uploadFiles(files) {
         files.forEach(function(file) {
-            nodeSrvc.addFiles(file).filter(function(f) {
+            fileSrvc.uploadFile(file).filter(function(f) {
                 if (vm.fileList.indexOf(f) < 0) {
                     vm.fileList.push(f);
                 }
@@ -40,12 +50,16 @@ function MainCtrl($scope, nodeSrvc) {
     }
 
     function fileClicked(file) {
+        console.log(' file ', file);
         vm.selectedFile = file;
-        vm.aceContent = nodeSrvc.getFileContent(file.filePath);
+        vm.aceContent = nodeSrvc.getFileContent(file.path);
     }
 
     function fileSelection(file) {
         vm.selectedFile = file;
+        if (vm.selectedFile.category === 'audio') {
+            initWave(vm.selectedFile);
+        }
     }
 
     function initWave(file) {

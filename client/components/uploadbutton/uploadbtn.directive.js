@@ -3,7 +3,7 @@
 angular.module('glossa')
     .directive('apsUploadFile', apsUploadFile);
 
-function apsUploadFile(nodeSrvc) {
+function apsUploadFile(fileSrvc) {
     var directive = {
         restrict: 'E',
         scope: {
@@ -39,7 +39,8 @@ function apsUploadFile(nodeSrvc) {
                 scope.fileName = null;
             }
 
-            nodeSrvc.addFiles(files);
+            fileSrvc.uploadFile(files);
+            // nodeSrvc.addFiles(files);
             scope.$apply();
         });
     }

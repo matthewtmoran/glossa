@@ -1,27 +1,26 @@
 <md-sidenav class="md-sidenav-left static-left md-whiteframe-z2" md-component-id="left2" md-is-locked-open="true"  layout="column">
 
 <!-- THIS LIST SHOULD LIST ALL THE FILES IN THE COPRUS SELECTED IN THE DRAWER. MAIN TITLE OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1, UNLESS THERE ISN'T ONE... THEN IT SHOULD BE THE NAME OF THE ACTUAL TXT FILE (WITHOUT .EXT) IF THAT IS WHAT THESE WILL BE... TEXT FILES OR DATA ON A DATABASE SOMEWHERE? SHOULD BE A DENSE VIEW, NO ICONS, JUST THE TITLE AND A FEW (LIKE 3) LINES OF THE ACTUAL TEXT. SHOULD HIGHLIGHT ON HOVER I THINK. -->
-
 	<md-list>
 		<md-list-item ng-repeat="file in vm.fileList">
 			<!--<a ng-click="vm.fileSelection(file)">-->
-			<a ng-if="file.fileCategory != 'audio'" ng-click="vm.fileClicked(file)">
+			<a ng-if="file.category != 'audio'" ng-click="vm.fileClicked(file)">
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="inset">
 						<md-icon md-font-library="material-icons">insert_drive_file</md-icon>
 					</div>
-					<div class="inset">{{file.fileName}}
+					<div class="inset">{{file.name}}
 					</div>
 				</md-item-content>
 			</a>
 
-			<md-button ng-if="file.fileCategory === 'audio'" ng-click="vm.fileSelection(file)">
+			<md-button ng-if="file.category === 'audio'" ng-click="vm.fileSelection(file)">
 				<div flex layout="row">
 					<span>
 						<md-icon md-font-library="material-icons">volume_up</md-icon>
 					</span>
 					<span flex></span>
-					{{file.fileName}}
+					{{file.name}}
 				</div>
 			</md-button>
 

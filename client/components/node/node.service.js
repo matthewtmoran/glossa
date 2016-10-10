@@ -41,7 +41,13 @@ function nodeSrvc() {
     function addFiles(files) {
         for (var key in files) {
             if (files.hasOwnProperty(key)) {
-                fs.createReadStream(files[key].path).pipe(fs.createWriteStream(uploadPath + files[key].name));
+
+                fs.createReadStream(files[key].path)
+                    .pipe(fs.createWriteStream(uploadPath + files[key].name)
+                        .on('close', function() {
+                            console.log("Uploaded file done");
+                        }));
+
                 buildFileObject(files[key].name);
             }
         }
