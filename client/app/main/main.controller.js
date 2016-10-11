@@ -1,8 +1,5 @@
 'use strict';
 
-// var db = require('../db/database'),
-//     guitars = db.guitars;
-
 angular.module('glossa')
     .controller('MainCtrl', MainCtrl);
 
@@ -12,12 +9,14 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.selectedFile = {};
     vm.fileList = [];
     vm.aceContent = "";
-
-    vm.uploadFiles = uploadFiles;
-    vm.fileClicked = fileClicked;
-    vm.fileSelection = fileSelection;
+    vm.searchText = '';
+    vm.filteredFiles = [];
 
     vm.createNewText = createNewText;
+    vm.fileClicked = fileClicked;
+    vm.fileSelection = fileSelection;
+    vm.searchSubmit = searchSubmit;
+    vm.uploadFiles = uploadFiles;
 
     activate();
 
@@ -25,19 +24,44 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         buildFileList();
     }
 
+    /**
+     * Creates a new blank texts(.md) document
+     */
     function createNewText() {
-        console.log('debug2');
-        fileSrvc.createNewText();
+        fileSrvc.createNewText().then(function(file) {
+            vm.selectedFile = file;
+        });
+    }
+
+    function fileClicked(file) {
+        console.log(' file ', file);
+        vm.selectedFile = file;
+        vm.aceContent = nodeSrvc.getFileContent(file.path);
+    }
+
+    function fileSelection(file) {
+        vm.selectedFile = file;
+        if (vm.selectedFile.category === 'audio') {
+            initWave(vm.selectedFile);
+        }
     }
 
     /**
-     * Queries for all files in db.
-     * Returns a promise object
+     * Called when search is submitted.
      */
-    function buildFileList() {
-        fileSrvc.getAllFiles().then(function(docs) {
-            vm.fileList = docs;
-        });
+    function searchSubmit() {
+        //if there is not text just return
+        if (!vm.searchText) {
+            return;
+        }
+        //if there is text and there is no results in the filtered list
+        if (vm.searchText.length && !vm.filteredFiles.length) {
+        //    create a new file with the search term
+        fileSrvc.createNewText(vm.searchText).then(function(file) {
+                vm.selectedFile = file;
+                vm.searchText = '';
+            });
+        }
     }
 
     /**
@@ -56,18 +80,28 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         });
     }
 
-    function fileClicked(file) {
-        console.log(' file ', file);
-        vm.selectedFile = file;
-        vm.aceContent = nodeSrvc.getFileContent(file.path);
+    //helper functions//
+
+    /**
+     * Queries for all files in db.
+     * Returns a promise object
+     */
+    function buildFileList() {
+        fileSrvc.getAllFiles().then(function(docs) {
+            vm.fileList = docs;
+        });
     }
 
-    function fileSelection(file) {
-        vm.selectedFile = file;
-        if (vm.selectedFile.category === 'audio') {
-            initWave(vm.selectedFile);
-        }
-    }
+
+
+
+
+
+
+
+
+
+
 
     function initWave(file) {
 

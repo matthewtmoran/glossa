@@ -9,10 +9,11 @@
 			<md-icon class="material-icons">search</md-icon>
 		</md-button>
 
-
 		<!--<div class="search-wrapper" flex>-->
 			<md-input-container md-no-float flex >
-				<input ng-model="searchInput" placeholder="Search..."><!-- Can/should search text be white? or more visible/legible (and without weird hacks)?-->
+				<form ng-submit="vm.searchSubmit()">
+					<input ng-model="vm.searchText" placeholder="Search..."><!-- Can/should search text be white? or more visible/legible (and without weird hacks)?-->
+				</form>
 				<!--<input ng-show="navVm.showSearch" ng-model="searchInput" placeholder="Search...">-->
 			</md-input-container>
 		<!--</div>-->

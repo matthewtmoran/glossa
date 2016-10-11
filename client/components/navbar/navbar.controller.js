@@ -5,14 +5,16 @@ angular.module('glossa')
 
 function NavbarCtrl($mdDialog, $scope, $mdSidenav) {
     var navVm = this;
+    var originatorEv;
 
-    navVm.showSearch = false;
     navVm.execute = execute;
     navVm.concordance = concordance;
     navVm.DictionaryBase = DictionaryBase;
     navVm.PersistentWordPatterns = PersistentWordPatterns;
     navVm.settings = settings;
     navVm.about = about;
+    navVm.openMenu = openMenu;
+    navVm.showSearch = false;
     navVm.dropDownMenu = [
         {
             action: 'concordance',
@@ -39,18 +41,19 @@ function NavbarCtrl($mdDialog, $scope, $mdSidenav) {
     navVm.toggleLeft = buildToggler('left');
     navVm.toggleRight = buildToggler('right');
 
+
+
+
     function buildToggler(componentId) {
         return function() {
             $mdSidenav(componentId).toggle();
         }
     }
 
-    var originatorEv;
-    navVm.openMenu = function($mdOpenMenu, ev) {
+    function openMenu($mdOpenMenu, ev) {
         originatorEv = ev;
         $mdOpenMenu(ev);
-    };
-
+    }
 
     //Calls dynamic function
     function execute(action) {

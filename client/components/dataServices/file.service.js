@@ -20,43 +20,88 @@ function fileSrvc(dbSrvc) {
     var service = {
         uploadFile: uploadFile,
         getAllFiles: getAllFiles,
-        createNewText: createNewText
+        createNewText: createNewText,
     };
 
     return service;
     //////////////
 
-    function createNewText(val) {
+
+    /**
+     * Helper function to call the proper file either named or an untitled file
+     * @param searchInput
+     */
+    function createNewText(searchInput) {
+        //if there is not text input on search submit
+        if (!searchInput) {
+            return startBlankFile();
+        } else {
+            return startNamedFile(searchInput);
+        }
+    }
+
+    /**
+     * Creates a file with the name of the user's search
+     */
+    function startNamedFile(searchInput) {
+        var file = {};
+        file.name = searchInput + '.md';
+        var newPath = uploadPath + file.name;
+        return createAndSaveFile(file, newPath);
+    }
+
+    /**
+     * Creates a new untitled file
+     */
+    function startBlankFile() {
         var fileExist = true;
         var fileNumber = 1;
         var fileNumber_str;
         var fileName = 'untitled';
-        var current = {};
+        var file = {};
 
+        //if a file with the same name exists
         while(fileExist) {
-            console.log("fileExists");
+            //change the integer to a string
             fileNumber_str = fileNumber.toString();
-            current.name = fileName + fileNumber_str + '.md';
-            console.log('cuttent.name', current.name);
-            console.log('fileList', fileList);
-            if (_.find(fileList,['name', current.name] )) {
-                console.log('here it comes:');
+            //create the name of the file using the generic name and dynamic incremental number
+            file.name = fileName + fileNumber_str + '.md';
+            //if a file exists with the same name...
+            if (_.find(fileList,['name', file.name] )) {
+                //increment the number
                 fileNumber++;
+                //    if a file with the same name does not exists...
             } else {
-                var newPath = uploadPath + current.name;
-                fs.writeFile(newPath, current.name, function (err) {
-                    if (err) {
-                        return console.log('There was an error making a new file', err);
-                    }
-                    console.log('New file created successfully');
-                    return dbSrvc.insert(fileCollection, createFileData(current)).then(function(doc) {
-                        fileList.push(doc);
-                        return doc;
-                    })
-                });
+                //define the path
+                var newPath = uploadPath + file.name;
+                //write the file to that path
+                //second argument will be the default text in the document
+                createAndSaveFile(file, newPath);
                 break;
             }
         }
+    }
+
+    /**
+     * Writes file to directory and saves the data in the database
+     * @param file - the file object
+     * @param path - the path of where the file will be stored
+     *
+     * I wanted to write the file to the system first but do to the async nature of the file writing and the promise, I was haivng trouble getting the promise value out when I needed it.
+     */
+    function createAndSaveFile (file, path) {
+        //insert the file in to the fileCollection
+        return dbSrvc.insert(fileCollection, createFileData(file))
+            .then(function(doc) {
+                //when promise returns, push the document to the fileList
+                fileList.push(doc);
+                //when the promise resolves write the file to the file system
+                fs.createWriteStream(path)
+                    .on('close', function() {
+                        console.log("file written to system")
+                    });
+                return doc;
+            })
     }
 
     //uploads file and saves data in database
@@ -64,7 +109,6 @@ function fileSrvc(dbSrvc) {
         for (var key in files) {
             if (files.hasOwnProperty(key)) {
                 file = files[key];
-
                 //copy the file
                 fs.createReadStream(file.path)
                     //write the file
