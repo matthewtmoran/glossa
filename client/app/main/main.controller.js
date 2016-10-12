@@ -85,10 +85,12 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         var changeData = {
             fileId: data.fileId,
             options: {},
-            field: {}
+            newObj: {},
+            field: data.filed,
+            file: vm.selectedFile
         };
 
-        changeData['field'][data.field] = vm.selectedFile[data.field];
+        changeData['newObj'][data.field] = vm.selectedFile[data.field];
 
         fileSrvc.updateFileData(changeData);
     }

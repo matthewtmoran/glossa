@@ -28,7 +28,18 @@ function fileSrvc(dbSrvc) {
     //////////////
 
     function updateFileData(data) {
-        dbSrvc.update(fileCollection, data)
+        dbSrvc.update(fileCollection, data);
+// TODO: need to change the files data
+// TODO: need the name not to include extension and path not to include file
+// TODO: Need to refractor usages
+// TODO: Need to write to file
+// TODO: Need to consider changing on blur or an event other than change depending on how perfromance is.
+// TODO:
+        //
+        // if (data.field === 'name') {
+        //     fs.rename(data.file.path, data.file.path.splice(data.file.name))
+        // }
+
     }
 
     /**
