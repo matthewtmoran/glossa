@@ -17,6 +17,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.fileSelection = fileSelection;
     vm.searchSubmit = searchSubmit;
     vm.uploadFiles = uploadFiles;
+    vm.updateData = updateData
 
     activate();
 
@@ -78,6 +79,18 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
                 }
             });
         });
+    }
+
+    function updateData(data) {
+        var changeData = {
+            fileId: data.fileId,
+            options: {},
+            field: {}
+        };
+
+        changeData['field'][data.field] = vm.selectedFile[data.field];
+
+        fileSrvc.updateFileData(changeData);
     }
 
     //helper functions//

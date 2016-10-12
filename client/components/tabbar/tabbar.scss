@@ -1,3 +1,9 @@
 .tabs-area {
 	padding-left: 2px;
+
+	.meta-tab {
+		input, textarea {
+			color: $black;
+		}
+	}
 }

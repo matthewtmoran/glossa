@@ -6,7 +6,8 @@ angular.module('glossa')
 function dbSrvc($q) {
     var service = {
         find: find,
-        insert: insert
+        insert: insert,
+        update: update
     };
 
     return service;
@@ -38,5 +39,15 @@ function dbSrvc($q) {
             }
         });
         return deferred.promise;
+    }
+
+    function update(db, data) {
+        console.log('data', data);
+        db.update({_id: data.fileId}, { $set: data.field }, data.options, function(err, numReplaced) {
+            if (err) {
+                console.log('There was an error updating the file', err);
+            }
+            console.log('updating data');
+        })
     }
 }

@@ -1,21 +1,10 @@
 <div layout="column" flex >
 	<md-tabs md-dynamic-height="" md-border-bottom=""  md-stretch-tabs="always" >
 		<md-tab label="Meta">
-			<md-content class="" flex >
-				<pre>{{vm.selectedFile}}</pre>
-			</md-content>
+			<md-content layout-padding="" ng-include="'components/tabbar/tabcontent/meta.html'" flex></md-content>
 		</md-tab>
 		<md-tab label="Baseline">
-			<md-content class="" flex >
-				<md-wavesurfer-player ng-if="vm.selectedFile.category === 'audio'" flex url="{{vm.selectedFile.path}}"></md-wavesurfer-player>
-
-				<div ui-ace ng-model="vm.aceContent"></div>
-					<!--useWrapMode : true,-->
-	                <!--mode: 'xml',-->
-	                <!--firstLineNumber: 5,-->
-	                <!--showGutter: false,-->
-	                <!--theme:'twilight',-->
-			</md-content>
+			<md-content ng-include="'components/tabbar/tabcontent/baseline.html'" flex></md-content>
 		</md-tab>
 		<md-tab label="Analyze">
 			<md-content class="md-padding">

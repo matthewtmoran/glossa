@@ -21,11 +21,15 @@ function fileSrvc(dbSrvc) {
         uploadFile: uploadFile,
         getAllFiles: getAllFiles,
         createNewText: createNewText,
+        updateFileData: updateFileData
     };
 
     return service;
     //////////////
 
+    function updateFileData(data) {
+        dbSrvc.update(fileCollection, data)
+    }
 
     /**
      * Helper function to call the proper file either named or an untitled file
@@ -76,8 +80,7 @@ function fileSrvc(dbSrvc) {
                 var newPath = uploadPath + file.name;
                 //write the file to that path
                 //second argument will be the default text in the document
-                createAndSaveFile(file, newPath);
-                break;
+                return createAndSaveFile(file, newPath);
             }
         }
     }
@@ -139,7 +142,8 @@ function fileSrvc(dbSrvc) {
             name: file.name,
             path: uploadPath + file.name,
             isLinked: false,
-            linked: {}
+            linked: {},
+            description: ''
         };
         if (!file.type && file.name.indexOf('.md') > -1)  {
             fileDoc.type = 'md';
