@@ -5,7 +5,7 @@
 			<md-button ng-click="vm.createNewText()" ng-cloak ng-if="!vm.filteredFiles.length">Create New File</md-button>
 	<md-list>
 		<md-list-item ng-repeat="file in vm.filteredFiles = (vm.fileList | filter: vm.searchText)">
-			<a ng-if="file.category != 'audio'" ng-click="vm.fileClicked(file)">
+			<a ng-if="file.category != 'audio'" ng-click="vm.fileSelection(file)">
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="inset">
 						<md-icon md-font-library="material-icons">insert_drive_file</md-icon>

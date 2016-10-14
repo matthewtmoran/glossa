@@ -13,7 +13,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.filteredFiles = [];
 
     vm.createNewText = createNewText;
-    vm.fileClicked = fileClicked;
+    // vm.fileClicked = fileClicked;
     vm.fileSelection = fileSelection;
     vm.searchSubmit = searchSubmit;
     vm.uploadFiles = uploadFiles;
@@ -34,11 +34,11 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         });
     }
 
-    function fileClicked(file) {
-        console.log(' file ', file);
-        vm.selectedFile = file;
-        vm.aceContent = nodeSrvc.getFileContent(file.path);
-    }
+    // function fileClicked(file) {
+    //     console.log(' file ', file);
+    //     vm.selectedFile = file;
+    //     vm.aceContent = nodeSrvc.getFileContent(file.path);
+    // }
 
     function fileSelection(file) {
         vm.selectedFile = file;
@@ -86,7 +86,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
             fileId: data.fileId,
             options: {},
             newObj: {},
-            field: data.filed,
+            field: data.field,
             file: vm.selectedFile
         };
 

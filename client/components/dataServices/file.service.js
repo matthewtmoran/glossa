@@ -27,19 +27,22 @@ function fileSrvc(dbSrvc) {
     return service;
     //////////////
 
+    /**
+     * Update to file data.
+     * Name update is only triggered on blur event (due to async file to write functionality)
+     * The rest is called immediately.
+     * TODO: Need to compact DB at some point.
+     * TODO: Should refractor the data that's being passed.
+     * @param data
+     */
     function updateFileData(data) {
-        dbSrvc.update(fileCollection, data);
-// TODO: need to change the files data
-// TODO: need the name not to include extension and path not to include file
-// TODO: Need to refractor usages
-// TODO: Need to write to file
-// TODO: Need to consider changing on blur or an event other than change depending on how perfromance is.
-// TODO:
-        //
-        // if (data.field === 'name') {
-        //     fs.rename(data.file.path, data.file.path.splice(data.file.name))
-        // }
-
+        if (data.field === 'name') {
+            data.newObj.path = uploadPath + data.newObj.name + data.file.extension;
+            dbSrvc.update(fileCollection, data);
+            renameFileToSystem(data.file.path, data.newObj.path);
+        } else {
+            dbSrvc.update(fileCollection, data);
+        }
     }
 
     /**
@@ -55,13 +58,26 @@ function fileSrvc(dbSrvc) {
         }
     }
 
+
+    /**
+     * Renames the file.
+     * @param oldPath - the old file path (name)
+     * @param newPath - the new file path (name)
+     */
+    function renameFileToSystem(oldPath, newPath) {
+        fs.rename(oldPath, newPath, function() {
+            console.log('File should be updated in file system.')
+        })
+    }
+
     /**
      * Creates a file with the name of the user's search
      */
     function startNamedFile(searchInput) {
         var file = {};
-        file.name = searchInput + '.md';
-        var newPath = uploadPath + file.name;
+        file.name = searchInput;
+        file.extension = ".md";
+        var newPath = uploadPath + file.name + file.extension;
         return createAndSaveFile(file, newPath);
     }
 
@@ -80,7 +96,10 @@ function fileSrvc(dbSrvc) {
             //change the integer to a string
             fileNumber_str = fileNumber.toString();
             //create the name of the file using the generic name and dynamic incremental number
-            file.name = fileName + fileNumber_str + '.md';
+            file.name = fileName + fileNumber_str;
+            file.extension = '.md';
+            // file.extenstion = '.md';
+            // file.fullName = file.name + file.extension;
             //if a file exists with the same name...
             if (_.find(fileList,['name', file.name] )) {
                 //increment the number
@@ -88,7 +107,7 @@ function fileSrvc(dbSrvc) {
                 //    if a file with the same name does not exists...
             } else {
                 //define the path
-                var newPath = uploadPath + file.name;
+                var newPath = uploadPath + file.name + file.extension;
                 //write the file to that path
                 //second argument will be the default text in the document
                 return createAndSaveFile(file, newPath);
@@ -151,12 +170,16 @@ function fileSrvc(dbSrvc) {
     function createFileData(file) {
         var fileDoc = {
             name: file.name,
-            path: uploadPath + file.name,
+            extension: file.extension,
             isLinked: false,
             linked: {},
             description: ''
         };
-        if (!file.type && file.name.indexOf('.md') > -1)  {
+
+        fileDoc.path = uploadPath + fileDoc.name + file.extension;
+        // fileDoc.path = uploadPath + fileDoc.fullName;
+
+        if (!file.type && fileDoc.extension === '.md')  {
             fileDoc.type = 'md';
         }
         fileDoc.category = defineCategory(fileDoc.type);
@@ -181,6 +204,10 @@ function fileSrvc(dbSrvc) {
             fileList = docs;
             return docs;
         })
+    }
+
+    function getFileContent(srcpath) {
+        return fs.readFileSync(srcpath, {encoding: 'utf-8'});
     }
 
 }

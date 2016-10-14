@@ -4,7 +4,7 @@
 		<div layout-gt-sm="row">
 			<md-input-container class="md-block" flex-gt-sm="">
 				<label>File Name</label>
-				<input ng-change="vm.updateData({fileId: vm.selectedFile._id, field: 'name'})" ng-model="vm.selectedFile.name" value="vm.selectedFile.name">
+				<input ng-blur="vm.updateData({fileId: vm.selectedFile._id, field: 'name'})" ng-model="vm.selectedFile.name" value="vm.selectedFile.name">
 			</md-input-container>
 		</div>
 		<div layout-gt-sm="row">
