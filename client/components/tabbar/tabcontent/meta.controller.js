@@ -26,16 +26,10 @@ function metaCrtl($scope, $timeout, fileSrvc) {
         var input = angular.element('#attachFileInput');
         input.attr('accept', item.accept);
         input.click();
-
         input.on('change', function (e) {
             var file = e.target.files[0];
-
-            fileSrvc.attachAudioFile(file).then(function(data) {
-                console.log('test promise in controller');
-            });
-
+            fileSrvc.attachAudioFile(file);
         });
-
     }
 
     function isOpenWatch(isOpen) {
