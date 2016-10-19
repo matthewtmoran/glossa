@@ -25,100 +25,53 @@ function fileSrvc(dbSrvc) {
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
         attachAudioFile: attachAudioFile,
-        setSelectedFile: setSelectedFile,
-        getSelectedFile: getSelectedFile
+        setSelectedFile: setCurrentFile,
+        getSelectedFile: getCurrentFile
     };
 
     return service;
-    //////////////
+    ///////////////
 
-    //dbSrvc takes the data collection and the query to call
+    /**
+     * Queries db for all files
+     * @returns {*}
+     *
+     * TODO: may just want to query for text files (Actually all the files being saved in db right now are text file and this might be fine)
+     */
     function getAllFiles() {
         return dbSrvc.find(fileCollection, {}).then(function(docs) {
             fileList = docs;
             return docs;
         })
     }
+
+
+    ////////////////////////
+    ///Text File Creation///
+    ////////////////////////
+
     /**
-     * Helper function to call the proper file either named or an untitled file
-     * @param searchInput
+     * Create new text file
+     * If no search input will name the file 'untitled$.md'
+     * @param searchInput - the users' search term
      */
     function createNewTextFile(searchInput) {
         //if there is not text input on search submit
         if (!searchInput) {
-            return startBlankFile();
+            return blankFile();
         } else {
-            return startNamedFile(searchInput);
+            return namedFile(searchInput);
         }
     }
     /**
-     * Update to file data.
-     * Name update is only triggered on blur event (due to async file to write functionality)
-     * The rest is called immediately.
-     * TODO: Need to compact DB at some point.
-     * TODO: Should refractor the data that's being passed.
-     * @param data
+     * Creates new untitled text file
      */
-    function updateFileData(data) {
-        if (data.field === 'name') {
-            data.newObj.path = uploadPath + data.newObj.name + data.file.extension;
-            dbSrvc.update(fileCollection, data);
-            renameFileToSystem(data.file.path, data.newObj.path);
-        } else {
-            dbSrvc.update(fileCollection, data);
-        }
-    }
-
-    /**
-     * Set the current file
-     * @param file
-     */
-    function setSelectedFile(file) {
-        data.currentFile = file;
-    }
-    /**
-     * Return the current file
-     * @returns {*}
-     */
-    function getSelectedFile() {
-        return data.currentFile;
-    }
-
-
-
-
-    /**
-     * Renames the file.
-     * @param oldPath - the old file path (name)
-     * @param newPath - the new file path (name)
-     */
-    function renameFileToSystem(oldPath, newPath) {
-        fs.rename(oldPath, newPath, function() {
-            console.log('File should be updated in file system.')
-        })
-    }
-
-    /**
-     * Creates a file with the name of the user's search
-     */
-    function startNamedFile(searchInput) {
-        var file = {};
-        file.name = searchInput;
-        file.extension = ".md";
-        var newPath = uploadPath + file.name + file.extension;
-        return createAndSaveFile(file, newPath);
-    }
-
-    /**
-     * Creates a new untitled file
-     */
-    function startBlankFile() {
+    function blankFile() {
         var fileExist = true;
         var fileNumber = 1;
         var fileNumber_str;
         var fileName = 'untitled';
         var file = {};
-
         //if a file with the same name exists
         while(fileExist) {
             //change the integer to a string
@@ -126,8 +79,6 @@ function fileSrvc(dbSrvc) {
             //create the name of the file using the generic name and dynamic incremental number
             file.name = fileName + fileNumber_str;
             file.extension = '.md';
-            // file.extenstion = '.md';
-            // file.fullName = file.name + file.extension;
             //if a file exists with the same name...
             if (_.find(fileList,['name', file.name] )) {
                 //increment the number
@@ -142,9 +93,18 @@ function fileSrvc(dbSrvc) {
             }
         }
     }
-
     /**
-     * Writes file to directory and saves the data in the database
+     * Creates titled text file
+     */
+    function namedFile(searchInput) {
+        var file = {};
+        file.name = searchInput;
+        file.extension = ".md";
+        var newPath = uploadPath + file.name + file.extension;
+        return createAndSaveFile(file, newPath);
+    }
+    /**
+     * Writes text file to directory and saves the data in the database
      * @param file - the file object
      * @param path - the path of where the file will be stored
      *
@@ -152,7 +112,7 @@ function fileSrvc(dbSrvc) {
      */
     function createAndSaveFile (file, path) {
         //insert the file in to the fileCollection
-        return dbSrvc.insert(fileCollection, createFileData(file))
+        return dbSrvc.insert(fileCollection, buildFileObject(file))
             .then(function(doc) {
                 //when promise returns, push the document to the fileList
                 fileList.push(doc);
@@ -165,8 +125,30 @@ function fileSrvc(dbSrvc) {
             })
     }
 
-    //creates and returns the file data
-    function createFileData(file) {
+
+    ////////////////////////
+    ////Helper Functions////
+    ////////////////////////
+
+    /**
+     * Create text file object
+     *
+     * This object will be saved to db and should have all necessary information
+     *
+     * @param file
+     * @returns {
+     *      {
+     *            name: (string|*),
+     *            extension: string,
+     *            isLinked: boolean,
+     *            linked: {},
+     *            audio: string,
+     *            image: string,
+     *            description: string
+     *      }
+     * }
+     */
+    function buildFileObject(file) {
         var fileDoc = {
             name: file.name,
             extension: file.extension,
@@ -186,7 +168,11 @@ function fileSrvc(dbSrvc) {
         fileDoc.category = defineCategory(fileDoc.type);
         return fileDoc;
     }
-    //adds a file category to the object
+    /**
+     * Defines The category for the file
+     * @param type
+     * @returns {*}
+     */
     function defineCategory(type) {
         if (type.indexOf('audio') > -1) {
             return 'audio';
@@ -199,16 +185,13 @@ function fileSrvc(dbSrvc) {
             return 'other';
         }
     }
-
-
-
-
-
     /**
      * Check if file exists
      * Returns true if the file exists and false if the file does not exist
      * @param dir
      * @returns {boolean}
+     *
+     * TODO: consider just querying the db for an existing file by the name(path)
      */
     function doesExist(dir) {
         try {
@@ -217,6 +200,20 @@ function fileSrvc(dbSrvc) {
         } catch (err) {
             return !(err && err.code === 'ENOENT');
         }
+    }
+    /**
+     * Set the current file
+     * @param file
+     */
+    function setCurrentFile(file) {
+        data.currentFile = file;
+    }
+    /**
+     * Return the current file
+     * @returns {*}
+     */
+    function getCurrentFile() {
+        return data.currentFile;
     }
 
 
@@ -238,16 +235,11 @@ function fileSrvc(dbSrvc) {
         }
 
         updateCollection(newPath).then(function(result) {
-            console.log('promise returned');
             copyAndWrite(file.path, newPath, function() {
-                console.log('copy and write ahs finished');
                 data.currentFile.audio = result.newObj.audio;
             })
         });
-
-        // return copyAndWrite(file.path, newPath, updateCollection);
     }
-
 
     /**
      * "Upload" file into app"
@@ -270,8 +262,6 @@ function fileSrvc(dbSrvc) {
             );
     }
 
-
-
     /**
      * Attach Audio File to the current file
      * @param path - the path where the file exists in the app.
@@ -280,14 +270,43 @@ function fileSrvc(dbSrvc) {
         var tempData = {
             newObj: {}
         };
-
         tempData['newObj']['audio'] = path;
-        console.log('data.currentFile', data.currentFile);
         tempData.fileId = data.currentFile._id;
         tempData.options = {};
         return dbSrvc.update(fileCollection, tempData).then(function(result) {
             return tempData;
         });
+    }
+
+
+    /**
+     * Update to file data.
+     * Name update is only triggered on blur event (due to async file to write functionality)
+     * The rest is called immediately.
+     * TODO: Need to compact DB at some point.
+     * TODO: Should refractor the data that's being passed.
+     * @param data
+     */
+    function updateFileData(data) {
+        if (data.field === 'name') {
+            data.newObj.path = uploadPath + data.newObj.name + data.file.extension;
+            dbSrvc.update(fileCollection, data);
+            renameFileToSystem(data.file.path, data.newObj.path);
+        } else {
+            dbSrvc.update(fileCollection, data);
+        }
+    }
+
+
+    /**
+     * Renames the file.
+     * @param oldPath - the old file path (name)
+     * @param newPath - the new file path (name)
+     */
+    function renameFileToSystem(oldPath, newPath) {
+        fs.rename(oldPath, newPath, function() {
+            console.log('File should be updated in file system.')
+        })
     }
 
 
