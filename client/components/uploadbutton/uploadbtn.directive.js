@@ -7,7 +7,9 @@ function apsUploadFile(fileSrvc) {
     var directive = {
         restrict: 'E',
         scope: {
-            buttonicon: '@buttonicon'
+            buttonicon: '@buttonicon',
+            filetypes: '@filetypes',
+            tooltiptext: '@tooltiptext'
         },
         templateUrl: 'components/uploadbutton/uploadbtn.html',
         link: apsUploadFileLink

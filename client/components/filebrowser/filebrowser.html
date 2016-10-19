@@ -2,7 +2,7 @@
 
 <!-- THIS LIST SHOULD LIST ALL THE FILES IN THE COPRUS SELECTED IN THE DRAWER. MAIN TITLE OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1, UNLESS THERE ISN'T ONE... THEN IT SHOULD BE THE NAME OF THE ACTUAL TXT FILE (WITHOUT .EXT) IF THAT IS WHAT THESE WILL BE... TEXT FILES OR DATA ON A DATABASE SOMEWHERE? SHOULD BE A DENSE VIEW, NO ICONS, JUST THE TITLE AND A FEW (LIKE 3) LINES OF THE ACTUAL TEXT. SHOULD HIGHLIGHT ON HOVER I THINK. -->
 
-			<md-button ng-click="vm.createNewText()" ng-cloak ng-if="!vm.filteredFiles.length">Create New File</md-button>
+			<md-button ng-click="vm.createNewTextFile()" ng-cloak ng-if="!vm.filteredFiles.length">Create New File</md-button>
 	<md-list>
 		<md-list-item ng-repeat="file in vm.filteredFiles = (vm.fileList | filter: vm.searchText)">
 			<a ng-if="file.category != 'audio'" ng-click="vm.fileSelection(file)">
@@ -22,7 +22,7 @@
 	<md-button id="uploadButton"
 	           class="md-button md-fab md-fab-bottom-right"
 	           aria-label="attach_file"
-				ng-click="vm.createNewText()">
+				ng-click="vm.createNewTextFile()">
 
 		<md-icon class="material-icons">add</md-icon>
 	</md-button>

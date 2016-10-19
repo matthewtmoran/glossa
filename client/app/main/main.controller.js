@@ -12,12 +12,12 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.searchText = '';
     vm.filteredFiles = [];
 
-    vm.createNewText = createNewText;
+    vm.createNewTextFile = createNewTextFile;
     // vm.fileClicked = fileClicked;
     vm.fileSelection = fileSelection;
     vm.searchSubmit = searchSubmit;
     vm.uploadFiles = uploadFiles;
-    vm.updateData = updateData
+    vm.updateData = updateData;
 
     activate();
 
@@ -28,9 +28,9 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     /**
      * Creates a new blank texts(.md) document
      */
-    function createNewText() {
-        fileSrvc.createNewText().then(function(file) {
-            vm.selectedFile = file;
+    function createNewTextFile() {
+        fileSrvc.createNewTextFile().then(function(file) {
+            updateFileSelection(file);
         });
     }
 
@@ -41,7 +41,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     // }
 
     function fileSelection(file) {
-        vm.selectedFile = file;
+        updateFileSelection(file);
         if (vm.selectedFile.category === 'audio') {
             initWave(vm.selectedFile);
         }
@@ -58,7 +58,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         //if there is text and there is no results in the filtered list
         if (vm.searchText.length && !vm.filteredFiles.length) {
         //    create a new file with the search term
-        fileSrvc.createNewText(vm.searchText).then(function(file) {
+        fileSrvc.createNewTextFile(vm.searchText).then(function(file) {
                 vm.selectedFile = file;
                 vm.searchText = '';
             });
@@ -104,25 +104,18 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     function buildFileList() {
         fileSrvc.getAllFiles().then(function(docs) {
             vm.fileList = docs;
+            //set intitial file
+            updateFileSelection(vm.fileList[0]);
         });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    function initWave(file) {
-
+    /**
+     * Sets the current file
+     * @param file
+     */
+    function updateFileSelection(file) {
+        fileSrvc.setSelectedFile(file);
+        vm.selectedFile = fileSrvc.getSelectedFile();
     }
-
-
-
 
 }

@@ -1,5 +1,5 @@
 <!--<pre>{{vm.selectedFile}}</pre>-->
-<div class="meta-tab">
+<div class="meta-tab" ng-controller="metaCrtl as metaVm">
 	<form name="fileMeta">
 		<div layout-gt-sm="row">
 			<md-input-container class="md-block" flex-gt-sm="">
@@ -14,4 +14,65 @@
 			</md-input-container>
 		</div>
 	</form>
+
+	<div>
+		<!--<aps-upload-file-->
+				<!--buttonicon="attachment"-->
+				<!--tooltiptext="Attach Audio"-->
+				<!--filetypes=".mp3, .m4a">-->
+		<!--</aps-upload-file>-->
+
+		<!--<inbox-button></inbox-button>-->
+
+		<!--<md-button class="md-raised md-primary">-->
+			<!--<md-icon class="material-icons">attachment</md-icon>-->
+		<!--</md-button>-->
+
+
+		<md-fab-speed-dial ng-hide="metaVm.hidden"
+		                   md-direction="right"
+		                   md-open="metaVm.isOpen"
+		                   class="md-scale "
+		                   ng-class="{ 'md-hover-full': metaVm.hover }"
+		                   ng-mouseenter="metaVm.isOpen = true"
+		                   ng-mouseleave="metaVm.isOpen = false">
+
+			<md-fab-trigger>
+				<md-button aria-label="menu" class="md-fab md-warn">
+					<md-tooltip md-direction="top"
+					            md-visible="tooltipVisible"
+					            md-autohide="true">Attach Files</md-tooltip>
+					<md-icon aria-label="menu">attachment</md-icon>
+				</md-button>
+			</md-fab-trigger>
+
+			<md-fab-actions>
+				<div ng-repeat="item in metaVm.items">
+					<md-button aria-label="{{metaVm.name}}"
+					           class="md-fab md-raised md-mini"
+					           ng-click="metaVm.attachFile(item)">
+
+						<md-tooltip md-direction="{{item.direction}}"
+						            md-visible="tooltipVisible"
+						            md-autohide="true">
+							{{item.name}}
+						</md-tooltip>
+
+						<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>
+					</md-button>
+				</div>
+			</md-fab-actions>
+		</md-fab-speed-dial>
+
+		<input id="attachFileInput" type="file" class="ng-hide">
+
+
+		<!--<div>-->
+			<!--<img ng-if="vm.selectedFile.image" ng-src="vm.selectedFile.image" alt="">-->
+		<!--</div>-->
+	</div>
 </div>
+
+<pre>
+  {{vm.selectedFile | json}}
+</pre>

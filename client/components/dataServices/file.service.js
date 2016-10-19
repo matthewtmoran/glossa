@@ -16,17 +16,41 @@ function fileSrvc(dbSrvc) {
 
     var file = {},
         fileList = [];
+    var data = {
+        currentFile: {}
+    };
 
     var service = {
-        uploadFile: uploadFile,
         getAllFiles: getAllFiles,
-        createNewText: createNewText,
-        updateFileData: updateFileData
+        createNewTextFile: createNewTextFile,
+        updateFileData: updateFileData,
+        attachAudioFile: attachAudioFile,
+        setSelectedFile: setSelectedFile,
+        getSelectedFile: getSelectedFile
     };
 
     return service;
     //////////////
 
+    //dbSrvc takes the data collection and the query to call
+    function getAllFiles() {
+        return dbSrvc.find(fileCollection, {}).then(function(docs) {
+            fileList = docs;
+            return docs;
+        })
+    }
+    /**
+     * Helper function to call the proper file either named or an untitled file
+     * @param searchInput
+     */
+    function createNewTextFile(searchInput) {
+        //if there is not text input on search submit
+        if (!searchInput) {
+            return startBlankFile();
+        } else {
+            return startNamedFile(searchInput);
+        }
+    }
     /**
      * Update to file data.
      * Name update is only triggered on blur event (due to async file to write functionality)
@@ -46,17 +70,21 @@ function fileSrvc(dbSrvc) {
     }
 
     /**
-     * Helper function to call the proper file either named or an untitled file
-     * @param searchInput
+     * Set the current file
+     * @param file
      */
-    function createNewText(searchInput) {
-        //if there is not text input on search submit
-        if (!searchInput) {
-            return startBlankFile();
-        } else {
-            return startNamedFile(searchInput);
-        }
+    function setSelectedFile(file) {
+        data.currentFile = file;
     }
+    /**
+     * Return the current file
+     * @returns {*}
+     */
+    function getSelectedFile() {
+        return data.currentFile;
+    }
+
+
 
 
     /**
@@ -137,35 +165,6 @@ function fileSrvc(dbSrvc) {
             })
     }
 
-    //uploads file and saves data in database
-    function uploadFile(files) {
-        for (var key in files) {
-            if (files.hasOwnProperty(key)) {
-                file = files[key];
-                //copy the file
-                fs.createReadStream(file.path)
-                    //write the file
-                    .pipe(fs.createWriteStream(uploadPath + file.name)
-                        .on('close', function() {
-                            console.log("Uploaded file done");
-
-                            //insert data into database
-                            fileCollection.insert(createFileData(file), function(err, fileDoc) {
-                                if (err) {
-                                    console.log('There was an error saving file data to the DB', err);
-                                }
-                                console.log('File data was saved to the DB', fileDoc);
-                                //push new document to fileList array
-                                fileList.push(fileDoc);
-                            })
-
-                        }
-                    )
-                );
-
-            }
-        }
-    }
     //creates and returns the file data
     function createFileData(file) {
         var fileDoc = {
@@ -173,6 +172,8 @@ function fileSrvc(dbSrvc) {
             extension: file.extension,
             isLinked: false,
             linked: {},
+            audio: '',
+            image: '',
             description: ''
         };
 
@@ -198,16 +199,96 @@ function fileSrvc(dbSrvc) {
             return 'other';
         }
     }
-    //dbSrvc takes the data collection and the query to call
-    function getAllFiles() {
-        return dbSrvc.find(fileCollection, {}).then(function(docs) {
-            fileList = docs;
-            return docs;
-        })
+
+
+
+
+
+    /**
+     * Check if file exists
+     * Returns true if the file exists and false if the file does not exist
+     * @param dir
+     * @returns {boolean}
+     */
+    function doesExist(dir) {
+        try {
+            fs.statSync(dir);
+            return true;
+        } catch (err) {
+            return !(err && err.code === 'ENOENT');
+        }
     }
 
-    function getFileContent(srcpath) {
-        return fs.readFileSync(srcpath, {encoding: 'utf-8'});
+
+
+    /**
+     * Attaches an audio file to the current file by writing new file to system and saving file in db.
+     * @param file - the new file being we are working with.
+     * @returns {*}
+     * TODO: here we need some set of events.
+     * TODO: Are they allowed to attach the same file to different text files?
+     *
+     */
+    function attachAudioFile(file) {
+        var newPath = uploadPath + file.name;
+        //check if file with the same name exists in file system
+        var exists = doesExist(newPath);
+        if (exists) {
+            return console.log('A file with this name already exists.  Do you want to overwrite the existing file or rename this file?')
+        }
+
+        updateCollection(newPath).then(function(result) {
+            console.log('promise returned');
+            copyAndWrite(file.path, newPath, function() {
+                console.log('copy and write ahs finished');
+                data.currentFile.audio = result.newObj.audio;
+            })
+        });
+
+        // return copyAndWrite(file.path, newPath, updateCollection);
     }
+
+
+    /**
+     * "Upload" file into app"
+     * Takes the original file location, the new file location, and a callback function
+     * It will copy the file and wirte the file and then initait the saveToDb callback
+     * @param from - the original file location
+     * @param to - the new file location
+     * @param saveToDb - call back that take the new Path and saves data in db.
+     */
+    function copyAndWrite(from, to, saveToDb) {
+        //copy the file
+        fs.createReadStream(from)
+        //write the file
+            .pipe(fs.createWriteStream(to)
+                .on('close', function() {
+                        console.log("Uploaded file done");
+                        return saveToDb(to);
+                    }
+                )
+            );
+    }
+
+
+
+    /**
+     * Attach Audio File to the current file
+     * @param path - the path where the file exists in the app.
+     */
+    function updateCollection(path) {
+        var tempData = {
+            newObj: {}
+        };
+
+        tempData['newObj']['audio'] = path;
+        console.log('data.currentFile', data.currentFile);
+        tempData.fileId = data.currentFile._id;
+        tempData.options = {};
+        return dbSrvc.update(fileCollection, tempData).then(function(result) {
+            return tempData;
+        });
+    }
+
 
 }
