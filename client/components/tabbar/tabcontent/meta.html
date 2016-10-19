@@ -1,4 +1,3 @@
-<!--<pre>{{vm.selectedFile}}</pre>-->
 <div class="meta-tab" ng-controller="metaCrtl as metaVm">
 	<form name="fileMeta">
 		<div layout-gt-sm="row">
@@ -34,23 +33,7 @@
 			</md-fab-trigger>
 
 			<md-fab-actions>
-				<!--<div ng-repeat="item in metaVm.items">-->
-					<!--<md-button aria-label="{{metaVm.name}}"-->
-					           <!--id="mini-btn-{{item.name}}"-->
-					           <!--class="md-fab md-raised md-mini"-->
-					           <!--ng-click="metaVm.attachFile(item)">-->
-
-						<!--<md-tooltip md-direction="{{item.direction}}"-->
-						            <!--md-visible="tooltipVisible"-->
-						            <!--md-autohide="true">-->
-							<!--{{item.name}}-->
-						<!--</md-tooltip>-->
-						<!--<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>-->
-					<!--</md-button>-->
-				<!--</div>-->
-
 					<dynamic-upload ng-repeat="item in metaVm.items" item="item"></dynamic-upload>
-
 			</md-fab-actions>
 		</md-fab-speed-dial>
 	</div>
