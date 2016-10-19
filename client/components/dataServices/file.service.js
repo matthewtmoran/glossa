@@ -235,8 +235,14 @@ function fileSrvc(dbSrvc) {
         }
 
         updateCollection(newPath).then(function(result) {
-            copyAndWrite(file.path, newPath, function() {
-                data.currentFile.audio = result.newObj.audio;
+            console.log('result', result);
+
+
+            return copyAndWrite(file.path, newPath, function(err, res) {
+                if (err) {
+                    return console.log('There was an error', err);
+                }
+                data.currentFile.audio = res;
             })
         });
     }
@@ -249,16 +255,18 @@ function fileSrvc(dbSrvc) {
      * @param to - the new file location
      * @param saveToDb - call back that take the new Path and saves data in db.
      */
-    function copyAndWrite(from, to, saveToDb) {
+    function copyAndWrite(from, to, callback) {
         //copy the file
         fs.createReadStream(from)
         //write the file
             .pipe(fs.createWriteStream(to)
                 .on('close', function() {
                         console.log("Uploaded file done");
-                        return saveToDb(to);
-                    }
-                )
+                        return callback(null, to);
+                    })
+                .on('error', function(err) {
+                    return callback(err, null);
+                })
             );
     }
 
@@ -272,9 +280,11 @@ function fileSrvc(dbSrvc) {
         };
         tempData['newObj']['audio'] = path;
         tempData.fileId = data.currentFile._id;
-        tempData.options = {};
+        tempData.options = {
+            returnUpdatedDocs: true
+        };
         return dbSrvc.update(fileCollection, tempData).then(function(result) {
-            return tempData;
+            return result;
         });
     }
 

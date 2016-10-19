@@ -43,14 +43,11 @@ function dbSrvc($q) {
 
     function update(db, data) {
         var deferred = $q.defer();
-        db.update({_id: data.fileId}, { $set: data.newObj }, data.options, function(err, numReplaced) {
+        db.update({_id: data.fileId}, { $set: data.newObj }, data.options, function(err, numReplaced, affectedDocuments) {
             if (err) {
                 deferred.reject(err);
-                // return console.log('There was an error updating the file', err);
             }
-            deferred.resolve(data.newObj);
-            console.log('updating data', data);
-            // return data.newObj;
+            deferred.resolve(affectedDocuments);
         });
         return deferred.promise;
     }
