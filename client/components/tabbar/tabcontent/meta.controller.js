@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('glossa')
-    .controller('metaCrtl', metaCrtl);
+    .controller('metaCrtl', metaCrtl)
 
 function metaCrtl($scope, $timeout, fileSrvc) {
     var metaVm = this;
@@ -9,8 +9,6 @@ function metaCrtl($scope, $timeout, fileSrvc) {
     metaVm.hidden = false;
     metaVm.isOpen = false;
     metaVm.hover = false;
-
-    metaVm.attachFile = attachFile;
 
     // On opening, add a delayed property which shows tooltips after the speed dial has opened
     // so that they have the proper position; if closing, immediately hide the tooltips
@@ -22,16 +20,6 @@ function metaCrtl($scope, $timeout, fileSrvc) {
         { name: "Attach Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
 
-    function attachFile(item) {
-        var input = angular.element('#attachFileInput');
-        input.attr('accept', item.accept);
-        input.click();
-        input.on('change', function (e) {
-            var file = e.target.files[0];
-            fileSrvc.attachAudioFile(file);
-        });
-    }
-
     function isOpenWatch(isOpen) {
         if (isOpen) {
             $timeout(function() {
@@ -41,5 +29,4 @@ function metaCrtl($scope, $timeout, fileSrvc) {
             $scope.tooltipVisible = metaVm.isOpen;
         }
     }
-
 }

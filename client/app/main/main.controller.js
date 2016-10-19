@@ -114,8 +114,8 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
      * @param file
      */
     function updateFileSelection(file) {
-        fileSrvc.setSelectedFile(file);
-        vm.selectedFile = fileSrvc.getSelectedFile();
+        fileSrvc.setCurrentFile(file);
+        vm.selectedFile = fileSrvc.getCurrentFile();
     }
 
 }

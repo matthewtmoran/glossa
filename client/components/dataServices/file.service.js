@@ -24,9 +24,10 @@ function fileSrvc(dbSrvc) {
         getAllFiles: getAllFiles,
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
-        attachAudioFile: attachAudioFile,
-        setSelectedFile: setCurrentFile,
-        getSelectedFile: getCurrentFile
+        attachFile: attachFile,
+        setCurrentFile: setCurrentFile,
+        getCurrentFile: getCurrentFile,
+        isAttached: isAttached
     };
 
     return service;
@@ -216,33 +217,37 @@ function fileSrvc(dbSrvc) {
         return data.currentFile;
     }
 
+    function isAttached(type) {
+        if (data.currentFile[type].length) {
+            return true;
+        }
+        return false;
+    }
 
 
     /**
      * Attaches an audio file to the current file by writing new file to system and saving file in db.
      * @param file - the new file being we are working with.
+     * @param type -
      * @returns {*}
+     *
      * TODO: here we need some set of events.
      * TODO: Are they allowed to attach the same file to different text files?
      *
      */
-    function attachAudioFile(file) {
+    function attachFile(file, type) {
         var newPath = uploadPath + file.name;
         //check if file with the same name exists in file system
         var exists = doesExist(newPath);
         if (exists) {
-            return console.log('A file with this name already exists.  Do you want to overwrite the existing file or rename this file?')
+           return alert('A file with this name already exists.');
         }
-
-        updateCollection(newPath).then(function(result) {
-            console.log('result', result);
-
-
+        return updateFileInDb(newPath, type).then(function(result) {
             return copyAndWrite(file.path, newPath, function(err, res) {
                 if (err) {
                     return console.log('There was an error', err);
                 }
-                data.currentFile.audio = res;
+                data.currentFile[type] = res;
             })
         });
     }
@@ -253,7 +258,7 @@ function fileSrvc(dbSrvc) {
      * It will copy the file and wirte the file and then initait the saveToDb callback
      * @param from - the original file location
      * @param to - the new file location
-     * @param saveToDb - call back that take the new Path and saves data in db.
+     * @param callback - call back that take the new Path and saves data in db.
      */
     function copyAndWrite(from, to, callback) {
         //copy the file
@@ -273,16 +278,19 @@ function fileSrvc(dbSrvc) {
     /**
      * Attach Audio File to the current file
      * @param path - the path where the file exists in the app.
+     * @param type -
      */
-    function updateCollection(path) {
+    function updateFileInDb(path, type) {
         var tempData = {
             newObj: {}
         };
-        tempData['newObj']['audio'] = path;
+        tempData['newObj'][type] = path;
         tempData.fileId = data.currentFile._id;
         tempData.options = {
             returnUpdatedDocs: true
         };
+
+        console.log('debug5 tempData', tempData);
         return dbSrvc.update(fileCollection, tempData).then(function(result) {
             return result;
         });
