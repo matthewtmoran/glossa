@@ -1,7 +1,26 @@
 'use strict';
-
+// TODO: Need to separate the directive and controller
 angular.module('glossa')
-    .controller('mdWavesurferPlayerController', mdWavesurferPlayerController);
+    .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
+    .directive('backImg', function(){
+        return function(scope, element, attrs){
+
+            console.log('element', element);
+
+            var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
+
+            console.log('waveEl', waveEl);
+
+            attrs.$observe('backImg', function(value) {
+                console.log('value', value);
+                waveEl.css({
+                    'background-image': 'url(../' + value +')',
+                    'background-size' : 'cover',
+                    'background-position' : 'center center'
+                });
+            });
+        };
+});
 
 
 function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming) {
@@ -44,6 +63,9 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
                 if (control.autoPlay) {
                     control.surfer.play();
                 }
+
+                // angular.element('.waveSurferWave').css('background-image', 'url(' + control.image + ')');
+
                 $scope.$apply();
             });
 
@@ -101,4 +123,4 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
             control.surfer.pause();
         }
     });
-};
+}

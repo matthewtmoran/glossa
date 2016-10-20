@@ -1,12 +1,13 @@
 'use strict';
-
+// TODO: Need to come up with a better system for file paths
 //node modules
 var db = require('../db/database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     fileCollection = db.uploadedFiles,
-    uploadPath = path.join(__dirname,'../uploads/');
+    uploadPath = path.join(__dirname,'../uploads/'),
+    imagesDir = 'uploads/images/';
 
 
 angular.module('glossa')
@@ -277,14 +278,16 @@ function fileSrvc(dbSrvc) {
      *
      */
     function attachFile(file, type) {
-        var newPath = uploadPath + file.name;
+        var writePath = path.join(__dirname,'../uploads/' + type + '/' + file.name);
+        var targetPath = 'uploads/' + type + '/' + file.name;
+
         //check if file with the same name exists in file system
-        var exists = doesExist(newPath);
+        var exists = doesExist(targetPath);
         if (exists) {
             return alert('A file with this name already exists.');
         }
-        return updateFileInDb(newPath, type).then(function(result) {
-            return copyAndWrite(file.path, newPath, function(err, res) {
+        return updateFileInDb(targetPath, type).then(function(result) {
+            return copyAndWrite(file.path, writePath, function(err, res) {
                 if (err) {
                     return console.log('There was an error', err);
                 }
