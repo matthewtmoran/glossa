@@ -46,7 +46,6 @@ var WaveSurfer = {
     },
 
     init: function (params) {
-        console.log('params', params);
         // Extract relevant parameters (or defaults)
         this.params = WaveSurfer.util.extend({}, this.defaultParams, params);
 
@@ -341,7 +340,6 @@ var WaveSurfer = {
      * Loads audio and re-renders the waveform.
      */
     load: function (url, peaks) {
-        console.log('url', url);
         this.empty();
 
         switch (this.params.backend) {

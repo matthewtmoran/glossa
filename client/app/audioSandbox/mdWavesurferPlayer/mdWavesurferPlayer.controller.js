@@ -4,20 +4,17 @@ angular.module('glossa')
     .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
     .directive('backImg', function(){
         return function(scope, element, attrs){
-
-            console.log('element', element);
-
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
-
-            console.log('waveEl', waveEl);
-
             attrs.$observe('backImg', function(value) {
-                console.log('value', value);
-                waveEl.css({
-                    'background-image': 'url(../' + value +')',
-                    'background-size' : 'cover',
-                    'background-position' : 'center center'
-                });
+
+                if (value) {
+                    waveEl.css({
+                        'background-image': 'url(../' + value +')',
+                        'background-size' : 'cover',
+                        'background-position' : 'center center'
+                    });
+                }
+
             });
         };
 });

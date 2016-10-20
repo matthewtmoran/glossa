@@ -12,6 +12,19 @@
 				<textarea ng-change="vm.updateData({fileId: vm.selectedFile._id, field: 'description'})" ng-model="vm.selectedFile.description" rows="5"></textarea>
 			</md-input-container>
 		</div>
+		<div ng-if="vm.selectedFile.audio" layout-gt-sm="row">
+			<md-input-container class="md-block" flex-gt-sm="">
+				<label>Audio</label>
+				<input disabled ng-model="vm.selectedFile.audio" >
+			</md-input-container>
+		</div>
+		<div ng-if="vm.selectedFile.image" layout-gt-sm="row">
+			<md-input-container class="md-block image-attachement" flex-gt-sm="">
+				<label>Image</label>
+				<input disabled ng-model="vm.selectedFile.image" >
+				<img ng-src="../{{vm.selectedFile.image}}" alt="">
+			</md-input-container>
+		</div>
 	</form>
 
 	<div>
