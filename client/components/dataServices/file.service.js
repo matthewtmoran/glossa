@@ -302,7 +302,6 @@ function fileSrvc(dbSrvc) {
      * @param type -
      */
     function updateFileInDb(path, type) {
-        console.log('begin update db');
         var tempData = {
             newObj: {}
         };
@@ -312,7 +311,6 @@ function fileSrvc(dbSrvc) {
             returnUpdatedDocs: true
         };
         return dbSrvc.update(fileCollection, tempData).then(function(result) {
-            console.log('end update eb');
             return result;
         });
     }
@@ -325,13 +323,11 @@ function fileSrvc(dbSrvc) {
      * @param callback - call back that take the new Path and saves data in db.
      */
     function copyAndWrite(from, to, callback) {
-        console.log('begin read and write');
         //copy the file
         fs.createReadStream(from)
         //write the file
             .pipe(fs.createWriteStream(to)
                 .on('close', function() {
-                    console.log("end read and write");
                     return callback(null, to);
                 })
                 .on('error', function(err) {
