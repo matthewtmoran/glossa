@@ -1,12 +1,13 @@
 'use strict';
-
+// TODO: Need to come up with a better system for file paths
 //node modules
 var db = require('../db/database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     fileCollection = db.uploadedFiles,
-    uploadPath = path.join(__dirname,'../uploads/');
+    uploadPath = path.join(__dirname,'../uploads/'),
+    imagesDir = 'uploads/images/';
 
 
 angular.module('glossa')
@@ -16,71 +17,70 @@ function fileSrvc(dbSrvc) {
 
     var file = {},
         fileList = [];
+    var data = {
+        currentFile: {}
+    };
 
     var service = {
-        uploadFile: uploadFile,
         getAllFiles: getAllFiles,
-        createNewText: createNewText,
-        updateFileData: updateFileData
+        createNewTextFile: createNewTextFile,
+        updateFileData: updateFileData,
+        attachFile: attachFile,
+        setCurrentFile: setCurrentFile,
+        getCurrentFile: getCurrentFile,
+        isAttached: isAttached
     };
 
     return service;
-    //////////////
-
-    function updateFileData(data) {
-        dbSrvc.update(fileCollection, data);
-// TODO: need to change the files data
-// TODO: need the name not to include extension and path not to include file
-// TODO: Need to refractor usages
-// TODO: Need to write to file
-// TODO: Need to consider changing on blur or an event other than change depending on how perfromance is.
-// TODO:
-        //
-        // if (data.field === 'name') {
-        //     fs.rename(data.file.path, data.file.path.splice(data.file.name))
-        // }
-
-    }
+    ///////////////
 
     /**
-     * Helper function to call the proper file either named or an untitled file
-     * @param searchInput
+     * Queries db for all files
+     * @returns {*}
+     *
+     * TODO: may just want to query for text files (Actually all the files being saved in db right now are text file and this might be fine)
      */
-    function createNewText(searchInput) {
+    function getAllFiles() {
+        return dbSrvc.find(fileCollection, {}).then(function(docs) {
+            fileList = docs;
+            return docs;
+        })
+    }
+
+
+    ////////////////////////
+    ///Text File Creation///
+    ////////////////////////
+
+    /**
+     * Create new text file
+     * If no search input will name the file 'untitled$.md'
+     * @param searchInput - the users' search term
+     */
+    function createNewTextFile(searchInput) {
         //if there is not text input on search submit
         if (!searchInput) {
-            return startBlankFile();
+            return blankFile();
         } else {
-            return startNamedFile(searchInput);
+            return namedFile(searchInput);
         }
     }
-
     /**
-     * Creates a file with the name of the user's search
+     * Creates new untitled text file
      */
-    function startNamedFile(searchInput) {
-        var file = {};
-        file.name = searchInput + '.md';
-        var newPath = uploadPath + file.name;
-        return createAndSaveFile(file, newPath);
-    }
-
-    /**
-     * Creates a new untitled file
-     */
-    function startBlankFile() {
+    function blankFile() {
         var fileExist = true;
         var fileNumber = 1;
         var fileNumber_str;
         var fileName = 'untitled';
         var file = {};
-
         //if a file with the same name exists
         while(fileExist) {
             //change the integer to a string
             fileNumber_str = fileNumber.toString();
             //create the name of the file using the generic name and dynamic incremental number
-            file.name = fileName + fileNumber_str + '.md';
+            file.name = fileName + fileNumber_str;
+            file.extension = '.md';
             //if a file exists with the same name...
             if (_.find(fileList,['name', file.name] )) {
                 //increment the number
@@ -88,16 +88,25 @@ function fileSrvc(dbSrvc) {
                 //    if a file with the same name does not exists...
             } else {
                 //define the path
-                var newPath = uploadPath + file.name;
+                var newPath = uploadPath + file.name + file.extension;
                 //write the file to that path
                 //second argument will be the default text in the document
                 return createAndSaveFile(file, newPath);
             }
         }
     }
-
     /**
-     * Writes file to directory and saves the data in the database
+     * Creates titled text file
+     */
+    function namedFile(searchInput) {
+        var file = {};
+        file.name = searchInput;
+        file.extension = ".md";
+        var newPath = uploadPath + file.name + file.extension;
+        return createAndSaveFile(file, newPath);
+    }
+    /**
+     * Writes text file to directory and saves the data in the database
      * @param file - the file object
      * @param path - the path of where the file will be stored
      *
@@ -105,7 +114,7 @@ function fileSrvc(dbSrvc) {
      */
     function createAndSaveFile (file, path) {
         //insert the file in to the fileCollection
-        return dbSrvc.insert(fileCollection, createFileData(file))
+        return dbSrvc.insert(fileCollection, buildFileObject(file))
             .then(function(doc) {
                 //when promise returns, push the document to the fileList
                 fileList.push(doc);
@@ -118,51 +127,54 @@ function fileSrvc(dbSrvc) {
             })
     }
 
-    //uploads file and saves data in database
-    function uploadFile(files) {
-        for (var key in files) {
-            if (files.hasOwnProperty(key)) {
-                file = files[key];
-                //copy the file
-                fs.createReadStream(file.path)
-                    //write the file
-                    .pipe(fs.createWriteStream(uploadPath + file.name)
-                        .on('close', function() {
-                            console.log("Uploaded file done");
 
-                            //insert data into database
-                            fileCollection.insert(createFileData(file), function(err, fileDoc) {
-                                if (err) {
-                                    console.log('There was an error saving file data to the DB', err);
-                                }
-                                console.log('File data was saved to the DB', fileDoc);
-                                //push new document to fileList array
-                                fileList.push(fileDoc);
-                            })
+    ////////////////////////
+    ////Helper Functions////
+    ////////////////////////
 
-                        }
-                    )
-                );
-
-            }
-        }
-    }
-    //creates and returns the file data
-    function createFileData(file) {
+    /**
+     * Create text file object
+     *
+     * This object will be saved to db and should have all necessary information
+     *
+     * @param file
+     * @returns {
+     *      {
+     *            name: (string|*),
+     *            extension: string,
+     *            isLinked: boolean,
+     *            linked: {},
+     *            audio: string,
+     *            image: string,
+     *            description: string
+     *      }
+     * }
+     */
+    function buildFileObject(file) {
         var fileDoc = {
             name: file.name,
-            path: uploadPath + file.name,
+            extension: file.extension,
             isLinked: false,
             linked: {},
+            audio: '',
+            image: '',
             description: ''
         };
-        if (!file.type && file.name.indexOf('.md') > -1)  {
+
+        fileDoc.path = uploadPath + fileDoc.name + file.extension;
+        // fileDoc.path = uploadPath + fileDoc.fullName;
+
+        if (!file.type && fileDoc.extension === '.md')  {
             fileDoc.type = 'md';
         }
         fileDoc.category = defineCategory(fileDoc.type);
         return fileDoc;
     }
-    //adds a file category to the object
+    /**
+     * Defines The category for the file
+     * @param type
+     * @returns {*}
+     */
     function defineCategory(type) {
         if (type.indexOf('audio') > -1) {
             return 'audio';
@@ -175,12 +187,153 @@ function fileSrvc(dbSrvc) {
             return 'other';
         }
     }
-    //dbSrvc takes the data collection and the query to call
-    function getAllFiles() {
-        return dbSrvc.find(fileCollection, {}).then(function(docs) {
-            fileList = docs;
-            return docs;
+    /**
+     * Check if file exists
+     * Returns true if the file exists and false if the file does not exist
+     * @param dir
+     * @returns {boolean}
+     *
+     * TODO: consider just querying the db for an existing file by the name(path)
+     */
+    function doesExist(dir) {
+        try {
+            fs.statSync(dir);
+            return true;
+        } catch (err) {
+            return !(err && err.code === 'ENOENT');
+        }
+    }
+    /**
+     * Set the current file
+     * @param file
+     */
+    function setCurrentFile(file) {
+        data.currentFile = file;
+    }
+    /**
+     * Return the current file
+     * @returns {*}
+     */
+    function getCurrentFile() {
+        return data.currentFile;
+    }
+    /**
+     * Does the text file already have audio/image files attached?
+     * @param type - the type of attached file we are checking against
+     * @returns {boolean} - true if it has file already attached
+     */
+    function isAttached(type) {
+        if (data.currentFile[type].length) {
+            return true;
+        }
+        return false;
+    }
+
+
+    ////////////////////////
+    ////Update Meta Data////
+    ////////////////////////
+
+    /**
+     * Update to file data.
+     * Name update is only triggered on blur event (due to async file to write functionality)
+     * The rest is called immediately.
+     * TODO: Need to compact DB at some point.
+     * TODO: Should refractor the data that's being passed.
+     * @param data
+     */
+    function updateFileData(data) {
+        if (data.field === 'name') {
+            data.newObj.path = uploadPath + data.newObj.name + data.file.extension;
+            dbSrvc.update(fileCollection, data);
+            renameFileToSystem(data.file.path, data.newObj.path);
+        } else {
+            dbSrvc.update(fileCollection, data);
+        }
+    }
+    /**
+     * Renames the file.
+     * @param oldPath - the old file path (name)
+     * @param newPath - the new file path (name)
+     */
+    function renameFileToSystem(oldPath, newPath) {
+        fs.rename(oldPath, newPath, function() {
+            console.log('File should be updated in file system.')
         })
+    }
+
+
+    ////////////////////////
+    ///Attach media files///
+    ////////////////////////
+
+    /**
+     * Attaches a file to the current file by writing new file to system and saving file in db.
+     * @param file - the new file being we are working with.
+     * @param type -
+     * @returns {*}
+     *
+     * TODO: here we need some set of events.
+     * TODO: Are they allowed to attach the same file to different text files?
+     *
+     */
+    function attachFile(file, type) {
+        var writePath = path.join(__dirname,'../uploads/' + type + '/' + file.name);
+        var targetPath = 'uploads/' + type + '/' + file.name;
+
+        //check if file with the same name exists in file system
+        var exists = doesExist(targetPath);
+        if (exists) {
+            return alert('A file with this name already exists.');
+        }
+        return copyAndWrite(file.path, writePath, function(err, res) {
+            if (err) {
+                return console.log('There was an error', err);
+            }
+            return updateFileInDb(targetPath, type).then(function(result) {
+                data.currentFile[type] = targetPath;
+                return result;
+            })
+        });
+    }
+    /**
+     * Attach Audio File to the current file
+     * @param path - the path where the file exists in the app.
+     * @param type -
+     */
+    function updateFileInDb(path, type) {
+        var tempData = {
+            newObj: {}
+        };
+        tempData['newObj'][type] = path;
+        tempData.fileId = data.currentFile._id;
+        tempData.options = {
+            returnUpdatedDocs: true
+        };
+        return dbSrvc.update(fileCollection, tempData).then(function(result) {
+            return result;
+        });
+    }
+    /**
+     * "Upload" file into app"
+     * Takes the original file location, the new file location, and a callback function
+     * It will copy the file and wirte the file and then initait the saveToDb callback
+     * @param from - the original file location
+     * @param to - the new file location
+     * @param callback - call back that take the new Path and saves data in db.
+     */
+    function copyAndWrite(from, to, callback) {
+        //copy the file
+        fs.createReadStream(from)
+        //write the file
+            .pipe(fs.createWriteStream(to)
+                .on('close', function() {
+                    return callback(null, to);
+                })
+                .on('error', function(err) {
+                    return callback(err, null);
+                })
+            );
     }
 
 }

@@ -11,12 +11,14 @@ function mdWavesurferUtils($q, $document, $timeout) {
     ///////////////
 
 
-
     function getLength(object) {
         var deferred = $q.defer();
         var estimateLength = function (url) {
             var audio = $document[0].createElement('audio');
             audio.src = url;
+
+            console.log('audio', audio);
+
             audio.addEventListener('loadeddata', function listener() {
                 deferred.resolve(this.duration);
                 audio.removeEventListener('loadeddata', listener);
