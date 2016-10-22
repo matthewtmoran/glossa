@@ -1,0 +1,56 @@
+<div class="meta-tab" ng-controller="metaCrtl as metaVm">
+	<form name="fileMeta">
+		<div layout-gt-sm="row">
+			<md-input-container class="md-block" flex-gt-sm="">
+				<label>File Name</label>
+				<input ng-blur="vm.updateData({fileId: vm.selectedFile._id, field: 'name'})" ng-model="vm.selectedFile.name" value="vm.selectedFile.name">
+			</md-input-container>
+		</div>
+		<div layout-gt-sm="row">
+			<md-input-container class="md-block" flex-gt-sm="">
+				<label>Description</label>
+				<textarea ng-change="vm.updateData({fileId: vm.selectedFile._id, field: 'description'})" ng-model="vm.selectedFile.description" rows="5"></textarea>
+			</md-input-container>
+		</div>
+		<div ng-if="vm.selectedFile.audio" layout-gt-sm="row">
+			<md-input-container class="md-block" flex-gt-sm="">
+				<label>Audio</label>
+				<input disabled ng-model="vm.selectedFile.audio" >
+			</md-input-container>
+		</div>
+		<div ng-if="vm.selectedFile.image" layout-gt-sm="row">
+			<md-input-container class="md-block image-attachement" flex-gt-sm="">
+				<label>Image</label>
+				<input disabled ng-model="vm.selectedFile.image" >
+				<img ng-src="../{{vm.selectedFile.image}}" alt="">
+			</md-input-container>
+		</div>
+	</form>
+
+	<div>
+		<md-fab-speed-dial ng-hide="metaVm.hidden"
+		                   md-direction="right"
+		                   md-open="metaVm.isOpen"
+		                   class="md-scale "
+		                   ng-class="{ 'md-hover-full': metaVm.hover }"
+		                   ng-mouseenter="metaVm.isOpen = true"
+		                   ng-mouseleave="metaVm.isOpen = false">
+
+			<md-fab-trigger>
+				<md-button aria-label="menu" class="md-fab md-warn">
+					<md-tooltip md-direction="top"
+					            md-visible="tooltipVisible"
+					            md-autohide="true">Attach Files</md-tooltip>
+					<md-icon aria-label="menu">attachment</md-icon>
+				</md-button>
+			</md-fab-trigger>
+
+			<md-fab-actions>
+					<dynamic-upload ng-repeat="item in metaVm.items" item="item"></dynamic-upload>
+			</md-fab-actions>
+		</md-fab-speed-dial>
+	</div>
+</div>
+<!--<pre>-->
+	<!--{{vm.selectedFile | json}}-->
+<!--</pre>-->
