@@ -1,11 +1,17 @@
-<md-toolbar ng-controller="NavbarCtrl as navVm" class="nav-content" md-whiteframe="1" class="primary-bg" md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
+<md-toolbar
+		layout="row"
+		class="nav-content primary-bg"
+		md-whiteframe="1"
+		md-selected-nav-item="currentNavItem"
+		nav-bar-aria-label="navigation links"
+		>
  <span flex style="-webkit-app-region: drag"></span>
 	<div class="md-toolbar-tools">
 		<md-button aria-label="Open demo menu" class="md-icon-button " ng-click="navVm.toggleLeft()">
 			<md-icon md-font-library="material-icons">menu</md-icon>
 		</md-button>
 
-		<md-button aria-label="Open Settings" class="md-icon-button" ng-click="navVm.showSearch = !navVm.showSearch">
+		<md-button aria-label="Open Settings" class="md-icon-button" ng-click="vm.showSearch = !vm.showSearch">
 			<md-icon class="material-icons">search</md-icon>
 		</md-button>
 
@@ -13,14 +19,11 @@
 			<md-input-container md-no-float flex >
 				<form ng-submit="vm.searchSubmit()">
 					<input ng-model="vm.searchText" placeholder="Search..."><!-- Can/should search text be white? or more visible/legible (and without weird hacks)?-->
+
 				</form>
 				<!--<input ng-show="navVm.showSearch" ng-model="searchInput" placeholder="Search...">-->
 			</md-input-container>
 		<!--</div>-->
-
-		<!--<md-button>-->
-			<!--<a ui-sref="waveform">wave form</a>-->
-		<!--</md-button>-->
 
 <!-- ADD THE STUFF BELOW BACK IN LATER, WHEN I THINK THROUGH WHAT NEEDS TO GO IN THERE A BIT BETTER-->
 		<!-- <md-button aria-label="Open Settings" class="md-icon-button">
@@ -39,8 +42,6 @@
 				</md-menu-item>
 			</md-menu-content>
 		</md-menu> -->
-		
 	</div>
-
 </md-toolbar>
 

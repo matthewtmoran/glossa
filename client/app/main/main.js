@@ -1,3 +1,20 @@
+// 'use strict';
+//
+// angular.module('glossa')
+//     .config(config);
+//
+// function config($stateProvider) {
+//     $stateProvider
+//         .state('main', {
+//             url: '/',
+//             // component: 'mainComponent',
+//             // template: '<main-component>'
+//             templateUrl: 'app/main/main.html',
+//             controller: 'MainCtrl',
+//             controllerAs: 'vm'
+//         });
+// }
+//
 'use strict';
 
 angular.module('glossa')
@@ -7,8 +24,10 @@ function config($stateProvider) {
     $stateProvider
         .state('main', {
             url: '/',
-            templateUrl: 'app/main/main.html',
-            controller: 'MainCtrl',
-            controllerAs: 'vm'
+            // component: 'mainComponent',
+            template: '<main-component layout="column">'
+            // templateUrl: 'app/main/main.html',
+            // controller: 'MainCtrl',
+            // controllerAs: 'vm'
         });
 }

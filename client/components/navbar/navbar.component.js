@@ -1,11 +1,37 @@
 'use strict';
 
 angular.module('glossa')
-    .controller('NavbarCtrl', NavbarCtrl);
+    .component('navbarComponent', {
+        controller: navbarCtrl,
+        controllerAs: 'navVm',
+        transclude: true,
+        templateUrl: 'components/navbar/navbar.html',
+        require: {
+            main: '^mainComponent'
+        },
+        scope: true
+    });
 
-function NavbarCtrl($mdDialog, $scope, $mdSidenav) {
+function navbarCtrl($mdSidenav, $scope) {
     var navVm = this;
     var originatorEv;
+    // navVm.searchText = '';
+
+    navVm.$onInit = function () {
+
+        // fbVm.fileList = fbVm.main.fileList;
+        // fbVm.filteredFiles = fbVm.main.filteredFiles;
+
+
+    };
+
+
+
+    // $scope.$watch('navVm.searchText', function(val) {
+    //     console.log('new Val', val);
+    //     navVm.main.searchText = val;
+    // });
+
 
     navVm.execute = execute;
     navVm.concordance = concordance;
@@ -38,7 +64,6 @@ function NavbarCtrl($mdDialog, $scope, $mdSidenav) {
         }
     ];
 
-    navVm.searchText = '';
 
     navVm.toggleLeft = buildToggler('left');
     navVm.toggleRight = buildToggler('right');
@@ -75,5 +100,5 @@ function NavbarCtrl($mdDialog, $scope, $mdSidenav) {
     function about() {
         console.log('about');
     }
-}
 
+}

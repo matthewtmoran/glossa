@@ -1,4 +1,4 @@
-.static-left {
+md-sidenav {
 	md-list {
 		md-list-item {
 			.md-button {
@@ -20,5 +20,8 @@
 			}
 		}
 	}
+	//&.static-left {
+	//	overflow: scroll;
+	//}
 }
 

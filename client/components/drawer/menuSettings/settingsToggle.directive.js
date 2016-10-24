@@ -9,7 +9,7 @@ function menuToggle($timeout) {
         scope: {
             section: '='
         },
-        templateUrl: 'components/sidebar/menuSettings/settingsToggle.html',
+        templateUrl: 'components/drawer/menuSettings/settingsToggle.html',
         link: menuSettingslink
     };
     return directive;

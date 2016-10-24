@@ -7,6 +7,9 @@ $red: #FF5252; // - accent color
 $lBlack: #757575; // secondary text
 $lGrey: #BDBDBD; // - divider color
 
+//This the new grey that you used for the fab button @MattM
+$newGrey: #9E9E9E;
+
 $primary: $mGrey;
 $light-primary: $white;
 $dark-primary: $dGrey;
@@ -33,11 +36,34 @@ $secondary-text: $lBlack;
 }
 
 
+//In this scss file we can global like rules for elements across the  app. @matt
+.md-fab {
+	//background-color: $newGrey !important;
+}
+
+.smooth {
+	-webkit-transition: .3s;
+	-moz-transition: .3s;
+	-o-transition: .3s;
+	transition: .3s;
+}
+
+//TODO: there should be a way to style button through themeing
+.md-grey-fab {
+	background-color: $newGrey !important;
+	//@extend .smooth;
+	&:hover {
+		background-color: $lGrey !important;
+	}
+}
+
+
 
 /* inject:scss */
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
+@import 'meta/meta';
+@import '../components/drawer/drawer';
 @import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
-@import '../components/sidebar/sidebar';
 @import '../components/tabbar/tabbar';
 /* endinject */

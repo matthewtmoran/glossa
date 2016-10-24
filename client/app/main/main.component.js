@@ -1,7 +1,12 @@
 'use strict';
 
 angular.module('glossa')
-    .controller('MainCtrl', MainCtrl);
+    .component('mainComponent', {
+        controller: MainCtrl,
+        controllerAs: 'vm',
+        transclude: true,
+        templateUrl: 'app/main/main.html'
+    });
 
 function MainCtrl($scope, nodeSrvc, fileSrvc) {
     var vm = this;
@@ -11,7 +16,6 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.aceContent = "";
     vm.searchText = '';
     vm.filteredFiles = [];
-    // vm.filteredFiles = fileSrvc.data.filteredFiles;
 
     vm.createNewTextFile = createNewTextFile;
     // vm.fileClicked = fileClicked;
@@ -58,8 +62,8 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         }
         //if there is text and there is no results in the filtered list
         if (vm.searchText.length && !vm.filteredFiles.length) {
-        //    create a new file with the search term
-        fileSrvc.createNewTextFile(vm.searchText).then(function(file) {
+            //    create a new file with the search term
+            fileSrvc.createNewTextFile(vm.searchText).then(function(file) {
                 vm.selectedFile = file;
                 vm.searchText = '';
             });
@@ -104,6 +108,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
      */
     function buildFileList() {
         fileSrvc.queryAllFiles().then(function(docs) {
+
             vm.fileList = docs;
             //set intitial file
             updateFileSelection(vm.fileList[0]);

@@ -1,19 +1,11 @@
-<div ng-controller="drawerCrtl as dVm" ng-include="'components/sidebar/sidebar.html'" layout="row" flex></div>
+<navbar-directive></navbar-directive>
 
-<div flex layout="column">
-
-
-	<div ng-include="'components/navbar/navbar.html'"></div>
-	<div flex layout="row">
-
-		<div ng-include="'components/filebrowser/filebrowser.html'"></div>
-		<div class="tabs-area" flex ng-include="'components/tabbar/tabbar.html'"></div>
-
-
-	</div>
-
+<div flex layout="row" >
+	<file-browser layout="column"></file-browser>
+	<tabbar></tabbar>
 </div>
 
+<drawer-directive></drawer-directive>
 
 
 

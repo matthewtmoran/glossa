@@ -8,13 +8,15 @@ function menuLink() {
         scope: {
             section: '='
         },
-        templateUrl: 'components/sidebar/menuLink/menuLink.html',
+        require: '^^drawerDirective',
+        templateUrl: 'components/drawer/menuLink/menuLink.html',
         link: menuLinkLink
     };
     return directive;
 
-    function menuLinkLink(scope, element, attrs) {
-        var controller = element.parent().controller();
+    function menuLinkLink(scope, element, attrs, crtl) {
+        var controller = crtl;
+        // var controller = element.parent().controller();
         scope.focusSection = function () {
             // set flag to be used later when
             // $locationChangeSuccess calls openPage()

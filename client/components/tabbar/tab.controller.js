@@ -1,12 +1,10 @@
 angular.module('glossa')
     .controller('tabCtrl', function($scope, $location, $log, $state) {
+        var tabVm = this;
+
         $scope.selectedIndex = 0;
 
-
-
-
         $scope.$watch('selectedIndex', function (current, old) {
-            console.log('selectedIndex', $scope.selectedIndex);
             switch (current) {
                 case 0:
                     $state.go('main.meta');

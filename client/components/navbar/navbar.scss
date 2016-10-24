@@ -1,6 +1,6 @@
 md-toolbar.nav-content {
-	height: 64px;
-	overflow: hidden;
+	//height: 64px;
+	//overflow: hidden;
 
 	md-input-container {
 		margin: 0;
@@ -34,6 +34,8 @@ md-input-container .md-input {
 
 //64 us the height of the navbar
 .static-left {
-	height: -webkit-calc(100% - 64px);
-	overflow: hidden;
+	//height: -webkit-calc(100% - 64px);
+	//overflow: hidden;
+
+	overflow: auto;
 }

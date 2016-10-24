@@ -30,9 +30,17 @@ TODO:
 </head>
 <title>Glossa</title>
 
-<body ng-app="glossa" layout="column"  ng-cloak>
+<body ng-app="glossa" layout="column" ng-cloak>
 
-<div ui-view></div>
+	<!--Replaced with navbar.html-->
+	<!--<navbar-directive></navbar-directive>-->
+
+
+	<ui-view layout="column"></ui-view>
+
+	<!--Replaced with drawer.html-->
+
+
 
 <!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
 <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
@@ -57,6 +65,7 @@ TODO:
 <script type="text/javascript" src="app/app.js"></script>
 <script type="text/javascript" src="app/main/main.js"></script>
 <script type="text/javascript" src="app/main/main.controller.js"></script>
+<script type="text/javascript" src="app/main/main.component.js"></script>
 <script type="text/javascript" src="app/meta/meta.js"></script>
 <script type="text/javascript" src="app/meta/meta.controller.js"></script>
 <script type="text/javascript" src="app/baseline/baseline.js"></script>
@@ -70,20 +79,31 @@ TODO:
 <!--<script type="text/javascript" src="app/audioSandbox/wavesurfer.directive.js"></script>-->
 
 <script type="text/javascript" src="components/navbar/navbar.controller.js"></script>
+<script type="text/javascript" src="components/navbar/navbar.directive.js"></script>
+<script type="text/javascript" src="components/navbar/navbar.component.js"></script>
 <script type="text/javascript" src="components/uploadbutton/uploadbtn.directive.js"></script>
 <script type="text/javascript" src="components/node/node.service.js"></script>
-<script type="text/javascript" src="components/sidebar/menu.service.js"></script>
-<script type="text/javascript" src="components/sidebar/drawer.controller.js"></script>
-<script type="text/javascript" src="components/sidebar/menuLink/menuLink.directive.js"></script>
-<script type="text/javascript" src="components/sidebar/menutoggle/menuToggle.driective.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.service.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.controller.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.directive.js"></script>
+<script type="text/javascript" src="components/drawer/menuLink/menuLink.directive.js"></script>
+<script type="text/javascript" src="components/drawer/menutoggle/menuToggle.driective.js"></script>
+<script type="text/javascript" src="components/drawer/menuSettings/settingsToggle.directive.js"></script>
+
 <script type="text/javascript" src="components/filters/humanize.js"></script>
 <script type="text/javascript" src="components/filters/nospace.js"></script>
-<script type="text/javascript" src="components/sidebar/menuSettings/settingsToggle.directive.js"></script>
+
+
+<script type="text/javascript" src="components/filebrowser/filebrowser.directive.js"></script>
+<script type="text/javascript" src="components/filebrowser/filebrowser.component.js"></script>
 
 <script type="text/javascript" src="components/dataServices/file.service.js"></script>
 <!--<script type="text/javascript" src="components/tabbar/tabcontent/meta.controller.js"></script>-->
 <script type="text/javascript" src="components/tabbar/tab.controller.js"></script>
 <script type="text/javascript" src="components/tabbar/tabcontent/dyanamicUpload.js"></script>
+<script type="text/javascript" src="components/tabbar/tabbar.directive.js"></script>
+
+<script type="text/javascript" src="components/filters/searchable.js"></script>
 
 <script type="text/javascript" src="../db/db.service.js"></script>
 

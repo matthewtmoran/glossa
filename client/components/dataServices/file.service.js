@@ -17,18 +17,27 @@ function fileSrvc(dbSrvc) {
 
     var file = {},
         fileList = [];
+
+    var fileSrvc = this;
+
+
     var data = {
-        currentFile: {}
+        searchText: '',
+        currentFile: {},
+        fileList: [],
+        filteredFiles: []
     };
 
     var service = {
-        getAllFiles: getAllFiles,
+        queryAllFiles: queryAllFiles,
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
         attachFile: attachFile,
         setCurrentFile: setCurrentFile,
         getCurrentFile: getCurrentFile,
-        isAttached: isAttached
+        isAttached: isAttached,
+        getFileList: getFileList,
+        data: data
     };
 
     return service;
@@ -40,11 +49,19 @@ function fileSrvc(dbSrvc) {
      *
      * TODO: may just want to query for text files (Actually all the files being saved in db right now are text file and this might be fine)
      */
-    function getAllFiles() {
+    function queryAllFiles() {
         return dbSrvc.find(fileCollection, {}).then(function(docs) {
-            fileList = docs;
+
+            // docs.forEach(function(doc) {
+            //     data.fileList.push(doc);
+            // });
+            // return fileList;
             return docs;
         })
+    }
+
+    function getFileList() {
+        return data.fileList;
     }
 
 

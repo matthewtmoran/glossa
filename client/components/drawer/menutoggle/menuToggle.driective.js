@@ -9,13 +9,15 @@ function menuToggle($timeout) {
         scope: {
           section: '='
         },
-        templateUrl: 'components/sidebar/menutoggle/menuToggle.html',
+        require: '^^drawerDirective',
+        templateUrl: 'components/drawer/menutoggle/menuToggle.html',
         link: menuToggleLink
     };
     return directive;
 
-    function menuToggleLink(scope, element, attrs) {
-        var controller = element.parent().controller();
+    function menuToggleLink(scope, element, attrs, crtl) {
+        var controller = crtl;
+        // var controller = element.parent().controller();
 
         scope.isOpen = isOpen;
         scope.toggle = toggle;
