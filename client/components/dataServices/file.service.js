@@ -91,6 +91,7 @@ function fileSrvc(dbSrvc) {
         var fileNumber_str;
         var fileName = 'untitled';
         var file = {};
+        var targetPath = '';
         //if a file with the same name exists
         while(fileExist) {
             //change the integer to a string
@@ -98,8 +99,10 @@ function fileSrvc(dbSrvc) {
             //create the name of the file using the generic name and dynamic incremental number
             file.name = fileName + fileNumber_str;
             file.extension = '.md';
+
+            targetPath = 'uploads/' + file.name + file.extension;
             //if a file exists with the same name...
-            if (_.find(fileList,['name', file.name] )) {
+            if (doesExist(targetPath)) {
                 //increment the number
                 fileNumber++;
                 //    if a file with the same name does not exists...

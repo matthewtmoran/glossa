@@ -2,12 +2,12 @@
 		md-component-id="left2"
 		md-is-locked-open="true"
 		layout="column">
-	<md-button ng-click="vm.createNewTextFile()" ng-cloak ng-if="!vm.filteredFiles.length">Create New File</md-button>
+	<md-button ng-click="fbVm.createNewTextFile()" ng-cloak ng-if="!fbVm.filteredFiles.length">Create New File</md-button>
 	<md-content>
 		<md-list flex>
 			<!-- SHOULD LIST ALL THE FILES IN SELECTED COPRUS. MAIN TITLE (H3) OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1. -->
 			<!-- <md-subheader>NAME OF CORPUS (WHEN BROWSING ALL OF THEM)</md-subheader> -->
-			<md-list-item ng-repeat="file in vm.filteredFiles = (vm.fileList | filter: vm.searchText)" class="md-2-line" ng-click="vm.fileSelection(file)">
+			<md-list-item ng-repeat="file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)" class="md-2-line" ng-click="fbVm.fileSelection(file)">
 				<a ng-if="file.category != 'audio'" >
 					<md-item-content md-ink-ripple layout="row" layout-align="start center">
 						<div class="md-list-item-text" layout="column">
@@ -22,8 +22,9 @@
 
 	<md-button id="uploadButton"
 	           class="md-button md-fab md-grey-fab md-fab-bottom-right"
-						 aria-label="attach_file"
-						 ng-click="vm.createNewTextFile()">
+	           aria-label="attach_file"
+	           ng-click="fbVm.createNewTextFile()"
+	           ng-if="fbVm.filteredFiles.length">
 		<md-icon class="material-icons">add</md-icon>
 	</md-button>
 	<aps-upload-file buttonicon="add"></aps-upload-file>

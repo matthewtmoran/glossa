@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('metaCrtl', metaCrtl);
 
-function metaCrtl($scope, $timeout) {
+function metaCrtl($scope, $timeout, fileSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -29,4 +29,19 @@ function metaCrtl($scope, $timeout) {
             $scope.tooltipVisible = metaVm.isOpen;
         }
     }
+
+    function updateData(data) {
+        var changeData = {
+            fileId: data.fileId,
+            options: {},
+            newObj: {},
+            field: data.field,
+            file: vm.selectedFile
+        };
+
+        changeData['newObj'][data.field] = vm.selectedFile[data.field];
+
+        fileSrvc.updateFileData(changeData);
+    }
+
 }

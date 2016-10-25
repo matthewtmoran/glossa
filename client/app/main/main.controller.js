@@ -9,7 +9,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     vm.selectedFile = {};
     vm.fileList = [];
     vm.aceContent = "";
-    vm.searchText = '';
+    vm.searchText = 'test';
     vm.filteredFiles = [];
     // vm.filteredFiles = fileSrvc.data.filteredFiles;
 
@@ -26,14 +26,14 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         buildFileList();
     }
 
-    /**
-     * Creates a new blank texts(.md) document
-     */
-    function createNewTextFile() {
-        fileSrvc.createNewTextFile().then(function(file) {
-            updateFileSelection(file);
-        });
-    }
+    // /**
+    //  * Creates a new blank texts(.md) document
+    //  */
+    // function createNewTextFile() {
+    //     fileSrvc.createNewTextFile().then(function(file) {
+    //         updateFileSelection(file);
+    //     });
+    // }
 
     // function fileClicked(file) {
     //     console.log(' file ', file);
@@ -82,19 +82,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         });
     }
 
-    function updateData(data) {
-        var changeData = {
-            fileId: data.fileId,
-            options: {},
-            newObj: {},
-            field: data.field,
-            file: vm.selectedFile
-        };
 
-        changeData['newObj'][data.field] = vm.selectedFile[data.field];
-
-        fileSrvc.updateFileData(changeData);
-    }
 
     //helper functions//
 
@@ -103,11 +91,11 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
      * Returns a promise object
      */
     function buildFileList() {
-        fileSrvc.queryAllFiles().then(function(docs) {
-            vm.fileList = docs;
-            //set intitial file
-            updateFileSelection(vm.fileList[0]);
-        });
+        // fileSrvc.queryAllFiles().then(function(docs) {
+        //     vm.fileList = docs;
+        //     //set intitial file
+        //     updateFileSelection(vm.fileList[0]);
+        // });
 
         // fileSrvc.queryAllFiles();
 

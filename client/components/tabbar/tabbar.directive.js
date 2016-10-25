@@ -11,7 +11,10 @@ function tabbar(fileSrvc) {
         controllerAs: 'tabVm',
         templateUrl: 'components/tabbar/tabbar.html',
         // link: navBarDirectiveLink
-        bindToController: true
+        bindToController: true,
+        scope: {
+            currentFile: '='
+        }
     };
     return directive;
 

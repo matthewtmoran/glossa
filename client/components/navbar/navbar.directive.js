@@ -11,7 +11,10 @@ function navBarDirective(fileSrvc) {
         controllerAs: 'navVm',
         templateUrl: 'components/navbar/navbar.html',
         // link: navBarDirectiveLink
-        bindToController: true
+        bindToController: true,
+        scope: {
+            searchText: '='
+        },
     };
     return directive;
 

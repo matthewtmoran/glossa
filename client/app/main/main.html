@@ -1,8 +1,14 @@
-<navbar-directive></navbar-directive>
+<navbar-component search-text="navVm.searchText"></navbar-component>
 
-<div flex layout="row" >
-	<file-browser layout="column"></file-browser>
-	<tabbar></tabbar>
+<div flex layout="row">
+	<filebrowser-component
+			layout="column"
+			search-text="navVm.searchText"
+			current-file="fbVm.currentFile"
+	></filebrowser-component>
+
+
+	<tabbar current-file="fbVm.currentFile"></tabbar>
 </div>
 
 <drawer-directive></drawer-directive>

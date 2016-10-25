@@ -9,29 +9,19 @@ angular.module('glossa')
         require: {
             main: '^mainComponent'
         },
-        scope: true
+        bindings: {
+            searchText: '='
+        }
     });
 
 function navbarCtrl($mdSidenav, $scope) {
     var navVm = this;
     var originatorEv;
-    // navVm.searchText = '';
+    navVm.searchText = '';
 
     navVm.$onInit = function () {
 
-        // fbVm.fileList = fbVm.main.fileList;
-        // fbVm.filteredFiles = fbVm.main.filteredFiles;
-
-
     };
-
-
-
-    // $scope.$watch('navVm.searchText', function(val) {
-    //     console.log('new Val', val);
-    //     navVm.main.searchText = val;
-    // });
-
 
     navVm.execute = execute;
     navVm.concordance = concordance;
@@ -63,11 +53,10 @@ function navbarCtrl($mdSidenav, $scope) {
             title: 'About Corpus'
         }
     ];
-
+    navVm.searchText = '';
 
     navVm.toggleLeft = buildToggler('left');
     navVm.toggleRight = buildToggler('right');
-
 
     function buildToggler(componentId) {
         return function() {
