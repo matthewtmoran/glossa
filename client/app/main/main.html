@@ -4,11 +4,16 @@
 	<filebrowser-component
 			layout="column"
 			search-text="navVm.searchText"
-			current-file="fbVm.currentFile"
-	></filebrowser-component>
+			current-file="fbVm.currentFile">
+	</filebrowser-component>
 
 
-	<tabbar current-file="fbVm.currentFile"></tabbar>
+	<viewer-editor-component
+			layout="column"
+	        flex
+			current-file="fbVm.currentFile">
+	</viewer-editor-component>
+	<!--<tabbar current-file="fbVm.currentFile"></tabbar>-->
 </div>
 
 <drawer-directive></drawer-directive>

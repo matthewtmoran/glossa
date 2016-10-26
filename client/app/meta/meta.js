@@ -7,8 +7,9 @@ function config($stateProvider) {
     $stateProvider
         .state('main.meta', {
             url: '/meta',
-            templateUrl: 'app/meta/meta.html',
-            controller: 'metaCrtl',
-            controllerAs: 'metaVm'
+            template: '<meta-component ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">'
+            // templateUrl: 'app/meta/meta.html',
+            // controller: 'metaCrtl',
+            // controllerAs: 'metaVm'
         });
 }

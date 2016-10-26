@@ -2,12 +2,15 @@
 	<form name="fileMeta">
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>File Name</label>
-			<input ng-blur="metaVm.updateData({fileId: vm.selectedFile._id, field: 'name'})" ng-model="tabVm.currentFile.name" value="tabVm.currentFile.name">
-			<!--<input ng-blur="vm.updateData({fileId: vm.selectedFile._id, field: 'name'})" ng-model="vm.selectedFile.name" value="vm.selectedFile.name">-->
+			<input ng-blur="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'name'})"
+			       ng-model="metaVm.currentFile.name"
+			       value="metaVm.currentFile.name">
 		</md-input-container>
 		<md-input-container class="md-block">
 			<label>Description</label>
-			<textarea ng-change="vm.updateData({fileId: tabVm.currentFile._id, field: 'description'})" ng-model="tabVm.currentFile.description" rows="5"></textarea>
+			<textarea ng-change="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"
+			          ng-model="metaVm.currentFile.description"
+			          rows="5"></textarea>
 		</md-input-container>
 		<!--<md-input-container ng-if="vm.selectedFile.audio" class="md-block" flex-gt-sm="">-->
 			<!--<label>Audio</label>-->

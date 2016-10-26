@@ -19,10 +19,6 @@ function navbarCtrl($mdSidenav, $scope) {
     var originatorEv;
     navVm.searchText = '';
 
-    navVm.$onInit = function () {
-
-    };
-
     navVm.execute = execute;
     navVm.concordance = concordance;
     navVm.DictionaryBase = DictionaryBase;
