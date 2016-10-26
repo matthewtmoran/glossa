@@ -21,6 +21,7 @@ function viewerEditorCtrl($scope, $state) {
 
     var stringBindingDeReg = $scope.$watch('veVm.currentFile',
         function(newValue) {
+        console.log('debug1')
             if (angular.isObject(newValue)) {
                 stringBindingDeReg();
                 neededBindings -= 1;
@@ -31,6 +32,7 @@ function viewerEditorCtrl($scope, $state) {
         });
 
     function onBindingsStabilize() {
+        console.log('debug2');
         if (neededBindings === 0) {
             console.log('everything is ready!');
 

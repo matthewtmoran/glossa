@@ -1,26 +1,48 @@
-<navbar-component search-text="navVm.searchText"></navbar-component>
 
-<div flex layout="row">
-	<filebrowser-component
-			layout="column"
-			search-text="navVm.searchText"
-			current-file="fbVm.currentFile">
-	</filebrowser-component>
+<navbar-component
+		layout="row"
+		search-text="navVm.searchText">
+</navbar-component>
+<md-content layout="row" flex>
+
+	<!--<md-button id="uploadButton"-->
+	           <!--style="top: 95% !important; bottom: auto!important; position: fixed!important; z-index: 10000!important;"-->
+	           <!--class="md-button md-fab md-grey-fab md-fab-bottom-right"-->
+	           <!--aria-label="attach_file"-->
+	           <!--ng-click="vm.createNewTextFile()"-->
+		<!--<md-icon class="material-icons">add</md-icon>-->
+	           <!--&lt;!&ndash;ng-if="fbVm.filteredFiles.length"&ndash;&gt;-->
+	<!--</md-button>-->
 
 
-	<viewer-editor-component
-			layout="column"
-	        flex
-			current-file="fbVm.currentFile">
-	</viewer-editor-component>
-	<!--<tabbar current-file="fbVm.currentFile"></tabbar>-->
-</div>
+	<md-button id="uploadButton"
+	           style="z-index:1000; left: 215px;"
+	           class="md-button md-fab md-grey-fab md-fab-bottom-left"
+	           ng-click="vm.createNewTextFile()"
+	           aria-label="attach_file">
+		<md-icon class="material-icons">add</md-icon>
+	</md-button>
+		<!--ng-if="fbVm.filteredFiles.length">-->
+		<!--ng-click="fbVm.createNewTextFile()"-->
+
+	<md-sidenav
+			md-component-id="left2"
+			md-is-locked-open="true"
+			layout-column>
+		<filebrowser-component
+				search-text="navVm.searchText"
+				current-file="fbVm.currentFile">
+		</filebrowser-component>
+
+
+
+	</md-sidenav>
+
+
+	<viewer-editor-component current-file="fbVm.currentFile" layout="column" flex></viewer-editor-component>
+</md-content>
 
 <drawer-directive></drawer-directive>
-
-
-
-
 
 
 

@@ -1,10 +1,10 @@
-<md-sidenav
-		md-component-id="left2"
-		md-is-locked-open="true"
-		layout="column">
+<!--<md-sidenav-->
+		<!--md-component-id="left2"-->
+		<!--md-is-locked-open="true"-->
+		<!--layout-column>-->
 	<md-button ng-click="fbVm.createNewTextFile()" ng-cloak ng-if="!fbVm.filteredFiles.length">Create New File</md-button>
-	<md-content>
-		<md-list flex>
+	<md-content layout-fill role="navigation">
+		<md-list>
 			<!-- SHOULD LIST ALL THE FILES IN SELECTED COPRUS. MAIN TITLE (H3) OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1. -->
 			<!-- <md-subheader>NAME OF CORPUS (WHEN BROWSING ALL OF THEM)</md-subheader> -->
 			<md-list-item ng-repeat="file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)" class="md-2-line" ng-click="fbVm.fileSelection(file)">
@@ -20,18 +20,21 @@
 		</md-list>
 	</md-content>
 
-	<md-button id="uploadButton"
-	           class="md-button md-fab md-grey-fab md-fab-bottom-right"
-	           aria-label="attach_file"
-	           ng-click="fbVm.createNewTextFile()"
-	           ng-if="fbVm.filteredFiles.length">
-		<md-icon class="material-icons">add</md-icon>
-	</md-button>
-	<aps-upload-file buttonicon="add"></aps-upload-file>
+
+<!--<md-button id="uploadButton"-->
+           <!--style="top: 95% !important; bottom: auto!important; position: fixed!important"-->
+           <!--class="md-button md-fab md-grey-fab md-fab-bottom-right"-->
+           <!--aria-label="attach_file"-->
+           <!--ng-click="fbVm.createNewTextFile()"-->
+           <!--ng-if="fbVm.filteredFiles.length">-->
+	<!--<md-icon class="material-icons">add</md-icon>-->
+<!--</md-button>-->
 
 
 
-</md-sidenav>
+	           <!--style="position: fixed !important;"-->
+
+<!--</md-sidenav>-->
 
 
 

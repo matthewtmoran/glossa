@@ -34,11 +34,10 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
      * Creates a new blank texts(.md) document
      */
     function createNewTextFile() {
-        fileSrvc.createNewTextFile().then(function(file) {
-            updateFileSelection(file);
-        });
+        //emit event becuase the data is stored in a child scope
+        $scope.$broadcast('create:textFile');
     }
-
+``
     // function fileClicked(file) {
     //     console.log(' file ', file);
     //     vm.selectedFile = file;

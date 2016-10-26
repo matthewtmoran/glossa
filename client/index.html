@@ -8,11 +8,12 @@ TODO:
 TODO:
 -->
 
+<!doctype html>
 <html lang="en" >
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width">
 	<!-- Angular Material style sheet -->
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.1/angular-material.min.css">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 	<link data-require="font-awesome@4.3.0" data-semver="4.3.0" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
@@ -35,8 +36,35 @@ TODO:
 	<!--Replaced with navbar.html-->
 	<!--<navbar-directive></navbar-directive>-->
 
+	<!--<div flex layout="column">-->
+		<!---->
+		<!--<div layout="row">-->
+			<!--<md-toolbar layout="row">-->
+				<!--<div flex="15"> this is the logo</div>-->
+				<!--<div flex="85"> this is the navbar</div>-->
+			<!--</md-toolbar>-->
+		<!--</div>-->
+		<!--<div layout="row" flex>-->
+			<!--<md-sidenav layout-column class="md-sidenav-left " id="siteMenu" md-component-id=" left" md-is-locked-open="$mdMedia('gt-sm')">-->
 
-	<ui-view layout="column"></ui-view>
+				<!--<md-content layout-fill role="navigation">-->
+					<!--<p>content content content</p>-->
+					<!--<p>content content content</p>-->
+					<!--<p>content content content</p>-->
+					<!--<p>content content content</p>-->
+					<!--<p>content content content</p>-->
+				<!--</md-content>-->
+			<!--</md-sidenav>-->
+			<!--<md-content layout="column" class="content-wrapper md-padding" flex layout-column>-->
+
+			<!--</md-content>-->
+		<!--</div>-->
+	<!--</div>-->
+	<div ui-view flex layout="column"></div>
+
+
+
+
 
 	<!--Replaced with drawer.html-->
 

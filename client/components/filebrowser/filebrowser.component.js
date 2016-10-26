@@ -21,6 +21,12 @@ function filebrowserComponent(fileSrvc, $scope) {
 
     fbVm.fileList = [];
 
+
+    //Listener for fab button click
+    $scope.$on('create:textFile', function() {
+        createNewTextFile();
+    });
+
     fileSrvc.queryAllFiles().then(function(docs) {
         fbVm.fileList = docs;
         //set intitial file

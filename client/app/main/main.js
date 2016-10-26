@@ -25,7 +25,7 @@ function config($stateProvider) {
         .state('main', {
             url: '/',
             // component: 'mainComponent',
-            template: '<main-component layout="column">'
+            template: '<main-component flex layout="column">'
             // templateUrl: 'app/main/main.html',
             // controller: 'MainCtrl',
             // controllerAs: 'vm'
