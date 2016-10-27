@@ -18,26 +18,33 @@ function filebrowserComponent(fileSrvc, $scope) {
     fbVm.fileSelection = fileSelection;
     fbVm.createNewTextFile = createNewTextFile;
 
-
     fbVm.fileList = [];
 
+    activate();
 
-    //Listener for fab button click
-    $scope.$on('create:textFile', function() {
-        createNewTextFile();
-    });
+    function activate() {
+        initialFileList();
+    }
 
-    fileSrvc.queryAllFiles().then(function(docs) {
-        fbVm.fileList = docs;
-        //set intitial file
-        updateFileSelection(fbVm.fileList[0]);
-    });
+    /**
+     * Queries for all files in db.
+     * Returns a promise object
+     */
+    function initialFileList() {
+        fileSrvc.queryAllFiles().then(function(docs) {
+            fbVm.fileList = docs;
+            //set intitial file
+            updateFileSelection(fbVm.fileList[0]);
+        });
+    }
 
+    /**
+     * Define the selected file
+     * called on file click event
+     * @param file
+     */
     function fileSelection(file) {
         updateFileSelection(file);
-        // if (vm.selectedFile.category === 'audio') {
-        //     initWave(vm.selectedFile);
-        // }
     }
 
     /**
@@ -59,18 +66,12 @@ function filebrowserComponent(fileSrvc, $scope) {
         });
     }
 
-    function updateData(data) {
-        var changeData = {
-            fileId: data.fileId,
-            options: {},
-            newObj: {},
-            field: data.field,
-            file: vm.selectedFile
-        };
-
-        changeData['newObj'][data.field] = vm.selectedFile[data.field];
-
-        fileSrvc.updateFileData(changeData);
-    }
+    /**
+     * Event Listener for #uploadButton click event
+     * Broadcasted from main.component.js
+     */
+    $scope.$on('create:textFile', function() {
+        createNewTextFile();
+    });
 
 }

@@ -18,11 +18,6 @@ TODO:
 
 	<link data-require="font-awesome@4.3.0" data-semver="4.3.0" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
 
-	<!--<link rel="stylesheet" href="assets/app.css">-->
-	<!--<link rel="stylesheet" href="assets/tutorial_3.css">-->
-
-	<!--<link rel="stylesheet" href="assets/css/style.css">-->
-
 	<!-- inject:css -->
 	<link rel="stylesheet" href="app/app.css">
 	<!-- endinject -->
@@ -33,41 +28,7 @@ TODO:
 
 <body ng-app="glossa" layout="column" ng-cloak>
 
-	<!--Replaced with navbar.html-->
-	<!--<navbar-directive></navbar-directive>-->
-
-	<!--<div flex layout="column">-->
-		<!---->
-		<!--<div layout="row">-->
-			<!--<md-toolbar layout="row">-->
-				<!--<div flex="15"> this is the logo</div>-->
-				<!--<div flex="85"> this is the navbar</div>-->
-			<!--</md-toolbar>-->
-		<!--</div>-->
-		<!--<div layout="row" flex>-->
-			<!--<md-sidenav layout-column class="md-sidenav-left " id="siteMenu" md-component-id=" left" md-is-locked-open="$mdMedia('gt-sm')">-->
-
-				<!--<md-content layout-fill role="navigation">-->
-					<!--<p>content content content</p>-->
-					<!--<p>content content content</p>-->
-					<!--<p>content content content</p>-->
-					<!--<p>content content content</p>-->
-					<!--<p>content content content</p>-->
-				<!--</md-content>-->
-			<!--</md-sidenav>-->
-			<!--<md-content layout="column" class="content-wrapper md-padding" flex layout-column>-->
-
-			<!--</md-content>-->
-		<!--</div>-->
-	<!--</div>-->
 	<div ui-view flex layout="column"></div>
-
-
-
-
-
-	<!--Replaced with drawer.html-->
-
 
 
 <!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
@@ -92,7 +53,6 @@ TODO:
 <!-- Your application bootstrap  -->
 <script type="text/javascript" src="app/app.js"></script>
 <script type="text/javascript" src="app/main/main.js"></script>
-<script type="text/javascript" src="app/main/main.controller.js"></script>
 <script type="text/javascript" src="app/main/main.component.js"></script>
 <script type="text/javascript" src="app/meta/meta.js"></script>
 <!--<script type="text/javascript" src="app/meta/meta.controller.js"></script>-->
@@ -107,8 +67,6 @@ TODO:
 <script type="text/javascript" src="app/audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer.controller.js"></script>
 <!--<script type="text/javascript" src="app/audioSandbox/wavesurfer.directive.js"></script>-->
 
-<script type="text/javascript" src="components/navbar/navbar.controller.js"></script>
-<script type="text/javascript" src="components/navbar/navbar.directive.js"></script>
 <script type="text/javascript" src="components/navbar/navbar.component.js"></script>
 <script type="text/javascript" src="components/uploadbutton/uploadbtn.directive.js"></script>
 <script type="text/javascript" src="components/node/node.service.js"></script>
@@ -131,11 +89,9 @@ TODO:
 
 <script type="text/javascript" src="components/dataServices/file.service.js"></script>
 <!--<script type="text/javascript" src="components/tabbar/tabcontent/meta.controller.js"></script>-->
-<script type="text/javascript" src="components/tabbar/tab.controller.js"></script>
 <script type="text/javascript" src="components/tabbar/tabcontent/dyanamicUpload.js"></script>
 <script type="text/javascript" src="components/tabbar/tabbar.directive.js"></script>
 
-<script type="text/javascript" src="components/filters/searchable.js"></script>
 
 <script type="text/javascript" src="../db/db.service.js"></script>
 

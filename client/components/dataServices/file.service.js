@@ -51,11 +51,6 @@ function fileSrvc(dbSrvc) {
      */
     function queryAllFiles() {
         return dbSrvc.find(fileCollection, {}).then(function(docs) {
-
-            // docs.forEach(function(doc) {
-            //     data.fileList.push(doc);
-            // });
-            // return fileList;
             return docs;
         })
     }

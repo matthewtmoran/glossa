@@ -32,6 +32,10 @@ function metaCtrl($scope, fileSrvc) {
     $scope.$watch('metaVm.isOpen', isOpenWatch);
 
 
+    /**
+     * Update the file's meta data from form
+     * @param data - object = {fileId: String, field: String}
+     */
     function updateData(data) {
         var changeData = {
             fileId: data.fileId,

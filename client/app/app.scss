@@ -61,9 +61,9 @@ $secondary-text: $lBlack;
 
 /* inject:scss */
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
+@import 'main/main';
 @import 'meta/meta';
 @import '../components/drawer/drawer';
 @import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
-@import '../components/tabbar/tabbar';
 /* endinject */
