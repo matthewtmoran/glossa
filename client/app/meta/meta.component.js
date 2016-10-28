@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc) {
+function metaCtrl($scope, fileSrvc, $mdDialog) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -26,6 +26,7 @@ function metaCtrl($scope, fileSrvc) {
     ];
 
     metaVm.updateData = updateData;
+    metaVm.showAttachDialog = showAttachDialog;
 
     // On opening, add a delayed property which shows tooltips after the speed dial has opened
     // so that they have the proper position; if closing, immediately hide the tooltips
@@ -48,6 +49,26 @@ function metaCtrl($scope, fileSrvc) {
         changeData['newObj'][data.field] = metaVm.currentFile[data.field];
 
         fileSrvc.updateFileData(changeData);
+    }
+
+    function showAttachDialog(ev) {
+        $mdDialog.show({
+            controller: attachfileCtrl,
+            controllerAs: 'atVm',
+            templateUrl: 'app/meta/modal/attachfile.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true,
+            bindToController: true,
+            locals: {
+                currentFile: metaVm.currentFile
+            }
+        })
+            .then(function(answer) {
+                $scope.status = 'You said the information was "' + answer + '".';
+            }, function() {
+                $scope.status = 'You cancelled the dialog.';
+            });
     }
 
     function isOpenWatch(isOpen) {

@@ -48,6 +48,10 @@ $secondary-text: $lBlack;
 	transition: .3s;
 }
 
+.md-large-btn {
+	width: 15em;
+}
+
 //TODO: there should be a way to style button through themeing
 .md-grey-fab {
 	background-color: $newGrey !important;
@@ -63,6 +67,7 @@ $secondary-text: $lBlack;
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
 @import 'main/main';
 @import 'meta/meta';
+@import 'meta/modal/attachfile';
 @import '../components/drawer/drawer';
 @import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';

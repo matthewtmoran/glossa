@@ -1,0 +1,68 @@
+<md-dialog id="attach-file-dialog" flex="50" aria-label="Attach files"  >
+	<form ng-cloak>
+		<!--<md-toolbar>-->
+			<!--<div class="md-toolbar-tools">-->
+				<!--<h2>Upload New</h2>-->
+				<!--<span flex></span>-->
+			<!--</div>-->
+			<!--<md-button class="md-icon-button" ng-click="atVm.cancel()">-->
+				<!--<md-icon aria-label="Close dialog">close</md-icon>-->
+			<!--</md-button>-->
+		<!--</md-toolbar>-->
+		<md-dialog-content>
+			<div class="md-dialog-content">
+				<div class="new-files">
+					<h2>Upload new</h2>
+					<div layout="row" layout-align="space-between center">
+						<dynamic-upload ng-repeat="item in atVm.items" item="item"></dynamic-upload>
+					</div>
+
+					<div class="md-padding" layout="row" layout-align="space-between center">
+						<h3 ng-show="atVm.currentFile.audio">
+							{{atVm.currentFile.audio}}
+						</h3>
+						<!--TODO: figure out how not to have to do this: '../'-->
+						<img  ng-show="atVm.currentFile.image" ng-src="{{'../' + atVm.currentFile.image}}" alt="">
+					</div>
+				</div>
+				<div class="notebook">
+					<h2>Attach from notebook</h2>
+					<md-input-container md-no-float class="md-block" >
+						<md-icon class="material-icons">search</md-icon>
+						<form ng-submit="atVm.searchSubmit()">
+							<input ng-model="atVm.searchText" placeholder="Search Notebooks...">
+						</form>
+					</md-input-container>
+
+					<md-content   class="search-result-wrapper">
+						<md-list>
+							<md-list-item ng-show="atVm.searchText" ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText || ''" class="md-2-line " ng-click="atVm.notebookSelection(notebook)">
+								<a>
+									<md-item-content md-ink-ripple layout="row" layout-align="start center">
+										<div class="md-list-item-text" layout="column">
+											<h3>{{notebook.name}}</h3>
+											<p>Preview of first few lines of a baseline</p>
+										</div>
+									</md-item-content>
+								</a>
+							<md-divider></md-divider>
+							</md-list-item>
+						</md-list>
+					</md-content>
+				</div>
+
+			</div>
+		</md-dialog-content>
+
+
+		<md-dialog-actions layout="row" layout-align="space-between">
+			<md-button ng-click="atVm.cancel('cancel')">
+				Cancel
+			</md-button>
+			<md-button ng-click="atVm.save('useful')">
+				Okay
+			</md-button>
+		</md-dialog-actions>
+
+	</form>
+</md-dialog>

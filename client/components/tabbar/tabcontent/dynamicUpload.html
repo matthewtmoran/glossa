@@ -1,13 +1,18 @@
-<md-button aria-label="{{metaVm.name}}"
+<md-button aria-label="{{item.name}}"
            id="mini-btn-{{item.type}}"
-           class="md-fab md-raised md-mini">
+           class="md-raised md-mini md-large-btn">
+
+	<span>{{item.name}}</span>
+
+	<span flex></span>
+
+	<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>
 
 	<md-tooltip md-direction="{{item.direction}}"
 	            md-visible="tooltipVisible"
 	            md-autohide="true">
 		{{item.name}}
 	</md-tooltip>
-	<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>
 </md-button>
-<input type="file" class="ng-hide">
+<input type="file" class="ng-hide" accept>
 

@@ -18,6 +18,7 @@ function dynamicUpload(fileSrvc) {
     function dynamicUploadLink(scope, element, attrs) {
         var button = angular.element(element[0].children[0]);
         var input = angular.element(element[0].children[1]);
+
         input.attr('accept', scope.item.accept);
 
         if (input.length && button.length) {
