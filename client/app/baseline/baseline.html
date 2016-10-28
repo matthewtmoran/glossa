@@ -1,14 +1,32 @@
-<md-wavesurfer-player
-		ng-if="vm.selectedFile.audio.length"
-		flex
-		url="{{'../' + vm.selectedFile.audio}}"
-		auto-play="false"
-		back-img="{{vm.selectedFile.image}}"
->
-	<!--back-img="{{vm.selectedFile.image}}">-->
-</md-wavesurfer-player>
+<div layout="column" flex>
 
-<div ui-ace ng-model="vm.aceContent"></div>
+	<div layout="row">
+		<md-wavesurfer-player
+				ng-if="blVm.currentFile.audio.length"
+				flex
+				url="{{'../' + blVm.currentFile.audio}}"
+				auto-play="false"
+				back-img="{{blVm.currentFile.image}}">
+			<!--back-img="{{vm.selectedFile.image}}">-->
+				<!--layout="row"-->
+		</md-wavesurfer-player>
+	</div>
+
+	<div layout="row" flex >
+		<md-content  id="ace-wrapper" class="content-wrapper " layout="row" flex >
+			<div flex ui-ace ng-model="blVm.aceContent" class="md-whiteframe-3dp" >
+
+			</div>
+				<!--<p>content</p>-->
+			<!--<div flex layout="row" ui-ace ng-model="blVm.aceContent"></div>-->
+
+		</md-content>
+
+	</div>
+</div>
+
+
+
 <!--useWrapMode : true,-->
 <!--mode: 'xml',-->
 <!--firstLineNumber: 5,-->
