@@ -18,7 +18,21 @@ function drawerMenu() {
                     name: 'sub-folder 1',
                     type: 'link',
                     state: 'beers.ipas',
-                    icon: 'fa fa-group'
+                    icon: 'fa fa-group',
+                    settings: [
+                        {
+                            name: 'Sub Option1',
+                            type: ''
+                        },
+                        {
+                            name: 'Sub Option2',
+                            type: ''
+                        },
+                        {
+                            name: 'Sub Option3',
+                            type: ''
+                        }
+                    ]
                 },
                 {
                     name: 'His New Corpus',

@@ -1,11 +1,5 @@
 md-sidenav.drawer {
 	z-index: 62;
-	//overflow: visible;
-
-	md-list {
-		//width: 100% !important;
-	}
-
 	//header section that contains logo in sidenav
 	md-toolbar {
 		background: none !important; //'white' or 'none'... does it matter? @onechrisjones
@@ -22,10 +16,8 @@ md-sidenav.drawer {
 			margin-top: 0;
 			border-top: 1px solid rgba(0, 0, 0, 0.12); //added these borders around the menu sub-items. @onechrisjones
 			border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-			> li {
-
-			}
 		}
+
 		.menu-heading {
 			padding-left: 15px; //brings in menu headings from left edge @onechrisjones
 		}
@@ -126,14 +118,26 @@ md-sidenav.drawer {
 		}
 
 		//bottom of side nav section
+	}
 		.bottom-list {
+			width: 100% !important;
+
+			li {
+				height: 60px;
+				button {
+					height: 60px !important;
+					max-height: 60px !important;
+					font-size: 1.2em;
+				}
+			}
+
+
 			ul {
 				> li {
 					border-top: none;
 				}
 			}
 		}
-	}
 }
 
 
