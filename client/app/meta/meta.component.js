@@ -27,6 +27,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
 
     metaVm.updateData = updateData;
     metaVm.showAttachDialog = showAttachDialog;
+    metaVm.confirmDeleteDialog = confirmDeleteDialog;
 
     // On opening, add a delayed property which shows tooltips after the speed dial has opened
     // so that they have the proper position; if closing, immediately hide the tooltips
@@ -70,6 +71,22 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
                 $scope.status = 'You cancelled the dialog.';
             });
     }
+    function confirmDeleteDialog(ev) {
+        // Appending dialog to document.body to cover sidenav in docs app
+        var confirm = $mdDialog.confirm()
+            .title('Are you sure you want to delete this text file?')
+            .textContent('By clicking yes, you confirm to delete everything DIRECTLY associated with this file?')
+            .ariaLabel('Delete Text')
+            .targetEvent(ev)
+            .ok('Yes, Delete')
+            .cancel('No, cancel');
+
+        $mdDialog.show(confirm).then(function() {
+            $scope.status = 'You decided to get rid of your debt.';
+        }, function() {
+            $scope.status = 'You decided to keep your debt.';
+        });
+    };
 
     function isOpenWatch(isOpen) {
         if (isOpen) {
