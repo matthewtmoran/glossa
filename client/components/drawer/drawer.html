@@ -1,99 +1,46 @@
-<md-sidenav class=" drawer site-sidenav md-sidenav-left collapsable-nav"
-            md-component-id="left"
-            md-whiteframe="24"
-            tabindex="-1"
-            layout="column"
-            layout-align="space-between center">
-            <!--ng-transclude=""-->
+<md-sidenav class=" drawer site-sidenav md-sidenav-left collapsable-nav" md-component-id="left" md-whiteframe="24" tabindex="-1" layout="column" layout-align="space-between center">
+    <md-list>
+        <md-toolbar class="nav-header logo-container">
+            <img src="assets/img/logo.svg" alt="">
+        </md-toolbar>
+        <!--<header class="nav-header logo-container">-->
+        <!--<img src="assets/img/logo.svg" alt="">-->
+        <!--</header>-->
+        <md-content flex="" role="navigation" class="_md flex">
+            <ul class="side-menu">
+                <li ng-repeat="section in dVm.menu.section" class="parent-list-item" ng-class="{'parentActive' : dVm.isSectionSelected(section)}">
 
+                    <!--if type is heading show this element-->
+                    <h2 class="menu-heading md-subhead ng-binding ng-scope" ng-if="section.type === 'heading'" id="heading_{{ section.name | nospace }}">{{section.name}}</h2>
 
-	<!--
+                    <!--if type is link show this element (which is actually inject as stated above)-->
+                    <menu-link section="section" ng-if="section.type === 'link'"></menu-link>
 
-	The md-list here is an angular-marterial tag that is basically functioning as a regulat div.  By separating the the sidenav into two section, we can add flex options to do the work that we would normally do in css/sass.
+                    <!--if type is toggle show this element (which is actually inject as stated above)-->
+                    <menu-toggle section="section" ng-if="section.type === 'toggle'"></menu-toggle>
+                </li>
+            </ul>
+        </md-content>
+    </md-list>
 
-	In the md-sidenav above, setting the layout as column is the flex way to allow for separation of elements.  Layout-align allows two child elements to be separated by space.  So now we have both these md-lists being separated by space and thus, the settings button at the bottom of the nav.
+    <md-list class="bottom-list">
+        <md-content role="navigation">
+            <ul class="side-menu">
+                <li class="parent-list-item">
+                    <md-button class="md-button-toggle">
+                        <div flex layout="row">
+                            Settings
+                            <span flex></span>
+                            <!--<settings-toggle section="section" ></settings-toggle>-->
 
-	The other option is to add css to make the button positioned absolute and all the way at the bottom.  This is an option but since angular material is built over flex, flex options seemed best.
-
-	@@@Matt
-
-	-->
-
-	<md-list>
-		<!--
-		So here I changed the header tag to a toolbar tag.  This is just because it's what angular-material recomends for displaying titles and what not though typically you would see a header tag for this stuff.
-
-		@@@Matt
-		-->
-		<md-toolbar class="nav-header logo-container">
-			<img src="assets/img/logo.svg" alt="">
-		</md-toolbar>
-		<!--<header class="nav-header logo-container">-->
-			<!--<img src="assets/img/logo.svg" alt="">-->
-		<!--</header>-->
-		<md-content flex="" role="navigation" class="_md flex">
-			<ul class="side-menu">
-				<li ng-repeat="section in dVm.menu.section"
-				    class="parent-list-item"
-				    ng-class="{'parentActive' : dVm.isSectionSelected(section)}">
-
-					<!--
-
-					The angular material site could utilize more angular-material actually.  I'm guessing it was built early on and since then have come out with more custom elements that do fancy things.  So I'm not even sure about having this ul>li here considering angular material has md-list and md-list-item etc... but maybe I'm misunderstanding something.
-
-					They also have much more potential options for their menu system but I'm not sure we need them.
-						For example they check the type of object and if the section has been marked as hidden or not.  I figure we didn't necessarily need to look at the section to see if they are hidden section.  I'm not sure what they use that for exactly.
-
-						I'm not sure what the use the children for but I can look and see what they are doing if you think we need to or feel like we are missing something by not having this.
-
-
-					Here we repeat an li for every object in dVm.menu.section
-					The object type will either be, 'heading', 'link', 'toggle'
-					Headings will be 'section headings'
-					Toggles will be a toggle button that has 'pages/states' nested in them that will display by sliding down and sliding up.
-					Links will be links to other major components of the app - Essentially changing the main view area on the right.
-
-					menu-link tag will inject html from /menuLink/menuLink.html
-					menu-toggle will inject html from /menuToggle/menuToggle.html
-
-
-					@@@Matt
-					-->
-
-					<!--if type is heading show this element-->
-					<h2 class="menu-heading md-subhead ng-binding ng-scope"
-					    ng-if="section.type === 'heading'"
-					    id="heading_{{ section.name | nospace }}">{{section.name}}</h2>
-
-					<!--if type is link show this element (which is actually inject as stated above)-->
-					<menu-link section="section" ng-if="section.type === 'link'"></menu-link>
-
-					<!--if type is toggle show this element (which is actually inject as stated above)-->
-					<menu-toggle section="section" ng-if="section.type === 'toggle'"></menu-toggle>
-				</li>
-			</ul>
-		</md-content>
-	</md-list>
-
-	<md-list class="bottom-list">
-		<md-content role="navigation" >
-			<ul class="side-menu">
-				<li class="parent-list-item">
-					<md-button class="md-button-toggle">
-						<div flex layout="row">
-							Settings
-							<span flex></span>
-							<!--<settings-toggle section="section" ></settings-toggle>-->
-
-							<span aria-hidden="true"
-							      class="md-toggle-icon">
+                            <span aria-hidden="true" class="md-toggle-icon">
 								<md-icon md-font-library="material-icons">settings</md-icon>
 							</span>
-						</div>
-					</md-button>
-				</li>
-			</ul>
-		</md-content>
-	</md-list>
+                        </div>
+                    </md-button>
+                </li>
+            </ul>
+        </md-content>
+    </md-list>
 
 </md-sidenav>

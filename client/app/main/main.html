@@ -13,13 +13,15 @@
 	</md-button>
 
 	<!--
-	I didn't want to have to put the sidenav outside of the actual component 'filebrowser' but I was having so many issues with the styling
-
+	I didn't want to have to put the sidenav outside of the actual component 'filebrowser' but I was having so many issues with the styling 
+	
+	@matt: My SO solution has the filebrowser NOT using md-sidenav... but md-list. Is that ill advised?   http://stackoverflow.com/a/40149614?noredirect=1
 	-->
 	<md-sidenav
 			md-component-id="left2"
 			md-is-locked-open="true"
-			layout-column>
+			layout-column
+			md-whiteframe="2">
 		<!--filebrowser-->
 		<filebrowser-component
 				search-text="navVm.searchText"
