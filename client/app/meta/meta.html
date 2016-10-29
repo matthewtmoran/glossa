@@ -1,7 +1,7 @@
 <div layout-padding="" class="meta-tab">
 	<form name="fileMeta">
 		<md-input-container class="md-block" flex-gt-sm="">
-			<label>File Name</label>
+			<label>Title</label>
 			<input ng-blur="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'name'})"
 			       ng-model="metaVm.currentFile.name"
 			       value="metaVm.currentFile.name">
@@ -23,8 +23,8 @@
 		<!--</md-input-container>-->
 	</form>
 	<div layout="row" layout-align="space-between center">
-		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
-		<md-button ng-click="metaVm.showAttachDialog($event)">Attach</md-button>
+		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete</md-button>
+		<md-button ng-click="metaVm.showAttachDialog($event)" class="md-primary">Attach</md-button>
 
 
 		<!--<md-fab-speed-dial ng-hide="metaVm.hidden"-->

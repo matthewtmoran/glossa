@@ -78,8 +78,8 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             .textContent('By clicking yes, you confirm to delete everything DIRECTLY associated with this file?')
             .ariaLabel('Delete Text')
             .targetEvent(ev)
-            .ok('Yes, Delete')
-            .cancel('No, cancel');
+            .ok('Delete')
+            .cancel('Cancel');
 
         $mdDialog.show(confirm).then(function() {
             $scope.status = 'You decided to get rid of your debt.';
