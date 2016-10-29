@@ -14,8 +14,8 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 
     // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 800, height: 600, titleBarStyle: 'hidden'});
-
+    mainWindow = new BrowserWindow({ width: 1024, height: 768});
+    //titleBarStyle: 'hidden'... this gives us control over title bar in macOS
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname + '/client/index.html');
 
