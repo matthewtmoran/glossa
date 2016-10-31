@@ -17,3 +17,18 @@
 		width: 200px;
 	}
 }
+
+.media-title {
+	padding: 16px !important;
+
+	.md-headline {
+		font-weight: 300 !important;
+		color: $black !important;
+	}
+
+}
+.media-description {
+	p {
+		color: $bFaint !important;
+	}
+}

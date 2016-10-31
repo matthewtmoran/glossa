@@ -2,6 +2,7 @@ $mGrey: #9E9E9E; //- primary
 $white: #F5F5F5; // -light primary
 $dGrey: #616161; // - dark primary
 $black: #212121; // - text/icons
+$bFaint: rgba(0,0,0,.54);
 
 $red: #FF5252; // - accent color
 $lBlack: #757575; // secondary text
@@ -31,8 +32,13 @@ $secondary-text: $lBlack;
 }
 
 @font-face {
-	font-family: "Roboto Mono";
-	src: url(../assets/fonts/RobotoMono-Regular.ttf);
+	font-family: "Roboto";
+	src: url(../assets/fonts/Roboto-Regular.ttf);
+}
+@font-face {
+	font-family: "Roboto";
+	src: url(../assets/fonts/Roboto-Light.ttf);
+	font-weight: 300;
 }
 
 

@@ -49,5 +49,41 @@
 			<!--</md-fab-actions>-->
 		<!--</md-fab-speed-dial>-->
 	</div>
+
+	<div layout="column" class="attached-media">
+		<h3>Associated Media</h3>
+
+		<md-content layout="row">
+
+			<md-card flex="33" ng-repeat="media in metaVm.attachedMedia" class="mdl-shadow--2dp">
+				<md-card-title class="media-title" layout-align="center space-between">
+					<md-card-title-text>
+						<span class="md-headline">{{media.title}}</span>
+						<!--<span class="md-subhead">Large</span>-->
+					</md-card-title-text>
+
+					<md-card-icon-actions layout="row" layout-align="end top">
+						<md-button class="md-icon-button">
+							<md-icon>open_in_new</md-icon>
+						</md-button>
+					</md-card-icon-actions>
+				</md-card-title>
+				<md-card-content class="media-description">
+					<p>{{media.description}}</p>
+				</md-card-content>
+					<!--<md-card-title-media>-->
+						<!--<div class="md-media-lg card-media">-->
+							<!--<img ng-if="media.type === 'image'" ng-src="{{'../' + media.name}}" alt="">-->
+						<!--</div>-->
+					<!--</md-card-title-media>-->
+
+
+				<md-divider></md-divider>
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button>Disconnect</md-button>
+				</md-card-actions>
+			</md-card>
+		</md-content>
+	</div>
 	<md-divider></md-divider>
 </div>

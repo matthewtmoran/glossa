@@ -29,6 +29,42 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
     metaVm.showAttachDialog = showAttachDialog;
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
 
+    metaVm.attachedMedia = [];
+
+    metaVm.activate = activate;
+
+    function activate() {
+        buildMediaList();
+    }
+    activate();
+
+    function buildMediaList() {
+        console.log('buildMediaList');
+        if (metaVm.currentFile.image) {
+            console.log('metaVm.currentFile.image', metaVm.currentFile.image);
+            var attachedImage = {};
+
+            attachedImage.title = 'Notebook Entry';
+            attachedImage.type = 'image';
+            attachedImage.name = metaVm.currentFile.image;
+            attachedImage.description = 'This is an attached image associated with this file.';
+            metaVm.attachedMedia.push(attachedImage);
+
+        }
+
+        if (metaVm.currentFile.audio) {
+            var attachedAudio = {};
+
+            attachedAudio.title = 'Audio Attachment';
+            attachedAudio.type = 'audio';
+            attachedAudio.name = metaVm.currentFile.audio;
+            attachedAudio.description = 'This is an attached audio file associated with this file.';
+            metaVm.attachedMedia.push(attachedAudio);
+        }
+
+
+    }
+
     // On opening, add a delayed property which shows tooltips after the speed dial has opened
     // so that they have the proper position; if closing, immediately hide the tooltips
     $scope.$watch('metaVm.isOpen', isOpenWatch);
