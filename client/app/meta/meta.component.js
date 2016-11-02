@@ -40,27 +40,27 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
 
     function buildMediaList() {
         console.log('buildMediaList');
-        if (metaVm.currentFile.image) {
-            console.log('metaVm.currentFile.image', metaVm.currentFile.image);
-            var attachedImage = {};
-
-            attachedImage.title = 'Notebook Entry';
-            attachedImage.type = 'image';
-            attachedImage.name = metaVm.currentFile.image;
-            attachedImage.description = 'This is an attached image associated with this file.';
-            metaVm.attachedMedia.push(attachedImage);
-
-        }
-
-        if (metaVm.currentFile.audio) {
-            var attachedAudio = {};
-
-            attachedAudio.title = 'Audio Attachment';
-            attachedAudio.type = 'audio';
-            attachedAudio.name = metaVm.currentFile.audio;
-            attachedAudio.description = 'This is an attached audio file associated with this file.';
-            metaVm.attachedMedia.push(attachedAudio);
-        }
+        // if (metaVm.currentFile.image) {
+        //     console.log('metaVm.currentFile.image', metaVm.currentFile.image);
+        //     var attachedImage = {};
+        //
+        //     attachedImage.title = 'Image Entry';
+        //     attachedImage.type = 'image';
+        //     attachedImage.name = metaVm.currentFile.image;
+        //     attachedImage.description = 'This is an attached image associated with this file.';
+        //     metaVm.attachedMedia.push(attachedImage);
+        //
+        // }
+        //
+        // if (metaVm.currentFile.audio) {
+        //     var attachedAudio = {};
+        //
+        //     attachedAudio.title = 'Audio Attachment';
+        //     attachedAudio.type = 'audio';
+        //     attachedAudio.name = metaVm.currentFile.audio;
+        //     attachedAudio.description = 'This is an attached audio file associated with this file.';
+        //     metaVm.attachedMedia.push(attachedAudio);
+        // }
 
 
     }

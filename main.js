@@ -1,8 +1,10 @@
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+var path = require('path');
 
 var mainWindow = null;
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

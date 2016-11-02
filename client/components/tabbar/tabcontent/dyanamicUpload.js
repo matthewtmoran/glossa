@@ -8,7 +8,8 @@ function dynamicUpload(fileSrvc) {
         restrict: 'E',
         // replace: true,
         scope: {
-            item: '='
+            item: '=',
+            currentFile: '='
         },
         templateUrl: 'components/tabbar/tabcontent/dynamicUpload.html',
         link: dynamicUploadLink
@@ -40,7 +41,7 @@ function dynamicUpload(fileSrvc) {
 
             var file = e.target.files[0];
 
-            fileSrvc.attachFile(file, scope.item.type);
+            fileSrvc.attachFile(file, scope.item.type, scope.currentFile);
             scope.$apply();
         });
     }

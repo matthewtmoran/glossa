@@ -10,19 +10,20 @@
 			<!--</md-button>-->
 		<!--</md-toolbar>-->
 		<md-dialog-content>
+			<pre>{{atVm.currentFile | json}}</pre>
 			<div class="md-dialog-content">
 				<div class="new-files">
 					<h2>Upload new</h2>
 					<div layout="row" layout-align="space-between center">
-						<dynamic-upload ng-repeat="item in atVm.items" item="item"></dynamic-upload>
+						<dynamic-upload ng-repeat="item in atVm.items" item="item" current-file="atVm.currentFile"></dynamic-upload>
 					</div>
 
 					<div class="md-padding" layout="row" layout-align="space-between center">
-						<h3 ng-show="atVm.currentFile.audio">
-							{{atVm.currentFile.audio}}
+						<h3 ng-show="atVm.currentFile.media.audio">
+							{{atVm.currentFile.media.audio.name}}
 						</h3>
 						<!--TODO: figure out how not to have to do this: '../'-->
-						<img  ng-show="atVm.currentFile.image" ng-src="{{'../' + atVm.currentFile.image}}" alt="">
+						<img  ng-if="atVm.currentFile.media.image.path" ng-src="{{'../' + atVm.currentFile.media.image.path}}" alt="">
 					</div>
 				</div>
 				<div class="notebook">

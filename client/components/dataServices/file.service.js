@@ -6,8 +6,10 @@ var db = require('../db/database'),
     path = require('path'),
     _ = require('lodash'),
     fileCollection = db.uploadedFiles,
-    uploadPath = path.join(__dirname,'../uploads/'),
-    imagesDir = 'uploads/images/';
+    uploadPathStatic = path.join(__dirname,'../uploads/'),
+    uploadPathRelative = 'uploads/',
+    imagesDir = 'uploads/image/',
+    audioDir = 'uploads/image/';
 
 
 angular.module('glossa')
@@ -95,7 +97,7 @@ function fileSrvc(dbSrvc) {
             file.name = fileName + fileNumber_str;
             file.extension = '.md';
 
-            targetPath = 'uploads/' + file.name + file.extension;
+            targetPath = uploadPathRelative + file.name + file.extension;
             //if a file exists with the same name...
             if (doesExist(targetPath)) {
                 //increment the number
@@ -103,7 +105,7 @@ function fileSrvc(dbSrvc) {
                 //    if a file with the same name does not exists...
             } else {
                 //define the path
-                var newPath = uploadPath + file.name + file.extension;
+                var newPath = uploadPathStatic + file.name + file.extension;
                 //write the file to that path
                 //second argument will be the default text in the document
                 return createAndSaveFile(file, newPath);
@@ -117,24 +119,25 @@ function fileSrvc(dbSrvc) {
         var file = {};
         file.name = searchInput;
         file.extension = ".md";
-        var newPath = uploadPath + file.name + file.extension;
-        return createAndSaveFile(file, newPath);
+        var fullFilePath = path.join(__dirname, file.name + file.extension);
+        return createAndSaveFile(file, fullFilePath);
     }
     /**
      * Writes text file to directory and saves the data in the database
      * @param file - the file object
-     * @param path - the path of where the file will be stored
+     * @param fullFilePath - the path of where the file will be stored
      *
      * I wanted to write the file to the system first but do to the async nature of the file writing and the promise, I was haivng trouble getting the promise value out when I needed it.
      */
-    function createAndSaveFile (file, path) {
+    function createAndSaveFile(file, fullFilePath) {
         //insert the file in to the fileCollection
         return dbSrvc.insert(fileCollection, buildFileObject(file))
             .then(function(doc) {
                 //when promise returns, push the document to the fileList
                 fileList.push(doc);
+
                 //when the promise resolves write the file to the file system
-                fs.createWriteStream(path)
+                fs.createWriteStream(fullFilePath)
                     .on('close', function() {
                         console.log("file written to system")
                     });
@@ -169,14 +172,13 @@ function fileSrvc(dbSrvc) {
         var fileDoc = {
             name: file.name,
             extension: file.extension,
-            isLinked: false,
-            linked: {},
-            audio: '',
-            image: '',
-            description: ''
+            description: '',
+            media: {}
         };
+        fileDoc.media.image = null;
+        fileDoc.media.audio = null;
 
-        fileDoc.path = uploadPath + fileDoc.name + file.extension;
+        fileDoc.path = uploadPathRelative + fileDoc.name + file.extension;
         // fileDoc.path = uploadPath + fileDoc.fullName;
 
         if (!file.type && fileDoc.extension === '.md')  {
@@ -238,7 +240,7 @@ function fileSrvc(dbSrvc) {
      * @returns {boolean} - true if it has file already attached
      */
     function isAttached(type) {
-        if (data.currentFile[type].length) {
+        if (data.currentFile.media[type]) {
             return true;
         }
         return false;
@@ -259,7 +261,7 @@ function fileSrvc(dbSrvc) {
      */
     function updateFileData(data) {
         if (data.field === 'name') {
-            data.newObj.path = uploadPath + data.newObj.name + data.file.extension;
+            data.newObj.path = uploadPathStatic + data.newObj.name + data.file.extension;
             dbSrvc.update(fileCollection, data);
             renameFileToSystem(data.file.path, data.newObj.path);
         } else {
@@ -292,21 +294,24 @@ function fileSrvc(dbSrvc) {
      * TODO: Are they allowed to attach the same file to different text files?
      *
      */
-    function attachFile(file, type) {
-        var writePath = path.join(__dirname,'../uploads/' + type + '/' + file.name);
-        var targetPath = 'uploads/' + type + '/' + file.name;
+    function attachFile(file, type, currentFile) {
+        var writePath = path.join(uploadPathStatic, type, file.name);
+        var targetPath = path.join(uploadPathRelative,type,file.name);
 
         //check if file with the same name exists in file system
         var exists = doesExist(targetPath);
         if (exists) {
+            //TODO: use angular material alert/confirm
             return alert('A file with this name already exists.');
         }
         return copyAndWrite(file.path, writePath, function(err, res) {
             if (err) {
                 return console.log('There was an error', err);
             }
-            return updateFileInDb(targetPath, type).then(function(result) {
-                data.currentFile[type] = targetPath;
+
+            return updateFileInDb(targetPath, type, file, currentFile).then(function(result) {
+                //TODO: Might be better just to update property
+                data.currentFile = result;
                 return result;
             })
         });
@@ -315,17 +320,31 @@ function fileSrvc(dbSrvc) {
      * Attach Audio File to the current file
      * @param path - the path where the file exists in the app.
      * @param type -
+     * @param file -
+     * @param currentFile - the current file that is selected
+     * Current file is passed in so i can set the tempData.newObj.media to the existing media otherwise, saving the media object, even though we are targeting a nested object, overwrites the media object completely.
      */
-    function updateFileInDb(path, type) {
+    function updateFileInDb(path, type, file, currentFile) {
         var tempData = {
             newObj: {}
         };
-        tempData['newObj'][type] = path;
-        tempData.fileId = data.currentFile._id;
+
+        tempData.newObj.media = currentFile.media;
+
+        tempData.newObj.media[type] = {
+            name: file.name,
+            description: '',
+            path: path,
+            extension: file.extension
+        };
+
+        tempData.fileId = currentFile._id;
         tempData.options = {
             returnUpdatedDocs: true
         };
+
         return dbSrvc.update(fileCollection, tempData).then(function(result) {
+            fileCollection.persistence.compactDatafile();
             return result;
         });
     }

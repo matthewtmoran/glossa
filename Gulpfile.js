@@ -12,6 +12,7 @@ var gulp = require('gulp'),
 
 var clientPath = 'client';
 var serverPath = 'server';
+
 var paths = {
     client: {
         assests: clientPath + '/assests/**/*',
@@ -21,7 +22,6 @@ var paths = {
         mainStyle: clientPath + '/app/app.scss',
         views: clientPath + '/{app,components}/**/*.html',
         mainView: clientPath + '/index.html'
-
     }
 };
 
@@ -104,7 +104,6 @@ gulp.task('webpack:dev', function () {
 gulp.task('clean:tmp', function() {
     del(['.tmp/**/*'], {dot: true});
 });
-
 
 
 
