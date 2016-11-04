@@ -63,13 +63,12 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             templateUrl: 'app/meta/modal/attachfile.html',
             parent: angular.element(document.body),
             targetEvent: ev,
-            clickOutsideToClose: true,
+            clickOutsideToClose: false,
             bindToController: true,
             locals: {
                 currentFile: metaVm.currentFile
             }
-        })
-            .then(function(answer) {
+        }).then(function(answer) {
                 $scope.status = 'You said the information was "' + answer + '".';
             }, function() {
                 $scope.status = 'You cancelled the dialog.';

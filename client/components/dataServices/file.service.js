@@ -22,6 +22,7 @@ function fileSrvc(dbSrvc) {
 
     var fileSrvc = this;
 
+    var stagedUpdate = [];
 
     var data = {
         searchText: '',
@@ -42,6 +43,8 @@ function fileSrvc(dbSrvc) {
         deleteMediaFile: deleteMediaFile,
         updateAttached: updateAttached,
         deleteTextFile: deleteTextFile,
+        clearStaged: clearStaged,
+        getStagedUpdate: getStagedUpdate,
         data: data
     };
 
@@ -324,6 +327,7 @@ function fileSrvc(dbSrvc) {
      *
      */
     function attachFile(file, type, currentFile) {
+        stagedUpdate.push(type);
         var writePath = path.join(uploadPathStatic, type, file.name);
         var targetPath = uploadPathRelative + type + '/' + file.name;
         // var targetPath = path.join(uploadPathRelative,type,file.name);
@@ -449,4 +453,10 @@ function fileSrvc(dbSrvc) {
         });
     }
 
+    function clearStaged() {
+        stagedUpdate = [];
+    }
+    function getStagedUpdate() {
+        return stagedUpdate;
+    }
 }

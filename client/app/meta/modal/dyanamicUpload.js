@@ -11,7 +11,7 @@ function dynamicUpload(fileSrvc) {
             item: '=',
             currentFile: '='
         },
-        templateUrl: 'components/tabbar/tabcontent/dynamicUpload.html',
+        templateUrl: 'app/meta/modal/dynamicUpload.html',
         link: dynamicUploadLink
     };
     return directive;
@@ -40,7 +40,6 @@ function dynamicUpload(fileSrvc) {
             // }
 
             var file = e.target.files[0];
-
             fileSrvc.attachFile(file, scope.item.type, scope.currentFile);
             scope.$apply();
         });
