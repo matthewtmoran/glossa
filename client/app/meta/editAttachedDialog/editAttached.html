@@ -1,13 +1,11 @@
-<md-dialog id="attach-file-dialog" flex="50" aria-label="Attach files"  >
+<md-dialog id="attach-file-dialog" flex="50" aria-label="Edit Attached files"  >
 	<form ng-cloak>
 		<md-dialog-content>
 			<div class="md-dialog-content">
-				<div class="new-files">
+				<div>
 					<h2>Edit Attached File</h2>
 					<div class="md-padding" layout="row" layout-align="space-between center">
-						<h3>
-							{{edVm.attachment.name}}
-						</h3>
+						<h3>{{edVm.attachment.name}}</h3>
 						<img  ng-if="edVm.attachedType === 'image'" ng-src="{{edVm.attachedPath}}" alt="">
 					</div>
 				</div>
@@ -34,8 +32,8 @@
 			<md-button ng-click="edVm.cancel('cancel')">
 				Cancel
 			</md-button>
-			<md-button ng-click="edVm.save('useful')">
-				Okay
+			<md-button ng-click="edVm.save('Update Attached File')">
+				Update
 			</md-button>
 		</md-dialog-actions>
 

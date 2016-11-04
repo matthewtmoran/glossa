@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('editAttached', editAttached);
 
-function editAttached($mdDialog, currentFile, attachment, attachedType) {
+function editAttached($mdDialog, currentFile, attachment, attachedType, fileSrvc) {
     var edVm = this;
 
 
@@ -12,6 +12,11 @@ function editAttached($mdDialog, currentFile, attachment, attachedType) {
     edVm.attachedType = attachedType;
     edVm.attachedPath = '../uploads/' + edVm.attachedType + '/' + edVm.attachment.name;
 
+    edVm.save = save;
+
+    function save() {
+
+    }
 
     edVm.hide = function() {
         $mdDialog.hide();

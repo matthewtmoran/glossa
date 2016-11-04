@@ -40,6 +40,7 @@ function fileSrvc(dbSrvc) {
         isAttached: isAttached,
         getFileList: getFileList,
         deleteMediaFile: deleteMediaFile,
+        updateAttached: updateAttached,
         data: data
     };
 
@@ -396,5 +397,29 @@ function fileSrvc(dbSrvc) {
         });
     }
 
+    function updateAttached(currentFile, attached, type) {
+
+        var tempData = {
+            newObj: {}
+        };
+        tempData.newObj.media = currentFile.media;
+
+        tempData.newObj.media[type] = {
+            name: attached.name,
+            description: '',
+            path: attached.path,
+            extension: attached.extension
+        };
+
+        tempData.fileId = currentFile._id;
+        tempData.options = {
+            returnUpdatedDocs: true
+        };
+
+        return dbSrvc.update(fileCollection, tempData).then(function(result) {
+            fileCollection.persistence.compactDatafile();
+            return result;
+        });
+    }
 
 }
