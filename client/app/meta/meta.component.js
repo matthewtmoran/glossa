@@ -95,9 +95,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             console.log("don't delete file")
         });
     };
-    // function deleteTextFile(currentFile) {
-    //     fileSrvc.deleteTextFile(currentFile);
-    // }
     function disconnectDialog(ev, attachment, type) {
         var confirm = $mdDialog.confirm()
             .title('Are you sure you want to disconnect this media attachment?')
@@ -108,7 +105,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             .cancel('No, cancel');
 
         $mdDialog.show(confirm).then(function() {
-            disconnect(attachment, type, metaVm.currentFile)
+            fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile)
         }, function() {
             console.log('cancel disconnect');
         });
@@ -133,10 +130,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             }, function() {
                 $scope.status = 'You cancelled the dialog.';
             });
-    }
-
-    function disconnect(attachment, type, currentFile) {
-        fileSrvc.deleteMediaFile(attachment, type, currentFile)
     }
 
     function isOpenWatch(isOpen) {

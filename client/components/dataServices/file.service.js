@@ -148,20 +148,20 @@ function fileSrvc(dbSrvc) {
             })
     }
 
-
+    /**
+     * Deletes the current text file and independently attached media
+     * @param currentFile
+     * @returns {*}
+     */
     function deleteTextFile(currentFile) {
-        console.log('currentFile',currentFile);
         for (var key in currentFile.media) {
             // check also if property is not inherited from prototype
             if (currentFile.media.hasOwnProperty(key) ) {
-                if (!currentFile.media[key]) {
-                    break;
+                if (currentFile.media[key]) {
+                    var attachment = currentFile.media[key];
+                    var writePath = path.join(uploadPathStatic, key, attachment.name);
+                    fs.unlink(writePath);
                 }
-
-                var attachment = currentFile.media[key];
-                var writePath = path.join(uploadPathStatic, key, attachment.name);
-                console.log('writePath');
-                fs.unlink(writePath);
             }
         }
 

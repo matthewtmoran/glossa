@@ -13,6 +13,10 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
 
     vm.createNewTextFile = createNewTextFile;
 
+    $scope.$on('remove:textFile', removeTextFile);
+
+
+
     /**
      * Creates a new blank text document
      *
@@ -24,12 +28,20 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         $scope.$broadcast('create:textFile');
     }
 
-
-    $scope.$on('remove:textFile', function(event, data) {
+    /**
+     * Event listener for deleteText
+     *
+     * Emitted from meta.component.js and $broadcasts down to filebrowser.component.js
+     *
+     * event - default event data
+     * data - currentFile
+     *
+     */
+    function removeTextFile(event, data) {
         $scope.$broadcast('rm:textFile', data);
-    });
+    }
 
-    // //TODO: confirm deletion
+
     // function fileSelection(file) {
     //     updateFileSelection(file);
     //     if (vm.selectedFile.category === 'audio') {

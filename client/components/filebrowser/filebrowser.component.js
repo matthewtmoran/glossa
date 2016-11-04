@@ -74,6 +74,16 @@ function filebrowserComponent(fileSrvc, $scope) {
         createNewTextFile();
     });
 
+    /**
+     * Event Listener for deleteText file
+     *
+     * Broadcasted from main.component.js -> emitted from meta.component.js
+     * event - default event data
+     * data - currentFile
+     *
+     * Removes file from view and updates currentFile
+     *
+     */
     $scope.$on('rm:textFile', function(event, data) {
         var index = fbVm.fileList.indexOf(data);
         fbVm.fileList.splice(index, 1);
