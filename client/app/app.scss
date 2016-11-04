@@ -67,7 +67,9 @@ $secondary-text: $lBlack;
 	}
 }
 
-
+md-backdrop.md-sidenav-backdrop {
+	z-index: 62 !important;
+}
 
 /* inject:scss */
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
