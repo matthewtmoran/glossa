@@ -6,9 +6,6 @@ angular.module('glossa')
         controllerAs: 'navVm',
         transclude: true,
         templateUrl: 'components/navbar/navbar.html',
-        require: {
-            main: '^mainComponent'
-        },
         bindings: {
             searchText: '='
         }

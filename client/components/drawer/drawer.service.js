@@ -144,7 +144,7 @@ function drawerMenu() {
                 {
                     name: 'My Notebook',
                     type: 'link',
-                    state: 'munchies.cheetos',
+                    state: 'notebook',
                     icon: 'fa fa-group'
                 },
                 {

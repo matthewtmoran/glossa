@@ -18,11 +18,8 @@ angular.module('glossa')
 function fileSrvc(dbSrvc) {
 
     var file = {},
-        fileList = [];
-
-    var fileSrvc = this;
-
-    var stagedUpdate = [];
+        fileList = [],
+        stagedUpdate = [];
 
     var data = {
         searchText: '',
@@ -62,14 +59,13 @@ function fileSrvc(dbSrvc) {
             return docs;
         })
     }
-
     function getFileList() {
         return data.fileList;
     }
 
 
     ////////////////////////
-    ///Text File Creation///
+    //Text File Functions///
     ////////////////////////
 
     /**
@@ -150,7 +146,6 @@ function fileSrvc(dbSrvc) {
                 return doc;
             })
     }
-
     /**
      * Deletes the current text file and independently attached media
      * @param currentFile
@@ -276,6 +271,12 @@ function fileSrvc(dbSrvc) {
             return true;
         }
         return false;
+    }
+    function clearStaged() {
+        stagedUpdate = [];
+    }
+    function getStagedUpdate() {
+        return stagedUpdate;
     }
 
 
@@ -403,7 +404,6 @@ function fileSrvc(dbSrvc) {
                 })
             );
     }
-
     function deleteMediaFile(attachment, type, currentFile) {
         var writePath = path.join(uploadPathStatic, type, attachment.name);
 
@@ -427,7 +427,6 @@ function fileSrvc(dbSrvc) {
             return result;
         });
     }
-
     function updateAttached(currentFile, attached, type) {
 
         var tempData = {
@@ -451,12 +450,5 @@ function fileSrvc(dbSrvc) {
             fileCollection.persistence.compactDatafile();
             return result;
         });
-    }
-
-    function clearStaged() {
-        stagedUpdate = [];
-    }
-    function getStagedUpdate() {
-        return stagedUpdate;
     }
 }

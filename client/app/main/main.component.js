@@ -12,9 +12,7 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     var vm = this;
 
     vm.createNewTextFile = createNewTextFile;
-
     $scope.$on('remove:textFile', removeTextFile);
-
 
 
     /**
@@ -27,7 +25,6 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
     function createNewTextFile() {
         $scope.$broadcast('create:textFile');
     }
-
     /**
      * Event listener for deleteText
      *

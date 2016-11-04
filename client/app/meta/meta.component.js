@@ -20,6 +20,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
     metaVm.hidden = false;
     metaVm.isOpen = false;
     metaVm.hover = false;
+    metaVm.attachedMedia = [];
     metaVm.items = [
         { name: "Attach Audio", icon: "volume_up", direction: "bottom", accept: '.mp3, .m4a', type: 'audio' },
         { name: "Attach Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
@@ -31,10 +32,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
 
-    metaVm.attachedMedia = [];
-
-    // On opening, add a delayed property which shows tooltips after the speed dial has opened
-    // so that they have the proper position; if closing, immediately hide the tooltips
     $scope.$watch('metaVm.isOpen', isOpenWatch);
 
 
@@ -55,7 +52,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
 
         fileSrvc.updateFileData(changeData);
     }
-
     function showAttachDialog(ev) {
         $mdDialog.show({
             controller: attachfileCtrl,

@@ -8,12 +8,10 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc) {
 
     atVm.currentFile = currentFile;
     atVm.searchText = '';
-
     atVm.items = [
         { name: "Audio", icon: "volume_up", direction: "top", accept: '.mp3, .m4a', type: 'audio' },
         { name: "Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
-
     atVm.notebooks = [
         {
             name: 'NoteBookName',
@@ -44,23 +42,24 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc) {
             description: 'Notebook7 description'
         }
     ];
-
     atVm.notebooksFiltered = [];
 
-    atVm.hide = function() {
-        $mdDialog.hide();
-    };
+    atVm.cancel = cancel;
+    atVm.hide = hide;
+    atVm.save = save;
 
-    atVm.cancel = function() {
+    function cancel() {
         var changedTypes = fileSrvc.getStagedUpdate();
         changedTypes.forEach(function(type) {
             fileSrvc.deleteMediaFile(atVm.currentFile.media[type], type, atVm.currentFile)
         });
         $mdDialog.cancel();
-    };
-
-    atVm.save = function(answer) {
+    }
+    function hide() {
+        $mdDialog.hide();
+    }
+    function save(answer) {
         fileSrvc.clearStaged();
         $mdDialog.hide(answer);
-    };
+    }
 }
