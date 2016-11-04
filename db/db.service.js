@@ -7,7 +7,8 @@ function dbSrvc($q) {
     var service = {
         find: find,
         insert: insert,
-        update: update
+        update: update,
+        remove: remove
     };
 
     return service;
@@ -48,6 +49,20 @@ function dbSrvc($q) {
                 deferred.reject(err);
             }
             deferred.resolve(affectedDocuments);
+        });
+        return deferred.promise;
+    }
+
+    function remove(db, fileId) {
+        var deferred = $q.defer();
+        db.remove({_id: fileId}, function(err, docs) {
+            if (err) {
+                console.log('There was an error deleting the file');
+                deferred.reject(err);
+            } else {
+                console.log('File removed successfully');
+                deferred.resolve(docs);
+            }
         });
         return deferred.promise;
     }

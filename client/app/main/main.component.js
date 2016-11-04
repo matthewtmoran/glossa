@@ -24,6 +24,11 @@ function MainCtrl($scope, nodeSrvc, fileSrvc) {
         $scope.$broadcast('create:textFile');
     }
 
+
+    $scope.$on('remove:textFile', function(event, data) {
+        $scope.$broadcast('rm:textFile', data);
+    });
+
     // //TODO: confirm deletion
     // function fileSelection(file) {
     //     updateFileSelection(file);

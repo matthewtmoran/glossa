@@ -41,6 +41,7 @@ function fileSrvc(dbSrvc) {
         getFileList: getFileList,
         deleteMediaFile: deleteMediaFile,
         updateAttached: updateAttached,
+        deleteTextFile: deleteTextFile,
         data: data
     };
 
@@ -147,6 +148,32 @@ function fileSrvc(dbSrvc) {
             })
     }
 
+
+    function deleteTextFile(currentFile) {
+        console.log('currentFile',currentFile);
+        for (var key in currentFile.media) {
+            // check also if property is not inherited from prototype
+            if (currentFile.media.hasOwnProperty(key) ) {
+                if (!currentFile.media[key]) {
+                    break;
+                }
+
+                var attachment = currentFile.media[key];
+                var writePath = path.join(uploadPathStatic, key, attachment.name);
+                console.log('writePath');
+                fs.unlink(writePath);
+            }
+        }
+
+        var parentFile = path.join(uploadPathStatic, currentFile.name + currentFile.extension);
+
+        fs.unlink(parentFile);
+
+        return dbSrvc.remove(fileCollection, currentFile._id ).then(function(doc) {
+            fileCollection.persistence.compactDatafile();
+            return doc;
+        });
+    }
 
     ////////////////////////
     ////Helper Functions////

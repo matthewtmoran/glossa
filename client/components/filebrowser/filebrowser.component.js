@@ -74,4 +74,10 @@ function filebrowserComponent(fileSrvc, $scope) {
         createNewTextFile();
     });
 
+    $scope.$on('rm:textFile', function(event, data) {
+        var index = fbVm.fileList.indexOf(data);
+        fbVm.fileList.splice(index, 1);
+        updateFileSelection(fbVm.fileList[0]);
+    })
+
 }

@@ -86,11 +86,18 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             .cancel('No, cancel');
 
         $mdDialog.show(confirm).then(function() {
-            console.log('DeleteFile');
+            fileSrvc.deleteTextFile(metaVm.currentFile).then(function() {
+
+            $scope.$emit('remove:textFile', metaVm.currentFile);
+
+            })
         }, function() {
             console.log("don't delete file")
         });
     };
+    // function deleteTextFile(currentFile) {
+    //     fileSrvc.deleteTextFile(currentFile);
+    // }
     function disconnectDialog(ev, attachment, type) {
         var confirm = $mdDialog.confirm()
             .title('Are you sure you want to disconnect this media attachment?')
