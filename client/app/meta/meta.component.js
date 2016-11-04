@@ -28,42 +28,10 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
     metaVm.updateData = updateData;
     metaVm.showAttachDialog = showAttachDialog;
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
+    metaVm.disconnectDialog = disconnectDialog;
+    metaVm.editAttachedFile = editAttachedFile;
 
     metaVm.attachedMedia = [];
-
-    metaVm.activate = activate;
-
-    function activate() {
-        buildMediaList();
-    }
-    activate();
-
-    function buildMediaList() {
-        console.log('buildMediaList');
-        // if (metaVm.currentFile.image) {
-        //     console.log('metaVm.currentFile.image', metaVm.currentFile.image);
-        //     var attachedImage = {};
-        //
-        //     attachedImage.title = 'Image Entry';
-        //     attachedImage.type = 'image';
-        //     attachedImage.name = metaVm.currentFile.image;
-        //     attachedImage.description = 'This is an attached image associated with this file.';
-        //     metaVm.attachedMedia.push(attachedImage);
-        //
-        // }
-        //
-        // if (metaVm.currentFile.audio) {
-        //     var attachedAudio = {};
-        //
-        //     attachedAudio.title = 'Audio Attachment';
-        //     attachedAudio.type = 'audio';
-        //     attachedAudio.name = metaVm.currentFile.audio;
-        //     attachedAudio.description = 'This is an attached audio file associated with this file.';
-        //     metaVm.attachedMedia.push(attachedAudio);
-        // }
-
-
-    }
 
     // On opening, add a delayed property which shows tooltips after the speed dial has opened
     // so that they have the proper position; if closing, immediately hide the tooltips
@@ -118,11 +86,51 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             .cancel('No, cancel');
 
         $mdDialog.show(confirm).then(function() {
-            $scope.status = 'You decided to get rid of your debt.';
+            console.log('DeleteFile');
         }, function() {
-            $scope.status = 'You decided to keep your debt.';
+            console.log("don't delete file")
         });
     };
+    function disconnectDialog(ev, attachment, type) {
+        var confirm = $mdDialog.confirm()
+            .title('Are you sure you want to disconnect this media attachment?')
+            .textContent('By clicking yes you will remove this media attachment from the application')
+            .ariaLabel('Disconnect attachment')
+            .targetEvent(ev)
+            .ok('Yes, Disconnect')
+            .cancel('No, cancel');
+
+        $mdDialog.show(confirm).then(function() {
+            disconnect(attachment, type, metaVm.currentFile)
+        }, function() {
+            console.log('cancel disconnect');
+        });
+    }
+    function editAttachedFile(ev, attachment, type) {
+        $mdDialog.show({
+            controller: editAttached,
+            controllerAs: 'edVm',
+            templateUrl: 'app/meta/editAttachedDialog/editAttached.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true,
+            bindToController: true,
+            locals: {
+                currentFile: metaVm.currentFile,
+                attachment: attachment,
+                attachedType: type
+            }
+        })
+            .then(function(answer) {
+                $scope.status = 'You said the information was "' + answer + '".';
+            }, function() {
+                $scope.status = 'You cancelled the dialog.';
+            });
+    }
+
+    function disconnect(attachment, type, currentFile) {
+        fileSrvc.deleteMediaFile(attachment, type, currentFile)
+    }
 
     function isOpenWatch(isOpen) {
         if (isOpen) {

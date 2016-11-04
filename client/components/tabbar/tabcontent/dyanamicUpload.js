@@ -24,7 +24,7 @@ function dynamicUpload(fileSrvc) {
 
         if (input.length && button.length) {
             button.click(function (e) {
-                if (fileSrvc.isAttached(scope.item.type)) {
+                if (fileSrvc.isAttached(scope.item.type, scope.currentFile)) {
                     return alert('This File already has an ' + scope.item.type + ' file attached to it.');
                 }
                 input.click();

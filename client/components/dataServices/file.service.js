@@ -39,6 +39,7 @@ function fileSrvc(dbSrvc) {
         getCurrentFile: getCurrentFile,
         isAttached: isAttached,
         getFileList: getFileList,
+        deleteMediaFile: deleteMediaFile,
         data: data
     };
 
@@ -239,8 +240,8 @@ function fileSrvc(dbSrvc) {
      * @param type - the type of attached file we are checking against
      * @returns {boolean} - true if it has file already attached
      */
-    function isAttached(type) {
-        if (data.currentFile.media[type]) {
+    function isAttached(type, currentFile) {
+        if (currentFile.media[type]) {
             return true;
         }
         return false;
@@ -296,7 +297,8 @@ function fileSrvc(dbSrvc) {
      */
     function attachFile(file, type, currentFile) {
         var writePath = path.join(uploadPathStatic, type, file.name);
-        var targetPath = path.join(uploadPathRelative,type,file.name);
+        var targetPath = uploadPathRelative + type + '/' + file.name;
+        // var targetPath = path.join(uploadPathRelative,type,file.name);
 
         //check if file with the same name exists in file system
         var exists = doesExist(targetPath);
@@ -369,5 +371,30 @@ function fileSrvc(dbSrvc) {
                 })
             );
     }
+
+    function deleteMediaFile(attachment, type, currentFile) {
+        var writePath = path.join(uploadPathStatic, type, attachment.name);
+
+        fs.unlink(writePath);
+
+        var tempData = {
+            newObj: {}
+        };
+
+        tempData.newObj.media = currentFile.media;
+
+        tempData.newObj.media[type] = null;
+
+        tempData.fileId = currentFile._id;
+        tempData.options = {
+            returnUpdatedDocs: true
+        };
+
+        return dbSrvc.update(fileCollection, tempData).then(function(result) {
+            fileCollection.persistence.compactDatafile();
+            return result;
+        });
+    }
+
 
 }

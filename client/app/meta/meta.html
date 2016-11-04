@@ -12,15 +12,6 @@
 			          ng-model="metaVm.currentFile.description"
 			          rows="5"></textarea>
 		</md-input-container>
-		<!--<md-input-container ng-if="vm.selectedFile.audio" class="md-block" flex-gt-sm="">-->
-			<!--<label>Audio</label>-->
-			<!--<input disabled ng-model="vm.selectedFile.audio" >-->
-		<!--</md-input-container>-->
-		<!--<md-input-container ng-if="vm.selectedFile.image" class="md-block image-attachement" flex-gt-sm="">-->
-			<!--<label>Image</label>-->
-			<!--<input disabled ng-model="vm.selectedFile.image" >-->
-			<!--<img ng-src="../{{vm.selectedFile.image}}" alt="">-->
-		<!--</md-input-container>-->
 	</form>
 	<div layout="row" layout-align="space-between center">
 		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
@@ -52,24 +43,27 @@
 
 	<div layout="column" class="attached-media">
 		<h3>Associated Media</h3>
-
 		<md-content layout="row">
 
-			<md-card flex="33" ng-repeat="media in metaVm.attachedMedia" class="mdl-shadow--2dp">
+			<md-card
+					flex="33"
+					class="mdl-shadow--2dp"
+					ng-repeat="(type, attachment) in metaVm.currentFile.media"
+					ng-if="attachment != null">
 				<md-card-title class="media-title" layout-align="center space-between">
 					<md-card-title-text>
-						<span class="md-headline">{{media.title}}</span>
+						<span class="md-headline">{{attachment.name}}</span>
 						<!--<span class="md-subhead">Large</span>-->
 					</md-card-title-text>
 
 					<md-card-icon-actions layout="row" layout-align="end top">
-						<md-button class="md-icon-button">
+						<md-button class="md-icon-button" ng-click="metaVm.editAttachedFile($event, attachment, type)">
 							<md-icon>open_in_new</md-icon>
 						</md-button>
 					</md-card-icon-actions>
 				</md-card-title>
 				<md-card-content class="media-description">
-					<p>{{media.description}}</p>
+					<p>{{attachment.description}}</p>
 				</md-card-content>
 					<!--<md-card-title-media>-->
 						<!--<div class="md-media-lg card-media">-->
@@ -77,10 +71,9 @@
 						<!--</div>-->
 					<!--</md-card-title-media>-->
 
-
 				<md-divider></md-divider>
 				<md-card-actions layout="row" layout-align="start center">
-					<md-button>Disconnect</md-button>
+					<md-button ng-click="metaVm.disconnectDialog($event, attachment, type)">Disconnect</md-button>
 				</md-card-actions>
 			</md-card>
 		</md-content>

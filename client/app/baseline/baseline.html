@@ -2,11 +2,11 @@
 
 	<div layout="row">
 		<md-wavesurfer-player
-				ng-if="blVm.currentFile.audio.length"
+				ng-if="blVm.currentFile.media.audio.path.length"
 				flex
-				url="{{'../' + blVm.currentFile.audio}}"
+				url="{{'../' + blVm.currentFile.media.audio.path}}"
 				auto-play="false"
-				back-img="{{blVm.currentFile.image}}">
+				back-img="{{blVm.currentFile.media.image.path}}">
 			<!--back-img="{{vm.selectedFile.image}}">-->
 				<!--layout="row"-->
 		</md-wavesurfer-player>
