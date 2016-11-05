@@ -22,11 +22,11 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc) {
     activate();
 
     function activate() {
-        getTextContent();
+        getTextContent(blVm.currentFile);
     }
 
-    function getTextContent() {
-        baselineSrvc.readContent(blVm.currentFile, function(result) {
+    function getTextContent(file) {
+        baselineSrvc.readContent(file, function(result) {
             blVm.textContent = result;
             $scope.$apply();
         });

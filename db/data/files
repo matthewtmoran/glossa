@@ -1,1 +1,2 @@
 {"name":"NewFile2","extension":".md","description":"Description","media":{"image":{"name":"Adam.jpg","description":"","path":"uploads/image/Adam.jpg"},"audio":{"name":"AdamKanu.m4a","description":"","path":"uploads/audio/AdamKanu.m4a"}},"path":"uploads/NewFile2.md","type":"md","category":"other","_id":"60lpqR4jWolk1tvE"}
+{"name":"SecondFile","extension":".md","description":"","media":{"image":null,"audio":null},"path":"uploads/SecondFile.md","type":"md","category":"other","_id":"9qIILHveGuBZVECp"}
