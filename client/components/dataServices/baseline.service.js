@@ -19,11 +19,6 @@ function baselineSrvc() {
 
 
     function readContent(file, cb) {
-        console.log('readContent: file', file);
-    //    use file pathe to read contents
-    //    pass contents to controller
-    //    display contents
-
        return fs.readFile(file.path, "utf8", function read(err, data) {
             if (err) {
                 return console.log('there was an error', err);
@@ -34,13 +29,11 @@ function baselineSrvc() {
     }
 
     function updateContent(file, newValue) {
-        console.log('file', file);
         fs.writeFileSync(file.path, newValue, 'utf-8');
     //    write to file system new changes
     }
 
     function sendFileContent(content) {
-        console.log('debug1');
         return content;
     }
 }

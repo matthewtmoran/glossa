@@ -301,9 +301,6 @@ function fileSrvc(dbSrvc) {
             // TODO: Its not updateing the path at the saem time that's why there is so much difficulty'
             data.newObj.path = uploadPathRelative + data.newObj.name + data.file.extension;
 
-            console.log('data*', data);
-
-
             return dbSrvc.update(fileCollection, data).then(function(result) {
                 fileCollection.persistence.compactDatafile();
 
