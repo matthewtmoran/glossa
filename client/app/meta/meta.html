@@ -3,12 +3,14 @@
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>File Name</label>
 			<input ng-blur="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'name'})"
+			       ng-model-options='{ debounce: 1000 }'
 			       ng-model="metaVm.currentFile.name"
 			       value="metaVm.currentFile.name">
 		</md-input-container>
 		<md-input-container class="md-block">
 			<label>Description</label>
 			<textarea ng-change="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"
+			          ng-model-options='{ debounce: 1000 }'
 			          ng-model="metaVm.currentFile.description"
 			          rows="5"></textarea>
 		</md-input-container>

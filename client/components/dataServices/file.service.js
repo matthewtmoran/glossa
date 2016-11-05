@@ -293,22 +293,45 @@ function fileSrvc(dbSrvc) {
      * @param data
      */
     function updateFileData(data) {
+        data.options = {
+            returnUpdatedDocs: true
+        };
         if (data.field === 'name') {
-            data.newObj.path = uploadPathStatic + data.newObj.name + data.file.extension;
-            dbSrvc.update(fileCollection, data);
-            renameFileToSystem(data.file.path, data.newObj.path);
+
+            // TODO: Its not updateing the path at the saem time that's why there is so much difficulty'
+            data.newObj.path = uploadPathRelative + data.newObj.name + data.file.extension;
+
+            console.log('data*', data);
+
+
+            return dbSrvc.update(fileCollection, data).then(function(result) {
+                fileCollection.persistence.compactDatafile();
+
+                renameFileToSystem(data.file.path, data.newObj.path, function() {
+                    console.log('probably dont need thie cb anymore...');
+                });
+
+                return result;
+            });
         } else {
-            dbSrvc.update(fileCollection, data);
+            return dbSrvc.update(fileCollection, data).then(function(result) {
+                fileCollection.persistence.compactDatafile();
+                return result;
+            })
         }
     }
+
     /**
      * Renames the file.
      * @param oldPath - the old file path (name)
      * @param newPath - the new file path (name)
      */
-    function renameFileToSystem(oldPath, newPath) {
-        fs.rename(oldPath, newPath, function() {
-            console.log('File should be updated in file system.')
+    function renameFileToSystem(oldPath, newPath, callback) {
+        fs.rename(oldPath, newPath, function(err) {
+            if (err) {
+               return console.log('There was an Error', err);
+            }
+            return callback();
         })
     }
 

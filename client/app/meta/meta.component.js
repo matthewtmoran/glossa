@@ -50,7 +50,13 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
 
         changeData['newObj'][data.field] = metaVm.currentFile[data.field];
 
-        fileSrvc.updateFileData(changeData);
+        fileSrvc.updateFileData(changeData).then(function(doc) {
+            metaVm.currentFile[data.field] = doc[data.field];
+
+            if (data.field === 'name') {
+                metaVm.currentFile.path = doc.path;
+            }
+        });
     }
     function showAttachDialog(ev) {
         $mdDialog.show({
