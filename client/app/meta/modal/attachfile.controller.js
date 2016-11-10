@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('attachfileCtrl', attachfileCtrl);
 
-function attachfileCtrl($mdDialog, currentFile, fileSrvc) {
+function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     var atVm = this;
 
     atVm.currentFile = currentFile;
@@ -13,6 +13,10 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc) {
         { name: "Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
 
+
+    notebookSrvc.queryNotebooks().then(function(docs) {
+        atVm.notebooks = docs;
+    });
 
     /*
     *
@@ -36,78 +40,78 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc) {
      }
     *
     * */
-    atVm.notebooks = [
-        {
-            name: 'NoteBookName',
-            description: 'The is a description that describes the notebook or something',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'Another Notebook',
-            description: 'another descrioption that describes the notebook',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'A hardcoded notbook',
-            description: 'a harcoded description',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'Best Notebook',
-            description: 'best description',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'Notebook5',
-            description: 'Notebook5 description',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'Notebook6',
-            description: 'Notebook6 description',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        },
-        {
-            name: 'Notebook7',
-            description: 'Notebook7 description',
-            image: null,
-            audio: null,
-            createdBy: 'MattMoran',
-            createdAt: Date.now(),
-            isAttached: false,
-            attachedToId: null
-        }
-    ];
+    // atVm.notebooks = [
+    //     {
+    //         name: 'NoteBookName',
+    //         description: 'The is a description that describes the notebook or something',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'Another Notebook',
+    //         description: 'another descrioption that describes the notebook',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'A hardcoded notbook',
+    //         description: 'a harcoded description',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'Best Notebook',
+    //         description: 'best description',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'Notebook5',
+    //         description: 'Notebook5 description',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'Notebook6',
+    //         description: 'Notebook6 description',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     },
+    //     {
+    //         name: 'Notebook7',
+    //         description: 'Notebook7 description',
+    //         image: null,
+    //         audio: null,
+    //         createdBy: 'MattMoran',
+    //         createdAt: Date.now(),
+    //         isAttached: false,
+    //         attachedToId: null
+    //     }
+    // ];
     atVm.notebooksFiltered = [];
 
     atVm.cancel = cancel;

@@ -12,6 +12,51 @@
 		<md-dialog-content>
 			<pre>{{atVm.currentFile | json}}</pre>
 			<div class="md-dialog-content">
+
+				<div class="notebook">
+					<h2>Attach from notebook</h2>
+					<md-input-container md-no-float class="md-block" >
+						<md-icon class="material-icons">search</md-icon>
+						<form ng-submit="atVm.searchSubmit()">
+							<input ng-model="atVm.searchText" placeholder="Search Notebooks...">
+						</form>
+					</md-input-container>
+
+					<md-content class="search-result-wrapper">
+						<md-list>
+							<md-list-item
+									ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText"
+									class="md-2-line notebook-item"
+									ng-click="atVm.attachNotebook(notebook)"
+									md-ink-ripple layout="row"
+									layout-align="center center">
+
+								<!--<div md-ink-ripple layout="column">-->
+
+								<div class="md-list-item-image md-padding" flex="30" layout="column">
+									<img ng-if="notebook.media.image" ng-src="{{'../' + notebook.media.image.path}}" alt="">
+								</div>
+
+								<div class="md-list-item-text md-padding" flex="40" layout="column">
+									<h3>{{notebook.name}}</h3>
+									<p>{{notebook.description}}</p>
+								</div>
+
+								<div class="md-list-item-audio md-padding" flex="30" layout="column" layout-align="center center">
+									<md-button ng-if="notebook.media.audio" class="md-icon-button">
+										<!--ng-click="atVm.playPauseAudio(notebook); $event.stopPropagation()"-->
+										<md-icon class="material-icons">volume_up</md-icon>
+									</md-button>
+								</div>
+
+								<!--</div>-->
+								<md-divider></md-divider>
+							</md-list-item>
+						</md-list>
+					</md-content>
+				</div>
+
+
 				<div class="new-files">
 					<h2>Upload new</h2>
 					<div layout="row" layout-align="space-between center">
@@ -27,31 +72,7 @@
 					</div>
 				</div>
 
-				<div class="notebook">
-					<h2>Attach from notebook</h2>
-					<md-input-container md-no-float class="md-block" >
-						<md-icon class="material-icons">search</md-icon>
-						<form ng-submit="atVm.searchSubmit()">
-							<input ng-model="atVm.searchText" placeholder="Search Notebooks...">
-						</form>
-					</md-input-container>
 
-					<md-content   class="search-result-wrapper">
-						<md-list>
-							<md-list-item ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText" class="md-2-line " ng-click="atVm.attachNotebook(notebook)">
-								<a>
-									<md-item-content md-ink-ripple layout="row" layout-align="start center">
-										<div class="md-list-item-text" layout="column">
-											<h3>{{notebook.name}}</h3>
-											<p>Preview of first few lines of a baseline</p>
-										</div>
-									</md-item-content>
-								</a>
-							<md-divider></md-divider>
-							</md-list-item>
-						</md-list>
-					</md-content>
-				</div>
 
 			</div>
 		</md-dialog-content>
