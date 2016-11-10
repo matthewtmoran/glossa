@@ -31,11 +31,22 @@ angular.module('glossa')
 
 */
 
-function notebookCtrl() {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope) {
     var nbVm = this;
 
 
+    nbVm.currentNotebook = {
+        media: {}
+    };
+    nbVm.notebooks = [];
+
     nbVm.message = 'hello world';
+
+    notebookSrvc.queryNotebooks().then(function(docs) {
+        nbVm.notebooks = docs;
+    });
+
+
 
 
     nbVm.items = [
@@ -43,6 +54,22 @@ function notebookCtrl() {
         { name: "Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
 
+    nbVm.createNotebook = createNotebook;
+    nbVm.playPauseAudio = playPauseAudio;
+
+
+    function createNotebook() {
+        notebookSrvc.createNotebook(nbVm.currentNotebook, function(result) {
+            nbVm.notebooks.push(result);
+            nbVm.currentNotebook = {
+                media: {}
+            };
+        });
+    }
+
+    function playPauseAudio(notebook) {
+        console.log('notebook to play audio', notebook);
+    }
 
 
 

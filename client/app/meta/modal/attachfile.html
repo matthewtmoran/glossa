@@ -26,6 +26,7 @@
 						<img  ng-if="atVm.currentFile.media.image.path" ng-src="{{'../' + atVm.currentFile.media.image.path}}" alt="">
 					</div>
 				</div>
+
 				<div class="notebook">
 					<h2>Attach from notebook</h2>
 					<md-input-container md-no-float class="md-block" >
@@ -37,7 +38,7 @@
 
 					<md-content   class="search-result-wrapper">
 						<md-list>
-							<md-list-item ng-show="atVm.searchText" ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText || ''" class="md-2-line " ng-click="atVm.notebookSelection(notebook)">
+							<md-list-item ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText" class="md-2-line " ng-click="atVm.attachNotebook(notebook)">
 								<a>
 									<md-item-content md-ink-ripple layout="row" layout-align="start center">
 										<div class="md-list-item-text" layout="column">

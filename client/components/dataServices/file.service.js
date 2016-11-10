@@ -6,10 +6,12 @@ var db = require('../db/database'),
     path = require('path'),
     _ = require('lodash'),
     fileCollection = db.uploadedFiles,
+    nbCollection = db.notebooks,
     uploadPathStatic = path.join(__dirname,'../uploads/'),
     uploadPathRelative = 'uploads/',
     imagesDir = 'uploads/image/',
-    audioDir = 'uploads/image/';
+    audioDir = 'uploads/image/',
+    util = require('../client/components/node/file.utils');
 
 
 angular.module('glossa')
@@ -33,6 +35,7 @@ function fileSrvc(dbSrvc) {
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
         attachFile: attachFile,
+        attach: attach,
         setCurrentFile: setCurrentFile,
         getCurrentFile: getCurrentFile,
         isAttached: isAttached,
@@ -204,6 +207,7 @@ function fileSrvc(dbSrvc) {
         };
         fileDoc.media.image = null;
         fileDoc.media.audio = null;
+        fileDoc.media.type = '';
 
         fileDoc.path = uploadPathRelative + fileDoc.name + file.extension;
         // fileDoc.path = uploadPath + fileDoc.fullName;
@@ -298,7 +302,6 @@ function fileSrvc(dbSrvc) {
         };
         if (data.field === 'name') {
 
-            // TODO: Its not updateing the path at the saem time that's why there is so much difficulty'
             data.newObj.path = uploadPathRelative + data.newObj.name + data.file.extension;
 
             return dbSrvc.update(fileCollection, data).then(function(result) {
@@ -337,6 +340,13 @@ function fileSrvc(dbSrvc) {
     ///Attach media files///
     ////////////////////////
 
+    function attach(file, type, currentFile, notebook) {
+        if (notebook) {
+           return mediaToNb(file, type, notebook)
+        }
+        return attachFile(file, type, currentFile)
+    }
+
     /**
      * Attaches a file to the current file by writing new file to system and saving file in db.
      * @param file - the new file being we are working with.
@@ -359,7 +369,7 @@ function fileSrvc(dbSrvc) {
             //TODO: use angular material alert/confirm
             return alert('A file with this name already exists.');
         }
-        return copyAndWrite(file.path, writePath, function(err, res) {
+        return util.copyAndWrite(file.path, writePath, null, function(err, res) {
             if (err) {
                 return console.log('There was an error', err);
             }
@@ -384,6 +394,10 @@ function fileSrvc(dbSrvc) {
             newObj: {}
         };
 
+        if (!currentFile.media.type || currentFile.media.type !== 'independent') {
+            tempData.newObj.type = 'independent';
+        }
+
         tempData.newObj.media = currentFile.media;
 
         tempData.newObj.media[type] = {
@@ -403,27 +417,7 @@ function fileSrvc(dbSrvc) {
             return result;
         });
     }
-    /**
-     * "Upload" file into app"
-     * Takes the original file location, the new file location, and a callback function
-     * It will copy the file and wirte the file and then initait the saveToDb callback
-     * @param from - the original file location
-     * @param to - the new file location
-     * @param callback - call back that take the new Path and saves data in db.
-     */
-    function copyAndWrite(from, to, callback) {
-        //copy the file
-        fs.createReadStream(from)
-        //write the file
-            .pipe(fs.createWriteStream(to)
-                .on('close', function() {
-                    return callback(null, to);
-                })
-                .on('error', function(err) {
-                    return callback(err, null);
-                })
-            );
-    }
+
     function deleteMediaFile(attachment, type, currentFile) {
         var writePath = path.join(uploadPathStatic, type, attachment.name);
 
@@ -471,4 +465,11 @@ function fileSrvc(dbSrvc) {
             return result;
         });
     }
+
+
+
+
+
+
+
 }

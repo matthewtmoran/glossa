@@ -47,7 +47,6 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc) {
 
             });
 
-
             //set intitial file
             updateFileSelection(fbVm.fileList[0]);
         });

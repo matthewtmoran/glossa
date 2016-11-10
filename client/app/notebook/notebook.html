@@ -4,53 +4,51 @@
 		search-text="navVm.searchText">
 </navbar-component>
 
-<md-content layout="row" flex>
-	<form name="notebook">
+
+<md-content id="notebook-container" layout="row" flex>
+	<form name="addNotebook">
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>Notebook Name</label>
-			<input ng-blur="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'name'})"
-			       ng-model="metaVm.currentFile.name"
-			       value="metaVm.currentFile.name">
+			<input
+			       ng-model="nbVm.currentNotebook.name"
+			       value="nbVm.currentNotebook.name">
 		</md-input-container>
 		<md-input-container class="md-block">
 			<label>Description</label>
-			<textarea ng-change="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"
-			          ng-model="metaVm.currentFile.description"
+			<textarea
+			          ng-model="nbVm.currentNotebook.description"
 			          rows="5"></textarea>
 		</md-input-container>
 
 		<div layout="row" layout-align="space-between center">
-			<dynamic-upload ng-repeat="item in nbVm.items" item="item" current-file=""></dynamic-upload>
+			<generic-upload ng-repeat="item in nbVm.items" item="item" current-notebook="nbVm.currentNotebook"></generic-upload>
 		</div>
 
-
+		<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>
 
 	</form>
 
-	<!--<md-button id="uploadButton"-->
-	           <!--class="md-button md-fab md-grey-fab md-fab-bottom-left"-->
-	           <!--ng-click="vm.createNewTextFile()"-->
-	           <!--aria-label="attach_file">-->
-		<!--<md-icon class="material-icons">add</md-icon>-->
-	<!--</md-button>-->
 
-	<!--
-	I didn't want to have to put the sidenav outside of the actual component 'filebrowser' but I was having so many issues with the styling
+	<md-content class="notebook-list">
+		<md-list>
+			<md-list-item ng-repeat="notebook in nbVm.notebooks" class="md-2-line ">
+				<a>
+					<md-item-content md-ink-ripple layout="row" layout-align="start center">
+						<img ng-if="notebook.media.image" ng-src="{{'../' + notebook.media.image.path}}" alt="">
+						<div class="md-list-item-text" layout="column">
+							<h3>{{notebook.name}}</h3>
+							<p>Preview of first few lines of a baseline</p>
+						</div>
+						<md-button ng-if="notebook.media.audio">
+							<md-icon ng-click="nbVm.playPauseAudio(notebook); $event.stopPropagation()">volume_up</md-icon>
+						</md-button>
+					</md-item-content>
+				</a>
+				<md-divider></md-divider>
+			</md-list-item>
+		</md-list>
+	</md-content>
 
-	-->
-
-	<!--<md-sidenav-->
-			<!--md-component-id="left2"-->
-			<!--md-is-locked-open="true"-->
-			<!--layout-column>-->
-		<!--&lt;!&ndash;filebrowser&ndash;&gt;-->
-		<!--<filebrowser-component-->
-				<!--search-text="navVm.searchText"-->
-				<!--current-file="fbVm.currentFile">-->
-		<!--</filebrowser-component>-->
-	<!--</md-sidenav>-->
-	<!--viewer-editor-->
-	<!--<viewer-editor-component current-file="fbVm.currentFile" layout="column" flex></viewer-editor-component>-->
 </md-content>
 <!--drawer-->
 <drawer-directive></drawer-directive>

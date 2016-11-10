@@ -51,7 +51,7 @@
 					flex="33"
 					class="mdl-shadow--2dp"
 					ng-repeat="(type, attachment) in metaVm.currentFile.media"
-					ng-if="attachment != null">
+					ng-if="attachment != null && type != 'type'">
 				<md-card-title class="media-title" layout-align="center space-between">
 					<md-card-title-text>
 						<span class="md-headline">{{attachment.name}}</span>
