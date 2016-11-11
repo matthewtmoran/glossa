@@ -44,25 +44,18 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
         $mdDialog.hide();
     }
     function save() {
-        console.log('save occurred');
         if (atVm.currentFile.mediaType === 'notebook') {
-            console.log('type is notebook');
             //TODO: attach notebook
             fileSrvc.saveNotebookAttachment(atVm.currentFile, atVm.notebook, function(err, result) {
                 if (err) {return console.log('There was an error attaching notebook:', err)}
-                console.log('Notebook attached successful: ', result);
                 $mdDialog.hide(result);
             })
-
         } else {
             //TODO: attach files independently
             fileSrvc.saveIndependentAttachment(atVm.currentFile, function(err, result) {
                 if (err) {return console.log('There was an error', err);}
-                console.log('This is the result of the save function and attach function');
                 $mdDialog.hide(result);
             });
         }
-
-
     }
 }

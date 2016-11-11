@@ -47,6 +47,7 @@ function fileSrvc(dbSrvc) {
         clearStaged: clearStaged,
         getStagedUpdate: getStagedUpdate,
         attachNotebook: attachNotebook,
+        unattachNotebook: unattachNotebook,
         data: data
     };
 
@@ -157,13 +158,32 @@ function fileSrvc(dbSrvc) {
      * @returns {*}
      */
     function deleteTextFile(currentFile) {
-        for (var key in currentFile.media) {
-            // check also if property is not inherited from prototype
-            if (currentFile.media.hasOwnProperty(key) ) {
-                if (currentFile.media[key]) {
-                    var attachment = currentFile.media[key];
-                    var writePath = path.join(uploadPathStatic, key, attachment.name);
-                    fs.unlink(writePath);
+        if (currentFile.mediaType === 'notebook') {
+            var data = {
+                fileId: currentFile.notebookId,
+                newObj: {
+                    isAttached: false,
+                    attachedToId: null
+                },
+                options: {
+                    returnUpdatedDocs: true
+                }
+            };
+
+            dbSrvc.update(nbCollection, data).then(function(result) {
+                nbCollection.persistence.compactDatafile();
+                return result;
+            })
+
+        } else {
+            for (var key in currentFile.media) {
+                // check also if property is not inherited from prototype
+                if (currentFile.media.hasOwnProperty(key) ) {
+                    if (currentFile.media[key]) {
+                        var attachment = currentFile.media[key];
+                        var writePath = path.join(uploadPathStatic, key, attachment.name);
+                        fs.unlink(writePath);
+                    }
                 }
             }
         }
@@ -172,7 +192,7 @@ function fileSrvc(dbSrvc) {
 
         fs.unlink(parentFile);
 
-        return dbSrvc.remove(fileCollection, currentFile._id ).then(function(doc) {
+        return dbSrvc.remove(fileCollection, currentFile._id).then(function(doc) {
             fileCollection.persistence.compactDatafile();
             return doc;
         });
@@ -354,6 +374,7 @@ function fileSrvc(dbSrvc) {
         }
         data.fileObj = notebook;
         return dbSrvc.updateAll(nbCollection, data).then(function(result) {
+            nbCollection.persistence.compactDatafile();
             return callback(null, result);
         });
     }
@@ -370,6 +391,7 @@ function fileSrvc(dbSrvc) {
         }
         data.fileObj = currentFile;
         return dbSrvc.updateAll(fileCollection, data).then(function(result) {
+            fileCollection.persistence.compactDatafile();
             return callback(null, result);
         });
     }
@@ -594,9 +616,28 @@ function fileSrvc(dbSrvc) {
         }
         callback(null, notebook, currentFile);
     }
+    function unattachNotebook(notebook, currentFile) {
+
+        delete notebook.isAttached;
+        delete notebook.attachedToId;
+
+        for (var key in currentFile.media) {
+            if (currentFile.media.hasOwnProperty(key)) {
+                delete currentFile.media[key];
+            }
+        }
+
+        delete currentFile.mediaType;
+        delete currentFile.notebookId;
+
+        saveNotebookAttachment(currentFile, notebook, function(err, result) {
+            if (err) {
+                return console.log('there was an error in the detaching the notebook', err);
+            }
+            return result;
+        })
 
 
-
-
+    }
 
 }

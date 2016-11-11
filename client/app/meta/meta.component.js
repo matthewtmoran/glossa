@@ -36,12 +36,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
 
-    // activate();
-
-    function activate() {
-        queryAttachedNotebook();
-    }
-
     /**
      * Update the file's meta data from form
      * @param data - object = {fileId: String, field: String}
@@ -89,7 +83,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
         // Appending dialog to document.body to cover sidenav in docs app
         var confirm = $mdDialog.confirm()
             .title('Are you sure you want to delete this text file?')
-            .textContent('By clicking yes, you confirm to delete everything DIRECTLY associated with this file?')
+            .textContent('By clicking yes, you confirm to delete all independently attached media files associated with this file?')
             .ariaLabel('Delete Text')
             .targetEvent(ev)
             .ok('Yes, Delete')
@@ -98,7 +92,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
         $mdDialog.show(confirm).then(function() {
             fileSrvc.deleteTextFile(metaVm.currentFile).then(function() {
 
-            $scope.$emit('remove:textFile', metaVm.currentFile);
+                $scope.$emit('remove:textFile', metaVm.currentFile);
 
             })
         }, function() {
@@ -106,20 +100,34 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
         });
     };
     function disconnectDialog(ev, attachment, type) {
+        var title,
+            textContent;
+        if (type) {
+            title = 'Are you sure you want to disconnect this media attachment?';
+            textContent = 'By clicking yes you will remove this media attachment from the application';
+        } else {
+            title = 'Are you sure you want to disconnect this notebook?';
+            textContent = 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.';
+        }
+
         var confirm = $mdDialog.confirm()
-            .title('Are you sure you want to disconnect this media attachment?')
-            .textContent('By clicking yes you will remove this media attachment from the application')
+            .title(title)
+            .textContent(textContent)
             .ariaLabel('Disconnect attachment')
             .targetEvent(ev)
             .ok('Yes, Disconnect')
             .cancel('No, cancel');
 
         $mdDialog.show(confirm).then(function() {
-            fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile)
+            if (type) {
+               return fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile)
+            }
+            return fileSrvc.unattachNotebook(attachment, metaVm.currentFile);
         }, function() {
             console.log('cancel disconnect');
         });
     }
+
     function editAttachedFile(ev, attachment, type) {
         $mdDialog.show({
             controller: editAttached,
