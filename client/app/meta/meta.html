@@ -17,38 +17,14 @@
 	</form>
 	<div layout="row" layout-align="space-between center">
 		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
-		<md-button ng-click="metaVm.showAttachDialog($event)">Attach</md-button>
-
-
-		<!--<md-fab-speed-dial ng-hide="metaVm.hidden"-->
-		                   <!--md-direction="right"-->
-		                   <!--md-open="metaVm.isOpen"-->
-		                   <!--class="md-scale "-->
-		                   <!--ng-class="{ 'md-hover-full': metaVm.hover }"-->
-		                   <!--ng-mouseenter="metaVm.isOpen = true"-->
-		                   <!--ng-mouseleave="metaVm.isOpen = false">-->
-
-			<!--<md-fab-trigger>-->
-				<!--<md-button aria-label="menu" class="md-fab md-warn">-->
-					<!--<md-tooltip md-direction="top"-->
-					            <!--md-visible="tooltipVisible"-->
-					            <!--md-autohide="true">Attach Files</md-tooltip>-->
-					<!--<md-icon aria-label="menu">attachment</md-icon>-->
-				<!--</md-button>-->
-			<!--</md-fab-trigger>-->
-
-			<!--<md-fab-actions>-->
-					<!--<dynamic-upload ng-repeat="item in metaVm.items" item="item"></dynamic-upload>-->
-			<!--</md-fab-actions>-->
-		<!--</md-fab-speed-dial>-->
+		<md-button ng-disabled="metaVm.currentFile.media.image && metaVm.currentFile.media.audio" ng-click="metaVm.showAttachDialog($event)">Attach</md-button>
 	</div>
 
 	<div layout="column" class="attached-media">
 		<h3>Associated Media</h3>
 		<md-content layout="row">
 
-			<md-card
-					flex="33"
+			<md-card flex="33"
 					class="mdl-shadow--2dp"
 					ng-repeat="(type, attachment) in metaVm.currentFile.media"
 					ng-if="attachment != null && type != 'type'">

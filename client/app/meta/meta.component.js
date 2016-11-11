@@ -34,7 +34,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
 
-
     /**
      * Update the file's meta data from form
      * @param data - object = {fileId: String, field: String}
@@ -70,10 +69,10 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             locals: {
                 currentFile: metaVm.currentFile
             }
-        }).then(function(answer) {
-                $scope.status = 'You said the information was "' + answer + '".';
-            }, function() {
-                $scope.status = 'You cancelled the dialog.';
+        }).then(function(data) {
+                metaVm.currentFile = data;
+            }, function(data) {
+                metaVm.currentFile = data;
             });
     }
     function confirmDeleteDialog(ev) {

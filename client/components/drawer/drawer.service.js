@@ -210,6 +210,11 @@ function drawerMenu() {
                     name:'wavesurfer sandbox',
                     type: 'link',
                     state: 'wavesurfer'
+                },
+                {
+                    name: 'home',
+                    type: 'link',
+                    state: 'main.meta'
                 }
             ]
         },

@@ -27,9 +27,10 @@
 							<md-list-item
 									ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText"
 									class="md-2-line notebook-item"
-									ng-click="atVm.attachNotebook(notebook)"
+									ng-click="atVm.attachNotebook(notebook, atVm.currentFile)"
 									md-ink-ripple layout="row"
-									layout-align="center center">
+									layout-align="center center"
+									ng-class="{ 'nb-active': notebook == atVm.activeNotebook }">
 
 								<!--<div md-ink-ripple layout="column">-->
 
@@ -41,13 +42,14 @@
 									<h3>{{notebook.name}}</h3>
 									<p>{{notebook.description}}</p>
 								</div>
-
 								<div class="md-list-item-audio md-padding" flex="30" layout="column" layout-align="center center">
 									<md-button ng-if="notebook.media.audio" class="md-icon-button">
 										<!--ng-click="atVm.playPauseAudio(notebook); $event.stopPropagation()"-->
 										<md-icon class="material-icons">volume_up</md-icon>
 									</md-button>
 								</div>
+
+
 
 								<!--</div>-->
 								<md-divider></md-divider>
@@ -58,7 +60,7 @@
 
 
 				<div class="new-files">
-					<h2>Upload new</h2>
+					<h2>or upload new files</h2>
 					<div layout="row" layout-align="space-between center">
 						<dynamic-upload ng-repeat="item in atVm.items" item="item" current-file="atVm.currentFile"></dynamic-upload>
 					</div>

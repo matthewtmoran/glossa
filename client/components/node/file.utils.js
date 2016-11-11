@@ -23,6 +23,37 @@ function copyAndWrite(from, to, data, callback){
         );
 }
 
+
+/**
+ * Check if file exists
+ * Returns true if the file exists and false if the file does not exist
+ * @param dir
+ * @returns {boolean}
+ *
+ * TODO: consider just querying the db for an existing file by the name(path)
+ */
+function doesExist(dir) {
+    try {
+        fs.statSync(dir);
+        return true;
+    } catch (err) {
+        return !(err && err.code === 'ENOENT');
+    }
+}
+
+function createMediaObject(mediaObj, type) {
+    var newMediaObj = {
+        name: mediaObj.name,
+        path: 'uploads/' + type + '/' + mediaObj.name,
+        extension: mediaObj.extension,
+        description: '',
+        type: type
+    };
+    return newMediaObj;
+}
+
 module.exports = {
+    createMediaObject: createMediaObject,
+    doesExist: doesExist,
     copyAndWrite : copyAndWrite,
 };

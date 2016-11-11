@@ -35,7 +35,8 @@ function fileSrvc(dbSrvc) {
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
         attachFile: attachFile,
-        attach: attach,
+        saveIndependentAttachment: saveIndependentAttachment,
+        saveNotebookAttachment: saveNotebookAttachment,
         setCurrentFile: setCurrentFile,
         getCurrentFile: getCurrentFile,
         isAttached: isAttached,
@@ -45,6 +46,7 @@ function fileSrvc(dbSrvc) {
         deleteTextFile: deleteTextFile,
         clearStaged: clearStaged,
         getStagedUpdate: getStagedUpdate,
+        attachNotebook: attachNotebook,
         data: data
     };
 
@@ -205,9 +207,7 @@ function fileSrvc(dbSrvc) {
             description: '',
             media: {}
         };
-        fileDoc.media.image = null;
-        fileDoc.media.audio = null;
-        fileDoc.media.type = '';
+        // fileDoc.mediaType = '';
 
         fileDoc.path = uploadPathRelative + fileDoc.name + file.extension;
         // fileDoc.path = uploadPath + fileDoc.fullName;
@@ -340,12 +340,142 @@ function fileSrvc(dbSrvc) {
     ///Attach media files///
     ////////////////////////
 
-    function attach(file, type, currentFile, notebook) {
-        if (notebook) {
-           return mediaToNb(file, type, notebook)
+    // function attach(file, type, currentFile, notebook) {
+    //     if (notebook) {
+    //        return mediaToNb(file, type, notebook)
+    //     }
+    //     return attachFile(file, type, currentFile)
+    // }
+
+    function writeToNotebook(notebook, callback) {
+        var data = {
+            options: {
+                upsert: true,
+                returnUpdatedDocs: true
+            },
+            fileObj: {}
+        };
+        if (notebook.$$hashKey) {
+            delete notebook.$$hashKey;
         }
-        return attachFile(file, type, currentFile)
+        data.fileObj = notebook;
+        return dbSrvc.updateAll(nbCollection, data).then(function(result) {
+            return callback(null, result);
+        });
     }
+
+    function writeToTransfile(currentFile, callback) {
+        var data = {
+            options: {
+                upsert: true,
+                returnUpdatedDocs: true
+            },
+            fileObj: {}
+        };
+        if (currentFile.$$hashKey) {
+            delete currentFile.$$hashKey;
+        }
+        data.fileObj = currentFile;
+        return dbSrvc.updateAll(fileCollection, data).then(function(result) {
+            return callback(null, result);
+        });
+    }
+
+    function saveIndependentAttachment(currentFile, callback) {
+        var maxLoops = Object.keys(currentFile.media).length;
+
+        for(var key in currentFile.media) {
+
+            if (currentFile.media.hasOwnProperty(key)) {
+
+                if (!currentFile.media[key].absolutePath) {
+                    maxLoops--;
+                    continue;
+                }
+                //closure to make current key always accessible
+                (function(key){
+                    //write to this path
+                    var writePath = path.join(uploadPathStatic, key, currentFile.media[key].name);
+
+                    //call copy and write function; pass in file location, new location, notebook data, and callback
+                    util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
+                        if (err) {
+                            return console.log('There was an error copying and writing file', err);
+                        }
+
+                        //Modify loop length
+                        maxLoops--;
+
+                        //create object for database
+                        currentFile.media[key] = util.createMediaObject(currentFile.media[key], key);
+
+                        //delete absolute path
+                        delete currentFile.media[key].absolutePath;
+
+                        // if we are are done looping
+                        if (!maxLoops) {
+                            //save the notebook in the database and call callback
+
+                            var data = {
+                                options: {
+                                    upsert: true,
+                                    returnUpdatedDocs: true
+                                },
+                                fileObj: {}
+                            };
+
+                            if (currentFile.$$hashKey) {
+                                delete currentFile.$$hashKey;
+                            }
+
+                            data.fileObj = currentFile;
+
+                            return dbSrvc.updateAll(fileCollection, data).then(function(result) {
+                                return callback(null, result);
+                            });
+                        }
+                    });
+                    //    pass the key to make accessible
+                })(key);
+            }
+        }
+    }
+    function saveNotebookAttachment(currentFile, notebook, callback) {
+
+        var updatedDocs = [];
+
+        updatedDocs.push(
+            writeToNotebook(notebook, function(err, result) {
+                if (err){return console.log('There was an error saving notebook', err)}
+                return result
+            })
+        );
+
+        updatedDocs.push(
+            writeToTransfile(currentFile, function(err, result) {
+                if (err){return console.log('There was an error saving transfile', err)}
+                return result;
+            })
+        );
+
+        Promise.all(updatedDocs).then(function(result) {
+            result.forEach(function(obj) {
+                if (obj.type === 'md') {
+                    return callback(null, obj);
+                }
+            });
+        }, function(err) {
+            console.log('err', err);
+        });
+
+
+
+
+
+
+    }
+
+
 
     /**
      * Attaches a file to the current file by writing new file to system and saving file in db.
@@ -429,7 +559,7 @@ function fileSrvc(dbSrvc) {
 
         tempData.newObj.media = currentFile.media;
 
-        tempData.newObj.media[type] = null;
+        delete tempData.newObj.media[type];
 
         tempData.fileId = currentFile._id;
         tempData.options = {
@@ -467,6 +597,21 @@ function fileSrvc(dbSrvc) {
     }
 
 
+    function attachNotebook(notebook, currentFile, callback) {
+
+        for(var key in notebook.media) {
+            if (notebook.media.hasOwnProperty(key)) {
+                currentFile.media[key] = notebook.media[key];
+                currentFile.mediaType = 'notebook';
+                currentFile.notebookId = notebook._id;
+
+                notebook.isAttached = true;
+                notebook.attachedToId = currentFile._id;
+
+            }
+        }
+        callback(null, notebook, currentFile);
+    }
 
 
 

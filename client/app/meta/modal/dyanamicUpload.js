@@ -1,3 +1,4 @@
+var util = require('../client/components/node/file.utils');
 'use strict';
 
 angular.module('glossa')
@@ -41,7 +42,22 @@ function dynamicUpload(fileSrvc) {
             // }
 
             var file = e.target.files[0];
-            fileSrvc.attach(file, scope.item.type, scope.currentFile, scope.notebook);
+
+            var targetPath = 'uploads/' + file.name + file.extension;
+
+            if (!util.doesExist(targetPath)) {
+                scope.currentFile.media[scope.item.type] = {
+                    name: file.name,
+                    description: '',
+                    absolutePath: file.path,
+                    type: file.type,
+                    extension: file.extension
+                };
+            } else {
+                return alert('A file with this name already exists');
+            }
+
+            // fileSrvc.attach(file, scope.item.type, scope.currentFile, scope.notebook);
             scope.$apply();
         });
     }

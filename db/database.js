@@ -27,9 +27,9 @@ var notebooks = new Datastore({filename: './db/data/notebooks', autoload: true})
             path: String,
             description,
        },
-       type: String(notebook,
-       notebookId: String || null,
     }
+    mediaType: String(notebook,
+    notebookId: String || null,
 }
 
  */

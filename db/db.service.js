@@ -8,7 +8,8 @@ function dbSrvc($q) {
         find: find,
         insert: insert,
         update: update,
-        remove: remove
+        remove: remove,
+        updateAll: updateAll
     };
 
     return service;
@@ -49,6 +50,17 @@ function dbSrvc($q) {
                 deferred.reject(err);
             }
             deferred.resolve(affectedDocuments);
+        });
+        return deferred.promise;
+    }
+
+    function updateAll(db, data) {
+        var deferred = $q.defer();
+        db.update({_id: data.fileObj._id}, data.fileObj, data.options, function(err, numReplaced, updatedDocument) {
+            if (err) {
+                deferred.reject(err);
+            }
+            deferred.resolve(updatedDocument);
         });
         return deferred.promise;
     }
