@@ -70,6 +70,15 @@ $secondary-text: $lBlack;
 	}
 }
 
+.vertical-align {
+	position: relative;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+
 md-backdrop.md-sidenav-backdrop {
 	z-index: 62 !important;
 }
