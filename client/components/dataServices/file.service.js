@@ -340,12 +340,6 @@ function fileSrvc(dbSrvc) {
     ///Attach media files///
     ////////////////////////
 
-    // function attach(file, type, currentFile, notebook) {
-    //     if (notebook) {
-    //        return mediaToNb(file, type, notebook)
-    //     }
-    //     return attachFile(file, type, currentFile)
-    // }
 
     function writeToNotebook(notebook, callback) {
         var data = {
@@ -363,7 +357,6 @@ function fileSrvc(dbSrvc) {
             return callback(null, result);
         });
     }
-
     function writeToTransfile(currentFile, callback) {
         var data = {
             options: {
@@ -441,16 +434,13 @@ function fileSrvc(dbSrvc) {
         }
     }
     function saveNotebookAttachment(currentFile, notebook, callback) {
-
         var updatedDocs = [];
-
         updatedDocs.push(
             writeToNotebook(notebook, function(err, result) {
                 if (err){return console.log('There was an error saving notebook', err)}
                 return result
             })
         );
-
         updatedDocs.push(
             writeToTransfile(currentFile, function(err, result) {
                 if (err){return console.log('There was an error saving transfile', err)}
@@ -467,14 +457,7 @@ function fileSrvc(dbSrvc) {
         }, function(err) {
             console.log('err', err);
         });
-
-
-
-
-
-
     }
-
 
 
     /**
@@ -595,7 +578,6 @@ function fileSrvc(dbSrvc) {
             return result;
         });
     }
-
 
     function attachNotebook(notebook, currentFile, callback) {
 

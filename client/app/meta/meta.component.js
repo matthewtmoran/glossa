@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -25,6 +25,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
         { name: "Attach Audio", icon: "volume_up", direction: "bottom", accept: '.mp3, .m4a', type: 'audio' },
         { name: "Attach Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
+    metaVm.attachedNotebook = {};
 
     metaVm.updateData = updateData;
     metaVm.showAttachDialog = showAttachDialog;
@@ -33,6 +34,13 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
     metaVm.editAttachedFile = editAttachedFile;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
+    $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
+
+    // activate();
+
+    function activate() {
+        queryAttachedNotebook();
+    }
 
     /**
      * Update the file's meta data from form
@@ -57,6 +65,8 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             }
         });
     }
+
+
     function showAttachDialog(ev) {
         $mdDialog.show({
             controller: attachfileCtrl,
@@ -130,6 +140,14 @@ function metaCtrl($scope, fileSrvc, $mdDialog) {
             }, function() {
                 $scope.status = 'You cancelled the dialog.';
             });
+    }
+
+    function queryAttachedNotebook() {
+        if (metaVm.currentFile.mediaType === 'notebook') {
+            notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
+                metaVm.attachedNotebook = result[0];
+            })
+        }
     }
 
     function isOpenWatch(isOpen) {

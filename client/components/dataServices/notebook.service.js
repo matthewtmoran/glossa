@@ -18,7 +18,8 @@ function notebookSrvc(dbSrvc) {
 
     var service = {
         createNotebook: createNotebook,
-        queryNotebooks: queryNotebooks
+        queryNotebooks: queryNotebooks,
+        findNotebook: findNotebook
     };
 
     return service;
@@ -98,6 +99,16 @@ function notebookSrvc(dbSrvc) {
         return dbSrvc.insert(nbCollection, notebook).then(function(result) {
             return result;
         });
+    }
+
+    function findNotebook(nbId) {
+        var query = {
+            _id: nbId
+        };
+
+        return dbSrvc.find(nbCollection, query).then(function(result) {
+            return result;
+        })
     }
 }
 

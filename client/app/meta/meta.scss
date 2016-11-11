@@ -18,6 +18,16 @@
 	}
 }
 
+.attachment-card {
+	.md-button {
+		color: $lBlue !important;
+	}
+
+	.md-subhead {
+		font-style: italic;
+	}
+}
+
 .media-title {
 	padding: 16px !important;
 
@@ -31,4 +41,47 @@
 	p {
 		color: $bFaint !important;
 	}
+}
+
+
+.media-content {
+	padding-right: 0;
+	padding-left: 0;
+
+	.media-image {
+		background: $lBlue;
+		padding-right: 16px;
+		padding-left: 16px;
+		position: relative;
+		max-height: 200px;
+		min-height: 200px;
+
+		img {
+			display: block;
+			width: auto;
+			height: 100%;
+			max-height: 168px !important;
+			max-width: 300px;
+			padding-top: 16px;
+			padding-bottom: 16px;
+		}
+
+		.md-icon-button {
+			position: absolute;
+			top: 16px;
+			right: 16px;
+
+			.md-icon {
+				color: white;
+
+			}
+		}
+	}
+
+	.media-description {
+		padding-right: 16px;
+		padding-left: 16px;
+	}
+
+
 }

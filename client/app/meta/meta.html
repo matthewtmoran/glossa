@@ -25,13 +25,15 @@
 		<md-content layout="row">
 
 			<md-card flex="33"
-					class="mdl-shadow--2dp"
+					class="mdl-shadow--2dp attachment-card"
 					ng-repeat="(type, attachment) in metaVm.currentFile.media"
-					ng-if="attachment != null && type != 'type'">
+					ng-if="attachment != null && type != 'type' && metaVm.currentFile.mediaType !== 'notebook'">
+
 				<md-card-title class="media-title" layout-align="center space-between">
+
 					<md-card-title-text>
 						<span class="md-headline">{{attachment.name}}</span>
-						<!--<span class="md-subhead">Large</span>-->
+						<span class="md-subhead">Independent Media File</span>
 					</md-card-title-text>
 
 					<md-card-icon-actions layout="row" layout-align="end top">
@@ -39,7 +41,9 @@
 							<md-icon>open_in_new</md-icon>
 						</md-button>
 					</md-card-icon-actions>
+
 				</md-card-title>
+
 				<md-card-content class="media-description">
 					<p>{{attachment.description}}</p>
 				</md-card-content>
@@ -48,7 +52,49 @@
 							<!--<img ng-if="media.type === 'image'" ng-src="{{'../' + media.name}}" alt="">-->
 						<!--</div>-->
 					<!--</md-card-title-media>-->
+				<md-divider></md-divider>
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="metaVm.disconnectDialog($event, attachment, type)">Disconnect</md-button>
+				</md-card-actions>
+			</md-card>
 
+			<md-card flex="66"
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-if="metaVm.currentFile.mediaType === 'notebook'">
+
+				<md-card-title class="media-title" layout-align="center space-between">
+
+					<md-card-title-text>
+						<span class="md-headline">{{metaVm.attachedNotebook.name}}</span>
+						<span class="md-subhead">Notebook Attachment</span>
+					</md-card-title-text>
+
+					<md-card-icon-actions layout="row" layout-align="end top">
+						<!--<md-button class="md-icon-button" ng-click="metaVm.editAttachedFile($event, metaVm.attachedNotebook, type)">-->
+							<!--<md-icon>open_in_new</md-icon>-->
+						<!--</md-button>-->
+					</md-card-icon-actions>
+
+				</md-card-title>
+
+				<md-card-content class="media-content">
+					<div ng-if="metaVm.attachedNotebook.media.image" class="media-image">
+						<img ng-src="{{'../' + metaVm.attachedNotebook.media.image.path}}" alt="">
+
+						<md-button class="md-icon-button" ng-if="metaVm.attachedNotebook.media.audio">
+							<md-icon class="md-icon" >volume_up</md-icon>
+						</md-button>
+					</div>
+
+					<div class="media-description">
+						<p>{{metaVm.attachedNotebook.description}}</p>
+					</div>
+				</md-card-content>
+				<!--<md-card-title-media>-->
+				<!--<div class="md-media-lg card-media">-->
+				<!--<img ng-if="media.type === 'image'" ng-src="{{'../' + media.name}}" alt="">-->
+				<!--</div>-->
+				<!--</md-card-title-media>-->
 				<md-divider></md-divider>
 				<md-card-actions layout="row" layout-align="start center">
 					<md-button ng-click="metaVm.disconnectDialog($event, attachment, type)">Disconnect</md-button>
