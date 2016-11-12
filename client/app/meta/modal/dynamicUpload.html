@@ -1,12 +1,13 @@
 <md-button aria-label="{{item.name}}"
            id="mini-btn-{{item.type}}"
-           class="md-raised md-mini md-large-btn">
+           class="md-mini md-large-btn"
+           ng-disabled="currentFile.media[item.type]">
 
 	<span>{{item.name}}</span>
 
 	<span flex></span>
 
-	<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>
+	<!--<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>-->
 
 	<md-tooltip md-direction="{{item.direction}}"
 	            md-visible="tooltipVisible"

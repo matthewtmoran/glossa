@@ -30,8 +30,11 @@
 					width: 100%;
 				}
 			}
+
 			.notebook-text {
-				//background: white;
+				overflow: hidden;
+				margin-bottom: 16px;
+
 				p {
 					margin: 0;
 				}

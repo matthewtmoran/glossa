@@ -7,6 +7,20 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     var atVm = this;
 
     atVm.currentFile = currentFile;
+
+    atVm.media = buildMedia(atVm.currentFile.media);
+    console.log('atVm.media', atVm.media);
+
+    function buildMedia(object) {
+        var media = [];
+        for(var key in object) {
+            if (object.hasOwnProperty(key)) {
+                media.push(object[key].name);
+            }
+        }
+        return media;
+    }
+
     atVm.currentFileBackup = angular.copy(atVm.currentFile);
     atVm.searchText = '';
     atVm.notebooksFiltered = [];
