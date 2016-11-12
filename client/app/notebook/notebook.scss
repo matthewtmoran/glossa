@@ -4,8 +4,62 @@
 	}
 
 	.notebook-list {
-		img {
-			width: 75px;
+		width: 100%;
+
+		.notebook-content {
+			width: 100%;
+
+			.notebook-title {
+				//background: white;
+				//max-height: 60px;
+
+				.md-headline {
+					font-weight: 300 !important;
+					margin: 0 !important;
+					//color: $black !important;
+				}
+			}
+
+			.notebook-media {
+				//height: 100%;
+				width: 100%;
+				background-size: cover;
+				background-position: center center;
+
+				img {
+					width: 100%;
+				}
+			}
+			.notebook-text {
+				//background: white;
+				p {
+					margin: 0;
+				}
+			}
 		}
+
+		//.notebook-content {
+		//	overflow: hidden;
+		//	width: 100%;
+		//
+		//
+		//
+		//	.notebook-text {
+		//		width: 100%;
+		//		p {
+		//			color: black;
+		//		}
+		//	}
+		//}
+
+
+		//.notebook-title {
+		//	width: 100%;
+		//	background: grey;
+		//}
+
+
+
+
 	}
 }

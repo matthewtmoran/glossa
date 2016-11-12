@@ -18,21 +18,16 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
     nbVm.notebooks = [];
 
     notebookSrvc.queryNotebooks().then(function(docs) {
-        nbVm.notebooks = docs;
+
+        docs.forEach(function(doc) {
+            nbVm.notebooks.push(buildGridList(doc))
+        });
+        console.log('docs', docs);
+
     });
 
-    nbVm.createNotebook = createNotebook;
     nbVm.playPauseAudio = playPauseAudio;
     nbVm.newNotebookDialog = newNotebookDialog;
-
-    function createNotebook() {
-        notebookSrvc.createNotebook(nbVm.currentNotebook, function(result) {
-            nbVm.notebooks.push(result);
-            nbVm.currentNotebook = {
-                media: {}
-            };
-        });
-    }
 
     function playPauseAudio(notebook) {
         console.log('notebook to play audio', notebook);
@@ -55,5 +50,41 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
             console.log('closed 2', data);
         });
     }
+    //TODO: need to loop through each doc and add that random col/row dimentions
+    function buildGridList(doc) {
 
+        // docs.forEach(function(doc) {
+        //     console.log('modifying nb object');
+        //     doc.colSpan = randomSpan();
+        //     doc.rowspan = randomSpan();
+        // });
+
+        doc.colspan = randomSpan();
+        doc.rowspan = randomSpan();
+
+
+        // nbVm.notebooks = (function() {
+        //     var nbs = [];
+        //     for (var i = 0; i < docs.length; i++) {
+        //         nbs.push({
+        //             colspan: randomSpan(),
+        //             rowspan: randomSpan()
+        //         });
+        //     }
+        //     return nbs;
+        // })();
+        console.log('returning nb list after mod');
+        return doc;
+    }
+
+    function randomSpan() {
+        var r = Math.random();
+        if (r < 0.4) {
+            return 1;
+        } else if (r < 0.8) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
 }

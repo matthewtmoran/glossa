@@ -46,24 +46,70 @@
 	<!--</form>-->
 
 
-	<md-content class="notebook-list">
-		<md-list>
-			<md-list-item ng-repeat="notebook in nbVm.notebooks" class="md-2-line ">
-				<a>
-					<md-item-content md-ink-ripple layout="row" layout-align="start center">
-						<img ng-if="notebook.media.image" ng-src="{{'../' + notebook.media.image.path}}" alt="">
-						<div class="md-list-item-text" layout="column">
-							<h3>{{notebook.name}}</h3>
-							<p>Preview of first few lines of a baseline</p>
-						</div>
-						<md-button ng-if="notebook.media.audio">
-							<md-icon ng-click="nbVm.playPauseAudio(notebook); $event.stopPropagation()">volume_up</md-icon>
+
+	<!--<md-content layout-padding>-->
+	<md-content class="notebook-list" layout-padding>
+				<!--md-row-height-gt-md="1:1"-->
+		<md-grid-list
+				md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="5"
+				md-row-height="350"
+				md-gutter="24px" md-gutter-gt-sm="16px">
+				<!--md-row-height="4:3"-->
+					<!--md-colspan-sm="1"-->
+					<!--md-colspan-xs="1"-->
+			<md-grid-tile
+					ng-repeat="notebook in nbVm.notebooks"
+					md-colspan="{{notebook.colspan}}"
+					class="md-whiteframe-2dp">
+
+				<div class="notebook-content" flex layout-fill layout="column">
+
+					<div class="notebook-title md-padding" layout-align="row" flex="20">
+						<h2 class="md-headline">{{notebook.name}}</h2>
+					</div>
+
+					<div ng-if="notebook.media.image"
+					     class="notebook-media"
+					     layout-align="row"
+					     flex
+					     ng-style="{'background-image':'url(../'+notebook.media.image.path+')'}">
+					</div>
+
+					<span ng-if="!notebook.media.image" flex></span>
+
+					<div ng-if="notebook.description" class="notebook-text md-padding" layout-align="row" flex="20">
+						<p>{{notebook.description}}</p>
+					</div>
+
+					<md-divider></md-divider>
+
+					<div class="notebook-actions"
+					     layout="row" layout-align="end end"
+					     flex="20">
+
+						<md-button>
+							Learn More
 						</md-button>
-					</md-item-content>
-				</a>
-				<md-divider></md-divider>
-			</md-list-item>
-		</md-list>
+
+						<md-button class="md-icon-button">
+							<md-icon>open_in_new</md-icon>
+						</md-button>
+					</div>
+
+				</div>
+
+				<!--<md-grid-tile-header>{{notebook.name}}</md-grid-tile-header>-->
+
+
+
+
+
+				<!--<md-grid-tile-footer>Action Item</md-grid-tile-footer>-->
+
+
+			</md-grid-tile>
+		</md-grid-list>
+
 	</md-content>
 
 </md-content>

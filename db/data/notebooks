@@ -3,5 +3,6 @@
 {"media":{},"name":"asdfasfasf","createdBy":"Moran","createdAt":1478909578959,"isAttached":false,"attachedToId":null,"_id":"LE7E1dz78m2zlEc4"}
 {"media":{},"name":"Just a notebook","createdBy":"Moran","createdAt":1478909045652,"isAttached":false,"attachedToId":null,"_id":"ZDHTMSAP4IZU1HZk"}
 {"media":{"audio":{"name":"AdamKanu.m4a","path":"uploads/audio/AdamKanu.m4a","description":"","type":"audio"},"image":{"name":"Adam.jpg","path":"uploads/image/Adam.jpg","description":"","type":"image"}},"name":"AdamKanu","createdBy":"Moran","createdAt":1478909660626,"isAttached":false,"attachedToId":null,"_id":"bEUceRAQB34rN0zx"}
+{"media":{"image":{"name":"BaretFishing.JPG","path":"uploads/image/BaretFishing.JPG","description":"","type":"image"}},"name":"Thisisantoher notebook","description":"this is the best description","createdBy":"Moran","createdAt":1478966102787,"isAttached":true,"attachedToId":"zi4lQosG3XlkJDqs","_id":"eoSfDIQIfC2Vd8hp"}
 {"media":{},"name":"asfasdfasdfasfd","createdBy":"Moran","createdAt":1478909498540,"isAttached":false,"attachedToId":null,"_id":"nXulxNoEWEW4qNxV"}
 {"media":{},"name":"testtest","createdBy":"Moran","createdAt":1478909160863,"isAttached":false,"attachedToId":null,"_id":"ypjhYlJbROmitVSy"}
