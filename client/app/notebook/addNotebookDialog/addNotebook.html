@@ -1,0 +1,34 @@
+<md-dialog id="new-notebook-dialog" flex="50" aria-label="New Notebook" class="md-padding">
+		<form name="addNotebook">
+			<md-dialog-content>
+				<div class="md-dialog-content">
+					<md-input-container class="md-block" flex-gt-sm="">
+						<label>Notebook Name</label>
+						<input ng-model="aNbVm.currentNotebook.name"
+						       value="aNbVm.currentNotebook.name" required>
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<label>Description</label>
+						<textarea ng-model="aNbVm.currentNotebook.description" rows="5"></textarea>
+					</md-input-container>
+
+					<div layout="row" layout-align="space-between center">
+						<generic-upload ng-repeat="item in aNbVm.items" item="item" current-notebook="aNbVm.currentNotebook"></generic-upload>
+					</div>
+				</div>
+
+			</md-dialog-content>
+
+			<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
+			<md-dialog-actions layout="row" layout-align="space-between">
+				<md-button ng-click="aNbVm.cancel('cancel')">
+					Cancel
+				</md-button>
+				<md-button ng-disabled="!aNbVm.currentNotebook.name" ng-click="aNbVm.save('Update Attached File')">
+					Add Notebook
+				</md-button>
+			</md-dialog-actions>
+		</form>
+
+</md-dialog>

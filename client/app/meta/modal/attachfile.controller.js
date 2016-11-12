@@ -41,7 +41,7 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
         $mdDialog.cancel(atVm.currentFileBackup);
     }
     function hide() {
-        $mdDialog.hide();
+        $mdDialog.hide('hide');
     }
     function save() {
         if (atVm.currentFile.mediaType === 'notebook') {

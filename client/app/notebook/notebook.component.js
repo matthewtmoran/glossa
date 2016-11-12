@@ -8,55 +8,22 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-/*
-
-{
-    name: String,
-        description: String,
-    image: {
-    name: String,
-        path: String,
-        description: String,
-},
-    audio: {
-        name: String,
-            path: String,
-            description: String,
-    },
-    createdBy: String,
-        createdAt: Date,
-    isAttached: Boolean,
-    attachedToId: String
-}
-
-*/
-
-function notebookCtrl(fileSrvc, notebookSrvc, $scope) {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
     var nbVm = this;
-
+    console.log('notebookCtrl');
 
     nbVm.currentNotebook = {
         media: {}
     };
     nbVm.notebooks = [];
 
-    nbVm.message = 'hello world';
-
     notebookSrvc.queryNotebooks().then(function(docs) {
         nbVm.notebooks = docs;
     });
 
-
-
-
-    nbVm.items = [
-        { name: "Audio", icon: "volume_up", direction: "top", accept: '.mp3, .m4a', type: 'audio' },
-        { name: "Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
-    ];
-
     nbVm.createNotebook = createNotebook;
     nbVm.playPauseAudio = playPauseAudio;
-
+    nbVm.newNotebookDialog = newNotebookDialog;
 
     function createNotebook() {
         notebookSrvc.createNotebook(nbVm.currentNotebook, function(result) {
@@ -71,6 +38,22 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope) {
         console.log('notebook to play audio', notebook);
     }
 
+    function newNotebookDialog(ev) {
+        $mdDialog.show({
+            controller: addNotebookCtrl,
+            controllerAs: 'aNbVm',
+            templateUrl: 'app/notebook/addNotebookDialog/addNotebook.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true,
+            bindToController: true,
+        }).then(function(data) {
+            nbVm.notebooks.push(data);
 
+        }, function(data) {
+
+            console.log('closed 2', data);
+        });
+    }
 
 }

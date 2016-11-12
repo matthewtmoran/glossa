@@ -1,32 +1,49 @@
 <navbar-component
 		layout="row"
-
 		search-text="navVm.searchText">
 </navbar-component>
 
-
 <md-content id="notebook-container" layout="row" flex>
-	<form name="addNotebook">
-		<md-input-container class="md-block" flex-gt-sm="">
-			<label>Notebook Name</label>
-			<input
-			       ng-model="nbVm.currentNotebook.name"
-			       value="nbVm.currentNotebook.name">
-		</md-input-container>
-		<md-input-container class="md-block">
-			<label>Description</label>
-			<textarea
-			          ng-model="nbVm.currentNotebook.description"
-			          rows="5"></textarea>
-		</md-input-container>
 
-		<div layout="row" layout-align="space-between center">
-			<generic-upload ng-repeat="item in nbVm.items" item="item" current-notebook="nbVm.currentNotebook"></generic-upload>
-		</div>
+	<md-button id="newNoteBook"
+	           class="md-button md-fab md-grey-fab md-fab-bottom-left"
+	           ng-click="nbVm.newNotebookDialog($event)"
+	           aria-label="attach_file">
+		<md-icon class="material-icons">add</md-icon>
+	</md-button>
 
-		<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>
+	<md-sidenav
+			md-component-id="left2"
+			md-is-locked-open="true"
+			layout-column>
+		<!--filebrowser-->
+		<nb-sidebar-component
+				search-text="navVm.searchText"
+				current-file="">
+		</nb-sidebar-component>
+	</md-sidenav>
 
-	</form>
+	<!--<form name="addNotebook">-->
+		<!--<md-input-container class="md-block" flex-gt-sm="">-->
+			<!--<label>Notebook Name</label>-->
+			<!--<input-->
+			       <!--ng-model="nbVm.currentNotebook.name"-->
+			       <!--value="nbVm.currentNotebook.name">-->
+		<!--</md-input-container>-->
+		<!--<md-input-container class="md-block">-->
+			<!--<label>Description</label>-->
+			<!--<textarea-->
+			          <!--ng-model="nbVm.currentNotebook.description"-->
+			          <!--rows="5"></textarea>-->
+		<!--</md-input-container>-->
+
+		<!--<div layout="row" layout-align="space-between center">-->
+			<!--<generic-upload ng-repeat="item in nbVm.items" item="item" current-notebook="nbVm.currentNotebook"></generic-upload>-->
+		<!--</div>-->
+
+		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
+
+	<!--</form>-->
 
 
 	<md-content class="notebook-list">
