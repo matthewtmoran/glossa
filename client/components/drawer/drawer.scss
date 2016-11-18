@@ -21,14 +21,14 @@ md-sidenav.drawer {
 		.menu-heading {
 			padding-left: 15px; //brings in menu headings from left edge @onechrisjones
 		}
-		
+
 		//general sidenav button styles
 		.md-button {
 			border-radius: 0;
 			color: inherit;
 			cursor: pointer;
 			font-weight: 400;
-			line-height: 40px;
+			//line-height: 40px;
 			margin: 0;
 			max-height: 40px;
 			overflow: hidden;
@@ -37,16 +37,11 @@ md-sidenav.drawer {
 			white-space: normal;
 			width: 100%;
 			display: block;
-			padding: 0 16px 0 32px;
+
 			text-transform: none;
 
 			&.active {
 				color: #FF5722; /* deep-orange 500 */
-			}
-
-			.md-toggle-icon {
-				padding-top: 12px ;
-				padding-bottom: 12px ;
 			}
 		}
 
@@ -73,7 +68,7 @@ md-sidenav.drawer {
 
 			.md-button {
 				display: block;
-				padding: 0 16px 0 32px;
+				//padding: 0 16px 0 32px;
 				text-transform: none;
 			}
 
@@ -96,8 +91,9 @@ md-sidenav.drawer {
 
 			.md-toggle-icon {
 				display: block;
-				margin-left: auto;
+				margin-left: 8px;
 				speak: none;
+				margin-right: 12px;
 				vertical-align: middle;
 				transform: rotate(180deg);
 				-webkit-transform: rotate(180deg);
