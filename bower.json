@@ -8,6 +8,7 @@
     "angular-material": "^1.1.1",
     "angular-ui-router": "ui-router#^0.3.1",
     "jquery": "^3.1.0",
-    "angular-ui-ace": "bower"
+    "angular-ui-ace": "bower",
+    "ment.io": "^0.9.24"
   }
 }

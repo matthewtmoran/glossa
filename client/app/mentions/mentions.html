@@ -1,0 +1,126 @@
+<navbar-component
+		layout="row"
+		search-text="navVm.searchText">
+</navbar-component>
+
+<md-content id="mentions-container" layout="row" flex>
+
+
+	<md-sidenav
+			md-component-id="left2"
+			md-is-locked-open="true"
+			layout-column>
+		<!--filebrowser-->
+	</md-sidenav>
+
+
+
+
+	<!--<md-content layout-padding>-->
+	<md-content class="mentions" layout-padding>
+		<h2>Mentions sandbox</h2>
+
+
+
+		<div class="form-group">
+			<h3>Content Editable:</h3>
+			     <!--mentio-macros="macros"-->
+			<div contenteditable mentio
+			     mentio-typed-term="typedTerm"
+			     mentio-require-leading-space="true"
+			     mentio-select-not-found="true"
+			     class="editor form-control"
+			     mentio-id="'htmlContent'"
+			     id="htmlContent"
+			     ng-model="mentionsVm.htmlContent"
+			>
+			</div>
+			<span class="caption small">Mentioned: {{typedTerm}}</span>
+		</div>
+
+
+
+
+
+
+
+		<form action="">
+			<span>test</span>
+			<textarea mentio
+			          mentio-id="'theText'"
+			          mentio-trigger-char="'@'"
+			          mentio-typed-text="typedTerm"
+			          ng-model="mentionsVm.theTextArea2"
+			          autocomplete="off"></textarea>
+
+		</form>
+			          <!--mentio-items="mentionsVm.mentionList | filter:label:typedTerm"-->
+
+
+		<mentio-menu
+				mentio-for="'theText'"
+				mentio-trigger-char="'#'"
+				mentio-items="mentionsVm.products"
+				mentio-template-url="/product-mentions.tpl"
+				mentio-search="mentionsVm.searchProducts(term)"
+				mentio-select-not-found="true"
+				mentio-select="mentionsVm.getProductTextRaw(item)"></mentio-menu>
+		<mentio-menu
+				mentio-for="'theText'"
+				mentio-trigger-char="'@'"
+				mentio-items="mentionsVm.people"
+				mentio-template-url="/people-mentions.tpl"
+				mentio-search="mentionsVm.searchPeople(term)"
+				mentio-select-not-found="true"
+				mentio-select="mentionsVm.getPeopleTextRaw(item)"></mentio-menu>
+
+
+		<!--contenteditable-->
+		<mentio-menu
+				mentio-for="'htmlContent'"
+				mentio-trigger-char="'@'"
+				mentio-items="mentionsVm.people"
+				mentio-template-url="/people-mentions.tpl"
+				mentio-search="mentionsVm.searchPeople(term)"
+				mentio-select="mentionsVm.getPeopleText(item)"
+		></mentio-menu>
+
+		<mentio-menu
+				mentio-for="'htmlContent'"
+				mentio-trigger-char="'#'"
+				mentio-items="mentionsVm.products"
+				mentio-template-url="/product-mentions.tpl"
+				mentio-search="mentionsVm.searchProducts(term)"
+				mentio-select="mentionsVm.getProductText(item)"
+		></mentio-menu>
+
+	</md-content>
+
+</md-content>
+<!--drawer-->
+<drawer-directive></drawer-directive>
+
+
+<script type="text/ng-template" id="/product-mentions.tpl">
+	<ul class="list-group product-search demo-scrollable-menu">
+		<li mentio-menu-item="product" ng-repeat="product in items" class="list-group-item clearfix">
+			<div class="row">
+				<div class="col-xs-2 text-center">
+				</div>
+				<div class="col-xs-10">
+					<h4>{{product.title}}</h4>
+					<!--<h4 class="list-group-item-heading">{{product.title | words:5}}</h4>-->
+					<!--<p class="list-group-item-text">{{product.description | words:7}}</p>-->
+				</div>
+			</div>
+		</li>
+	</ul>
+</script>
+
+<script type="text/ng-template" id="/people-mentions.tpl">
+	<ul class="list-group user-search">
+		<li mentio-menu-item="person" ng-repeat="person in items" class="list-group-item">
+			<p>{{person.name}}</p>
+		</li>
+	</ul>
+</script>

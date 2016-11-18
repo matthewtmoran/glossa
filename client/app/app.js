@@ -5,6 +5,7 @@ angular.module('glossa', [
     'ngMaterial',
     'ui.router',
     'ui.ace',
+    'mentio'
     // 'mdWavesurfer'
     ])
     .config(config);

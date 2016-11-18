@@ -212,6 +212,11 @@ function drawerMenu() {
                     state: 'wavesurfer'
                 },
                 {
+                    name:'Mentions',
+                    type: 'link',
+                    state: 'mentions'
+                },
+                {
                     name: 'home',
                     type: 'link',
                     state: 'main.meta'
