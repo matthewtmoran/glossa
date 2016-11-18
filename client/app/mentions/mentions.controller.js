@@ -39,6 +39,7 @@ function mentionsCtrl($q, $timeout) {
     var mentionsVm = this;
 
     console.log('init');
+    mentionsVm.typedTerm = 'Hello';
 
     mentionsVm.peopleList = [
         {name: 'Matt'},
@@ -123,9 +124,9 @@ function mentionsCtrl($q, $timeout) {
 
 
     function getProductText(item) {
-        console.log('Called when product selected', item);
+        console.log('******************************Called when product selected', item);
         // note item.label is sent when the typedText wasn't found
-        return '<span class="highlight">#' + (item.name || item.label || item.title) + '</span>';
+        return '#' + (item.name || item.label || item.title);
         // return '[~<i>' + (item.name || item.label) + '</i>]';
     };
 

@@ -3,6 +3,7 @@ var Datastore = require('nedb'),
 
 var uploadedFiles = new Datastore({filename: './db/data/files', autoload: true});
 var notebooks = new Datastore({filename: './db/data/notebooks', autoload: true});
+var hashtags = new Datastore({filename: './db/data/hashtags', autoload: true});
 
 // guitars.ensureIndex({fieldName: 'id', unique: true});
 
@@ -63,5 +64,6 @@ var notebooks = new Datastore({filename: './db/data/notebooks', autoload: true})
 
 module.exports = {
     notebooks: notebooks,
-    uploadedFiles: uploadedFiles
+    uploadedFiles: uploadedFiles,
+    hashtags: hashtags
 };

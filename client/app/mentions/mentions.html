@@ -25,68 +25,82 @@
 		<div class="form-group">
 			<h3>Content Editable:</h3>
 			     <!--mentio-macros="macros"-->
-			<div contenteditable mentio
-			     mentio-typed-term="typedTerm"
-			     mentio-require-leading-space="true"
-			     mentio-select-not-found="true"
-			     class="editor form-control"
-			     mentio-id="'htmlContent'"
-			     id="htmlContent"
-			     ng-model="mentionsVm.htmlContent"
-			>
-			</div>
-			<span class="caption small">Mentioned: {{typedTerm}}</span>
+			<!--<div contenteditable mentio-->
+			     <!--mentio-typed-term="typedTerm"-->
+			     <!--mentio-require-leading-space="true"-->
+			     <!--mentio-select-not-found="true"-->
+			     <!--class="editor form-control"-->
+			     <!--mentio-id="'htmlContent'"-->
+			     <!--id="htmlContent"-->
+			     <!--ng-model="mentionsVm.htmlContent"-->
+			<!--&gt;-->
+			<!--</div>-->
+			<!--<span class="caption small">Mentioned: {{typedTerm}}</span>-->
 		</div>
-
-
-
-
-
 
 
 		<form action="">
 			<span>test</span>
+			<!--<textarea mentio-->
+			<!--id="theText"-->
+			<!--mentio-id="'theText'"-->
+			<!--mentio-trigger-char="'@'"-->
+			<!--mentio-typed-term="typedTerm"-->
+			<!--mentio-require-leading-space="true"-->
+			<!--mentio-select-not-found="true"-->
+			<!--ng-model="mentionsVm.theTextArea2"-->
+			<!--autocomplete="off"></textarea>-->
+			          <!--mentio-typed-text="typedTerm"-->
+
+			          <!--mentio-typed-term="typedTerm"-->
 			<textarea mentio
+			          contenteditable="true"
+			          id="theText"
 			          mentio-id="'theText'"
-			          mentio-trigger-char="'@'"
-			          mentio-typed-text="typedTerm"
+			          mentio-typed-term="typedTerm"
+			          mentio-require-leading-space="true"
+			          mentio-select-not-found="true"
 			          ng-model="mentionsVm.theTextArea2"
-			          autocomplete="off"></textarea>
+			          autocomplete="off"
+			          class="editor form-control"></textarea>
+			Mentioned: {{typedTerm}};
+			          <!--mentio-select="getProductText(typedTerm)"-->
 
 		</form>
 			          <!--mentio-items="mentionsVm.mentionList | filter:label:typedTerm"-->
 
 
-		<mentio-menu
-				mentio-for="'theText'"
-				mentio-trigger-char="'#'"
-				mentio-items="mentionsVm.products"
-				mentio-template-url="/product-mentions.tpl"
-				mentio-search="mentionsVm.searchProducts(term)"
-				mentio-select-not-found="true"
-				mentio-select="mentionsVm.getProductTextRaw(item)"></mentio-menu>
-		<mentio-menu
-				mentio-for="'theText'"
-				mentio-trigger-char="'@'"
-				mentio-items="mentionsVm.people"
-				mentio-template-url="/people-mentions.tpl"
-				mentio-search="mentionsVm.searchPeople(term)"
-				mentio-select-not-found="true"
-				mentio-select="mentionsVm.getPeopleTextRaw(item)"></mentio-menu>
+		<!--<mentio-menu-->
+				<!--mentio-for="'theText'"-->
+				<!--mentio-trigger-char="'#'"-->
+				<!--mentio-items="mentionsVm.products"-->
+				<!--mentio-template-url="/product-mentions.tpl"-->
+				<!--mentio-search="mentionsVm.searchProducts(term)"-->
+				<!--mentio-select-not-found="true"-->
+				<!--mentio-select="mentionsVm.getProductTextRaw(item)"></mentio-menu>-->
+		<!--<mentio-menu-->
+				<!--mentio-for="'theText'"-->
+				<!--mentio-trigger-char="'@'"-->
+				<!--mentio-items="mentionsVm.people"-->
+				<!--mentio-template-url="/people-mentions.tpl"-->
+				<!--mentio-search="mentionsVm.searchPeople(term)"-->
+				<!--mentio-select-not-found="true"-->
+				<!--mentio-select="mentionsVm.getPeopleTextRaw(item)"></mentio-menu>-->
 
 
 		<!--contenteditable-->
-		<mentio-menu
-				mentio-for="'htmlContent'"
-				mentio-trigger-char="'@'"
-				mentio-items="mentionsVm.people"
-				mentio-template-url="/people-mentions.tpl"
-				mentio-search="mentionsVm.searchPeople(term)"
-				mentio-select="mentionsVm.getPeopleText(item)"
-		></mentio-menu>
+		<!--<mentio-menu-->
+				<!--mentio-for="'htmlContent'"-->
+				<!--mentio-trigger-char="'@'"-->
+				<!--mentio-select-not-found="true"-->
+				<!--mentio-items="mentionsVm.people"-->
+				<!--mentio-template-url="/people-mentions.tpl"-->
+				<!--mentio-search="mentionsVm.searchPeople(term)"-->
+				<!--mentio-select="mentionsVm.getPeopleText(item)"-->
+		<!--&gt;</mentio-menu>-->
 
 		<mentio-menu
-				mentio-for="'htmlContent'"
+				mentio-for="'theText'"
 				mentio-trigger-char="'#'"
 				mentio-items="mentionsVm.products"
 				mentio-template-url="/product-mentions.tpl"
