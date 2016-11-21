@@ -62,7 +62,8 @@
 			          mentio-select-not-found="true"
 			          ng-model="mentionsVm.theTextArea2"
 			          autocomplete="off"
-			          class="editor form-control"></textarea>
+			          class="editor form-control"
+			          simplemde ></textarea>
 			Mentioned: {{typedTerm}};
 			          <!--mentio-select="getProductText(typedTerm)"-->
 
@@ -89,15 +90,14 @@
 
 
 		<!--contenteditable-->
-		<!--<mentio-menu-->
-				<!--mentio-for="'htmlContent'"-->
-				<!--mentio-trigger-char="'@'"-->
-				<!--mentio-select-not-found="true"-->
-				<!--mentio-items="mentionsVm.people"-->
-				<!--mentio-template-url="/people-mentions.tpl"-->
-				<!--mentio-search="mentionsVm.searchPeople(term)"-->
-				<!--mentio-select="mentionsVm.getPeopleText(item)"-->
-		<!--&gt;</mentio-menu>-->
+		<mentio-menu
+				mentio-for="'theText'"
+				mentio-trigger-char="'@'"
+				mentio-items="mentionsVm.people"
+				mentio-template-url="/people-mentions.tpl"
+				mentio-search="mentionsVm.searchPeople(term)"
+				mentio-select="mentionsVm.getPeopleText(item)"
+		></mentio-menu>
 
 		<mentio-menu
 				mentio-for="'theText'"
