@@ -38,6 +38,7 @@
 
 }
 .media-description {
+	padding-top: 8px;
 	p {
 		color: $bFaint !important;
 	}
@@ -47,6 +48,8 @@
 .media-content {
 	padding-right: 0;
 	padding-left: 0;
+	padding-top: 0;
+	padding-bottom: 0;
 
 	.media-image {
 		position: relative;

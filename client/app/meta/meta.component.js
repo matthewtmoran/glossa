@@ -202,23 +202,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         // var res = mentionsVm.theTextArea.replace($scope.typedTerm, item.tag || item.label);
         // mentionsVm.theTextArea = res;
 
-        console.log('metaVm.currentFile.description', metaVm.currentFile.description);
-
-        console.log('$scope.typedTerm', $scope.typedTerm);
-
-        // metaVm.currentFile.description.trigger();
-
-        // angular.element('#theText').trigger('textarea');
-
-        // $scope.$digest()
-        // var res = metaVm.currentFile.description.replace($scope.typedTerm, item.tag || item.label);
-        //
-        // metaVm.currentFile.description = res;
-
-
-        // metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'});
-
-
         return '#' + (item.tag || item.label);
 
     }

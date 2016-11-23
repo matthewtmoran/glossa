@@ -24,6 +24,8 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
     var control = this,
         timeInterval;
 
+    console.log('$attrs', $attrs);
+
     control.themeClass = "md-" + $mdTheming.defaultTheme() + "-theme";
     control.isReady = false;
     control.surfer = null;
@@ -52,7 +54,29 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
                 height: '200'
             };
 
-            options = angular.extend(defaults, $attrs, (control.properties || {}), options);
+
+
+
+            control.playerProperties = {}
+            var nKey;
+            for (var attr in $attrs) {
+                console.log('attr', attr);
+                if (attr.match(/^player/)) {
+                    nKey = attr.replace(/^player([A-Z])/, function (m, $1) {
+                        return $1.toLowerCase();
+                    });
+                    console.log('nkey', nKey);
+                    control.playerProperties[nKey] = $attrs[attr];
+                }
+            }
+
+            console.log('control.playerProperties', control.playerProperties);
+
+            options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);
+
+            console.log('options', options);
+
+
             control.surfer.init(options);
 
             control.surfer.on('ready', function () {
@@ -85,6 +109,8 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
 
         control.title = control.title || control.src.split('/').pop();
         control.surfer.load(control.src);
+
+
     };
 
     var startInterval = function () {
