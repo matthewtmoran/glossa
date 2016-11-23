@@ -3,6 +3,9 @@
 	height: 200px;
 }
 
-.highlight {
-	color: blue;
+
+.list-group-item.active {
+	color: #fff;
+	background-color: #428bca !important;
+	border-color: #428bca !important;
 }

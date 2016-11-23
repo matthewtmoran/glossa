@@ -1,44 +1,57 @@
 'use strict';
 
+// .directive('contenteditable', ['$sce', function($sce) {
+//     return {
+//         restrict: 'A', // only activate on element attribute
+//         require: '?ngModel', // get a hold of NgModelController
+//         link: function(scope, element, attrs, ngModel) {
+//             function read() {
+//                 var html = element.html();
+//                 // When we clear the content editable the browser leaves a <br> behind
+//                 // If strip-br attribute is provided then we strip this out
+//                 if (attrs.stripBr && html === '<br>') {
+//                     html = '';
+//                 }
+//                 ngModel.$setViewValue(html);
+//             }
+//
+//             if(!ngModel) return; // do nothing if no ng-model
+//
+//             // if (!ngModel) {
+//             //     return console.log('nothing here')
+//             // }
+//
+//             // Specify how UI should be updated
+//             ngModel.$render = function() {
+//                 if (ngModel.$viewValue !== element.html()) {
+//                     element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
+//                 }
+//             };
+//
+//             // Listen for change events to enable binding
+//             element.on('blur keyup change', function(e) {
+//                 scope.$apply(read);
+//             });
+//             read(); // initialize
+//         }
+//     };
+// }])
+//     .directive('myeditable', function() {
+//         return {
+//             restrict: 'A',
+//             link: function(scope, element, attrs) {
+//
+//             }
+//         }
+//     })
+
 angular.module('glossa')
-    .controller('mentionsCtrl', mentionsCtrl)
-    .directive('contenteditable', ['$sce', function($sce) {
-    return {
-        restrict: 'A', // only activate on element attribute
-        require: '?ngModel', // get a hold of NgModelController
-        link: function(scope, element, attrs, ngModel) {
-            function read() {
-                var html = element.html();
-                // When we clear the content editable the browser leaves a <br> behind
-                // If strip-br attribute is provided then we strip this out
-                if (attrs.stripBr && html === '<br>') {
-                    html = '';
-                }
-                ngModel.$setViewValue(html);
-            }
+    .controller('mentionsCtrl', mentionsCtrl);
 
-            if(!ngModel) return; // do nothing if no ng-model
 
-            // Specify how UI should be updated
-            ngModel.$render = function() {
-                if (ngModel.$viewValue !== element.html()) {
-                    element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
-                }
-            };
-
-            // Listen for change events to enable binding
-            element.on('blur keyup change', function() {
-                scope.$apply(read);
-            });
-            read(); // initialize
-        }
-    };
-}]);
-
-function mentionsCtrl($q, $timeout) {
+function mentionsCtrl($q, $timeout, hashtagSrvc, $scope) {
     var mentionsVm = this;
 
-    console.log('init');
     mentionsVm.typedTerm = 'Hello';
 
     mentionsVm.peopleList = [
@@ -53,8 +66,9 @@ function mentionsCtrl($q, $timeout) {
         {title: 'Beer'}
     ];
 
-    mentionsVm.theTextArea = 'Type an # and some text';
-    mentionsVm.theTextArea2 = 'Type an @';
+    mentionsVm.theTextArea = '';
+    mentionsVm.theTextArea2 = '';
+
 
     mentionsVm.searchProducts = searchProducts;
     mentionsVm.getProductTextRaw = getProductTextRaw;
@@ -65,6 +79,8 @@ function mentionsCtrl($q, $timeout) {
     mentionsVm.getPeopleText = getPeopleText;
     mentionsVm.getProductText = getProductText;
 
+    mentionsVm.searchHashtags = searchHashtags;
+    mentionsVm.selectHashtag = selectHashtag;
 
 
     function searchProducts(term) {
@@ -85,7 +101,7 @@ function mentionsCtrl($q, $timeout) {
          propertly during replacement */
         // simulated async promise
         $timeout(function() {
-            deferred.resolve('#' + item.sku);
+            deferred.resolve('#' + item.title);
         }, 500);
         return deferred.promise;
     }
@@ -111,6 +127,39 @@ function mentionsCtrl($q, $timeout) {
         //     return $q.when(peopleList);
         // });
     }
+
+    function searchHashtags(term) {
+        var hashtagList = [];
+        if (term.length > 1) {
+            return hashtagSrvc.searchHastags(term).then(function (response) {
+                angular.forEach(response, function(item) {
+                    if (item.tag.toUpperCase().indexOf(term.toUpperCase()) >= 0) {
+                        hashtagList.push(item);
+                    }
+                });
+                mentionsVm.hashtags = hashtagList;
+                return $q.when(hashtagList);
+            });
+        } else if(hashtagList.length < 2 && term) {
+
+        } else {
+            mentionsVm.hashtags = [];
+        }
+    }
+
+    function selectHashtag(item) {
+        //This is were we will add the tag data to the current notebook/textfile
+
+        var parent = angular.element('.CodeMirror-line');
+        var element = parent.find('span').text() === $scope.typedTerm;
+        $(element).text(item.tag || item.label);
+        var res = mentionsVm.theTextArea.replace($scope.typedTerm, item.tag || item.label);
+        mentionsVm.theTextArea = res;
+
+        return '#' + (item.tag || item.label);
+
+    }
+
     function getPeopleTextRaw(item) {
         console.log('people create', item);
         return '@' + item.name;

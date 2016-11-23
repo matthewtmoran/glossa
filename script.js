@@ -12,6 +12,13 @@ console.log('hashtags', jsonData.hashtags);
 var inc = 0;
 
 jsonData.hashtags.forEach(function(dat) {
+        dat.tag = dat.tag.substr(1);
+        console.log('dat.tag', dat.tag);
+        dat.canEdit = false;
+
+
+
+
     hashtags.insert(dat, function(err, doc) {
         if (err) {
             console.log('There was an error saving file data to the DB', err);

@@ -41,32 +41,36 @@
 
 		<form action="">
 			<span>test</span>
-			<!--<textarea mentio-->
-			<!--id="theText"-->
-			<!--mentio-id="'theText'"-->
-			<!--mentio-trigger-char="'@'"-->
-			<!--mentio-typed-term="typedTerm"-->
-			<!--mentio-require-leading-space="true"-->
-			<!--mentio-select-not-found="true"-->
-			<!--ng-model="mentionsVm.theTextArea2"-->
-			<!--autocomplete="off"></textarea>-->
-			          <!--mentio-typed-text="typedTerm"-->
 
-			          <!--mentio-typed-term="typedTerm"-->
-			<textarea mentio
-			          contenteditable="true"
+			          <!--mentio-typed-text="typedTerm"-->
+			          <!--contenteditable-->
+			<textarea
+					  simplemde
+					  mentio
 			          id="theText"
 			          mentio-id="'theText'"
 			          mentio-typed-term="typedTerm"
 			          mentio-require-leading-space="true"
 			          mentio-select-not-found="true"
-			          ng-model="mentionsVm.theTextArea2"
+			          ng-model="mentionsVm.theTextArea"
+					  ng-trim="false"
 			          autocomplete="off"
 			          class="editor form-control"
-			          simplemde ></textarea>
-			Mentioned: {{typedTerm}};
-			          <!--mentio-select="getProductText(typedTerm)"-->
+			></textarea>
+			<p>typed term: {{typedTerm}}</p>
 
+
+
+			<mentio-menu
+					mentio-for="'theText'"
+					mentio-trigger-char="'#'"
+					mentio-items="mentionsVm.hashtags"
+					mentio-template-url="/product-mentions.tpl"
+					mentio-search="mentionsVm.searchHashtags(term)"
+					mentio-select="mentionsVm.selectHashtag(item)"
+			></mentio-menu>
+
+			          <!--simplemde -->
 		</form>
 			          <!--mentio-items="mentionsVm.mentionList | filter:label:typedTerm"-->
 
@@ -90,23 +94,26 @@
 
 
 		<!--contenteditable-->
-		<mentio-menu
-				mentio-for="'theText'"
-				mentio-trigger-char="'@'"
-				mentio-items="mentionsVm.people"
-				mentio-template-url="/people-mentions.tpl"
-				mentio-search="mentionsVm.searchPeople(term)"
-				mentio-select="mentionsVm.getPeopleText(item)"
-		></mentio-menu>
+		<!--<mentio-menu-->
+				<!--mentio-for="'theText'"-->
+				<!--mentio-trigger-char="'@'"-->
+				<!--mentio-items="mentionsVm.people"-->
+				<!--mentio-template-url="/people-mentions.tpl"-->
+				<!--mentio-search="mentionsVm.searchPeople(term)"-->
+				<!--mentio-select="mentionsVm.getPeopleText(item)"-->
+		<!--&gt;</mentio-menu>-->
 
-		<mentio-menu
-				mentio-for="'theText'"
-				mentio-trigger-char="'#'"
-				mentio-items="mentionsVm.products"
-				mentio-template-url="/product-mentions.tpl"
-				mentio-search="mentionsVm.searchProducts(term)"
-				mentio-select="mentionsVm.getProductText(item)"
-		></mentio-menu>
+
+
+
+		<!--<mentio-menu-->
+				<!--mentio-for="'htmlContent'"-->
+				<!--mentio-trigger-char="'@'"-->
+				<!--mentio-items="mentionsVm.people"-->
+				<!--mentio-template-url="/people-mentions.tpl"-->
+				<!--mentio-search="mentionsVm.searchPeople(term)"-->
+				<!--mentio-select="mentionsVm.getPeopleText(item)"-->
+		<!--&gt;</mentio-menu>-->
 
 	</md-content>
 
@@ -116,25 +123,56 @@
 
 
 <script type="text/ng-template" id="/product-mentions.tpl">
-	<ul class="list-group product-search demo-scrollable-menu">
-		<li mentio-menu-item="product" ng-repeat="product in items" class="list-group-item clearfix">
-			<div class="row">
-				<div class="col-xs-2 text-center">
-				</div>
-				<div class="col-xs-10">
-					<h4>{{product.title}}</h4>
-					<!--<h4 class="list-group-item-heading">{{product.title | words:5}}</h4>-->
-					<!--<p class="list-group-item-text">{{product.description | words:7}}</p>-->
-				</div>
-			</div>
-		</li>
-	</ul>
+
+	<md-menu-content width="6" class="md-whiteframe-4dp">
+		<md-menu-item>
+			<p>Type space to add new...</p>
+		</md-menu-item>
+		<md-divider></md-divider>
+		<md-menu-item mentio-menu-item="item" class="list-group-item" ng-repeat="item in items">
+			<md-button>
+				<p>{{item.tag}}</p>
+				<md-tooltip  md-direction="top"
+				            md-visible="tooltipVisible"
+				            md-autohide="true">
+					{{item.realTitle}}
+				</md-tooltip>
+			</md-button>
+		</md-menu-item>
+	</md-menu-content>
+
+	<!--<ul class="md-whiteframe-4dp">-->
+		<!--<li mentio-menu-item="product" class="list-group-item" ng-repeat="product in items">-->
+			<!--<md-button>-->
+				<!--<p>{{product.tag}}</p>-->
+				<!--<md-tooltip md-direction="top"-->
+				            <!--md-visible="tooltipVisible"-->
+				            <!--md-autohide="true">-->
+					<!--{{product.realTitle}}-->
+				<!--</md-tooltip>-->
+			<!--</md-button>-->
+		<!--</li>-->
+	<!--</ul>-->
+
+	<!--<ul class="list-group product-search demo-scrollable-menu">-->
+		<!--<li mentio-menu-item="product" ng-repeat="product in items" class="list-group-item clearfix">-->
+			<!--<div class="row">-->
+				<!--<div class="col-xs-2 text-center">-->
+				<!--</div>-->
+				<!--<div class="col-xs-10">-->
+					<!--<h4>{{product.tag}}</h4>-->
+					<!--&lt;!&ndash;<h4 class="list-group-item-heading">{{product.title | words:5}}</h4>&ndash;&gt;-->
+					<!--&lt;!&ndash;<p class="list-group-item-text">{{product.description | words:7}}</p>&ndash;&gt;-->
+				<!--</div>-->
+			<!--</div>-->
+		<!--</li>-->
+	<!--</ul>-->
 </script>
 
 <script type="text/ng-template" id="/people-mentions.tpl">
 	<ul class="list-group user-search">
 		<li mentio-menu-item="person" ng-repeat="person in items" class="list-group-item">
-			<p>{{person.name}}</p>
+			<p>{{person}}</p>
 		</li>
 	</ul>
 </script>
