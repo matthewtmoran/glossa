@@ -69,6 +69,14 @@
 					mentio-search="mentionsVm.searchHashtags(term)"
 					mentio-select="mentionsVm.selectHashtag(item)"
 			></mentio-menu>
+			<!--<mentio-menu-->
+					<!--mentio-for="'theText'"-->
+					<!--mentio-trigger-char="'@'"-->
+					<!--mentio-items="mentionsVm.people"-->
+					<!--mentio-template-url="/product-mentions.tpl"-->
+					<!--mentio-search="mentionsVm.searchPeople(term)"-->
+					<!--mentio-select="mentionsVm.selectPerson(item)"-->
+			<!--&gt;</mentio-menu>-->
 
 			          <!--simplemde -->
 		</form>
@@ -131,7 +139,7 @@
 		<md-divider></md-divider>
 		<md-menu-item mentio-menu-item="item" class="list-group-item" ng-repeat="item in items">
 			<md-button>
-				<p>{{item.tag}}</p>
+				<p>{{item.tag || item.label || item.title || item.name}}</p>
 				<md-tooltip  md-direction="top"
 				            md-visible="tooltipVisible"
 				            md-autohide="true">
@@ -140,33 +148,6 @@
 			</md-button>
 		</md-menu-item>
 	</md-menu-content>
-
-	<!--<ul class="md-whiteframe-4dp">-->
-		<!--<li mentio-menu-item="product" class="list-group-item" ng-repeat="product in items">-->
-			<!--<md-button>-->
-				<!--<p>{{product.tag}}</p>-->
-				<!--<md-tooltip md-direction="top"-->
-				            <!--md-visible="tooltipVisible"-->
-				            <!--md-autohide="true">-->
-					<!--{{product.realTitle}}-->
-				<!--</md-tooltip>-->
-			<!--</md-button>-->
-		<!--</li>-->
-	<!--</ul>-->
-
-	<!--<ul class="list-group product-search demo-scrollable-menu">-->
-		<!--<li mentio-menu-item="product" ng-repeat="product in items" class="list-group-item clearfix">-->
-			<!--<div class="row">-->
-				<!--<div class="col-xs-2 text-center">-->
-				<!--</div>-->
-				<!--<div class="col-xs-10">-->
-					<!--<h4>{{product.tag}}</h4>-->
-					<!--&lt;!&ndash;<h4 class="list-group-item-heading">{{product.title | words:5}}</h4>&ndash;&gt;-->
-					<!--&lt;!&ndash;<p class="list-group-item-text">{{product.description | words:7}}</p>&ndash;&gt;-->
-				<!--</div>-->
-			<!--</div>-->
-		<!--</li>-->
-	<!--</ul>-->
 </script>
 
 <script type="text/ng-template" id="/people-mentions.tpl">

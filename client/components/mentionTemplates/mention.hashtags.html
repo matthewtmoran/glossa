@@ -1,0 +1,17 @@
+
+<md-menu-content width="6" class="md-whiteframe-4dp">
+	<md-menu-item>
+		<p>Type space to add new...</p>
+	</md-menu-item>
+	<md-divider></md-divider>
+	<md-menu-item mentio-menu-item="item" class="list-group-item" ng-repeat="item in items">
+		<md-button>
+			<p>{{item.tag || item.label || item.title || item.name}}</p>
+			<md-tooltip  md-direction="top"
+			             md-visible="tooltipVisible"
+			             md-autohide="true">
+				{{item.realTitle}}
+			</md-tooltip>
+		</md-button>
+	</md-menu-item>
+</md-menu-content>

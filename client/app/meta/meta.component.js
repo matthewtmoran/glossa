@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -32,6 +32,9 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
+
+    metaVm.selectHashtag = selectHashtag;
+    metaVm.searchHashtags = searchHashtags;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
@@ -166,6 +169,58 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc) {
         } else {
             $scope.tooltipVisible = metaVm.isOpen;
         }
+    }
+
+
+    //mention funcitons
+
+    function searchHashtags(term) {
+        var hashtagList = [];
+        if (term.length > 1) {
+            return hashtagSrvc.searchHastags(term).then(function (response) {
+                angular.forEach(response, function(item) {
+                    if (item.tag.toUpperCase().indexOf(term.toUpperCase()) >= 0) {
+                        hashtagList.push(item);
+                    }
+                });
+                metaVm.hashtags = hashtagList;
+                return $q.when(hashtagList);
+            });
+        } else if(hashtagList.length < 2 && term) {
+
+        } else {
+            metaVm.hashtags = [];
+        }
+    }
+
+    function selectHashtag(item) {
+        //This is were we will add the tag data to the current notebook/textfile
+
+        // var parent = angular.element('.CodeMirror-line');
+        // var element = parent.find('span').text() === $scope.typedTerm;
+        // $(element).text(item.tag || item.label);
+        // var res = mentionsVm.theTextArea.replace($scope.typedTerm, item.tag || item.label);
+        // mentionsVm.theTextArea = res;
+
+        console.log('metaVm.currentFile.description', metaVm.currentFile.description);
+
+        console.log('$scope.typedTerm', $scope.typedTerm);
+
+        // metaVm.currentFile.description.trigger();
+
+        // angular.element('#theText').trigger('textarea');
+
+        // $scope.$digest()
+        // var res = metaVm.currentFile.description.replace($scope.typedTerm, item.tag || item.label);
+        //
+        // metaVm.currentFile.description = res;
+
+
+        // metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'});
+
+
+        return '#' + (item.tag || item.label);
+
     }
 
 }

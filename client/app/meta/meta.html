@@ -10,10 +10,32 @@
 		<md-input-container class="md-block">
 			<label>Description</label>
 			<textarea ng-change="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"
-			          ng-model-options='{ debounce: 1000 }'
+			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"
+			          mentio
+			          ng-trim="false"
+			          autocomplete="off"
+			          id="theText"
+			          mentio-id="'theText'"
+			          mentio-typed-term="typedTerm"
+			          mentio-require-leading-space="true"
+			          mentio-select-not-found="true"
 			          rows="5"></textarea>
+
+			<mentio-menu
+					mentio-for="'theText'"
+					mentio-trigger-char="'#'"
+					mentio-items="metaVm.hashtags"
+					mentio-template-url="./components/mentionTemplates/mention.hashtags.html"
+					mentio-search="metaVm.searchHashtags(term)"
+					mentio-select="metaVm.selectHashtag(item)"
+			></mentio-menu>
+
+					<!--mentio-template-url="/product-mentions.tpl"-->
+
 		</md-input-container>
+
+		{{metaVm.currentFile.description | json }}
 	</form>
 	<div layout="row" layout-align="space-between center">
 		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
