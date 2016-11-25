@@ -66,3 +66,25 @@
 
 	}
 }
+.grid-tile {
+	//max-width: 530px;
+}
+.notebook-card {
+	//max-width: 400px;
+	//height: 500px;
+	//margin: 12px;
+	//min-width: 300px !important;
+
+	.card-media {
+		position: relative;
+		overflow: hidden;
+		max-height: 250px;
+		min-height: 250px;
+
+		img {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	}
+}

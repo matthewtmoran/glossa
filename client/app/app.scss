@@ -130,9 +130,10 @@ md-backdrop.md-sidenav-backdrop {
 @import 'meta/meta';
 @import 'meta/modal/attachfile';
 @import 'notebook/addNotebookDialog/addNotebook';
-@import 'notebook/nbSidebar/nbSidebar';
 @import 'notebook/notebook';
 @import '../components/drawer/drawer';
 @import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
+@import '../components/wavesurferDirectives/mdWavesurferPlayer';
+@import '../components/wavesurferDirectives/wavePreview/wavePreview';
 /* endinject */

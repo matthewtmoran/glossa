@@ -8,9 +8,28 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout) {
     var nbVm = this;
-    console.log('notebookCtrl');
+
+    nbVm.hidden = false;
+    nbVm.isOpen = false;
+    nbVm.hover = false;
+    nbVm.items = [
+        { name: "Create Audio Post", icon: "volume_up", direction: "left", type: 'audio' },
+        { name: "Create Image Post", icon: "add_a_photo", direction: "left", type: 'image' },
+        { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
+    ];
+
+    $scope.$watch('nbVm.isOpen', isOpenWatch);
+    function isOpenWatch(isOpen) {
+        if (isOpen) {
+            $timeout(function() {
+                $scope.tooltipVisible = nbVm.isOpen;
+            }, 600);
+        } else {
+            $scope.tooltipVisible = nbVm.isOpen;
+        }
+    }
 
     nbVm.currentNotebook = {
         media: {}
@@ -18,21 +37,16 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
     nbVm.notebooks = [];
 
     notebookSrvc.queryNotebooks().then(function(docs) {
-
-        docs.forEach(function(doc) {
-            nbVm.notebooks.push(buildGridList(doc))
-        });
-        console.log('docs', docs);
-
+        nbVm.notebooks = docs;
     });
 
     nbVm.playPauseAudio = playPauseAudio;
     nbVm.newNotebookDialog = newNotebookDialog;
+    nbVm.openNBDialog = openNBDialog;
 
     function playPauseAudio(notebook) {
         console.log('notebook to play audio', notebook);
     }
-
     function newNotebookDialog(ev) {
         $mdDialog.show({
             controller: addNotebookCtrl,
@@ -50,41 +64,36 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog) {
             console.log('closed 2', data);
         });
     }
-    //TODO: need to loop through each doc and add that random col/row dimentions
-    function buildGridList(doc) {
 
-        // docs.forEach(function(doc) {
-        //     console.log('modifying nb object');
-        //     doc.colSpan = randomSpan();
-        //     doc.rowspan = randomSpan();
-        // });
-
-        doc.colspan = randomSpan();
-        doc.rowspan = randomSpan();
-
-
-        // nbVm.notebooks = (function() {
-        //     var nbs = [];
-        //     for (var i = 0; i < docs.length; i++) {
-        //         nbs.push({
-        //             colspan: randomSpan(),
-        //             rowspan: randomSpan()
-        //         });
-        //     }
-        //     return nbs;
-        // })();
-        console.log('returning nb list after mod');
-        return doc;
+    function openNBDialog(type) {
+        switch(type) {
+            case 'image':
+                openImageDialog();
+                break;
+            case 'audio':
+                openAudioDialog();
+                break;
+            case 'normal':
+                openPostDialog();
+        }
     }
 
-    function randomSpan() {
-        var r = Math.random();
-        if (r < 0.4) {
-            return 1;
-        } else if (r < 0.8) {
-            return 2;
-        } else {
-            return 3;
-        }
+    function openPostDialog(ev) {
+        $mdDialog.show({
+            controller: newPostCtrl,
+            controllerAs: 'newPostVm',
+            templateUrl: 'app/notebook/postDialog/newPost.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: false,
+            bindToController: true,
+            locals: {
+                currentFile: nbVm.currentFile
+            }
+        }).then(function(data) {
+            nbVm.notebooks.push(data);
+        }, function(data) {
+
+        });
     }
 }
