@@ -65,7 +65,7 @@
 		</md-fab-trigger>
 
 		<md-fab-actions>
-			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.openNBDialog(item.type)">
+			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.openNBDialog($event, item.type)">
 
 				<md-icon>{{item.icon}}</md-icon>
 

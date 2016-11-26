@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout) {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc) {
     var nbVm = this;
 
     nbVm.hidden = false;
@@ -19,8 +19,41 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout) {
         { name: "Create Image Post", icon: "add_a_photo", direction: "left", type: 'image' },
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
+    nbVm.currentNotebook = {
+        media: {}
+    };
+    nbVm.notebooks = [];
+
+    nbVm.playPauseAudio = playPauseAudio;
+    nbVm.openNBDialog = openNBDialog;
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
+
+    notebookSrvc.queryNotebooks().then(function(docs) {
+        nbVm.notebooks = docs;
+    });
+
+    function playPauseAudio(notebook) {
+        console.log('notebook to play audio', notebook);
+    }
+
+    /**
+     * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebook to the array
+     * @param ev - the event
+     * @param type - the type of post
+     */
+    function openNBDialog(ev, type) {
+        postSrvc.newPostDialog(ev, type, nbVm.currentNotebook).then(function(res) {
+            nbVm.currentNotebook = {
+                media: {}
+            };
+            if (typeof res !== 'string') {
+                return nbVm.notebooks.push(res);
+            }
+             return console.log('this was not saved', res);
+        });
+    }
+
     function isOpenWatch(isOpen) {
         if (isOpen) {
             $timeout(function() {
@@ -29,71 +62,5 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout) {
         } else {
             $scope.tooltipVisible = nbVm.isOpen;
         }
-    }
-
-    nbVm.currentNotebook = {
-        media: {}
-    };
-    nbVm.notebooks = [];
-
-    notebookSrvc.queryNotebooks().then(function(docs) {
-        nbVm.notebooks = docs;
-    });
-
-    nbVm.playPauseAudio = playPauseAudio;
-    nbVm.newNotebookDialog = newNotebookDialog;
-    nbVm.openNBDialog = openNBDialog;
-
-    function playPauseAudio(notebook) {
-        console.log('notebook to play audio', notebook);
-    }
-    function newNotebookDialog(ev) {
-        $mdDialog.show({
-            controller: addNotebookCtrl,
-            controllerAs: 'aNbVm',
-            templateUrl: 'app/notebook/addNotebookDialog/addNotebook.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true,
-            bindToController: true,
-        }).then(function(data) {
-            nbVm.notebooks.push(data);
-
-        }, function(data) {
-
-            console.log('closed 2', data);
-        });
-    }
-
-    function openNBDialog(type) {
-        switch(type) {
-            case 'image':
-                openImageDialog();
-                break;
-            case 'audio':
-                openAudioDialog();
-                break;
-            case 'normal':
-                openPostDialog();
-        }
-    }
-
-    function openPostDialog(ev) {
-        $mdDialog.show({
-            controller: newPostCtrl,
-            controllerAs: 'newPostVm',
-            templateUrl: 'app/notebook/postDialog/newPost.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: false,
-            bindToController: true,
-            locals: {
-                currentFile: nbVm.currentFile
-            }
-        }).then(function(data) {
-            nbVm.notebooks.push(data);
-        }, function(data) {
-
-        });
     }
 }

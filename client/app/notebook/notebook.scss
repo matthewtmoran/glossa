@@ -88,3 +88,23 @@
 		}
 	}
 }
+
+.post-dialog {
+	.simplemde-wrapper {
+		width: 100% !important;
+	}
+	.CodeMirror {
+	}
+}
+
+#image-post-dialog {
+	.image-caption {
+		width: 100% !important;
+	}
+
+	.CodeMirror {
+		min-height: 200px !important;
+		height: 200px !important;
+		width: 100% !important;
+	}
+}

@@ -1,44 +1,35 @@
-<md-dialog id="new-post-dialog" flex="50" class="md-padding">
+<md-dialog class="post-dialog" flex="50" class="md-padding">
 	<form name="addPost">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Create New Post</h2>
+			</div>
+		</md-toolbar>
 		<md-dialog-content>
 			<div class="md-dialog-content">
-				
-				<md-input-container>
-					<textarea aria-label="text area" ng-model="newPostVm.currentPost" simplemde></textarea>
+
+				<md-input-container class="simplemde-wrapper">
+					<textarea class="simplemde-textarea" aria-label="text area" ng-model="newPostVm.currentPost" simplemde="newPostVm.editorOptions"></textarea>
 				</md-input-container>
 
-
-				{{newPostVm.currentPost}}
-				{{newPostVm.currentNotebook.title}}
-				
-				<!--<md-input-container class="md-block" flex-gt-sm="">-->
-					<!--<label>Post Name</label>-->
-					<!--<input ng-model="newPostVm.currentNotebook.name"-->
-					       <!--value="newPostVm.currentNotebook.name" required>-->
-				<!--</md-input-container>-->
-
-				<!--<md-input-container class="md-block">-->
-					<!--<label>Description</label>-->
-					<!--<textarea ng-model="newPostVm.currentNotebook.description" rows="5"></textarea>-->
-				<!--</md-input-container>-->
-
-				<div layout="row" layout-align="start center">
+				<div layout="row" layout-align="space-between center ">
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
 					              buttonicon="camera_alt" button-id="uploadImage"
 					              filetypes=".jpg, .png, .svg"></basic-upload>
+					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
+					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
 					              buttonicon="volume_up" button-id="uploadAudio"
 					              filetypes=".mp3, .m4a"></basic-upload>
 				</div>
 
 			</div>
-
 		</md-dialog-content>
 
 		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
 		<md-dialog-actions layout="row" >
 			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
-			<md-button ng-click="newPostVm.save('Update Attached File')">Add Notebook</md-button>
+			<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>
 		</md-dialog-actions>
 	</form>
 

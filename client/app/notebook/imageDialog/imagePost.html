@@ -1,0 +1,31 @@
+<md-dialog class="post-dialog" flex="50" class="md-padding">
+	<form name="addPost">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Create New Image Post</h2>
+			</div>
+		</md-toolbar>
+		<md-dialog-content>
+			<div class="md-dialog-content">
+				<md-input-container layout="row" layout-align="start center">
+					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
+					              buttonicon="camera_alt" button-id="uploadImage"
+					              filetypes=".jpg, .png, .svg"></basic-upload>
+					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
+				</md-input-container>
+
+				<md-input-container class="simplemde-wrapper">
+					<h3>Image Caption</h3>
+					<textarea id="imageCaption" aria-label="text area" ng-model="newPostVm.currentPost" simplemde="newPostVm.editorOptions"></textarea>
+				</md-input-container>
+			</div>
+
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" >
+			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
+			<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>
+		</md-dialog-actions>
+	</form>
+
+</md-dialog>
