@@ -22,6 +22,7 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
     var service = {
         parseTitle: parseTitle,
         newPostDialog: newPostDialog,
+        existingPostDialog: existingPostDialog,
         save: save
     };
     return service;
@@ -77,6 +78,29 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
             bindToController: true,
             locals: {
                 simplemdeOptions: options.simplemde,
+                currentNotebook: currentNotebook
+            }
+        }).then(function(data) {
+
+            console.log('Dialog is closed. data', data);
+
+            return data;
+        }, function(data) {
+            return data;
+        });
+    }
+
+    function existingPostDialog(currentNotebook) {
+        return $mdDialog.show({
+            templateUrl: 'app/notebook/postDialog/existingPost.html',
+            parent: angular.element(document.body),
+            // targetEvent: ev,
+            controller: newPostCtrl,
+            controllerAs: 'newPostVm',
+            bindToController: true,
+            clickOutsideToClose: false,
+            locals: {
+                simplemdeOptions: '',
                 currentNotebook: currentNotebook
             }
         }).then(function(data) {
@@ -149,6 +173,8 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         });
         return deferred.promise;
     }
+
+
 
 
 }

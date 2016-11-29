@@ -22,13 +22,13 @@
 
 			.notebook-media {
 				//height: 100%;
-				width: 100%;
-				background-size: cover;
-				background-position: center center;
+				//width: 100%;
+				//background-size: cover;
+				//background-position: center center;
 
-				img {
-					width: 100%;
-				}
+				//img {
+				//	width: 100%;
+				//}
 			}
 
 			.notebook-text {
@@ -70,12 +70,22 @@
 	//max-width: 530px;
 }
 .notebook-card {
-	//max-width: 400px;
-	//height: 500px;
-	//margin: 12px;
-	//min-width: 300px !important;
 
-	.card-media {
+	.inner-padding {
+		padding: 0 16px 0 16px;
+	}
+
+	.card-content {
+		padding: 0;
+	}
+
+	.card-title {
+		.title-text {
+
+		}
+	}
+
+	.card-image {
 		position: relative;
 		overflow: hidden;
 		max-height: 250px;
@@ -85,6 +95,21 @@
 			display: block;
 			width: 100%;
 			height: 100%;
+		}
+	}
+
+	.card-media {
+		position: relative;
+		overflow: hidden;
+		//max-height: 100%;
+		height: 100%;
+		width: 100%;
+		//min-height: 250px;
+
+		img {
+			display: block;
+			width: 100%;
+			height: 100% !important;
 		}
 	}
 }

@@ -26,6 +26,7 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
 
     nbVm.playPauseAudio = playPauseAudio;
     nbVm.openNBDialog = openNBDialog;
+    nbVm.openExistinDialog = openExistinDialog;
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
@@ -52,6 +53,12 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             }
              return console.log('this was not saved', res);
         });
+    }
+
+    function openExistinDialog(notebook) {
+        postSrvc.existingPostDialog(notebook).then(function(res) {
+            console.log('the response is here', res);
+        })
     }
 
     function isOpenWatch(isOpen) {

@@ -1,0 +1,38 @@
+<md-card class="notebook-card" flex layout-fill layout="column">
+	<md-card-header class="card-title" flex="12">
+		<md-card-header-text class="title-text ">
+			<span class="md-headline">{{notebook.name}}</span>
+		</md-card-header-text>
+		<md-divider></md-divider>
+	</md-card-header>
+
+	<md-card-content class="card-content" flex>
+
+		<div ng-if="notebook.media.image" class="md-media-lg card-image ">
+			<img ng-src="{{'../' + notebook.media.image.path}}" class="md-card-image" alt="">
+		</div>
+
+		<div ng-if="notebook.postType === 'audio'">
+			<wave-preview
+					flex
+					url="{{'../' + notebook.media.audio.path}}"
+					auto-play="false"
+					player-wave-color="white"
+					player-height="150"
+					player-progress-color="black">
+			</wave-preview>
+		</div>
+
+		<div class="card-text inner-padding">
+			<p ng-if="notebook.description">{{notebook.description}}</p>
+			<p ng-if="notebook.media.image.caption">{{notebook.image.caption}}</p>
+		</div>
+
+	</md-card-content>
+
+
+	<md-card-actions flex=10 layout="row" layout-align="end bottom">
+		<!--<md-button>Action 1</md-button>-->
+		<md-button ng-click="openExistinDialog(notebook)">Edit Post</md-button>
+	</md-card-actions>
+</md-card>
