@@ -39,8 +39,17 @@ function hashtagSrvc(dbSrvc) {
 
     }
 
-    function createHashtag() {
 
+    function createHashtag(hashtag) {
+
+        hashtag.tagColor = '#4285f4';
+        hashtag.realTitle = hashtag.tag;
+        hashtag.canEdit = true;
+        hashtag.createdAt = Date.now();
+
+        return dbSrvc.insert(hashtagsCol, hashtag).then(function(doc) {
+            return doc;
+        })
     }
 
 }
