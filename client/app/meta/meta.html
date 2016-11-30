@@ -81,6 +81,7 @@
 				</md-card-actions>
 
 			</md-card><!--Independent Media-->
+			<!--Notebook Attachment-->
 			<md-card flex="50"
 			         class="mdl-shadow--2dp attachment-card"
 			         ng-if="metaVm.currentFile.mediaType === 'notebook'">
@@ -100,7 +101,7 @@
 				<md-card-actions layout="row" layout-align="start center">
 					<md-button ng-click="metaVm.disconnectDialog($event, metaVm.attachedNotebook)">Disconnect</md-button>
 					<span flex></span>
-					<md-button class="md-icon-button">
+					<md-button ng-click="metaVm.openExistinDialog(metaVm.attachedNotebook)" class="md-icon-button">
 						<md-icon>open_in_new</md-icon>
 					</md-button>
 				</md-card-actions>

@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -32,6 +32,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
+    metaVm.openExistinDialog = openExistinDialog;
 
     metaVm.selectHashtag = selectHashtag;
     metaVm.searchHashtags = searchHashtags;
@@ -131,6 +132,12 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         });
     }
 
+    function openExistinDialog(notebook) {
+        postSrvc.existingPostDialog(notebook).then(function(res) {
+            console.log('the response is here', res);
+        })
+    }
+
     function editAttachedFile(ev, attachment, type) {
         $mdDialog.show({
             controller: editAttached,
@@ -170,7 +177,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             $scope.tooltipVisible = metaVm.isOpen;
         }
     }
-
 
     //mention funcitons
 
