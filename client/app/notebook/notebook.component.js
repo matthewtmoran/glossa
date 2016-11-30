@@ -27,12 +27,51 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     nbVm.playPauseAudio = playPauseAudio;
     nbVm.openNBDialog = openNBDialog;
     nbVm.openExistinDialog = openExistinDialog;
+    nbVm.commonTags = [];
+
+    var hashtagsUsed = [];
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
     notebookSrvc.queryNotebooks().then(function(docs) {
+
+        docs.forEach(function(doc) {
+            if (doc.hashtags) {
+                doc.hashtags.forEach(function(tag) {
+                    hashtagsUsed.push(tag);
+                })
+            }
+        });
+
+        findCommon(hashtagsUsed).forEach(function(item) {
+            nbVm.commonTags.push(item.item);
+        });
+
+
         nbVm.notebooks = docs;
     });
+
+    function findCommon(arr) {
+        var uniqs = {};
+
+        for(var i = 0; i < arr.length; i++) {
+            uniqs[arr[i].tag] = (uniqs[arr[i].tag] || {});
+            uniqs[arr[i].tag]['item'] = arr[i];
+            uniqs[arr[i].tag]['occurance'] = (uniqs[arr[i].tag]['occurance'] || 0) + 1;
+        }
+
+        var props = Object.keys(uniqs).map(function(key) {
+            return { item: this[key].item, occurance: this[key].occurance };
+        }, uniqs);
+
+        props.sort(function(p1, p2) {
+            return p2.occurance - p1.occurance;
+        });
+
+        var topThree = props.slice(0, 4);
+
+        return topThree;
+    }
 
     function playPauseAudio(notebook) {
         console.log('notebook to play audio', notebook);

@@ -150,6 +150,8 @@ function mentionsCtrl($q, $timeout, hashtagSrvc, $scope) {
     function selectHashtag(item) {
         //This is were we will add the tag data to the current notebook/textfile
 
+
+
         var parent = angular.element('.CodeMirror-line');
         var element = parent.find('span').text() === $scope.typedTerm;
         $(element).text(item.tag || item.label);

@@ -120,11 +120,10 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
      * @returns {promise.promise|jQuery.promise|promise|*|d.promise|Promise}
      * TODO: we can turn this into one dynamic function
      */
-    function saveNormalPost(currentNotebook, postContent) {
+    function saveNormalPost(currentNotebook) {
         var deferred = $q.defer();
 
-        currentNotebook.name = parseTitle(postContent);
-        currentNotebook.description = postContent;
+        currentNotebook.name = parseTitle(currentNotebook.description);
 
         notebookSrvc.createNotebook(currentNotebook, function(result) {
             if (!result) {

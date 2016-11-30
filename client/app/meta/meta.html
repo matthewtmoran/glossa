@@ -9,6 +9,7 @@
 		</md-input-container>
 		<md-input-container class="md-block">
 			<label>Description</label>
+
 			<textarea ng-change="metaVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"
 			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"

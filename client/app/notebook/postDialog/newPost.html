@@ -1,5 +1,5 @@
-<md-dialog class="post-dialog" flex="50" class="md-padding">
-	<form name="addPost">
+<md-dialog class="post-dialog" flex="50" class="md-padding" >
+	<form name="addPost" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
 				<h2>Create New Post</h2>
@@ -9,7 +9,24 @@
 			<div class="md-dialog-content">
 
 				<md-input-container class="simplemde-wrapper">
-					<textarea class="simplemde-textarea" aria-label="text area" ng-model="newPostVm.currentPost" simplemde="newPostVm.editorOptions"></textarea>
+					<textarea class="simplemde-textarea" aria-label="text area"
+					          simplemde="newPostVm.editorOptions"
+					          id="theText"
+					          ng-model="newPostVm.currentNotebook.description"
+					          mentio
+					          mentio-id="'theText'"
+					          mentio-typed-term="typedTerm"
+					          mentio-require-leading-space="true"
+					          mentio-select-not-found="true"
+					          autocomplete="off"></textarea>
+					<mentio-menu
+							mentio-for="'theText'"
+							mentio-trigger-char="'#'"
+							mentio-items="newPostVm.hashtags"
+							mentio-template-url="./components/mentionTemplates/mention.hashtags.html"
+							mentio-search="newPostVm.searchHashtags(term)"
+							mentio-select="newPostVm.selectHashtag(item)"
+					></mentio-menu>
 				</md-input-container>
 
 				<div layout="row" layout-align="space-between center ">
