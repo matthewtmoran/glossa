@@ -1,5 +1,11 @@
 'use strict';
 
+var db = require('../db/database'),
+    fs = require('fs'),
+    path = require('path'),
+    _ = require('lodash'),
+    corporaMenus = db.corporaMenu;
+
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
@@ -87,7 +93,8 @@ function drawerMenu() {
                     name: 'Export',
                     type: ''
                 }
-            ]
+            ],
+            orderNum: 1
         },
         {
             name: 'Lexicon',
@@ -119,7 +126,8 @@ function drawerMenu() {
                     name: 'Export Concordance',
                     type: ''
                 }
-            ]
+            ],
+            orderNum: 2
         },
         {
             name: 'Grammar',
@@ -143,7 +151,8 @@ function drawerMenu() {
                     type: 'link',
                     icon: 'fa fa-plus'
                 }
-            ]
+            ],
+            orderNum: 3
         },
         {
             name: 'Notebooks',
@@ -167,11 +176,13 @@ function drawerMenu() {
                     type: 'link',
                     icon: 'fa fa-map-marker'
                 }
-            ]
+            ],
+            orderNum: 4
         },
         {
             name: 'Help',
-            type: 'heading'
+            type: 'heading',
+            orderNum: 5
         },
         {
             name: 'Glossa Basics',
@@ -195,20 +206,24 @@ function drawerMenu() {
                     type: 'link',
                     icon: 'fa fa-map-marker'
                 }
-            ]
+            ],
+            orderNum: 6
 
         },
         {
             name: 'Grammatical Helps',
             type: 'toggle',
+            orderNum: 7
         },
         {
             name: 'Phonology Helps',
             type: 'toggle',
+            orderNum: 8
         },
         {
             name: 'Dev',
-            type: 'heading'
+            type: 'heading',
+            orderNum: 9
         },
         {
             name: 'Sandbox States',
@@ -229,9 +244,67 @@ function drawerMenu() {
                     type: 'link',
                     state: 'main.meta'
                 }
-            ]
-        },
+            ],
+            orderNum: 10
+        }
     ];
+
+    activate();
+
+    function activate() {
+        addCustomItems();
+    }
+
+    function addCustomItems() {
+        section.forEach(function(sec) {
+            if (sec.name === 'Corpora') {
+                console.log('found corpora')
+                return queryCorporaMenus().forEach(function(item) {
+                    console.log('item', item);
+                    sec.pages.push(item);
+                    console.log('sec', sec);
+                });
+            }
+        });
+    }
+
+    function queryCorporaMenus() {
+
+        var items = [
+            {
+                name: 'Static 1',
+                type: 'link',
+                state: 'corpus',
+                params: {
+                    user: 'Moran',
+                    corpus: 'static 1'
+                }
+            },
+            {
+                name: 'Static 2',
+                type: 'link',
+                state: 'corpus',
+                params: {
+                    user: 'Moran',
+                    corpus: 'static 2'
+                }
+            },
+            {
+                name: 'Static 2',
+                type: 'link',
+                state: 'corpus',
+                params: {
+                    user: 'Moran',
+                    corpus: 'static 2'
+                }
+            }
+        ];
+        return items;
+
+        // return dbSrvc.find(corporaMenus, {}).then(function(docs) {
+        //     return docs;
+        // })
+    }
 
     var service = {
         section: section,
@@ -252,7 +325,6 @@ function drawerMenu() {
     };
 
     function toggleSettingsSection(section) {
-        console.log('toggleSettingsSection', section);
         service.openSetting = (service.openSetting === section ? null : section);
     }
     function isSectionSettingsSelected(section) {

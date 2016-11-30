@@ -17,12 +17,11 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('fileSrvc', fileSrvc);
 
-function fileSrvc(dbSrvc, $stateParams) {
+function fileSrvc(dbSrvc) {
 
     var file = {},
         fileList = [],
-        stagedUpdate = [],
-        currentCorpus = $stateParams.corpus;
+        stagedUpdate = [];
 
 
     var data = {
@@ -62,7 +61,7 @@ function fileSrvc(dbSrvc, $stateParams) {
      *
      * TODO: may just want to query for text files (Actually all the files being saved in db right now are text file and this might be fine)
      */
-    function queryAllFiles() {
+    function queryAllFiles(currentCorpus) {
         return dbSrvc.find(fileCollection, {corpus: currentCorpus}).then(function(docs) {
             return docs;
         })

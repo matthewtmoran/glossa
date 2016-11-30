@@ -11,6 +11,8 @@ angular.module('glossa')
 function corpusCtrl($scope, nodeSrvc, fileSrvc, $stateParams) {
     var vm = this;
 
+    console.log('init corpora state');
+
     vm.createNewTextFile = createNewTextFile;
     $scope.$on('remove:textFile', removeTextFile);
 

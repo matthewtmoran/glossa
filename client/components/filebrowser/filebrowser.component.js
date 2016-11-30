@@ -12,26 +12,27 @@ angular.module('glossa')
         }
     });
 
-function filebrowserComponent(fileSrvc, $scope, baselineSrvc) {
+function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
     var fbVm = this;
 
     fbVm.fileSelection = fileSelection;
     fbVm.createNewTextFile = createNewTextFile;
     fbVm.fileList = [];
+    var currentCorpus = $stateParams.corpus;
 
     activate();
 
     function activate() {
-        initialFileList();
+        initialFileList(currentCorpus);
     }
 
     /**
      * Queries for all files in db.
      * Returns a promise object
      */
-    function initialFileList() {
+    function initialFileList(corpus) {
         var prevLength = 37;
-        fileSrvc.queryAllFiles().then(function(docs) {
+        fileSrvc.queryAllFiles(corpus).then(function(docs) {
 
             docs.forEach(function(doc){
                 baselineSrvc.readContent(doc, function(content) {
