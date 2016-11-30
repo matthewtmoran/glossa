@@ -5,7 +5,7 @@ angular.module('glossa')
 
 function config($stateProvider) {
     $stateProvider
-        .state('main.baseline', {
+        .state('corpus.baseline', {
             template: '<baseline-component layout="column" flex ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">'
 
             // url: '/meta',

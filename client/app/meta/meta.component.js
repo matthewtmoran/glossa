@@ -198,7 +198,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             metaVm.hashtags = [];
         }
     }
-
     function selectHashtag(item) {
         //This is were we will add the tag data to the current notebook/textfile
 

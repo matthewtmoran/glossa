@@ -17,7 +17,6 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc) {
 
     fbVm.fileSelection = fileSelection;
     fbVm.createNewTextFile = createNewTextFile;
-
     fbVm.fileList = [];
 
     activate();

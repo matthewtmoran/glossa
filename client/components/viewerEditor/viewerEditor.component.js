@@ -24,11 +24,11 @@ function viewerEditorCtrl($scope, $state) {
     function selectedIndexWatch(current, old) {
         switch (current) {
             case 0:
-                $state.go('main.meta');
+                $state.go('corpus.meta');
                 // $location.url("/meta");
                 break;
             case 1:
-                $state.go('main.baseline');
+                $state.go('corpus.baseline');
                 // $location.url("/main.baseline");
                 break;
             case 2:

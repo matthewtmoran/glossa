@@ -1,6 +1,6 @@
 <md-button class="md-button-link"
            ng-class="{'active' : isSelected()}"
-           ui-sref="{{section.state}}"
+           ui-sref="{{section.state}}(section.params)"
            ng-click="focusSection()">
 
 	<div flex layout="row">

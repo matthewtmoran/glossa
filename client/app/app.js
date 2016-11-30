@@ -12,6 +12,7 @@ angular.module('glossa', [
     .config(config);
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
+
     // $mdThemingProvider.theme('default')
     //     .primaryPalette('blue-grey')
     //     .accentPalette('pink');
@@ -90,8 +91,16 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
 
 
 
-    $urlRouterProvider
-        .otherwise('/');
+    // $urlRouterProvider
+    //     .otherwise('/corpus/:corpus:default');
+
+    $urlRouterProvider.otherwise(function($injector, $location){
+        var state = $injector.get('$state');
+        state.go("corpus", $location.corpus());
+        return $location.path();
+    });
+
+
     $mdIconProvider
         .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
 };

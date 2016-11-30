@@ -8,17 +8,25 @@ function drawerMenu() {
     var section = [
         {
             name: 'Test Heading',
-            type: 'heading'
+            type: 'heading',
+            orderNum: 0
         },
         {
             name: 'Corpora',
             type: 'toggle',
             pages: [
                 {
-                    name: 'sub-folder 1',
+                    name: 'Corpus',
                     type: 'link',
-                    state: 'beers.ipas',
-                    icon: 'fa fa-group',
+                    state: 'corpus',
+                    params: {
+                        user: 'Moran',
+                        corpus: 'default'
+                    },
+                        // corpus: {
+                        //     _id: '0001',
+                        //     name: 'default'
+                        // }
                     settings: [
                         {
                             name: 'Sub Option1',
