@@ -21,7 +21,7 @@
 	</md-button>
 	<md-menu-content width="4">
 		<md-menu-item ng-repeat="setting in section.settings">
-			<md-button>
+			<md-button ng-click="setting.action()">
 				<p>{{setting.name}}</p>
 			</md-button>
 		</md-menu-item>

@@ -1,0 +1,25 @@
+<md-dialog class="corpus-dialog" flex="50" class="md-padding">
+	<form name="createCorpus">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Create New Corpus</h2>
+			</div>
+		</md-toolbar>
+		<md-dialog-content>
+			<div class="md-dialog-content">
+
+				<md-input-container class="">
+					<label>Corpus Name</label>
+					<input ng-model="dialogVm.newCorpus.params.corpus" required type="text">
+				</md-input-container>
+
+			</div>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" >
+			<md-button ng-click="dialogVm.cancel('cancel')">Cancel</md-button>
+			<md-button ng-click="dialogVm.save('Update Attached File')">Create New Corpus</md-button>
+		</md-dialog-actions>
+	</form>
+
+</md-dialog>

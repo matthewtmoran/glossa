@@ -9,7 +9,7 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu() {
+function drawerMenu(dbSrvc, $mdDialog) {
 
     var section = [
         {
@@ -29,10 +29,6 @@ function drawerMenu() {
                         user: 'Moran',
                         corpus: 'default'
                     },
-                        // corpus: {
-                        //     _id: '0001',
-                        //     name: 'default'
-                        // }
                     settings: [
                         {
                             name: 'Sub Option1',
@@ -47,30 +43,13 @@ function drawerMenu() {
                             type: ''
                         }
                     ]
-                },
-                {
-                    name: 'His New Corpus',
-                    type: 'link',
-                    state: 'beers.ipas',
-                    icon: 'fa fa-group'
-                },
-                {
-                    name: 'Phonetics',
-                    state: 'home.toollist',
-                    type: 'link',
-                    icon: 'fa fa-map-marker'
-                },
-                {
-                    name: 'Literacy Stories',
-                    state: 'home.createTool',
-                    type: 'link',
-                    icon: 'fa fa-plus'
                 }
             ],
             settings: [
                 {
                     name: 'Add Corpus',
-                    type: ''
+                    type: '',
+                    action: corpusDialog
                 },
                 {
                   // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
@@ -255,63 +234,13 @@ function drawerMenu() {
         addCustomItems();
     }
 
-    function addCustomItems() {
-        section.forEach(function(sec) {
-            if (sec.name === 'Corpora') {
-                console.log('found corpora')
-                return queryCorporaMenus().forEach(function(item) {
-                    console.log('item', item);
-                    sec.pages.push(item);
-                    console.log('sec', sec);
-                });
-            }
-        });
-    }
-
-    function queryCorporaMenus() {
-
-        var items = [
-            {
-                name: 'Static 1',
-                type: 'link',
-                state: 'corpus',
-                params: {
-                    user: 'Moran',
-                    corpus: 'static 1'
-                }
-            },
-            {
-                name: 'Static 2',
-                type: 'link',
-                state: 'corpus',
-                params: {
-                    user: 'Moran',
-                    corpus: 'static 2'
-                }
-            },
-            {
-                name: 'Static 2',
-                type: 'link',
-                state: 'corpus',
-                params: {
-                    user: 'Moran',
-                    corpus: 'static 2'
-                }
-            }
-        ];
-        return items;
-
-        // return dbSrvc.find(corporaMenus, {}).then(function(docs) {
-        //     return docs;
-        // })
-    }
-
     var service = {
         section: section,
         toggleSelectSection: toggleSelectSection,
         isSectionSelected: isSectionSelected,
         toggleSettingsSection: toggleSettingsSection,
-        isSectionSettingsSelected: isSectionSettingsSelected
+        isSectionSettingsSelected: isSectionSettingsSelected,
+        createCorpus: createCorpus
     };
 
     return service;
@@ -323,11 +252,58 @@ function drawerMenu() {
     function isSectionSelected(section) {
         return service.openedSection === section;
     };
-
     function toggleSettingsSection(section) {
         service.openSetting = (service.openSetting === section ? null : section);
     }
     function isSectionSettingsSelected(section) {
         return service.openSetting === section;
+    }
+
+
+    function addCustomItems() {
+        section.forEach(function(sec) {
+            if (sec.name === 'Corpora') {
+                return queryCorporaMenus().then(function(res) {
+                    res.forEach(function(item) {
+                        sec.pages.push(item);
+                    });
+                });
+            }
+        });
+    }
+
+    function queryCorporaMenus() {
+        return dbSrvc.find(corporaMenus, {}).then(function(docs) {
+            return docs;
+        })
+    }
+
+    function corpusDialog() {
+        $mdDialog.show({
+            templateUrl: 'components/drawer/dialogs/corpusDialog.html',
+            parent: angular.element(document.body),
+            // targetEvent: ev,
+            controller: corpusDialogCtrl,
+            controllerAs: 'dialogVm',
+            bindToController: true,
+            clickOutsideToClose: false,
+        }).then(function(data) {
+
+            console.log('Dialog is closed. data', data);
+
+            return data;
+        }, function(data) {
+            return data;
+        });
+    }
+
+    function createCorpus(corpus) {
+
+        corpus.type = 'link';
+        corpus.state = 'corpus';
+
+        dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
+            return docs;
+        })
     }
 }

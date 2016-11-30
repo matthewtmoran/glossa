@@ -1,7 +1,7 @@
 angular.module('glossa')
     .controller('drawerCrtl', drawerCrtl);
 
-function drawerCrtl(drawerMenu) {
+function drawerCrtl(drawerMenu, $mdDialog) {
     var dVm = this;
 
     dVm.isOpen = isOpen;
@@ -9,6 +9,8 @@ function drawerCrtl(drawerMenu) {
 
     dVm.isSettingsOpen = isSettingsOpen;
     dVm.toggleSettingsOpen = toggleSettingsOpen;
+
+    dVm.createCorpus = createCorpus;
 
     dVm.autoFocusContent = false;
     dVm.menu = drawerMenu;
@@ -31,6 +33,17 @@ function drawerCrtl(drawerMenu) {
     }
     function toggleSettingsOpen(section) {
         dVm.menu.toggleSettingsSection(section);
+    }
+
+
+    function corpusDialog() {
+
+    }
+
+
+    function createCorpus() {
+
+        // drawerMenu.createNewItem('corpus')
     }
 
 
