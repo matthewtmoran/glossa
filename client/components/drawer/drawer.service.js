@@ -240,8 +240,9 @@ function drawerMenu(dbSrvc, $mdDialog) {
         isSectionSelected: isSectionSelected,
         toggleSettingsSection: toggleSettingsSection,
         isSectionSettingsSelected: isSectionSettingsSelected,
-        createCorpus: createCorpus
-    };
+        createCorpus: createCorpus,
+        addCreatedCorpus: addCreatedCorpus
+};
 
     return service;
     ///////////////
@@ -268,6 +269,14 @@ function drawerMenu(dbSrvc, $mdDialog) {
                         sec.pages.push(item);
                     });
                 });
+            }
+        });
+    }
+
+    function addCreatedCorpus(corpus) {
+        section.forEach(function(sec) {
+            if (sec.name === 'Corpora') {
+                return sec.pages.push(corpus);
             }
         });
     }
@@ -299,10 +308,11 @@ function drawerMenu(dbSrvc, $mdDialog) {
 
     function createCorpus(corpus) {
 
+        corpus.params.corpus = corpus.name.replace(/\s/g,'').toLowerCase();
         corpus.type = 'link';
         corpus.state = 'corpus';
 
-        dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
+       return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
             return docs;
         })
     }

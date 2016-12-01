@@ -29,9 +29,12 @@ function corpusDialogCtrl($mdDialog, drawerMenu) {
 
 
         drawerMenu.createCorpus(dialogVm.newCorpus).then(function(result) {
+            drawerMenu.addCreatedCorpus(result);
+
             $mdDialog.hide(result);
 
             dialogVm.newCorpus = {
+                name:'',
                 params: {
                     corpus: ''
                 }

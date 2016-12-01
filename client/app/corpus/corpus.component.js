@@ -11,13 +11,8 @@ angular.module('glossa')
 function corpusCtrl($scope, nodeSrvc, fileSrvc, $stateParams) {
     var vm = this;
 
-    console.log('init corpora state');
-
     vm.createNewTextFile = createNewTextFile;
     $scope.$on('remove:textFile', removeTextFile);
-
-    console.log('$stateParam', $stateParams);
-    console.log('$stateParam.user', $stateParams.user);
 
     /**
      * Creates a new blank text document
