@@ -9,39 +9,34 @@ angular.module('glossa', [
     'simplemde'
     // 'mdWavesurfer'
     ])
-    .config(config);
+    .config(config)
+    .run(function($rootScope, $state, $injector) {
+        $rootScope.$on('$stateChangeStart',function (event, toState, toParams) {
+            var redirect = toState.redirectTo;
+            if (redirect) {
+                if (angular.isString(redirect)) {
+                    event.preventDefault();
+                    $state.go(redirect, toParams);
+                }
+                else {
+                    var newState = $injector.invoke(redirect, null, {toState: toState, toParams: toParams});
+                    if (newState) {
+                        if (angular.isString(newState)) {
+                            event.preventDefault();
+                            $state.go(newState);
+                        }
+                        else if (newState.state) {
+                            event.preventDefault();
+                            $state.go(newState.state, newState.params);
+                        }
+                    }
+                }
+            }
+        })
+})
+
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
-
-    // $mdThemingProvider.theme('default')
-    //     .primaryPalette('blue-grey')
-    //     .accentPalette('pink');
-
-    // 9E9E9E - primary
-    // #F5F5F5 - light primary
-    // #616161 - dark primary
-    //#212121 - text/icons
-
-    //#FF5252 - accent color
-    //#212121 - primary text
-    //#757575 - secondary text
-    //#BDBDBD - divider color
-
-    /*
-    500
-    300
-    800
-    A100
-
-    A200
-    A100
-    A400
-    A700
-
-
-
-     */
-
     var customAccent = {
         '50': '#b80000',
         '100': '#d10000',
@@ -96,10 +91,12 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
 
     $urlRouterProvider.otherwise(function($injector, $location){
         var state = $injector.get('$state');
-        state.go("corpus", $location.corpus());
+
+        console.log('state', state);
+        // state.go("corpus", $location.corpus());
+        state.go("corpus");
         return $location.path();
     });
-
 
     $mdIconProvider
         .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
