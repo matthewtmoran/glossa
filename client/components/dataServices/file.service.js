@@ -17,7 +17,7 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('fileSrvc', fileSrvc);
 
-function fileSrvc(dbSrvc) {
+function fileSrvc(dbSrvc, $stateParams) {
 
     var file = {},
         fileList = [],
@@ -222,12 +222,14 @@ function fileSrvc(dbSrvc) {
      * }
      */
     function buildFileObject(file) {
+
+        console.log('$stateParams', $stateParams);
         var fileDoc = {
             name: file.name,
             extension: file.extension,
             description: '',
             media: {},
-            corpus: currentCorpus
+            corpus: $stateParams.corpus
         };
         // fileDoc.mediaType = '';
 
