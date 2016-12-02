@@ -9,7 +9,8 @@
 		<h3>users</h3>
 		<md-divider></md-divider>
 		<h3>Common Tags</h3>
-		<md-button ui-sref="managetags" class="md-raised">Tag Management</md-button>
+		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised">Tag Management</md-button>
+		<!--<md-button ui-sref="managetags" class="md-raised">Tag Management</md-button>-->
 		<md-list>
 			<md-list-item ng-repeat="tag in nbVm.commonTags">
 				<md-chip class="chip-container">

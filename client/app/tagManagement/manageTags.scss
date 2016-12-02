@@ -1,5 +1,35 @@
 #manageTags-container {
+
+
+}
+
+.manage-dialog {
+
+	.md-block {
+		overflow: hidden;
+		//padding: 0;
+	}
 	input, textarea {
 		color: black !important;
+	}
+
+}
+
+#vertical-container {
+	height: 292px;
+	width: 100%;
+	//max-width: 400px;
+
+
+	.repeated-item {
+		color: black;
+
+		&.editable {
+			background: $lBlue;
+		}
+		&.non-editable {
+			color: $lGrey;
+		}
+
 	}
 }

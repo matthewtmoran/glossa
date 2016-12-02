@@ -1,0 +1,50 @@
+<md-dialog class="manage-dialog " flex="80" aria-label="New Notebook">
+
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2>Manage Hashtags</h2>
+		</div>
+	</md-toolbar>
+
+	<md-dialog-content class="">
+		<div>
+			<md-input-container class="md-block md-padding">
+				<label>Search hashtags</label>
+				<input ng-model="dialogVm.searchText" type="text">
+			</md-input-container>
+
+		</div>
+		<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
+		<!--<md-virtual-repeat-container id="vertical-container">-->
+			<!--<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: dialogVm.searchText " md-on-demand-->
+			     <!--class="repeated-item" flex>-->
+				<!--{{item.tag}}-->
+			<!--</div>-->
+		<!--</md-virtual-repeat-container>-->
+		<md-divider></md-divider>
+		<md-virtual-repeat-container id="vertical-container" class="md-padding">
+			<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText}"
+			     class="repeated-item md-padding" ng-class="{ 'editable': item.canEdit, 'non-editable': !item.canEdit}" flex layout-align="space-between center" layout="row">
+			     <!--class="repeated-item md-padding" ng-class="item.canEdit ? 'editable'" flex>-->
+				<span>{{item.tag}}</span>
+				<span ng-if="item.canEdit" class="action-items">
+					<md-button class="md-icon-button">
+						<md-icon>open_in_new</md-icon>
+					</md-button>
+					<md-button class="md-icon-button">
+						<md-icon>delete_forever</md-icon>
+					</md-button>
+
+				</span>
+			</div>
+		</md-virtual-repeat-container>
+	</md-dialog-content>
+
+		<md-divider></md-divider>
+
+
+	<md-dialog-actions layout="row" class="md-padding">
+		<md-button ng-click="dialogVm.cancel('cancel')">Cancel</md-button>
+		<!--<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>-->
+	</md-dialog-actions>
+</md-dialog>

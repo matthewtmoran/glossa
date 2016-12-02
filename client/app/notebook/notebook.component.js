@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc) {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc, dialogSrvc) {
     var nbVm = this;
 
     nbVm.hidden = false;
@@ -27,6 +27,8 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     nbVm.playPauseAudio = playPauseAudio;
     nbVm.openNBDialog = openNBDialog;
     nbVm.openExistinDialog = openExistinDialog;
+    nbVm.tagManageDialog = tagManageDialog;
+
     nbVm.commonTags = [];
 
     var hashtagsUsed = [];
@@ -94,8 +96,18 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         });
     }
 
+    function tagManageDialog() {
+
+
+
+        dialogSrvc.manageTags().then(function(res) {
+            console.log('the response is here', res);
+        })
+
+    }
+
     function openExistinDialog(notebook) {
-        postSrvc.existingPostDialog(notebook).then(function(res) {
+         postSrvc.existingPostDialog(notebook).then(function(res) {
             console.log('the response is here', res);
         })
     }
