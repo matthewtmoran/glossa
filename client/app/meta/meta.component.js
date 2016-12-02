@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -29,7 +29,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
     metaVm.updateData = updateData;
     metaVm.newUpdate = newUpdate;
-    metaVm.showAttachDialog = showAttachDialog;
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
@@ -81,26 +80,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
             console.log('result of newAttachDialog', result);
         });
-    }
-
-
-    function showAttachDialog(ev) {
-        $mdDialog.show({
-            controller: attachfileCtrl,
-            controllerAs: 'atVm',
-            templateUrl: 'app/meta/modal/attachfile.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: false,
-            bindToController: true,
-            locals: {
-                currentFile: metaVm.currentFile
-            }
-        }).then(function(data) {
-                metaVm.currentFile = data;
-            }, function(data) {
-                metaVm.currentFile = data;
-            });
     }
 
     function confirmDeleteDialog(ev) {
