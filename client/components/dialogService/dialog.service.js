@@ -7,6 +7,7 @@ function dialogSrvc($mdDialog) {
     var service = {
         hide: hide,
         manageTags: manageTags,
+        attachToNotebook: attachToNotebook,
         cancel: cancel
     };
     return service;
@@ -27,6 +28,25 @@ function dialogSrvc($mdDialog) {
             parent: angular.element(document.body),
             clickOutsideToClose: false,
             bindToController: true,
+        }).then(function(data) {
+            return data;
+        }, function(data) {
+            return data;
+        });
+    }
+
+    function attachToNotebook(ev, currentFile) {
+       return $mdDialog.show({
+            controller: attachfileCtrl,
+            controllerAs: 'atVm',
+            templateUrl: 'app/meta/modal/attachfile.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: false,
+            bindToController: true,
+            locals: {
+                currentFile: currentFile
+            }
         }).then(function(data) {
             return data;
         }, function(data) {

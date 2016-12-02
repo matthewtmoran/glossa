@@ -126,11 +126,6 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         // TODO: Need to modify the parseTitle function to return some sort fo string if no title markdown elemnt is provided
         currentNotebook.name = parseTitle(currentNotebook.description);
 
-
-
-
-
-
         notebookSrvc.createNotebook(currentNotebook, function(result) {
             if (!result) {
                 deferred.reject('There was an issue')

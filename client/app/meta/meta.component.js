@@ -28,17 +28,30 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     metaVm.attachedNotebook = {};
 
     metaVm.updateData = updateData;
+    metaVm.newUpdate = newUpdate;
     metaVm.showAttachDialog = showAttachDialog;
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
     metaVm.openExistinDialog = openExistinDialog;
+    metaVm.newAttachDialog = newAttachDialog;
 
     metaVm.selectHashtag = selectHashtag;
     metaVm.searchHashtags = searchHashtags;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
+
+
+
+    function newUpdate(field) {
+        fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
+            if (!result.success) {
+                return console.log('TODO: show user the update was unsuccessful and handle errors');
+            }
+            console.log('TODO: show user the update was successful', result);
+        })
+    }
 
     /**
      * Update the file's meta data from form
@@ -61,6 +74,12 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             if (data.field === 'name') {
                 metaVm.currentFile.path = doc.path;
             }
+        });
+    }
+
+    function newAttachDialog(ev) {
+        dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
+            console.log('result of newAttachDialog', result);
         });
     }
 
@@ -200,6 +219,17 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         }
     }
     function selectHashtag(item) {
+
+        if (item.label) {
+            //save new tag
+            newHashtag(item.label).then(function(result) {
+                if (!metaVm.currentFile.tags) {
+                    metaVm.currentFile.tags = [];
+                }
+                metaVm.currentFile.tags.push(result);
+                return '#' + result.tag;
+            });
+        }
         //This is were we will add the tag data to the current notebook/textfile
 
         // var parent = angular.element('.CodeMirror-line');
@@ -209,6 +239,18 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         // mentionsVm.theTextArea = res;
 
         return '#' + (item.tag || item.label);
+
+    }
+
+    function newHashtag(term) {
+
+        var hashtag = {
+            tag: term
+        };
+
+        return hashtagSrvc.createHashtag(hashtag).then(function(tag) {
+            return tag;
+        });
 
     }
 

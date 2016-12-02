@@ -17,7 +17,7 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('fileSrvc', fileSrvc);
 
-function fileSrvc(dbSrvc, $stateParams) {
+function fileSrvc(dbSrvc, $stateParams, $q) {
 
     var file = {},
         fileList = [],
@@ -49,6 +49,7 @@ function fileSrvc(dbSrvc, $stateParams) {
         getStagedUpdate: getStagedUpdate,
         attachNotebook: attachNotebook,
         unattachNotebook: unattachNotebook,
+        newUpdate: newUpdate,
         data: data
     };
 
@@ -349,14 +350,29 @@ function fileSrvc(dbSrvc, $stateParams) {
      * Renames the file.
      * @param oldPath - the old file path (name)
      * @param newPath - the new file path (name)
+     * TODO: maybe create a 'filesystem' api and move this function there.
      */
-    function renameFileToSystem(oldPath, newPath, callback) {
+    function renameFileToSystem(objToMod) {
+        var deferred = $q.defer();
+        var oldPath = objToMod.path,
+            newPath = uploadPathRelative + objToMod.name + objToMod.extension;
+
         fs.rename(oldPath, newPath, function(err) {
             if (err) {
-               return console.log('There was an Error', err);
+                deferred.reject({
+                    success: false,
+                    msg: 'There was an error renaming file in the filesystem',
+                    error: err
+                });
             }
-            return callback();
-        })
+            objToMod.path = newPath;
+            deferred.resolve({
+                success: true,
+                msg: 'File renamed in filesystem success',
+                data: objToMod
+            });
+        });
+        return deferred.promise;
     }
 
 
@@ -497,6 +513,7 @@ function fileSrvc(dbSrvc, $stateParams) {
      *
      */
     function attachFile(file, type, currentFile) {
+        console.log('attachFile');
         stagedUpdate.push(type);
         var writePath = path.join(uploadPathStatic, type, file.name);
         var targetPath = uploadPathRelative + type + '/' + file.name;
@@ -641,6 +658,35 @@ function fileSrvc(dbSrvc, $stateParams) {
             return result;
         })
 
+
+    }
+
+
+    /**
+     * Should be a universal update function
+     * @param objectToUpdate - The object being updated
+     * @param fsChange - (optional) the field name being updated - this gives us the ability to write to the file system if the the name filed is modified.
+     * @returns a promise object {success: Boolean, msg: 'message to diplay to user', (data/error): data object or error message}
+     */
+    function newUpdate(objectToUpdate, fsChange) {
+        //if the field modified is the name field
+        if (fsChange === 'name') {
+            //rename in the file in the file system
+            /**
+             * Updates in the db if the filesystem write is successful
+             * @returns a promise object {success: Boolean, msg: 'message to diplay to user', (data/error): data object or error message}
+             */
+            renameFileToSystem(objectToUpdate).then(function(result) {
+                if (!result.success) {
+                    return alert('There was an error modifying data: ' + result);
+                }
+               return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
+            })
+        }
+        return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
+    }
+
+    function extractHashtags() {
 
     }
 

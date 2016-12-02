@@ -9,7 +9,8 @@ function dbSrvc($q) {
         insert: insert,
         update: update,
         remove: remove,
-        updateAll: updateAll
+        updateAll: updateAll,
+        basicUpdate: basicUpdate
     };
 
     return service;
@@ -61,6 +62,30 @@ function dbSrvc($q) {
                 deferred.reject(err);
             }
             deferred.resolve(updatedDocument);
+        });
+        return deferred.promise;
+    }
+
+    function cleanObject(obj) {
+        delete obj.$$hashKey;
+        return obj;
+    }
+
+    function basicUpdate(db, data) {
+        var deferred = $q.defer();
+        db.update({_id: data._id}, cleanObject(data), {returnUpdatedDocs: true, upsert: true}, function(err, numReplaced, updatedDocument) {
+            if (err) {
+                deferred.reject({
+                    success: true,
+                    msg: 'Update not successful',
+                    data: err
+                });
+            }
+            deferred.resolve({
+                success: true,
+                msg: 'Update successful',
+                data: updatedDocument
+            });
         });
         return deferred.promise;
     }
