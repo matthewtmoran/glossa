@@ -98,8 +98,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
 
     function tagManageDialog() {
 
-
-
         dialogSrvc.manageTags().then(function(res) {
             console.log('the response is here', res);
         })

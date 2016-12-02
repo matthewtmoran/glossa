@@ -38,11 +38,16 @@ function notebookSrvc(dbSrvc) {
         for(var key in notebook.media) {
 
             if (notebook.media.hasOwnProperty(key)) {
+                var writePath = path.join(uploadPathStatic, key, notebook.media[key].name);
+
+                if (util.doesExist(writePath)) {
+                    //TODO: maybe some osrt of option here to rename file...
+                    return alert('A File with the name ' + notebook.media[key].name + ' Already exists.  Please upload another file....');
+                }
 
                 //closure to make current key always accessible
                 (function(key){
                     //write to this path
-                    var writePath = path.join(uploadPathStatic, key, notebook.media[key].name);
 
                     //call copy and write function; pass in file location, new location, notebook data, and callback
                     util.copyAndWrite(notebook.media[key].absolutePath, writePath, notebook, function(err, to) {

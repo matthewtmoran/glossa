@@ -83,6 +83,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
                 metaVm.currentFile = data;
             });
     }
+
     function confirmDeleteDialog(ev) {
         // Appending dialog to document.body to cover sidenav in docs app
         var confirm = $mdDialog.confirm()
