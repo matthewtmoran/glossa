@@ -4,7 +4,6 @@ angular.module('glossa')
     .config(config);
 
 function config($stateProvider) {
-    console.log('$stateProvider', $stateProvider);
     $stateProvider
         .state('corpus', {
             url: '/',

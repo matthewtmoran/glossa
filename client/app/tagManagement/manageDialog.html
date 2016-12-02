@@ -7,13 +7,14 @@
 	</md-toolbar>
 
 	<md-dialog-content class="">
-		<div>
-			<md-input-container class="md-block md-padding">
-				<label>Search hashtags</label>
-				<input ng-model="dialogVm.searchText" type="text">
+		<div layout-gt-xs="row">
+			<md-input-container  md-no-float class="md-block md-padding search-text-container" flex-gt-sm>
+				<!--<label>Search hashtags</label>-->
+				<md-icon class="material-icons">search</md-icon>
+				<input ng-model="dialogVm.searchText" type="text"  placeholder="Search hashtags...">
 			</md-input-container>
-
 		</div>
+
 		<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
 		<!--<md-virtual-repeat-container id="vertical-container">-->
 			<!--<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: dialogVm.searchText " md-on-demand-->
