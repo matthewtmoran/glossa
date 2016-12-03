@@ -9,9 +9,9 @@
 				           ng-disabled="!control.isReady"
 				           type="button"
 				           ng-click="control.surfer.playPause()">
-					<md-tooltip>
-						{{control.surfer.isPlaying() ? 'Pause' : 'Play'}}
-					</md-tooltip>
+					<!--<md-tooltip>-->
+						<!--{{control.surfer.isPlaying() ? 'Pause' : 'Play'}}-->
+					<!--</md-tooltip>-->
 					<md-icon ng-show="control.surfer.isPlaying()" class="material-icons">pause</md-icon>
 					<md-icon ng-show="!control.surfer.isPlaying()"  class="material-icons">play_arrow</md-icon>
 				</md-button>

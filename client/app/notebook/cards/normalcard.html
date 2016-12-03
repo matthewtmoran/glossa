@@ -12,12 +12,13 @@
 			<img ng-src="{{'../' + notebook.media.image.path}}" class="md-card-image" alt="">
 		</div>
 
-		<div ng-if="notebook.postType === 'audio'">
+		<div class="wave-container" ng-if="notebook.postType === 'audio'">
 			<wave-preview
 					flex
 					url="{{'../' + notebook.media.audio.path}}"
 					auto-play="false"
 					player-wave-color="white"
+					player-cursor-color="#FF5252"
 					player-height="150"
 					player-progress-color="black">
 			</wave-preview>
