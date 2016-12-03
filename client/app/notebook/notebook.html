@@ -5,14 +5,14 @@
 
 <md-content id="notebook-container" layout="row" flex ng-cloak>
 
-	<md-content flex="25" layout-padding>
+	<md-content flex="25" layout-padding class="left-side">
 		<h3>users</h3>
 		<md-divider></md-divider>
 		<h3>Common Tags</h3>
-		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised">Tag Management</md-button>
+		<md-button ng-click="nbVm.tagManageDialog()" flex class="md-raised">Tag Management</md-button>
 		<!--<md-button ui-sref="managetags" class="md-raised">Tag Management</md-button>-->
 		<md-list>
-			<md-list-item ng-repeat="tag in nbVm.commonTags">
+			<md-list-item class="chip-item" ng-repeat="tag in nbVm.commonTags">
 				<md-chip class="chip-container">
 					<span>
 						<span class="chip-icon">#</span>
@@ -42,7 +42,7 @@
 				md-gutter="16px" md-gutter-gt-sm="24px">
 
 			<md-grid-tile
-					class="grid-tile md-whiteframe-8dp"
+					class="grid-tile mdl-shadow--2dp"
 					ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
 					md-colspan="1">
 
@@ -62,9 +62,9 @@
 	                   ng-mouseleave="nbVm.isOpen = false">
 
 		<md-fab-trigger>
-			<md-button aria-label="menu" class="md-fab md-warn">
+			<md-button aria-label="menu" class="md-fab md-grey-fab">
 				<md-tooltip md-direction="left"
-				            md-visible="tooltipVisible"
+				            md-visible="false"
 				            md-autohide="true">Attach Files</md-tooltip>
 				<md-icon aria-label="menu">add</md-icon>
 			</md-button>
@@ -75,7 +75,7 @@
 
 				<md-icon>{{item.icon}}</md-icon>
 
-				<md-tooltip md-direction="{{item.direction}}" md-visible="tooltipVisible"
+				<md-tooltip md-direction="{{item.direction}}" md-visible="false"
 				            md-autohide="false">
 					{{item.name}}
 				</md-tooltip>
