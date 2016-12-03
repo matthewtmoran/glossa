@@ -8,20 +8,7 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
 
     atVm.currentFile = currentFile;
 
-    atVm.media = buildMedia(atVm.currentFile.media);
-    console.log('atVm.media', atVm.media);
-
-    function buildMedia(object) {
-        var media = [];
-        for(var key in object) {
-            if (object.hasOwnProperty(key)) {
-                media.push(object[key].name);
-            }
-        }
-        return media;
-    }
-
-    atVm.currentFileBackup = angular.copy(atVm.currentFile);
+    atVm.currentFileEditable = angular.copy(atVm.currentFile);
     atVm.searchText = '';
     atVm.notebooksFiltered = [];
     atVm.items = [
@@ -37,8 +24,10 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     atVm.hide = hide;
     atVm.save = save;
     atVm.attachNotebook = attachNotebook;
+    atVm.hasIndy;
 
     function attachNotebook(notebook, currentFile) {
+        console.log('notebook', notebook)
 
         atVm.activeNotebook = notebook;
 
@@ -52,21 +41,22 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
 
     function cancel() {
         //pass back original object to meta view
-        $mdDialog.cancel(atVm.currentFileBackup);
+        $mdDialog.cancel(currentFile);
     }
     function hide() {
         $mdDialog.hide('hide');
     }
     function save() {
-        if (atVm.currentFile.mediaType === 'notebook') {
+        if (atVm.currentFileEditable.mediaType === 'notebook') {
+            console.log('this is happening');
             //TODO: attach notebook
-            fileSrvc.saveNotebookAttachment(atVm.currentFile, atVm.notebook, function(err, result) {
+            fileSrvc.saveNotebookAttachment(atVm.currentFileEditable, atVm.notebook, function(err, result) {
                 if (err) {return console.log('There was an error attaching notebook:', err)}
                 $mdDialog.hide(result);
             })
         } else {
             //TODO: attach files independently
-            fileSrvc.saveIndependentAttachment(atVm.currentFile, function(err, result) {
+            fileSrvc.saveIndependentAttachment(atVm.currentFileEditable, function(err, result) {
                 if (err) {return console.log('There was an error', err);}
                 $mdDialog.hide(result);
             });

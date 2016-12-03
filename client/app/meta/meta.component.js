@@ -76,9 +76,14 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         });
     }
 
+    /**
+     * This function opens the attach dialog.
+     * @param ev - this is the event object
+     * The result will be returned whether an item is attached or not.
+     */
     function newAttachDialog(ev) {
         dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
-            console.log('result of newAttachDialog', result);
+            metaVm.currentFile = result;
         });
     }
 
@@ -123,7 +128,9 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
         $mdDialog.show(confirm).then(function() {
             if (type) {
-               return fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile)
+              return fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile).then(function(result) {
+                  metaVm.currentFile = result;
+               })
             }
             return fileSrvc.unattachNotebook(attachment, metaVm.currentFile);
         }, function() {

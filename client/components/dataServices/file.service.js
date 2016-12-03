@@ -35,7 +35,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         queryAllFiles: queryAllFiles,
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
-        attachFile: attachFile,
+        // attachFile: attachFile,
         saveIndependentAttachment: saveIndependentAttachment,
         saveNotebookAttachment: saveNotebookAttachment,
         setCurrentFile: setCurrentFile,
@@ -224,7 +224,6 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function buildFileObject(file) {
 
-        console.log('$stateParams', $stateParams);
         var fileDoc = {
             name: file.name,
             extension: file.extension,
@@ -346,6 +345,8 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         }
     }
 
+    //Some File System Functions
+
     /**
      * Renames the file.
      * @param oldPath - the old file path (name)
@@ -417,6 +418,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     }
 
     function saveIndependentAttachment(currentFile, callback) {
+        currentFile.mediaType = 'independent';
         var maxLoops = Object.keys(currentFile.media).length;
 
         for(var key in currentFile.media) {
@@ -502,41 +504,41 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     }
 
 
-    /**
-     * Attaches a file to the current file by writing new file to system and saving file in db.
-     * @param file - the new file being we are working with.
-     * @param type -
-     * @returns {*}
-     *
-     * TODO: here we need some set of events.
-     * TODO: Are they allowed to attach the same file to different text files?
-     *
-     */
-    function attachFile(file, type, currentFile) {
-        console.log('attachFile');
-        stagedUpdate.push(type);
-        var writePath = path.join(uploadPathStatic, type, file.name);
-        var targetPath = uploadPathRelative + type + '/' + file.name;
-        // var targetPath = path.join(uploadPathRelative,type,file.name);
-
-        //check if file with the same name exists in file system
-        var exists = doesExist(targetPath);
-        if (exists) {
-            //TODO: use angular material alert/confirm
-            return alert('A file with this name already exists.');
-        }
-        return util.copyAndWrite(file.path, writePath, null, function(err, res) {
-            if (err) {
-                return console.log('There was an error', err);
-            }
-
-            return updateFileInDb(targetPath, type, file, currentFile).then(function(result) {
-                //TODO: Might be better just to update property
-                data.currentFile = result;
-                return result;
-            })
-        });
-    }
+    // /**
+    //  * Attaches a file to the current file by writing new file to system and saving file in db.
+    //  * @param file - the new file being we are working with.
+    //  * @param type -
+    //  * @returns {*}
+    //  *
+    //  * TODO: here we need some set of events.
+    //  * TODO: Are they allowed to attach the same file to different text files?
+    //  *
+    //  */
+    // function attachFile(file, type, currentFile) {
+    //     console.log('attachFile');
+    //     stagedUpdate.push(type);
+    //     var writePath = path.join(uploadPathStatic, type, file.name);
+    //     var targetPath = uploadPathRelative + type + '/' + file.name;
+    //
+    //     //check if file with the same name exists in file system
+    //     if (doesExist(targetPath)) {
+    //         //TODO: use angular material alert/confirm
+    //         return alert('A file with this name already exists.');
+    //     }
+    //     return util.copyAndWrite(file.path, writePath, null, function(err, res) {
+    //         if (err) {
+    //             return console.log('There was an error', err);
+    //         }
+    //
+    //         currentFile.mediaType = 'independent';
+    //
+    //         return updateFileInDb(targetPath, type, file, currentFile).then(function(result) {
+    //             //TODO: Might be better just to update property
+    //             data.currentFile = result;
+    //             return result;
+    //         })
+    //     });
+    // }
     /**
      * Attach Audio File to the current file
      * @param path - the path where the file exists in the app.
@@ -586,6 +588,10 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         tempData.newObj.media = currentFile.media;
 
         delete tempData.newObj.media[type];
+
+        if (!tempData.newObj.media.image && !tempData.newObj.media.audio) {
+            tempData.newObj.mediaType = '';
+        }
 
         tempData.fileId = currentFile._id;
         tempData.options = {

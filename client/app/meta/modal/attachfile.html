@@ -5,13 +5,24 @@
 				<div class="new-files md-padding">
 					<h2 class="dialog-section-title">Add New Media</h2>
 					<div class="upload-buttons" layout="row" layout-align="space-between center">
-						<dynamic-upload ng-repeat="item in atVm.items" item="item" current-file="atVm.currentFile"></dynamic-upload>
+						<basic-upload parentbinding="atVm.currentFileEditable.media.image"
+						              buttonicon="camera_alt" button-id="uploadImage"
+						              type="image"
+						              filetypes=".jpg, .png, .svg">
+						</basic-upload>
+						<span>{{atVm.currentFileEditable.media.image.name}}</span>
+						<span>{{atVm.currentFileEditable.media.audio.name}}</span>
+						<basic-upload parentbinding="atVm.currentFileEditable.media.audio"
+						              buttonicon="volume_up" button-id="uploadAudio"
+						              type="audio"
+						              filetypes=".mp3, .m4a">
+						</basic-upload>
 					</div>
 				</div>
 
-				<md-divider ng-hide="atVm.currentFile.media.image || atVm.currentFile.media.audio"></md-divider>
+				<md-divider ng-if="atVm.currentFileEditable.mediaType === 'notebook' || !atVm.currentFileEditable.mediaType"></md-divider>
 
-				<div ng-hide="atVm.currentFile.media.image || atVm.currentFile.media.audio" class="notebook">
+				<div ng-if="atVm.currentFileEditable.mediaType === 'notebook' || !atVm.currentFileEditable.mediaType" class="notebook">
 
 					<h2 class="dialog-section-title md-padding">Attach from notebook</h2>
 					<md-input-container md-no-float class="md-block" >
@@ -28,7 +39,7 @@
 							<md-list-item
 									ng-repeat="notebook in atVm.notebooks | filter: atVm.searchText"
 									class="md-2-line notebook-item"
-									ng-click="atVm.attachNotebook(notebook, atVm.currentFile)"
+									ng-click="atVm.attachNotebook(notebook, atVm.currentFileEditable)"
 									md-ink-ripple layout="row"
 									layout-align="center center"
 									ng-class="{ 'nb-active': notebook == atVm.activeNotebook }">

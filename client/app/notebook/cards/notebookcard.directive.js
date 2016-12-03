@@ -4,21 +4,6 @@ angular.module('glossa')
     .directive('notebookListItem', notebookListItem);
 
 function notebookListItem(postSrvc, $mdDialog) {
-    // var getTemplate = function(contentType) {
-    //     var template = '';
-    //     switch(contentType) {
-    //         case 'image':
-    //             template = imageTemplate;
-    //             break;
-    //         case 'audio':
-    //             template = videoTemplate;
-    //             break;
-    //         case 'normal':
-    //             template = noteTemplate;
-    //             break;
-    //     }
-    //     return template;
-    // }
 
     var directive = {
         restrict: 'E',
