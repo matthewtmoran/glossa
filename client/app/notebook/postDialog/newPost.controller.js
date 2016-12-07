@@ -72,18 +72,24 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
     function selectHashtag(item) {
         //This is were we will add the tag data to the current notebook/textfile
 
-        if (item.label) {
-            console.log('TODO: verify that this tag does not exist');
-            console.log('TODO: Save tag to db');
-        } else {
-            newPostVm.potentialTags.push(item);
-            var parent = angular.element('.CodeMirror-line');
-            var element = parent.find('span').text() === $scope.typedTerm;
-            $(element).text(item.tag || item.label);
-            var res = newPostVm.currentNotebook.description.replace($scope.typedTerm, item.tag || item.label);
-            newPostVm.currentNotebook.description = res;
-        }
+        // if (item.label) {
+        //     console.log('TODO: verify that this tag does not exist');
+        //     console.log('TODO: Save tag to db');
+        // } else {
+        //     newPostVm.potentialTags.push(item);
+        //     var parent = angular.element('.CodeMirror-line');
+        //     var element = parent.find('span').text() === $scope.typedTerm;
+        //     $(element).text(item.tag || item.label);
+        //     var res = newPostVm.currentNotebook.description.replace($scope.typedTerm, item.tag || item.label);
+        //     newPostVm.currentNotebook.description = res;
+        // }
 
+
+        // console.log('SimpleMDE', SimpleMDE;
+
+        var mText = SimpleMDE.markdown(newPostVm.currentNotebook.description);
+
+        console.log('mText', mText);
 
 
 

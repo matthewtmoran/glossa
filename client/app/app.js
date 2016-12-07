@@ -6,7 +6,8 @@ angular.module('glossa', [
     'ui.router',
     'ui.ace',
     'mentio',
-    'simplemde'
+    'simplemde',
+    'ngSanitize'
     // 'mdWavesurfer'
     ])
     .config(config)

@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc, dialogSrvc) {
+function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc, dialogSrvc, $sce) {
     var nbVm = this;
 
     nbVm.hidden = false;

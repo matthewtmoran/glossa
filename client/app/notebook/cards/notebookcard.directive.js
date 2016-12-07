@@ -3,7 +3,7 @@
 angular.module('glossa')
     .directive('notebookListItem', notebookListItem);
 
-function notebookListItem(postSrvc, $mdDialog) {
+function notebookListItem(postSrvc, $mdDialog,$sce) {
 
     var directive = {
         restrict: 'E',
@@ -16,6 +16,11 @@ function notebookListItem(postSrvc, $mdDialog) {
     return directive;
 
     function notebookListItemLink(scope, element, attrs) {
+
+        if (scope.notebook.description) {
+            scope.notebook.description = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
+        }
+
 
         scope.openExistinDialog = function(notebook) {
             postSrvc.existingPostDialog(notebook).then(function (res) {
