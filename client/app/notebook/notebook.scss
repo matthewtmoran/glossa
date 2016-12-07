@@ -287,3 +287,51 @@
 	}
 }
 
+.post-dialog {
+	.md-dialog-content {
+		padding-right: 0;
+		padding-left: 0;
+
+		.simplemde-wrapper {
+			padding: 0;
+		}
+	}
+
+	.editor-toolbar {
+		border-radius: 0 !important;
+
+		.toolbar-icon {
+			position: relative;
+
+
+			.md-icon-button {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+
+
+			}
+			&.active {
+
+				.material-icons {
+					color: $lBlue !important;
+
+				}
+			}
+		}
+
+		.separator {
+			position: relative;
+		}
+
+	}
+	.CodeMirror-wrap {
+		border-radius: 0 !important;
+	}
+}
+
+.md-resize-wrapper {
+
+}

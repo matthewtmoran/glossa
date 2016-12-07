@@ -138,3 +138,42 @@ md-backdrop.md-sidenav-backdrop {
 @import '../components/wavesurferDirectives/mdWavesurferPlayer';
 @import '../components/wavesurferDirectives/wavePreview/wavePreview';
 /* endinject */
+
+
+.material-icons {
+	// ...but you need to add your own CSS class names for the icons you want to use:
+	&.arrow-backward::before {
+		content: '\e5c4';
+	}
+	&.arrow-forward::before {
+		content: '\e5c8';
+	}
+	&.add::before {
+		content: '\e145';
+	}
+	&.format_bold::before {
+		content: '\e238';
+	}
+
+	&.help::before {
+		content: '\e887';
+	}
+	&.visibility::before {
+		content: '\e8f4';
+	}
+	&.format_list_numbered::before {
+		content: '\e242';
+	}
+	&.format_list_bulleted::before {
+		content: '\e241';
+	}
+	&.format_quote::before {
+		content: '\e244';
+	}
+	&.title::before {
+		content: '\e264';
+	}
+	&.format_italic::before {
+		content: '\e23f';
+	}
+}

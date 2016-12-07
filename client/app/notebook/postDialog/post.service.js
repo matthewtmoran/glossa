@@ -4,6 +4,67 @@ angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
 function postSrvc($mdDialog, notebookSrvc, $q) {
+    var simplemdeTollbar = [
+        {
+            name: "italic",
+            action: SimpleMDE.toggleItalic,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: 'format_italic',
+            title: "Italic",
+        },
+        {
+            name: "bold",
+            action: SimpleMDE.toggleBold,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: "format_bold",
+            title: "Bold",
+        },
+        {
+            name: "header",
+            action: SimpleMDE.toggleHeading1,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: "title",
+            title: "Header",
+        },
+        "|", // Separator
+        {
+            name: "Blockquote",
+            action: SimpleMDE.toggleBlockquote,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: "format_quote",
+            title: "Blockquote",
+        },
+        {
+            name: "Bullet List",
+            action: SimpleMDE.toggleUnorderedList,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: "format_list_bulleted",
+            title: "Bullet List",
+        },
+        {
+            name: "Ordered List",
+            action: SimpleMDE.toggleOrderedList,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: 'format_list_numbered',
+            title: "Numbered List",
+        },
+        "|",
+        {
+            name: "Toggle Preview",
+            action: SimpleMDE.togglePreview,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass: 'visibility',
+            title: "Toggle Preview",
+        },
+        {
+            name: "Help",
+            action: test,
+            className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+            iconClass:'help',
+            title: "Toggle Preview",
+        }
+    ];
+
     /**
      * This is a little mini api that we can call dynamically.
      * @type {{image: save.image, normal: save.normal, audio: save.audio}}
@@ -26,6 +87,10 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         save: save
     };
     return service;
+
+    function test(e) {
+        console.log('test', e);
+    }
 
     function parseTitle(text) {
         var re = /(#+)\s(.*)/;
@@ -50,7 +115,14 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
                 break;
             case 'normal':
                 options.template = 'app/notebook/postDialog/newPost.html';
-                options.simplemde = {hideIcons: ['image', 'link', 'preview/fullscreen']};
+                // options.simplemde = {spellChecker: false, status: false};
+                options.simplemde = {
+                    toolbar: simplemdeTollbar,
+                    spellChecker: false,
+                    status: false,
+                    autoDownloadFontAwesome: false,
+                    forceSync: true
+                };
                 break;
             case 'default':
                 console.log('error');
