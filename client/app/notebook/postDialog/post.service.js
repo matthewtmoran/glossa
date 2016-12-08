@@ -100,7 +100,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         currentNotebook.postType = type;
         switch(type) {
             case 'image':
-                options.template = 'app/notebook/imageDialog/imagePost.html';
+                options.template = 'app/notebook/postDialog/imagePost.html';
                 options.simplemde = {
                     toolbar: false,
                     status: false,

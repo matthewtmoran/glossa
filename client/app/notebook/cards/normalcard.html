@@ -8,7 +8,7 @@
 
 	<md-card-content class="card-content" flex>
 
-		<div ng-if="notebook.media.image" class="md-media-lg card-image ">
+		<div ng-if="notebook.media.image" class="md-media-lg card-image">
 			<img ng-src="{{'../' + notebook.media.image.path}}" class="md-card-image" alt="">
 		</div>
 
@@ -26,7 +26,8 @@
 
 		<div class="card-text inner-padding">
 			<div ng-if="notebook.description" ng-bind-html="notebook.description"></div>
-			<div ng-if="notebook.media.image.caption">{{notebook.media.image.caption}}</div>
+			<p ng-if="notebook.media.image.caption">{{notebook.media.image.caption}}</p>
+			<p ng-if="notebook.media.audio.caption">{{notebook.media.audio.caption}}</p>
 		</div>
 
 	</md-card-content>
