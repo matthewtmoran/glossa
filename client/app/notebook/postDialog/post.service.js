@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
-function postSrvc($mdDialog, notebookSrvc, $q) {
+function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
     var simplemdeTollbar = [
         {
             name: "italic",
@@ -81,7 +81,7 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         }
     };
     var service = {
-        parseTitle: parseTitle,
+        // parseTitle: parseTitle,
         newPostDialog: newPostDialog,
         existingPostDialog: existingPostDialog,
         save: save
@@ -90,12 +90,6 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
 
     function test(e) {
         console.log('test', e);
-    }
-
-    function parseTitle(text) {
-        var re = /(#+)\s(.*)/;
-        var m = text.match(re);
-        return m[0] || text.splice(0, 16);
     }
 
     function newPostDialog(ev, type, currentNotebook) {
@@ -107,21 +101,35 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         switch(type) {
             case 'image':
                 options.template = 'app/notebook/imageDialog/imagePost.html';
-                options.simplemde = {toolbar: false};
+                options.simplemde = {
+                    toolbar: false,
+                    status: false,
+                    spellChecker: false,
+                    autoDownloadFontAwesome: false,
+                    forceSync: true,
+                    placeholder: 'image caption...'
+                };
                 break;
             case 'audio':
                 options.template = 'app/notebook/postDialog/audioPost.html';
-                options.simplemde = {toolbar: false};
+                options.simplemde = {
+                    toolbar: false,
+                    status: false,
+                    spellChecker: false,
+                    autoDownloadFontAwesome: false,
+                    forceSync: true,
+                    placeholder: 'audio caption...'
+                };
                 break;
             case 'normal':
                 options.template = 'app/notebook/postDialog/newPost.html';
-                // options.simplemde = {spellChecker: false, status: false};
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,
                     status: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true
+                    forceSync: true,
+                    placeholder: 'Post description...'
                 };
                 break;
             case 'default':
@@ -196,7 +204,7 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
         var deferred = $q.defer();
 
         // TODO: Need to modify the parseTitle function to return some sort fo string if no title markdown elemnt is provided
-        currentNotebook.name = parseTitle(currentNotebook.description);
+        currentNotebook.name = simpleParse.parseTitle(currentNotebook.description);
 
         notebookSrvc.createNotebook(currentNotebook, function(result) {
             if (!result) {
@@ -205,16 +213,17 @@ function postSrvc($mdDialog, notebookSrvc, $q) {
             currentNotebook = {
                 media: {}
             };
+            console.log('result', result);
             deferred.resolve(result);
         });
         return deferred.promise;
     }
 
-    function saveImagePost(currentNotebook, postContent) {
+    function saveImagePost(currentNotebook) {
+        console.log('currentNotebook', currentNotebook);
         var deferred = $q.defer();
 
         currentNotebook.name = currentNotebook.media.image.name;
-        currentNotebook.media.image.caption = postContent;
 
         notebookSrvc.createNotebook(currentNotebook, function(result) {
             if (!result) {

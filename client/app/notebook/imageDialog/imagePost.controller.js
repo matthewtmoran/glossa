@@ -9,7 +9,6 @@ function imagePost($mdDialog, notebookSrvc) {
     newPostVm.cancel = cancel;
     newPostVm.hide = hide;
     newPostVm.save = save;
-    newPostVm.currentPost = '';
     newPostVm.editorOptions = {
         toolbar: false
     };
@@ -27,6 +26,7 @@ function imagePost($mdDialog, notebookSrvc) {
     }
 
     function save() {
+        console.log('newPostVm.currentNotebook', newPostVm.currentNotebook);
         newPostVm.currentNotebook.name = newPostVm.currentNotebook.media.image.name;
         notebookSrvc.createNotebook(newPostVm.currentNotebook, function(result) {
             newPostVm.currentNotebook = {

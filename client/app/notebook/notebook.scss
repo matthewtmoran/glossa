@@ -86,6 +86,13 @@
 
 	.card-content {
 		padding: 0;
+		position: relative;
+		overflow: hidden;
+
+		.card-text {
+			position: absolute;
+
+		}
 	}
 
 	.card-title {

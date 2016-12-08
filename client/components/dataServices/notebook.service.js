@@ -60,11 +60,19 @@ function notebookSrvc(dbSrvc) {
                         //create object for database
                         notebook.media[key] = createMediaObject(notebook.media[key], key);
 
+                        //should only run here if there is an imgge/audio post with a caption
+                        if (notebook.caption) {
+                            notebook.media[key]['caption'] = notebook.caption;
+                            delete notebook.caption;
+                        }
+
+
                         //delete absolute path
                         delete notebook.media[key].absolutePath;
 
                         // if we are are done looping
                         if (!maxLoops) {
+                            console.log('notebook', notebook);
                            //save the notebook in the database and call callback
                            return insertInDb(nbCollection, notebook).then(function(result) {
                                 return callback(result);

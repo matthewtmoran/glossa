@@ -24,7 +24,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     };
     nbVm.notebooks = [];
 
-    nbVm.playPauseAudio = playPauseAudio;
     nbVm.openNBDialog = openNBDialog;
     nbVm.openExistinDialog = openExistinDialog;
     nbVm.tagManageDialog = tagManageDialog;
@@ -48,7 +47,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         findCommon(hashtagsUsed).forEach(function(item) {
             nbVm.commonTags.push(item.item);
         });
-
 
         nbVm.notebooks = docs;
     });
@@ -75,9 +73,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         return topThree;
     }
 
-    function playPauseAudio(notebook) {
-        console.log('notebook to play audio', notebook);
-    }
 
     /**
      * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebook to the array
@@ -97,16 +92,14 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     }
 
     function tagManageDialog() {
-
         dialogSrvc.manageTags().then(function(res) {
-            console.log('the response is here', res);
+            console.log('manageTags response:', res);
         })
-
     }
 
     function openExistinDialog(notebook) {
          postSrvc.existingPostDialog(notebook).then(function(res) {
-            console.log('the response is here', res);
+            console.log('existingPostDialog response:', res);
         })
     }
 

@@ -9,14 +9,13 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
     newPostVm.cancel = cancel;
     newPostVm.hide = hide;
     newPostVm.save = save;
-    newPostVm.currentPost = '';
     newPostVm.editorOptions = simplemdeOptions;
 
     newPostVm.searchHashtags = searchHashtags;
     newPostVm.selectHashtag = selectHashtag;
 
-    newPostVm.currentNotebook = currentNotebook;
-    newPostVm.potentialTags = newPostVm.currentNotebook.hashtags || [];
+    // newPostVm.currentNotebook = currentNotebook;
+    newPostVm.currentNotebook.potentialTags = newPostVm.currentNotebook.hashtags || [];
 
     function cancel() {
         $mdDialog.cancel('cancel');
@@ -31,17 +30,16 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
         //remove potential tag if it does not exist in the text
         //
 
-        newPostVm.potentialTags.forEach(function(tag) {
-            if (currentNotebook.description.indexOf(tag.tag) > -1) {
-                if (!currentNotebook.hashtags) {
-                    currentNotebook.hashtags = [];
-                }
-                delete tag.$$hashKey;
-                currentNotebook.hashtags.push(tag);
-            }
-        });
-
-        postSrvc.save[currentNotebook.postType](currentNotebook).then(function(result) {
+        // newPostVm.potentialTags.forEach(function(tag) {
+        //     if (currentNotebook.description.indexOf(tag.tag) > -1) {
+        //         if (!currentNotebook.hashtags) {
+        //             currentNotebook.hashtags = [];
+        //         }
+        //         delete tag.$$hashKey;
+        //         currentNotebook.hashtags.push(tag);
+        //     }
+        // });
+        postSrvc.save[currentNotebook.postType](newPostVm.currentNotebook).then(function(result) {
             newPostVm.currentNotebook = {
                 media: {}
             };

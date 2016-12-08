@@ -1,4 +1,4 @@
-<md-dialog class="post-dialog" flex="50" class="md-padding" >
+<md-dialog class="post-dialog" flex="50">
 	<form name="addPost" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
@@ -7,13 +7,13 @@
 		</md-toolbar>
 		<md-dialog-content>
 			<div class="md-dialog-content" >
-
 				<md-input-container class="simplemde-wrapper" convert-icons>
 					<textarea class="simplemde-textarea"  aria-label="text area"
 					          simplemde="newPostVm.editorOptions"
 					          id="theText"
 					          ng-model="newPostVm.currentNotebook.description"
 					          mentio
+					          required
 					          mentio-id="'theText'"
 					          mentio-typed-term="typedTerm"
 					          mentio-require-leading-space="true"
@@ -39,15 +39,13 @@
 					              buttonicon="volume_up" button-id="uploadAudio"
 					              filetypes=".mp3, .m4a"></basic-upload>
 				</div>
-
 			</div>
 		</md-dialog-content>
 
 		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
 		<md-dialog-actions layout="row" >
 			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
-			<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>
+			<md-button ng-disabled="!addPost.$valid" ng-click="newPostVm.save('Create Normal Post')">Add Post</md-button>
 		</md-dialog-actions>
 	</form>
-
 </md-dialog>

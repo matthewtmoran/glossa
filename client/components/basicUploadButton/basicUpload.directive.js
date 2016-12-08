@@ -14,7 +14,7 @@ function basicUpload(fileSrvc) {
             buttonicon: '@buttonicon',
             filetypes: '@filetypes',
             tooltiptext: '@tooltiptext',
-            type: '@type'
+            type: '@type',
         },
         templateUrl: 'components/basicUploadButton/basicUpload.html',
         link: apsUploadFileLink
