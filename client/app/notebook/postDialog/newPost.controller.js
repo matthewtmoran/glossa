@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('newPostCtrl', newPostCtrl);
 
-function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q, passData) {
+function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q) {
     var newPostVm = this;
 
     newPostVm.cancel = cancel;

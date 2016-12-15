@@ -5,7 +5,6 @@ angular.module('glossa', [
     'ngMaterial',
     'ui.router',
     'ui.ace',
-    'mentio',
     'simplemde',
     'ngSanitize'
     // 'mdWavesurfer'
