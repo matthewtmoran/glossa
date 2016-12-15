@@ -107,7 +107,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
                     forceSync: true,
-                    placeholder: 'image caption...'
+                    placeholder: 'image caption...',
+
                 };
                 break;
             case 'audio':
@@ -129,7 +130,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     status: false,
                     autoDownloadFontAwesome: false,
                     forceSync: true,
-                    placeholder: 'Post description...'
+                    placeholder: 'Post description...',
+                    extraKeys: {"Ctrl-Space": "autocomplete"}
                 };
                 break;
             case 'default':

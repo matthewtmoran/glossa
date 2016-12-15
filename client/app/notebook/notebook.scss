@@ -342,3 +342,12 @@
 .md-resize-wrapper {
 
 }
+
+.CodeMirror-hints {
+	z-index: 99999 !important;
+	color: black !important;
+	li {
+		color: black !important;
+
+	}
+}

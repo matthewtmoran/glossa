@@ -19,6 +19,10 @@ function simpleParse() {
     }
 
 
+    function passTagData(tag) {
+        console.log('tag', tag);
+    }
+
     // function parseTitle(text) {
     //     var re = /(#+)\s(.*)/;
     //     var m = text.match(re);

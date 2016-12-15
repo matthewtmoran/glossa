@@ -44,6 +44,8 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             }
         });
 
+        console.log('hashtagsUsed', hashtagsUsed);
+
         findCommon(hashtagsUsed).forEach(function(item) {
             nbVm.commonTags.push(item.item);
         });

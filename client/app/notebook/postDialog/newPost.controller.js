@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('newPostCtrl', newPostCtrl);
 
-function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q) {
+function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q, passData) {
     var newPostVm = this;
 
     newPostVm.cancel = cancel;
@@ -50,6 +50,8 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
 
 
     function searchHashtags(term) {
+        console.log('searchHashTags', term);
+        term = term.slice(1, term.length);
         var hashtagList = [];
         if (term.length > 1) {
             return hashtagSrvc.searchHastags(term).then(function (response) {
@@ -74,26 +76,29 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
         //     console.log('TODO: verify that this tag does not exist');
         //     console.log('TODO: Save tag to db');
         // } else {
-        //     newPostVm.potentialTags.push(item);
-        //     var parent = angular.element('.CodeMirror-line');
-        //     var element = parent.find('span').text() === $scope.typedTerm;
-        //     $(element).text(item.tag || item.label);
-        //     var res = newPostVm.currentNotebook.description.replace($scope.typedTerm, item.tag || item.label);
-        //     newPostVm.currentNotebook.description = res;
+        //     newPostVm.currentNotebook.potentialTags.push(item);
+        //     // var parent = angular.element('.CodeMirror-line');
+        //     // var element = parent.find('span').text() === $scope.typedTerm;
+        //     // $(element).text(item.tag || item.label);
+        //     // var res = newPostVm.currentNotebook.description.replace($scope.typedTerm, item.tag || item.label);
+        //     // newPostVm.currentNotebook.description = res;
         // }
 
+        // var myEditor = passData.getCM();
+        // var position = myEditor.findWordAt(myEditor.getCursor());
+        // var text = myEditor.getRange(position.anchor, position.head);
+        // console.log('text********', text);
+        // var res = newPostVm.currentNotebook.description.replace(text, '#' + (item.tag || item.label));
+        // $scope.typedTerm = res;
+        //
+        // $scope.$apply();
 
-        // console.log('SimpleMDE', SimpleMDE;
-
-        var mText = SimpleMDE.markdown(newPostVm.currentNotebook.description);
-
-        console.log('mText', mText);
-
-
-
+        // console.log('item', item);
         return '#' + (item.tag || item.label);
 
     }
+
+        // console.log('$scope', $scope);
 
 
 
