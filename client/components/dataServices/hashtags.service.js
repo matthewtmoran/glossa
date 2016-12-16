@@ -30,8 +30,8 @@ function hashtagSrvc(dbSrvc) {
         var query = {
             tag:  new RegExp(term, 'i')
         };
-        return dbSrvc.find(hashtagsCol, query).then(function(docs) {
-            return docs;
+        return dbSrvc.find(hashtagsCol, query).then(function(result) {
+            return result;
         })
     }
 
@@ -40,7 +40,10 @@ function hashtagSrvc(dbSrvc) {
     }
 
 
-    function createHashtag(hashtag) {
+    function createHashtag(term) {
+        var hashtag = {
+            tag: term,
+        };
 
         hashtag.tagColor = '#4285f4';
         hashtag.realTitle = hashtag.tag;

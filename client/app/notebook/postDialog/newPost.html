@@ -8,34 +8,14 @@
 		<md-dialog-content>
 			<div class="md-dialog-content" >
 				<md-input-container class="simplemde-wrapper" convert-icons>
-					          <!--myIndex-->
-					          <!--mentio-->
 					<textarea class="simplemde-textarea"  aria-label="text area"
 					          simplemde="newPostVm.editorOptions"
 					          id="theText"
 					          ng-model="newPostVm.currentNotebook.description"
 					          required
 					          ></textarea>
-					          <!--menu-scope="menuScope"-->
-
-								<!--autocomplete="off"-->
-					<!--{{queryTags}}-->
-					          <!--mentio-id="'theText'"-->
-					          <!--mentio-typed-term="typedTerm"-->
-					          <!--mentio-require-leading-space="true"-->
-					          <!--mentio-select-not-found="true"-->
-					<!--<mentio-menu-->
-							<!--mentio-for="'theText'"-->
-							<!--mentio-trigger-char="'#'"-->
-							<!--mentio-items="newPostVm.hashtags"-->
-							<!--mentio-template-url="./components/mentionTemplates/mention.hashtags.html"-->
-							<!--mentio-search="newPostVm.searchHashtags(term)"-->
-							<!--mentio-select="newPostVm.selectHashtag(item)"-->
-					<!--&gt;</mentio-menu>-->
 				</md-input-container>
-				<!--<hashtagmenu ng-if="queryTags" items="newPostVm.hashtags" hashtag-search="newPostVm.searchHashtags" parent-scope="parentScope"></hashtagmenu>-->
 
-				{{queryTags}}
 
 				<div layout="row" layout-align="space-between center ">
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"

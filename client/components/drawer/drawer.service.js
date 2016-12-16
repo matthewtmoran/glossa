@@ -264,8 +264,11 @@ function drawerMenu(dbSrvc, $mdDialog) {
     function addCustomItems() {
         section.forEach(function(sec) {
             if (sec.name === 'Corpora') {
-                return queryCorporaMenus().then(function(res) {
-                    res.forEach(function(item) {
+                return queryCorporaMenus().then(function(result) {
+                    if (!result.success) {
+                        return console.log(result);
+                    }
+                    result.data.forEach(function(item) {
                         sec.pages.push(item);
                     });
                 });

@@ -5,27 +5,32 @@ angular.module('glossa')
 
 function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q) {
     var newPostVm = this;
-
+    var dialogObject = {
+        dataChanged: false,
+        event: 'hide',
+        data: null
+    };
     newPostVm.cancel = cancel;
     newPostVm.hide = hide;
     newPostVm.save = save;
     newPostVm.editorOptions = simplemdeOptions;
 
-    newPostVm.searchHashtags = searchHashtags;
-    newPostVm.selectHashtag = selectHashtag;
-
     // newPostVm.currentNotebook = currentNotebook;
     newPostVm.currentNotebook.potentialTags = newPostVm.currentNotebook.hashtags || [];
 
     function cancel() {
-        $mdDialog.cancel('cancel');
+        $mdDialog.cancel(dialogObject);
     }
     function hide() {
-        $mdDialog.hide('hide');
+        $mdDialog.hide(dialogObject);
     }
 
     function save() {
-
+        dialogObject = {
+            dataChanged: true,
+            event: 'save',
+            data: {}
+        };
         //search the description and compare to potential tags
         //remove potential tag if it does not exist in the text
         //
@@ -43,63 +48,8 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
             newPostVm.currentNotebook = {
                 media: {}
             };
-            $mdDialog.hide(result);
+            dialogObject.data = result;
+            $mdDialog.hide(dialogObject);
         });
-
     }
-
-
-    function searchHashtags(term) {
-        console.log('searchHashTags', term);
-        term = term.slice(1, term.length);
-        var hashtagList = [];
-        if (term.length > 1) {
-            return hashtagSrvc.searchHastags(term).then(function (response) {
-                angular.forEach(response, function(item) {
-                    if (item.tag.toUpperCase().indexOf(term.toUpperCase()) >= 0) {
-                        hashtagList.push(item);
-                    }
-                });
-                newPostVm.hashtags = hashtagList;
-                return $q.when(hashtagList);
-            });
-        } else if(hashtagList.length < 2 && term) {
-
-        } else {
-            newPostVm.hashtags = [];
-        }
-    }
-    function selectHashtag(item) {
-        //This is were we will add the tag data to the current notebook/textfile
-
-        // if (item.label) {
-        //     console.log('TODO: verify that this tag does not exist');
-        //     console.log('TODO: Save tag to db');
-        // } else {
-        //     newPostVm.currentNotebook.potentialTags.push(item);
-        //     // var parent = angular.element('.CodeMirror-line');
-        //     // var element = parent.find('span').text() === $scope.typedTerm;
-        //     // $(element).text(item.tag || item.label);
-        //     // var res = newPostVm.currentNotebook.description.replace($scope.typedTerm, item.tag || item.label);
-        //     // newPostVm.currentNotebook.description = res;
-        // }
-
-        // var myEditor = passData.getCM();
-        // var position = myEditor.findWordAt(myEditor.getCursor());
-        // var text = myEditor.getRange(position.anchor, position.head);
-        // console.log('text********', text);
-        // var res = newPostVm.currentNotebook.description.replace(text, '#' + (item.tag || item.label));
-        // $scope.typedTerm = res;
-        //
-        // $scope.$apply();
-
-        // console.log('item', item);
-        return '#' + (item.tag || item.label);
-
-    }
-
-        // console.log('$scope', $scope);
-
-
-
 }

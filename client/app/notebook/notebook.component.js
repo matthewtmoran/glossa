@@ -34,9 +34,12 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
-    notebookSrvc.queryNotebooks().then(function(docs) {
+    notebookSrvc.queryNotebooks().then(function(result) {
+        if (!result.success) {
+            return console.log(result)
+        }
 
-        docs.forEach(function(doc) {
+        result.data.forEach(function(doc) {
             if (doc.hashtags) {
                 doc.hashtags.forEach(function(tag) {
                     hashtagsUsed.push(tag);
@@ -50,7 +53,7 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             nbVm.commonTags.push(item.item);
         });
 
-        nbVm.notebooks = docs;
+        nbVm.notebooks = result.data;
     });
 
     function findCommon(arr) {
@@ -82,14 +85,15 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
      * @param type - the type of post
      */
     function openNBDialog(ev, type) {
-        postSrvc.newPostDialog(ev, type, nbVm.currentNotebook).then(function(res) {
+        postSrvc.newPostDialog(ev, type, nbVm.currentNotebook).then(function(result) {
             nbVm.currentNotebook = {
                 media: {}
             };
-            if (typeof res !== 'string') {
-                return nbVm.notebooks.push(res);
+            //if there was data changed
+            if (result.dataChanged) {
+                return nbVm.notebooks.push(result.data.data);
             }
-             return console.log('this was not saved', res);
+             return console.log('this was not saved', result);
         });
     }
 

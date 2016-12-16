@@ -21,10 +21,18 @@ function dbSrvc($q) {
         db.find(query, function(err, docs) {
             if (err) {
                 console.log('There was an error with the query: ' + query + 'with db: ' + db);
-                deferred.reject(err);
+                deferred.reject({
+                    success: true,
+                    msg: 'Query not successful',
+                    data: err
+                });
             } else {
-                console.log('Queried all files in database.');
-                deferred.resolve(docs);
+                console.log('Queried database.');
+                deferred.resolve({
+                    success: true,
+                    msg: 'Query successful',
+                    data: docs
+                });
             }
         });
         return deferred.promise;
@@ -35,10 +43,18 @@ function dbSrvc($q) {
         db.insert(data, function(err, doc) {
             if (err) {
                 console.log('There was an error saving file data to the DB', err);
-                deferred.reject(err);
+                deferred.reject({
+                    success: false,
+                    msg: 'Creation failure',
+                    data: err
+                });
             } else {
                 console.log('File data was saved to the DB', doc);
-                deferred.resolve(doc);
+                deferred.resolve({
+                    success: true,
+                    msg: 'Creation success',
+                    data: doc
+                });
             }
         });
         return deferred.promise;

@@ -74,7 +74,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
             return saveImagePost(currentNotebook, postContent);
         },
         normal: function (currentNotebook, postContent) {
-            return saveNormalPost(currentNotebook, postContent);
+            return saveNormalPost(currentNotebook);
         },
         audio: function(currentNotebook, postContent) {
             return saveAudioPost(currentNotebook, postContent);
@@ -131,7 +131,6 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     autoDownloadFontAwesome: false,
                     forceSync: true,
                     placeholder: 'Post description...',
-                    extraKeys: {"Ctrl-Space": "autocomplete"}
                 };
                 break;
             case 'default':
@@ -205,24 +204,21 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
     function saveNormalPost(currentNotebook) {
         var deferred = $q.defer();
 
-        // TODO: Need to modify the parseTitle function to return some sort fo string if no title markdown elemnt is provided
-        currentNotebook.name = simpleParse.parseTitle(currentNotebook.description);
+        currentNotebook = simpleParse.parseNotebook(currentNotebook);
 
         notebookSrvc.createNotebook(currentNotebook, function(result) {
-            if (!result) {
-                deferred.reject('There was an issue')
+            if (!result.success) {
+                deferred.reject(result);
             }
             currentNotebook = {
                 media: {}
             };
-            console.log('result', result);
             deferred.resolve(result);
         });
         return deferred.promise;
     }
 
     function saveImagePost(currentNotebook) {
-        console.log('currentNotebook', currentNotebook);
         var deferred = $q.defer();
 
         currentNotebook.name = currentNotebook.media.image.name;
