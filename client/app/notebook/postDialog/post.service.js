@@ -204,17 +204,18 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
     function saveNormalPost(currentNotebook) {
         var deferred = $q.defer();
 
-        currentNotebook = simpleParse.parseNotebook(currentNotebook);
+       $q.when(simpleParse.parseNotebook(currentNotebook)).then(function(result) {
 
-        notebookSrvc.createNotebook(currentNotebook, function(result) {
-            if (!result.success) {
-                deferred.reject(result);
-            }
-            currentNotebook = {
-                media: {}
-            };
-            deferred.resolve(result);
-        });
+           notebookSrvc.createNotebook(result, function(r) {
+               if (!r.success) {
+                   deferred.reject(r);
+               }
+               currentNotebook = {
+                   media: {}
+               };
+               deferred.resolve(r);
+           });
+       });
         return deferred.promise;
     }
 

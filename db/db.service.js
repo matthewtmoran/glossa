@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('dbSrvc', dbSrvc);
 
-function dbSrvc($q) {
+function dbSrvc($q, $timeout) {
     var service = {
         find: find,
         insert: insert,
@@ -40,23 +40,23 @@ function dbSrvc($q) {
 
     function insert(db, data) {
         var deferred = $q.defer();
-        db.insert(data, function(err, doc) {
-            if (err) {
-                console.log('There was an error saving file data to the DB', err);
-                deferred.reject({
-                    success: false,
-                    msg: 'Creation failure',
-                    data: err
-                });
-            } else {
-                console.log('File data was saved to the DB', doc);
-                deferred.resolve({
-                    success: true,
-                    msg: 'Creation success',
-                    data: doc
-                });
-            }
-        });
+            db.insert(data, function(err, doc) {
+                if (err) {
+                    console.log('There was an error saving file data to the DB', err);
+                    deferred.reject({
+                        success: false,
+                        msg: 'Creation failure',
+                        data: err
+                    });
+                } else {
+                    console.log('File data was saved to the DB', doc);
+                    deferred.resolve({
+                        success: true,
+                        msg: 'Creation success',
+                        data: doc
+                    });
+                }
+            });
         return deferred.promise;
     }
 

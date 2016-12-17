@@ -3,9 +3,8 @@
 angular.module('glossa')
     .factory('simpleParse', simpleParse);
 
-function simpleParse(hashtagSrvc) {
+function simpleParse(hashtagSrvc, $q) {
     var service = {
-        parseTitle: parseTitle,
         parseNotebook: parseNotebook
     };
     return service;
@@ -13,8 +12,11 @@ function simpleParse(hashtagSrvc) {
 
     function parseNotebook(notebook) {
         notebook.name = parseTitle(notebook.description);
-        notebook.hashtags = findHashtags(notebook.description);
-        return notebook;
+
+        return $q.when(findHashtags(notebook.description)).then(function(re) {
+            notebook.hashtags = re;
+            return notebook;
+        });
     }
 
     //Parses the title or return first 16 characters of text
@@ -38,31 +40,45 @@ function simpleParse(hashtagSrvc) {
                 return tag.trim().substr(1);
             });
         }
-        return getHashtagObject(newMatches);
+
+      return $q.when(getHashtagObject(newMatches).then(function(result) {
+          return result;
+        }));
+
     }
 
     function getHashtagObject(tags) {
+        var deferred = $q.defer();
         var hashtagObject = [];
         //for each tag
         tags.forEach(function(tag) {
             //query db for tag
             hashtagSrvc.searchHastags(tag).then(function(result) {
-                if (!result.success) {return console.log(result);}
+                if (!result.success) {
+                    deferred.reject(result)
+                ;}
                 //if the tag returns but is undefined it does not exist
                 if (!result.data.length) {
                     //create new tag
-                    hashtagSrvc.createHashtag(tag).then(function(result) {
-                        if (!result.success) { return console.log('there was an error creating tag');}
+                   return hashtagSrvc.createHashtag(tag).then(function(result) {
                         //push result of newly created tag to db
-                        hashtagObject.push(result.data);
-                    });
+                        // hashtagObject.push(result.data[0]);
+                       return result;
+                    })
                 } else {
                     //otherwise, there is a result that is defined so just push it to the array
-                    hashtagObject.push(result.data[0]);
+                  return result;
+                  // hashtagObject.push(result.data[0]);
                 }
+            }).then(function(res) {
+                hashtagObject.push(res.data[0]);
+                deferred.resolve(hashtagObject);
+            }).catch(function(err) {
+                console.log('there is an error', err);
             })
         });
-        return hashtagObject;
+        return deferred.promise;
+        // return hashtagObject;
     }
 
 }

@@ -15,9 +15,6 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
     newPostVm.save = save;
     newPostVm.editorOptions = simplemdeOptions;
 
-    // newPostVm.currentNotebook = currentNotebook;
-    newPostVm.currentNotebook.potentialTags = newPostVm.currentNotebook.hashtags || [];
-
     function cancel() {
         $mdDialog.cancel(dialogObject);
     }
@@ -31,19 +28,7 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
             event: 'save',
             data: {}
         };
-        //search the description and compare to potential tags
-        //remove potential tag if it does not exist in the text
-        //
 
-        // newPostVm.potentialTags.forEach(function(tag) {
-        //     if (currentNotebook.description.indexOf(tag.tag) > -1) {
-        //         if (!currentNotebook.hashtags) {
-        //             currentNotebook.hashtags = [];
-        //         }
-        //         delete tag.$$hashKey;
-        //         currentNotebook.hashtags.push(tag);
-        //     }
-        // });
         postSrvc.save[currentNotebook.postType](newPostVm.currentNotebook).then(function(result) {
             newPostVm.currentNotebook = {
                 media: {}
