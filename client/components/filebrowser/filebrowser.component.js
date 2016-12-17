@@ -73,9 +73,9 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
      * Creates a new blank texts(.md) document
      */
     function createNewTextFile() {
-        fileSrvc.createNewTextFile().then(function(file) {
-            fbVm.fileList.push(file);
-            updateFileSelection(file);
+        fileSrvc.createNewTextFile().then(function(result) {
+            fbVm.fileList.push(result.data);
+            updateFileSelection(result.data);
         });
     }
 
