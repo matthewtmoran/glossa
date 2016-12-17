@@ -316,7 +316,7 @@ function drawerMenu(dbSrvc, $mdDialog) {
         corpus.state = 'corpus';
 
        return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
-            return docs;
+            return docs.data;
         })
     }
 }

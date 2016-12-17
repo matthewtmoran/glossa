@@ -35,9 +35,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     metaVm.openExistinDialog = openExistinDialog;
     metaVm.newAttachDialog = newAttachDialog;
 
-    metaVm.selectHashtag = selectHashtag;
-    metaVm.searchHashtags = searchHashtags;
-
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
 
@@ -68,10 +65,10 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         changeData['newObj'][data.field] = metaVm.currentFile[data.field];
 
         fileSrvc.updateFileData(changeData).then(function(doc) {
-            metaVm.currentFile[data.field] = doc[data.field];
+            metaVm.currentFile[data.field] = doc.data[data.field];
 
             if (data.field === 'name') {
-                metaVm.currentFile.path = doc.path;
+                metaVm.currentFile.path = doc.data.path;
             }
         });
     }
@@ -80,6 +77,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
      * This function opens the attach dialog.
      * @param ev - this is the event object
      * The result will be returned whether an item is attached or not.
+     * TODO: update api here
      */
     function newAttachDialog(ev) {
         dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
@@ -129,7 +127,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         $mdDialog.show(confirm).then(function() {
             if (type) {
               return fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile).then(function(result) {
-                  metaVm.currentFile = result;
+                  metaVm.currentFile = result.data;
                })
             }
             return fileSrvc.unattachNotebook(attachment, metaVm.currentFile);
@@ -169,7 +167,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     function queryAttachedNotebook() {
         if (metaVm.currentFile.mediaType === 'notebook') {
             notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
-                metaVm.attachedNotebook = result[0];
+                metaVm.attachedNotebook = result.data[0];
             })
         }
     }
@@ -182,62 +180,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         } else {
             $scope.tooltipVisible = metaVm.isOpen;
         }
-    }
-
-    //mention funcitons
-
-    function searchHashtags(term) {
-        var hashtagList = [];
-        if (term.length > 1) {
-            return hashtagSrvc.searchHastags(term).then(function (response) {
-                angular.forEach(response, function(item) {
-                    if (item.tag.toUpperCase().indexOf(term.toUpperCase()) >= 0) {
-                        hashtagList.push(item);
-                    }
-                });
-                metaVm.hashtags = hashtagList;
-                return $q.when(hashtagList);
-            });
-        } else if(hashtagList.length < 2 && term) {
-
-        } else {
-            metaVm.hashtags = [];
-        }
-    }
-    function selectHashtag(item) {
-
-        if (item.label) {
-            //save new tag
-            newHashtag(item.label).then(function(result) {
-                if (!metaVm.currentFile.tags) {
-                    metaVm.currentFile.tags = [];
-                }
-                metaVm.currentFile.tags.push(result);
-                return '#' + result.tag;
-            });
-        }
-        //This is were we will add the tag data to the current notebook/textfile
-
-        // var parent = angular.element('.CodeMirror-line');
-        // var element = parent.find('span').text() === $scope.typedTerm;
-        // $(element).text(item.tag || item.label);
-        // var res = mentionsVm.theTextArea.replace($scope.typedTerm, item.tag || item.label);
-        // mentionsVm.theTextArea = res;
-
-        return '#' + (item.tag || item.label);
-
-    }
-
-    function newHashtag(term) {
-
-        var hashtag = {
-            tag: term
-        };
-
-        return hashtagSrvc.createHashtag(hashtag).then(function(tag) {
-            return tag;
-        });
-
     }
 
 }

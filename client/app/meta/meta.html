@@ -13,24 +13,10 @@
 			<textarea ng-change="metaVm.newUpdate('description')"
 			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"
-			          mentio
 			          ng-trim="false"
 			          autocomplete="off"
 			          id="theText"
-			          mentio-id="'theText'"
-			          mentio-typed-term="typedTerm"
-			          mentio-require-leading-space="true"
-			          mentio-select-not-found="true"
 			          rows="5"></textarea>
-
-			<mentio-menu
-					mentio-for="'theText'"
-					mentio-trigger-char="'#'"
-					mentio-items="metaVm.hashtags"
-					mentio-template-url="./components/mentionTemplates/mention.hashtags.html"
-					mentio-search="metaVm.searchHashtags(term)"
-					mentio-select="metaVm.selectHashtag(item)"
-			></mentio-menu>
 
 		</md-input-container>
 	</form>
