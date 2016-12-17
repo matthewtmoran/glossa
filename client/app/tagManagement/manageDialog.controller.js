@@ -18,7 +18,7 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc) {
 
 
     hashtagSrvc.get().then(function(result) {
-        dialogVm.infiniteItems = result;
+        dialogVm.infiniteItems = result.data;
     });
 
     // In this example, we set up our model using a plain object.

@@ -17,14 +17,13 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     ];
 
     notebookSrvc.queryNotebooks().then(function(docs) {
-        atVm.notebooks = docs;
+        atVm.notebooks = docs.data;
     });
 
     atVm.cancel = cancel;
     atVm.hide = hide;
     atVm.save = save;
     atVm.attachNotebook = attachNotebook;
-    atVm.hasIndy;
 
     function attachNotebook(notebook, currentFile) {
         console.log('notebook', notebook)

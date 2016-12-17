@@ -16,17 +16,14 @@ function manageTagsCtrl($scope, nodeSrvc, hashtagSrvc) {
     vm.createHashtag = createHashtag;
 
 
-    hashtagSrvc.get().then(function(hashtags) {
-        vm.hashtagList = hashtags;
+    hashtagSrvc.get().then(function(result) {
+        vm.hashtagList = result.data;
     });
 
-
     function createHashtag() {
-
         hashtagSrvc.createHashtag(vm.newHashtag).then(function(tag) {
             vm.hashtagList.push(tag);
         });
-
         vm.newHashtag = {};
     }
 

@@ -47,8 +47,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             }
         });
 
-        console.log('hashtagsUsed', hashtagsUsed);
-
         findCommon(hashtagsUsed).forEach(function(item) {
             nbVm.commonTags.push(item.item);
         });
@@ -73,7 +71,7 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             return p2.occurance - p1.occurance;
         });
 
-        var topThree = props.slice(0, 4);
+        var topThree = props.slice(0, 5);
 
         return topThree;
     }

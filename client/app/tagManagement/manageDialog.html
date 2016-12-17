@@ -13,6 +13,12 @@
 				<md-icon class="material-icons">search</md-icon>
 				<input ng-model="dialogVm.searchText" type="text"  placeholder="Search hashtags...">
 			</md-input-container>
+
+			<md-input-container>
+				<md-switch ng-model="dialogVm.onlyCreated"  md-no-ink  aria-label="Switch 2" class="md-warn">
+					Created Tags Only
+				</md-switch>
+			</md-input-container>
 		</div>
 
 		<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
@@ -24,7 +30,7 @@
 		<!--</md-virtual-repeat-container>-->
 		<md-divider></md-divider>
 		<md-virtual-repeat-container id="vertical-container" class="md-padding">
-			<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText}"
+			<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText, 'canEdit': dialogVm.onlyCreated}"
 			     class="repeated-item md-padding" ng-class="{ 'editable': item.canEdit, 'non-editable': !item.canEdit}" flex layout-align="space-between center" layout="row">
 			     <!--class="repeated-item md-padding" ng-class="item.canEdit ? 'editable'" flex>-->
 				<span>{{item.tag}}</span>

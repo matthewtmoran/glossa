@@ -91,8 +91,6 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
 
     $urlRouterProvider.otherwise(function($injector, $location){
         var state = $injector.get('$state');
-
-        console.log('state', state);
         // state.go("corpus", $location.corpus());
         state.go("corpus");
         return $location.path();

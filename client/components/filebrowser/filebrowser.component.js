@@ -34,7 +34,7 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
         var prevLength = 37;
         fileSrvc.queryAllFiles(corpus).then(function(docs) {
 
-            docs.forEach(function(doc){
+            docs.data.forEach(function(doc){
                 baselineSrvc.readContent(doc, function(content) {
                     if (content.length > prevLength) {
                         doc.previewContent = content.substring(0, prevLength) + '...';
