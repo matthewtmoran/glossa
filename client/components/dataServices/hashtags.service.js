@@ -3,17 +3,20 @@
 var db = require('../db/database'),
     _ = require('lodash'),
     hashtagsCol = db.hashtags,
+    fileCollection = db.uploadedFiles,
+    nbCollection = db.notebooks,
     util = require('../client/components/node/file.utils');
 
 angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);
 
 
-function hashtagSrvc(dbSrvc) {
+function hashtagSrvc(dbSrvc, $q) {
     var service = {
         searchHastags: searchHastags,
-        findHashtag: findHashtag,
+        updateTag: updateTag,
         createHashtag: createHashtag,
+        normalizeHashtag: normalizeHashtag,
         get: get
     };
 
@@ -35,8 +38,8 @@ function hashtagSrvc(dbSrvc) {
         })
     }
 
-    function findHashtag() {
-
+    function updateTag(objectToUpdate) {
+        return dbSrvc.basicUpdate(hashtagsCol, objectToUpdate)
     }
 
 
@@ -53,6 +56,45 @@ function hashtagSrvc(dbSrvc) {
         return dbSrvc.insert(hashtagsCol, hashtag).then(function(doc) {
             return doc;
         })
+    }
+
+    //trying to normalize hashtags accross notebookes right now
+
+
+    function normalizeHashtag(tag) {
+        console.log('normalizeHashtag tag:', tag)
+        $q.when(dbSrvc.find(nbCollection, {"hashtags._id": tag._id}, function(err, result) {
+           if (err) {return console.log('There was an error')}
+
+           console.log('result 1', result);
+        })).then(function(result) {
+            console.log('result2', result);
+
+            result.data.forEach(function(nb, i) {
+
+                nb.hashtags.forEach(function(t, index) {
+                    if (t._id === tag._id) {
+                        nb.hashtags[index] = tag;
+                    }
+                });
+
+                $q.when(dbSrvc.basicUpdate(nbCollection, nb, function(err, result) {
+                    console.log('result3', result);
+
+                })).then(function(res) {
+                    console.log('result 4', res);
+                    result.data[i] = res;
+                });
+            });
+
+            console.log('returning result', result);
+           return result;
+        });
+            // nbCollection
+    }
+
+    function saveNoramlized(db, item) {
+
     }
 
 }

@@ -11,6 +11,7 @@
     "angular-ui-ace": "bower",
     "simplemde-angular": "^0.0.3",
     "codemirror": "^5.19.0",
-    "angular-sanitize": "^1.5.9"
+    "angular-sanitize": "^1.5.9",
+    "angular-material-data-table": "^0.10.10"
   }
 }

@@ -1,57 +1,105 @@
 <md-dialog class="manage-dialog " flex="80" aria-label="New Notebook">
 
-	<md-toolbar>
-		<div class="md-toolbar-tools">
-			<h2>Manage Hashtags</h2>
-		</div>
-	</md-toolbar>
+	<div ng-show="dialogVm.showData === 'alldata'">
 
-	<md-dialog-content class="">
-		<div layout-gt-xs="row">
-			<md-input-container  md-no-float class="md-block md-padding search-text-container" flex-gt-sm>
-				<!--<label>Search hashtags</label>-->
-				<md-icon class="material-icons">search</md-icon>
-				<input ng-model="dialogVm.searchText" type="text"  placeholder="Search hashtags...">
-			</md-input-container>
-
-			<md-input-container>
-				<md-switch ng-model="dialogVm.onlyCreated"  md-no-ink  aria-label="Switch 2" class="md-warn">
-					Created Tags Only
-				</md-switch>
-			</md-input-container>
-		</div>
-
-		<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
-		<!--<md-virtual-repeat-container id="vertical-container">-->
-			<!--<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: dialogVm.searchText " md-on-demand-->
-			     <!--class="repeated-item" flex>-->
-				<!--{{item.tag}}-->
-			<!--</div>-->
-		<!--</md-virtual-repeat-container>-->
-		<md-divider></md-divider>
-		<md-virtual-repeat-container id="vertical-container" class="md-padding">
-			<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText, 'canEdit': dialogVm.onlyCreated}"
-			     class="repeated-item md-padding" ng-class="{ 'editable': item.canEdit, 'non-editable': !item.canEdit}" flex layout-align="space-between center" layout="row">
-			     <!--class="repeated-item md-padding" ng-class="item.canEdit ? 'editable'" flex>-->
-				<span>{{item.tag}}</span>
-				<span ng-if="item.canEdit" class="action-items">
-					<md-button class="md-icon-button">
-						<md-icon>open_in_new</md-icon>
-					</md-button>
-					<md-button class="md-icon-button">
-						<md-icon>delete_forever</md-icon>
-					</md-button>
-
-				</span>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Manage Hashtags</h2>
 			</div>
-		</md-virtual-repeat-container>
-	</md-dialog-content>
+		</md-toolbar>
 
-		<md-divider></md-divider>
+		<md-dialog-content>
+			<div layout-gt-xs="row">
+				<md-input-container  md-no-float class="md-block md-padding search-text-container" flex-gt-sm>
+					<!--<label>Search hashtags</label>-->
+					<md-icon class="material-icons">search</md-icon>
+					<input ng-model="dialogVm.searchText" type="text"  placeholder="Search hashtags...">
+				</md-input-container>
+
+				<md-input-container>
+					<md-switch ng-model="dialogVm.onlyCreated"  md-no-ink  aria-label="Switch 2" class="md-warn">
+						Created Tags Only
+					</md-switch>
+				</md-input-container>
+			</div>
+
+			<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
+			<!--<md-virtual-repeat-container id="vertical-container">-->
+				<!--<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: dialogVm.searchText " md-on-demand-->
+				     <!--class="repeated-item" flex>-->
+					<!--{{item.tag}}-->
+				<!--</div>-->
+			<!--</md-virtual-repeat-container>-->
+			<md-divider></md-divider>
+			<md-virtual-repeat-container id="vertical-container" class="md-padding">
+				<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText, 'canEdit': dialogVm.onlyCreated}"
+				     class="repeated-item md-padding" ng-class="{ 'editable': item.canEdit, 'non-editable': !item.canEdit}" flex layout-align="space-between center" layout="row">
+				     <!--class="repeated-item md-padding" ng-class="item.canEdit ? 'editable'" flex>-->
+					<span>{{item.tag}}</span>
+					<span ng-if="item.canEdit" class="action-items">
+						<md-button ng-click="dialogVm.showDetails(item)" class="md-icon-button">
+							<md-icon >open_in_new</md-icon>
+						</md-button>
+						<md-button class="md-icon-button">
+							<md-icon>delete_forever</md-icon>
+						</md-button>
+
+					</span>
+				</div>
+			</md-virtual-repeat-container>
+		</md-dialog-content>
+
+			<md-divider></md-divider>
 
 
-	<md-dialog-actions layout="row" class="md-padding">
-		<md-button ng-click="dialogVm.cancel('cancel')">Cancel</md-button>
-		<!--<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>-->
-	</md-dialog-actions>
+		<md-dialog-actions layout="row" class="md-padding">
+			<md-button ng-click="dialogVm.cancel('cancel')">Cancel</md-button>
+			<!--<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>-->
+		</md-dialog-actions>
+	</div>
+
+	<div ng-show="dialogVm.showData === 'details'">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Manage Hashtags: {{dialogVm.currentItem.tag}}</h2>
+			</div>
+		</md-toolbar>
+
+		<md-table-container>
+			<table md-table md-row-select="dialogVm.tableOptions.rowSelection" multiple="{{dialogVm.tableOptions.multiSelect}}" ng-model="dialogVm.selected" md-progress="promise">
+				<thead md-head md-order="query.order" md-on-reorder="getDesserts">
+				<tr md-row>
+					<th md-column md-numeric>Tag</th>
+					<th md-column md-numeric>Description</th>
+					<th md-column md-numeric>Real Title</th>
+				</tr>
+				</thead>
+				<tbody md-body>
+				<tr md-row md-select="dessert" md-select-id="name" md-auto-select >
+					<td md-cell
+					    ng-click="dialogVm.editField($event, dialogVm.currentItem.tag, 'tag');"
+					    ng-class="{'md-placeholder': !dialogVm.currentItem.tag}">{{dialogVm.currentItem.tag || 'Add tag'}}</td>
+
+					<td md-cell
+					    ng-click="dialogVm.editField($event, dialogVm.currentItem.tagDescription || '', 'tagDescription');"
+					    ng-class="{'md-placeholder': !dialogVm.currentItem.tagDescription}">{{dialogVm.currentItem.tagDescription || 'Add description'}}</td>
+
+					<td md-cell
+					    ng-click="dialogVm.editField($event, dialogVm.currentItem.realTitle, 'realTitle');"
+					    ng-class="{'md-placeholder': !dialogVm.currentItem.realTitle}">{{dialogVm.currentItem.realTitle || 'Add realTitle'}}</td>
+				</tr>
+				</tbody>
+			</table>
+		</md-table-container>
+
+
+		<md-dialog-actions layout="row" class="md-padding">
+			<md-button ng-click="dialogVm.showTagList()">Back to Tag List</md-button>
+			<md-button ng-click="dialogVm.updateTag()">Save Changes</md-button>
+		</md-dialog-actions>
+
+	</div>
+
+
+
 </md-dialog>

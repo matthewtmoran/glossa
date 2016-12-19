@@ -3,10 +3,8 @@
 angular.module('glossa')
     .controller('manageTagsCtrl', manageTagsCtrl);
 
-function manageTagsCtrl(dialogSrvc, hashtagSrvc) {
+function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog) {
     var dialogVm = this;
-
-
 
     dialogVm.hide = function() {
         dialogSrvc.hide();
@@ -16,10 +14,98 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc) {
         return dialogSrvc.cancel('Manage Dialog cancel');
     };
 
+    dialogVm.showData = 'alldata';
 
     hashtagSrvc.get().then(function(result) {
         dialogVm.infiniteItems = result.data;
     });
+
+
+    dialogVm.showAll = showAll;
+    dialogVm.showDetails = showDetails;
+    dialogVm.showTagList = showTagList;
+    dialogVm.editField = editField;
+    dialogVm.updateTag = updateTag;
+
+    dialogVm.tableOptions = {
+        rowSelection: true,
+        multiSelect: true,
+        autoSelect: true,
+        decapitate: false,
+        largeEditDialog: false,
+        boundaryLinks: false,
+        limitSelect: true,
+        pageSelect: true
+    };
+    dialogVm.selected = [];
+
+    function showAll() {
+        dialogVm.showData = 'alldata';
+    }
+
+    function showDetails(item) {
+        dialogVm.currentItem = item;
+        dialogVm.currentItem_OG = angular.copy(item);
+        dialogVm.showData = 'details';
+    }
+
+    function showTagList() {
+        dialogVm.showData = 'alldata';
+
+        if (!angular.equals(dialogVm.currentItem, dialogVm.currentItem_OG)) {
+            console.log('TODO: need to figure out a way to confirm changes here or something')
+        }
+
+    }
+
+    function editField(event, value, field) {
+        event.stopPropagation(); // in case autoselect is enabled
+        // dialogVm.midEdit = true;
+        //
+        var editDialog = {
+            modelValue: value,
+            placeholder: 'Edit ' + field,
+            save: function (input) {
+                dialogVm.currentItem[field] = input.$modelValue;
+            },
+            targetEvent: event,
+            title: 'Edit ' + field,
+            validators: {}
+        };
+        //
+        var promise;
+        //
+        if(dialogVm.tableOptions.largeEditDialog) {
+            promise = $mdEditDialog.large(editDialog);
+        } else {
+            promise = $mdEditDialog.small(editDialog);
+        }
+        //
+        promise.then(function (ctrl) {
+            var input = ctrl.getInput();
+
+            input.$viewChangeListeners.push(function () {
+                input.$setValidity('test', input.$modelValue !== 'test');
+            });
+        });
+
+    }
+
+    function updateTag() {
+        console.log('TODO: query databases for all instances of this tag and normalize data');
+
+        hashtagSrvc.updateTag(dialogVm.currentItem).then(function(result) {
+            console.log('this is the result tag that is updated', result);
+
+
+            hashtagSrvc.normalizeHashtag(result.data);
+
+
+        });
+
+
+        dialogVm.showData = 'alldata';
+    }
 
     // In this example, we set up our model using a plain object.
     // Using a class works too. All that matters is that we implement

@@ -38,3 +38,31 @@
 
 	}
 }
+
+md-edit-dialog {
+	input {
+		color: black !important;
+	}
+}
+
+md-backdrop.md-edit-dialog-backdrop {
+	z-index: 81 !important; /* or greater */
+}
+
+//.animate-show {
+//	//background: white;
+//	//overflow: hidden;
+//	//transition: all 0.5s;
+//}
+//
+.animate-show.ng-hide-add, .animate-show.ng-hide-remove {
+	transition: all 0.5s;
+}
+//
+//.animate-show:not(.ng-hide) {
+//	//height: 60px;
+//}
+
+//.manage-dialog {
+//	transition: all 0.5s;
+//}
