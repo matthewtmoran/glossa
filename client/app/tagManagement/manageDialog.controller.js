@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('manageTagsCtrl', manageTagsCtrl);
 
-function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog) {
+function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
     var dialogVm = this;
 
     dialogVm.hide = function() {
@@ -92,19 +92,16 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog) {
     }
 
     function updateTag() {
-        console.log('TODO: query databases for all instances of this tag and normalize data');
-
+        console.log('TODO: normalize file data(currently hashtags are normalized)');
         hashtagSrvc.updateTag(dialogVm.currentItem).then(function(result) {
-            console.log('this is the result tag that is updated', result);
-
-
-            hashtagSrvc.normalizeHashtag(result.data);
-
-
+            hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
+                dialogVm.showData = 'alldata';
+            }).catch(function(err) {
+                console.log('there was an error',err);
+            });
+        }).catch(function(err) {
+            console.log('there was an error', err)
         });
-
-
-        dialogVm.showData = 'alldata';
     }
 
     // In this example, we set up our model using a plain object.

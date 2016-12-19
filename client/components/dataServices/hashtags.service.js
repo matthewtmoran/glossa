@@ -62,39 +62,33 @@ function hashtagSrvc(dbSrvc, $q) {
 
 
     function normalizeHashtag(tag) {
-        console.log('normalizeHashtag tag:', tag)
-        $q.when(dbSrvc.find(nbCollection, {"hashtags._id": tag._id}, function(err, result) {
-           if (err) {return console.log('There was an error')}
+        return dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
 
-           console.log('result 1', result);
-        })).then(function(result) {
-            console.log('result2', result);
+            var promises = [];
 
             result.data.forEach(function(nb, i) {
 
+                //Modify the data
                 nb.hashtags.forEach(function(t, index) {
                     if (t._id === tag._id) {
                         nb.hashtags[index] = tag;
                     }
                 });
 
-                $q.when(dbSrvc.basicUpdate(nbCollection, nb, function(err, result) {
-                    console.log('result3', result);
+                promises.push(dbSrvc.basicUpdate(nbCollection, nb));
 
-                })).then(function(res) {
-                    console.log('result 4', res);
-                    result.data[i] = res;
-                });
             });
 
-            console.log('returning result', result);
-           return result;
+           return $q.all(promises).then(function(result) {
+                console.log('All promises have resolved: result', result);
+                console.log("This is where we could send a notifcation to user or something");
+                return result;
+            });
+
+        }).catch(function(err) {
+            console.log('there was an error', err);
         });
-            // nbCollection
     }
 
-    function saveNoramlized(db, item) {
-
-    }
 
 }
