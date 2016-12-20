@@ -92,7 +92,7 @@ function dbSrvc($q, $timeout) {
         db.update({_id: data._id}, cleanObject(data), {returnUpdatedDocs: true, upsert: true}, function(err, numReplaced, updatedDocument) {
             if (err) {
                 deferred.reject({
-                    success: true,
+                    success: false,
                     msg: 'Update not successful',
                     data: err
                 });
@@ -111,10 +111,18 @@ function dbSrvc($q, $timeout) {
         db.remove({_id: fileId}, function(err, docs) {
             if (err) {
                 console.log('There was an error deleting the file');
-                deferred.reject(err);
+                deferred.reject({
+                    success: true,
+                    msg: 'Update not successful',
+                    data: err
+                });
             } else {
                 console.log('File removed successfully');
-                deferred.resolve(docs);
+                deferred.resolve({
+                    success: true,
+                    msg: 'Update successful',
+                    data: docs
+                });
             }
         });
         return deferred.promise;

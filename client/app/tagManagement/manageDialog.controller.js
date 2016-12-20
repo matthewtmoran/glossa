@@ -26,6 +26,7 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
     dialogVm.showTagList = showTagList;
     dialogVm.editField = editField;
     dialogVm.updateTag = updateTag;
+    dialogVm.removeTag = removeTag;
 
     dialogVm.tableOptions = {
         rowSelection: true,
@@ -102,6 +103,22 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
         }).catch(function(err) {
             console.log('there was an error', err)
         });
+    }
+
+    function removeTag(item) {
+        var r = confirm("Are you sure you want to remove this tag from the application?");
+        if (r == true) {
+            hashtagSrvc.removeHashtag(item).then(function(result) {
+                console.log('removing and normalizing hashtag result', result);
+                var index = dialogVm.infiniteItems.indexOf(item);
+                dialogVm.infiniteItems.splice(index, 1);
+            }).catch(function(err) {
+                console.log('error removing and normalizing', err);
+            });
+
+        } else {
+            return false;
+        }
     }
 
     // In this example, we set up our model using a plain object.

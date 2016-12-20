@@ -17,7 +17,8 @@ function hashtagSrvc(dbSrvc, $q) {
         updateTag: updateTag,
         createHashtag: createHashtag,
         normalizeHashtag: normalizeHashtag,
-        get: get
+        get: get,
+        removeHashtag: removeHashtag
     };
 
     return service;
@@ -42,7 +43,6 @@ function hashtagSrvc(dbSrvc, $q) {
         return dbSrvc.basicUpdate(hashtagsCol, objectToUpdate)
     }
 
-
     function createHashtag(term) {
         var hashtag = {
             tag: term,
@@ -53,13 +53,11 @@ function hashtagSrvc(dbSrvc, $q) {
         hashtag.canEdit = true;
         hashtag.createdAt = Date.now();
 
-        return dbSrvc.insert(hashtagsCol, hashtag).then(function(doc) {
-            return doc;
-        })
+        return dbSrvc.insert(hashtagsCol, hashtag).then(function(res) {
+            console.log('result from insertion into db', res);
+            return res.data;
+        });
     }
-
-    //trying to normalize hashtags accross notebookes right now
-
 
     function normalizeHashtag(tag) {
         return dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
@@ -90,5 +88,48 @@ function hashtagSrvc(dbSrvc, $q) {
         });
     }
 
+    function removeHashtag(tag) {
+        var promises = [];
 
+        promises.push(dbSrvc.remove(hashtagsCol, tag._id));
+
+        return dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
+
+            var re = new RegExp('#'+ tag.tag, "gi");
+            result.data.forEach(function(nb, i) {
+
+                console.log('nb', nb);
+                console.log('nb.description', nb.description);
+
+                // nb.description = nb.description.replace(re, '');
+                console.log('nb.description after replace ', nb.description);
+
+
+                //Modify the data
+                nb.hashtags.forEach(function(t, index) {
+                    if (t._id === tag._id) {
+                        console.log('t', t);
+                        console.log('nb.hashtags[index]', nb.hashtags[index]);
+                        delete nb.hashtags[index];
+                        if (!nb.hashtags.length || !nb.hashtags) {
+                            delete nb.hashtags;
+                        }
+                    }
+                });
+
+                console.log('nb after modification', nb);
+
+                promises.push(dbSrvc.basicUpdate(nbCollection, nb));
+
+            });
+
+
+            return $q.all(promises).then(function(result) {
+                console.log('All promises have resolved: result', result);
+                console.log("This is where we could send a notifcation to user or something");
+                return result;
+            });
+
+        })
+    }
 }
