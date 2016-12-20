@@ -14,7 +14,6 @@ function simpleParse(hashtagSrvc, $q) {
         notebook.name = parseTitle(notebook.description);
 
        return $q.when(findHashtags(notebook.description)).then(function(re) {
-            console.log('this should be an array of all the hashtag objects', re);
 
             notebook.hashtags = [];
 
@@ -22,13 +21,10 @@ function simpleParse(hashtagSrvc, $q) {
                 notebook.hashtags.push(d);
             });
 
-            console.log('notebook after tags are inserted', notebook);
-
            return notebook;
 
         });
     }
-
     //Parses the title or return first 16 characters of text
     function parseTitle(text) {
        var heading = /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/;
@@ -51,41 +47,21 @@ function simpleParse(hashtagSrvc, $q) {
             });
         }
 
-        //here we have parsed the description text into an array of tags
-        //check for these values among hashtags in the db
-        //if they do not exist create one and push to array
-
-        console.log('amount of tags:', newMatches.length);
-
-        var hashtagObjects = getHashtagObject(newMatches);
-        console.log('hashtagObjects', hashtagObjects);
-
-
-       return hashtagObjects;
-
-      // return $q.when(getHashtagObject(newMatches).then(function(result) {
-      //     return result;
-      //   }));
+        return getHashtagObject(newMatches);
 
     }
 
     function getHashtagObject(tags) {
-        console.log('getHashtagObject param:', tags);
         var promises = [];
 
         //for each tag
         tags.forEach(function(tag) {
             //query db for tag
             promises.push(hashtagSrvc.searchHastags(tag).then(function(result) {
-                console.log('result from search of hashtag', result);
                 //if the tag returns but is undefined it does not exist
                 if (!result.data.length) {
-                    console.log('this tag does not exist');
-                    var createTagVar = hashtagSrvc.createHashtag(tag);
-                    console.log('createTagVar', createTagVar);
-                    return createTagVar;
+                    return hashtagSrvc.createHashtag(tag);
                 } else {
-                    console.log('this tag does exist');
                     //otherwise, there is a result that is defined so just push it to the array
                     return $q.when(result.data[0]);
                   // return result;
@@ -94,17 +70,8 @@ function simpleParse(hashtagSrvc, $q) {
         });
 
        return $q.all(promises).then(function(result) {
-            console.log('result from promise $.all', result);
             return result;
         });
-
-       // $q.all(promises).then(function(result, res2) {
-       //      console.log('promise result', result);
-       //      console.log('promise result', res2);
-       //      return result;
-       //  }).then(function(res) {
-       //      console.log('res', res);
-       //  });
     }
 
 }

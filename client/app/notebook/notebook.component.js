@@ -34,26 +34,39 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
-    notebookSrvc.queryNotebooks().then(function(result) {
-        if (!result.success) {
-            return console.log(result)
-        }
+    activate();
 
-        result.data.forEach(function(doc) {
-            if (doc.hashtags) {
-                doc.hashtags.forEach(function(tag) {
-                    hashtagsUsed.push(tag);
-                })
-            }
+    function activate() {
+        queryNotebooks();
+    }
+
+    function queryNotebooks() {
+        hashtagsUsed = [];
+        nbVm.commonTags = [];
+        notebookSrvc.queryNotebooks().then(function(result) {
+
+            //iterates over all notebooks
+            result.data.forEach(function(doc) {
+                if (doc.hashtags) {
+
+                    doc.hashtags.forEach(function(tag) {
+                        //pushes each hashtag to an array
+                        hashtagsUsed.push(tag);
+                    })
+                }
+            });
+
+            findCommon(hashtagsUsed).forEach(function(item) {
+                nbVm.commonTags.push(item.item);
+            });
+
+            nbVm.notebooks = result.data;
+        }).catch(function(err) {
+            console.log('there was an error querying notebooks', err);
         });
+    }
 
-        findCommon(hashtagsUsed).forEach(function(item) {
-            nbVm.commonTags.push(item.item);
-        });
-
-        nbVm.notebooks = result.data;
-    });
-
+    //find the common tags accross notebooks
     function findCommon(arr) {
         var uniqs = {};
 
@@ -97,7 +110,9 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
 
     function tagManageDialog() {
         dialogSrvc.manageTags().then(function(res) {
-            console.log('manageTags response:', res);
+            if (res.dataChanged) {
+                queryNotebooks();
+            }
         })
     }
 

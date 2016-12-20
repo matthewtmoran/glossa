@@ -54,7 +54,6 @@ function hashtagSrvc(dbSrvc, $q) {
         hashtag.createdAt = Date.now();
 
         return dbSrvc.insert(hashtagsCol, hashtag).then(function(res) {
-            console.log('result from insertion into db', res);
             return res.data;
         });
     }
@@ -78,8 +77,6 @@ function hashtagSrvc(dbSrvc, $q) {
             });
 
            return $q.all(promises).then(function(result) {
-                console.log('All promises have resolved: result', result);
-                console.log("This is where we could send a notifcation to user or something");
                 return result;
             });
 
@@ -98,18 +95,12 @@ function hashtagSrvc(dbSrvc, $q) {
             var re = new RegExp('#'+ tag.tag, "gi");
             result.data.forEach(function(nb, i) {
 
-                console.log('nb', nb);
-                console.log('nb.description', nb.description);
-
-                // nb.description = nb.description.replace(re, '');
-                console.log('nb.description after replace ', nb.description);
-
+                var test = re.test(nb.description);
+                nb.description = nb.description.replace(re, tag.tag);
 
                 //Modify the data
                 nb.hashtags.forEach(function(t, index) {
                     if (t._id === tag._id) {
-                        console.log('t', t);
-                        console.log('nb.hashtags[index]', nb.hashtags[index]);
                         delete nb.hashtags[index];
                         if (!nb.hashtags.length || !nb.hashtags) {
                             delete nb.hashtags;
@@ -117,16 +108,12 @@ function hashtagSrvc(dbSrvc, $q) {
                     }
                 });
 
-                console.log('nb after modification', nb);
-
                 promises.push(dbSrvc.basicUpdate(nbCollection, nb));
 
             });
 
 
             return $q.all(promises).then(function(result) {
-                console.log('All promises have resolved: result', result);
-                console.log("This is where we could send a notifcation to user or something");
                 return result;
             });
 

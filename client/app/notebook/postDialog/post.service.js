@@ -204,9 +204,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
     function saveNormalPost(currentNotebook) {
         var deferred = $q.defer();
 
-
         $q.when(simpleParse.parseNotebook(currentNotebook)).then(function(result) {
-            console.log('result in post service', result);
 
             notebookSrvc.createNotebook(result, function(r) {
                 if (!r.success) {
