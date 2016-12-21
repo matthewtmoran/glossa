@@ -39,7 +39,18 @@
 	}
 }
 
+.table-container {
+	max-height: 400px;
+}
+.disabled-cell {
+	color: grey !important;
+	cursor: default !important;
+}
+
+
+
 md-edit-dialog {
+
 	input {
 		color: black !important;
 	}

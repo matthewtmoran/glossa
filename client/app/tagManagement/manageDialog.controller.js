@@ -66,7 +66,7 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
 
     }
 
-    function editField(event, value, field) {
+    function editField(event, tag, value, field) {
         event.stopPropagation(); // in case autoselect is enabled
         // dialogVm.midEdit = true;
         //
@@ -74,8 +74,8 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
             modelValue: value,
             placeholder: 'Edit ' + field,
             save: function (input) {
-                dialogVm.currentItem[field] = input.$modelValue;
-                changesMade = true;
+                tag[field] = input.$modelValue;
+                updateTag(tag);
             },
             targetEvent: event,
             title: 'Edit ' + field,
@@ -100,11 +100,10 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
 
     }
 
-    function updateTag() {
+    function updateTag(item) {
         console.log('TODO: normalize file data(currently hashtags are normalized)');
-        hashtagSrvc.updateTag(dialogVm.currentItem).then(function(result) {
+        hashtagSrvc.updateTag(item).then(function(result) {
             hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
-                dialogVm.showData = 'alldata';
                 changesMade = true;
 
             }).catch(function(err) {
@@ -115,7 +114,8 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
         });
     }
 
-    function removeTag(item) {
+    function removeTag(event, item) {
+        event.stopPropagation();
         var r = confirm("Are you sure you want to remove this tag from the application?");
         if (r == true) {
             hashtagSrvc.removeHashtag(item).then(function(result) {
