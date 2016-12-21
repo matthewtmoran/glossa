@@ -176,3 +176,28 @@ md-backdrop.md-sidenav-backdrop {
 		content: '\e23f';
 	}
 }
+
+
+.CodeMirror-hints {
+	z-index: 99999 !important;
+	color: black !important;
+
+	position: absolute;
+	top: 0;
+
+
+	.enter-space {
+		font-family: Roboto, "Ti", sans-serif !important;
+		font-size:1.1em;
+		line-height: 2em;
+		display: block;
+		font-style: italic;
+	}
+
+	li {
+		font-family: Roboto, "Ti", sans-serif !important;
+		color: black !important;
+		font-size:1.2em;
+		line-height: 1.8em;
+	}
+}

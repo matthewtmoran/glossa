@@ -45,7 +45,13 @@ angular.module('simplemde', [])
                         ngModel.$setViewValue(mde.value());
                     });
 
-                    //This basically gets the current word and includs the # charachter
+                    showHashtagHints(instance, object);
+
+
+                });
+
+
+                function showHashtagHints(instance, object) {
                     var cursor = instance.getCursor();
                     var currentLine = instance.getLine(cursor.line);
                     var start = cursor.ch;
@@ -61,7 +67,7 @@ angular.module('simplemde', [])
                         //calls this custom function that's defined in codemirror.  Definitley need that option otherwise we will end up in an endless loop
                         cm.showHint(instance, cm.hint.customList, {"completeSingle" : false, 'closeOnUnfocus': false})
                     }
-                });
+                }
 
 
 

@@ -16247,12 +16247,22 @@
                     this.picked = false;
                     var widget = this, cm = completion.cm;
 
+
+
+
                     var hints = this.hints = document.createElement("ul");
                     hints.className = "CodeMirror-hints";
                     this.selectedHint = data.selectedHint || 0;
 
+                    var staticEl = document.createElement("span");
+                    staticEl.className = "enter-space";
+                    staticEl.innerHTML = 'Type space to create new tag...';
+
+                    hints.insertBefore(staticEl, hints.firstChild);
+
+
                     var completions = data.list;
-                    for (var i = 0; i < completions.length; ++i) {
+                    for (var i = 1; i < completions.length; ++i) {
                         var elt = hints.appendChild(document.createElement("li")), cur = completions[i];
                         var className = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
                         if (cur.className != null) className = cur.className + " " + className;
@@ -16350,7 +16360,9 @@
 
                 Widget.prototype = {
                     close: function() {
-                        if (this.completion.widget != this) return;
+                        if (this.completion.widget != this){
+                            return;
+                        }
                         this.completion.widget = null;
                         this.hints.parentNode.removeChild(this.hints);
                         this.completion.cm.removeKeyMap(this.keyMap);
