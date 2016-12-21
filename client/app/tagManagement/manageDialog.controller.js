@@ -36,7 +36,7 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
     dialogVm.removeTag = removeTag;
 
     dialogVm.tableOptions = {
-        rowSelection: true,
+        rowSelection: false,
         multiSelect: true,
         autoSelect: true,
         decapitate: false,

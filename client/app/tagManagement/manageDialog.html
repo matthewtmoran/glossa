@@ -35,15 +35,14 @@
 				<table md-table md-row-select="dialogVm.tableOptions.rowSelection" multiple="{{dialogVm.tableOptions.multiSelect}}" ng-model="dialogVm.selected" md-progress="promise">
 					<thead md-head md-order="query.order" md-on-reorder="getDesserts">
 					<tr md-row>
-						<th md-column md-numeric>Tag</th>
-						<th md-column md-numeric>Description</th>
-						<th md-column md-numeric>Real Title</th>
-						<th md-column md-numeric>Action</th>
+						<th md-column >Tag</th>
+						<th md-column >Description</th>
+						<th md-column >Real Title</th>
+						<th md-column >Action</th>
 					</tr>
 					</thead>
 					<tbody md-body>
 						<tr md-row md-select="item" md-select-id="name" md-auto-select ng-diabled="!item.canEdit" ng-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText, 'canEdit': dialogVm.onlyCreated}">
-							<!--<tr md-row md-select="dessert" md-select-id="name" md-auto-select ng-repeat="tag in dialogVm.infiniteItems | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit" >-->
 							<td md-cell
 							    ng-click="!item.canEdit || dialogVm.editField($event, item, item.tag, 'tag');"
 							    ng-class="{'md-placeholder': !item.tag, 'disabled-cell': !item.canEdit}">{{item.tag || 'Add tag'}}</td>
