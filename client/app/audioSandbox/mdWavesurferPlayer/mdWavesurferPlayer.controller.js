@@ -96,12 +96,8 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
         }
 
 
-        console.log('control.src', control.src);
-
         control.title = control.title || control.src.split('/').pop();
         control.surfer.load(control.src);
-
-        console.log('control.title', control.title);
 
     };
 

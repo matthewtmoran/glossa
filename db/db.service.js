@@ -27,7 +27,6 @@ function dbSrvc($q, $timeout) {
                     data: err
                 });
             } else {
-                console.log('Queried database.');
                 deferred.resolve({
                     success: true,
                     msg: 'Query successful',
@@ -49,7 +48,6 @@ function dbSrvc($q, $timeout) {
                         data: err
                     });
                 } else {
-                    console.log('File data was saved to the DB', doc);
                     deferred.resolve({
                         success: true,
                         msg: 'Creation success',
@@ -117,7 +115,6 @@ function dbSrvc($q, $timeout) {
                     data: err
                 });
             } else {
-                console.log('File removed successfully');
                 deferred.resolve({
                     success: true,
                     msg: 'Update successful',
