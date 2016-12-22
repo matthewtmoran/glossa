@@ -17,10 +17,15 @@ function notebookListItem(postSrvc, $mdDialog,$sce) {
 
     function notebookListItemLink(scope, element, attrs) {
 
-        if (scope.notebook.description) {
+        if (scope.notebook.description && scope.notebook.postType === 'normal') {
             scope.notebook.description = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
         }
-
+        if (scope.notebook.media.image && scope.notebook.postType === 'image') {
+            scope.notebook.media.image.caption = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.image.caption));
+        }
+        if (scope.notebook.media.audio && scope.notebook.postType === 'audio') {
+            scope.notebook.media.audio.caption = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.audio.caption));
+        }
 
         scope.openExistinDialog = function(notebook) {
             postSrvc.existingPostDialog(notebook).then(function (res) {

@@ -25,9 +25,9 @@
 		</div>
 
 		<div class="card-text inner-padding">
-			<div ng-if="notebook.description" ng-bind-html="notebook.description"></div>
-			<p ng-if="notebook.media.image.caption">{{notebook.media.image.caption}}</p>
-			<p ng-if="notebook.media.audio.caption">{{notebook.media.audio.caption}}</p>
+			<div ng-if="notebook.description || notebook.media.image.caption || notebook.media.audio.caption" ng-bind-html="notebook.description || notebook.media.image.caption || notebook.media.audio.caption"></div>
+			<!--<p ng-if="notebook.media.image.caption">{{notebook.media.image.caption}}</p>-->
+			<!--<p ng-if="notebook.media.audio.caption">{{notebook.media.audio.caption}}</p>-->
 		</div>
 
 	</md-card-content>

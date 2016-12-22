@@ -51,7 +51,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
     function newUpdate(field) {
 
-        console.log('this is called');
         $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
 
             metaVm.currentFile.hashtags = [];

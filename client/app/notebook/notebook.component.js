@@ -66,6 +66,7 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         });
     }
 
+    // TODO: move to service
     //find the common tags accross notebooks
     function findCommon(arr) {
         var uniqs = {};

@@ -34,10 +34,17 @@ function basicUpload(fileSrvc) {
 
         input.on('change', function (e) {
             var file = e.target.files[0];
-            var targetPath = 'uploads/' + scope.type + '/' + file.name;
-            if (util.doesExist(targetPath)) {
-                return alert('A file with this name already exists.  Choose another file');
+            var targetPath;
+            //if there is no file, return
+            if (!file) {
+                return;
+            } else {
+                targetPath = 'uploads/' + scope.type + '/' + file.name;
+                if (util.doesExist(targetPath)) {
+                    return alert('A file with this name already exists.  Choose another file');
+                }
             }
+
 
             scope.parentbinding = {
                 name: file.name,

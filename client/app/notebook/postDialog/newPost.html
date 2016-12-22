@@ -20,11 +20,13 @@
 				<div layout="row" layout-align="space-between center ">
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
 					              buttonicon="camera_alt" button-id="uploadImage"
+					              type="image"
 					              filetypes=".jpg, .png, .svg"></basic-upload>
 					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
 					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
 					              buttonicon="volume_up" button-id="uploadAudio"
+					              type="audio"
 					              filetypes=".mp3, .m4a"></basic-upload>
 				</div>
 			</div>

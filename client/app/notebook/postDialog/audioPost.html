@@ -9,14 +9,19 @@
 			<div class="md-dialog-content">
 				<md-input-container layout="row" layout-align="start center">
 					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
-					              buttonicon="volume_up" button-id="uploadAudio"
+					              buttonicon="volume_up"
+					              button-id="uploadAudio"
+					              type="audio"
 					              filetypes=".mp3, .m4a"></basic-upload>
 					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
 				</md-input-container>
 
 				<h3 class="md-padding">Audio Caption</h3>
 				<md-input-container class="simplemde-wrapper">
-					<textarea id="audioCaption" aria-label="text area" ng-model="newPostVm.currentNotebook.caption" simplemde="newPostVm.editorOptions"></textarea>
+					<textarea id="audioCaption"
+					          aria-label="text area"
+					          ng-model="newPostVm.currentNotebook.caption"
+					          simplemde="newPostVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
 

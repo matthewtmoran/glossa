@@ -21,7 +21,6 @@ function newPostCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, current
     function hide() {
         $mdDialog.hide(dialogObject);
     }
-
     function save() {
         dialogObject = {
             dataChanged: true,
