@@ -46,6 +46,7 @@
 					</div>
 
 					<div ng-if="type === 'audio'">
+						{{metaVm.currentFile.media.audio.path | json}}
 						<wave-preview
 								flex
 								url="{{'../' + metaVm.currentFile.media.audio.path}}"

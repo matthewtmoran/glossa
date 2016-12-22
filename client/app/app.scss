@@ -177,6 +177,9 @@ md-backdrop.md-sidenav-backdrop {
 	}
 }
 
+md-dialog {
+	border-top: 1px solid rgba(0,0,0,0.12) !important;
+}
 
 .CodeMirror-hints {
 	z-index: 99999 !important;
