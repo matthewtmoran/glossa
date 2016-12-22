@@ -17,15 +17,26 @@ angular.module('glossa')
 function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse) {
     var metaVm = this;
 
+    console.log('metaVm.currentFile',metaVm.currentFile);
+
     metaVm.hidden = false;
     metaVm.isOpen = false;
     metaVm.hover = false;
     metaVm.attachedMedia = [];
+    metaVm.attachedNotebook = {};
     metaVm.items = [
         { name: "Attach Audio", icon: "volume_up", direction: "bottom", accept: '.mp3, .m4a', type: 'audio' },
         { name: "Attach Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
-    metaVm.attachedNotebook = {};
+    metaVm.editorOptions = {
+        toolbar: false,
+        status: false,
+        spellChecker: false,
+        autoDownloadFontAwesome: false,
+        forceSync: true,
+        placeholder: 'Description...',
+        updateFunction: newUpdate
+    };
 
     metaVm.updateData = updateData;
     metaVm.newUpdate = newUpdate;
@@ -38,17 +49,10 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
 
+    $scope.$on('update:meta-description', newUpdate('description'));
 
-    metaVm.editorOptions = {
-        toolbar: false,
-        status: false,
-        spellChecker: false,
-        autoDownloadFontAwesome: false,
-        forceSync: true,
-        placeholder: 'Description...',
-        updateFunction: newUpdate
-    };
 
+    //I believe this is the one we use...
     function newUpdate(field) {
 
         $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
@@ -70,8 +74,8 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         });
     }
 
-    $scope.$on('update:meta-description', newUpdate('description'));
 
+    //TODO: remove this?
     /**
      * Update the file's meta data from form
      * @param data - object = {fileId: String, field: String}
@@ -95,6 +99,9 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             }
         });
     }
+
+
+    //DIALOGS
 
     /**
      * This function opens the attach dialog.
@@ -187,12 +194,17 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             });
     }
 
+
+    //Queryies the attached notebook data
     function queryAttachedNotebook() {
+
+        console.log('change in currentfile', metaVm.currentFile);
         if (metaVm.currentFile.mediaType === 'notebook') {
             notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
                 metaVm.attachedNotebook = result.data[0];
             })
         }
+
     }
 
     function isOpenWatch(isOpen) {

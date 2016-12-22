@@ -11,13 +11,12 @@
 			<!--<label>Description</label>-->
 
 			<textarea aria-label="textarea"
+			          simplemde="metaVm.editorOptions"
 			          update-function="metaVm.newUpdate('description')"
-			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"
 			          ng-trim="false"
 			          autocomplete="off"
 			          id="meta-description"
-			          simplemde="metaVm.editorOptions"
 			          rows="5"></textarea>
 
 		</md-input-container>
