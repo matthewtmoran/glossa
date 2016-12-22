@@ -45,11 +45,13 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         spellChecker: false,
         autoDownloadFontAwesome: false,
         forceSync: true,
-        placeholder: 'Description...'
+        placeholder: 'Description...',
+        updateFunction: newUpdate
     };
 
     function newUpdate(field) {
 
+        console.log('this is called');
         $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
 
             metaVm.currentFile.hashtags = [];
@@ -66,12 +68,10 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
                 // console.log('TODO: show user the update was successful', result);
             })
 
-
-
         });
-
-
     }
+
+    $scope.$on('update:meta-description', newUpdate('description'));
 
     /**
      * Update the file's meta data from form

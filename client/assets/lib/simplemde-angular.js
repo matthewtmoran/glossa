@@ -4,16 +4,17 @@ angular.module('simplemde', [])
         return {
             restrict: 'A',
             require: 'ngModel',
-            controller: ['$scope', function ($scope, hashtagSrvc, $q) {
-                return {
-                    get: function () {
-                        return $scope.simplemde.instance;
-                    },
-                    rerenderPreview: function (val) {
-                        return $scope.simplemde.rerenderPreview(val);
-                    }
-                };
-            }],
+            // controller: ['$scope', function ($scope, hashtagSrvc, $q, simpleParse, fileSrvc) {
+            //
+            //     return {
+            //         get: function () {
+            //             return $scope.simplemde.instance;
+            //         },
+            //         rerenderPreview: function (val) {
+            //             return $scope.simplemde.rerenderPreview(val);
+            //         }
+            //     };
+            // }],
             link: function (scope, element, attrs, ngModel) {
                 // scope.parentScope = scope;
                 var hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
@@ -48,6 +49,17 @@ angular.module('simplemde', [])
                     showHashtagHints(instance, object);
 
 
+                });
+
+
+                // TODO:I dont like that this is called initially
+                //I have to watch for this blur event to make changes.
+                mde.codemirror.on('blur', function(instance, object) {
+
+                    if (!!options.updateFunction) {
+                        //I binded this function to options so I would have access to it here.
+                        options.updateFunction();
+                    }
                 });
 
 

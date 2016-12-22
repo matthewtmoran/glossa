@@ -11,7 +11,7 @@
 			<!--<label>Description</label>-->
 
 			<textarea aria-label="textarea"
-			          ng-blur="metaVm.newUpdate('description')"
+			          update-function="metaVm.newUpdate('description')"
 			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"
 			          ng-trim="false"

@@ -108,14 +108,10 @@ function hashtagSrvc(dbSrvc, $q) {
 
         promises.push(dbSrvc.remove(hashtagsCol, tag._id));
 
-        return dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
-
+        var notebookPromise = dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
             var re = new RegExp('#'+ tag.tag, "gi");
             result.data.forEach(function(nb, i) {
-
-                var test = re.test(nb.description);
                 nb.description = nb.description.replace(re, tag.tag);
-
                 //Modify the data
                 nb.hashtags.forEach(function(t, index) {
                     if (t._id === tag._id) {
@@ -125,16 +121,34 @@ function hashtagSrvc(dbSrvc, $q) {
                         }
                     }
                 });
-
-                promises.push(dbSrvc.basicUpdate(nbCollection, nb));
-
+                return dbSrvc.basicUpdate(nbCollection, nb);
             });
+        });
 
-
-            return $q.all(promises).then(function(result) {
-                return result;
+        var filePromise = dbSrvc.find(fileCollection, {"hashtags._id": tag._id}).then(function(result) {
+            var re = new RegExp('#'+ tag.tag, "gi");
+            result.data.forEach(function(file, i) {
+                file.description = file.description.replace(re, tag.tag);
+                //Modify the data
+                file.hashtags.forEach(function(t, index) {
+                    if (t._id === tag._id) {
+                        delete file.hashtags[index];
+                        if (!file.hashtags.length || !file.hashtags) {
+                            delete file.hashtags;
+                        }
+                    }
+                });
+                return dbSrvc.basicUpdate(fileCollection, file);
             });
+        });
 
-        })
+        promises.push(filePromise);
+        promises.push(notebookPromise);
+
+        return $q.all(promises).then(function(result) {
+            return result;
+        }).catch(function(err) {
+            console.log('there was an error ', err);
+        });
     }
 }
