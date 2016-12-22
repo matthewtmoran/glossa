@@ -5,7 +5,8 @@ angular.module('glossa')
 
 function simpleParse(hashtagSrvc, $q) {
     var service = {
-        parseNotebook: parseNotebook
+        parseNotebook: parseNotebook,
+        findHashtags: findHashtags
     };
     return service;
 

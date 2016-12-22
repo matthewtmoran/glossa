@@ -2,8 +2,19 @@
 	input, textarea {
 		color: $black !important;
 	}
-}
 
+	.CodeMirror,
+	.CodeMirror-scroll {
+		border-top: none;
+		border-left: none;
+		border-right: none;
+		background: transparent;
+		min-height: 50px!important;
+		height: 100px !important;
+		max-height: 100px !important;
+	}
+
+}
 
 //meta
 .image-attachement {

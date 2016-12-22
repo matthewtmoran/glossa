@@ -8,14 +8,16 @@
 			       value="metaVm.currentFile.name">
 		</md-input-container>
 		<md-input-container class="md-block">
-			<label>Description</label>
+			<!--<label>Description</label>-->
 
-			<textarea ng-change="metaVm.newUpdate('description')"
+			<textarea aria-label="textarea"
+			          ng-blur="metaVm.newUpdate('description')"
 			          ng-model-options='{ debounce: 300 }'
 			          ng-model="metaVm.currentFile.description"
 			          ng-trim="false"
 			          autocomplete="off"
-			          id="theText"
+			          id="meta-description"
+			          simplemde="metaVm.editorOptions"
 			          rows="5"></textarea>
 
 		</md-input-container>

@@ -14,7 +14,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -39,14 +39,38 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
 
 
+    metaVm.editorOptions = {
+        toolbar: false,
+        status: false,
+        spellChecker: false,
+        autoDownloadFontAwesome: false,
+        forceSync: true,
+        placeholder: 'Description...'
+    };
 
     function newUpdate(field) {
-        fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
-            if (!result.success) {
-                return console.log('TODO: show user the update was unsuccessful and handle errors');
-            }
-            console.log('TODO: show user the update was successful', result);
-        })
+
+        $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
+
+            metaVm.currentFile.hashtags = [];
+            result.forEach(function(tag) {
+                metaVm.currentFile.hashtags.push(tag);
+            });
+
+
+            fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
+                if (!result.success) {
+                    return console.log('TODO: show user the update was unsuccessful and handle errors');
+                }
+
+                // console.log('TODO: show user the update was successful', result);
+            })
+
+
+
+        });
+
+
     }
 
     /**
@@ -77,7 +101,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
      * This function opens the attach dialog.
      * @param ev - this is the event object
      * The result will be returned whether an item is attached or not.
-     * TODO: update api here
      */
     function newAttachDialog(ev) {
         dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
@@ -105,6 +128,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             console.log("don't delete file")
         });
     };
+
     function disconnectDialog(ev, attachment, type) {
         var title,
             textContent;

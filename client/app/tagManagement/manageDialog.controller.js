@@ -101,7 +101,6 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
     }
 
     function updateTag(item) {
-        console.log('TODO: normalize file data(currently hashtags are normalized)');
         hashtagSrvc.updateTag(item).then(function(result) {
             hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
                 changesMade = true;

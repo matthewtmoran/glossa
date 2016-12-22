@@ -32,7 +32,7 @@ function hashtagSrvc(dbSrvc, $q) {
 
     function searchHastags(term) {
         var query = {
-            tag:  new RegExp(term, 'i')
+            tag:  new RegExp('^' + term + '$', 'i')
         };
         return dbSrvc.find(hashtagsCol, query).then(function(result) {
             return result;
@@ -59,9 +59,26 @@ function hashtagSrvc(dbSrvc, $q) {
     }
 
     function normalizeHashtag(tag) {
-        return dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
 
-            var promises = [];
+        var promises = [];
+
+        var filePromise = dbSrvc.find(fileCollection, {"hashtags._id": tag._id}).then(function(result) {
+
+            result.data.forEach(function(file, i) {
+
+                //Modify the data
+                file.hashtags.forEach(function(t, index) {
+                    if (t._id === tag._id) {
+                        file.hashtags[index] = tag;
+                    }
+                });
+
+               return dbSrvc.basicUpdate(fileCollection, file);
+
+            });
+        });
+
+       var notebookPromise = dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
 
             result.data.forEach(function(nb, i) {
 
@@ -72,17 +89,18 @@ function hashtagSrvc(dbSrvc, $q) {
                     }
                 });
 
-                promises.push(dbSrvc.basicUpdate(nbCollection, nb));
-
+                return dbSrvc.basicUpdate(nbCollection, nb);
             });
 
-           return $q.all(promises).then(function(result) {
-                return result;
-            });
-
-        }).catch(function(err) {
-            console.log('there was an error', err);
         });
+
+        promises.push(filePromise);
+        promises.push(notebookPromise);
+
+        return $q.all(promises).then(function(result) {
+            return result;
+        });
+
     }
 
     function removeHashtag(tag) {
