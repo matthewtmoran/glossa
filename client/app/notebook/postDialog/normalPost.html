@@ -2,29 +2,29 @@
 	<form name="addPost" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
-				<h2>Create New Post</h2>
+				<h2>{{postVm.postDetails.title}}</h2>
 			</div>
 		</md-toolbar>
 		<md-dialog-content>
 			<div class="md-dialog-content" >
 				<md-input-container class="simplemde-wrapper" convert-icons>
 					<textarea class="simplemde-textarea"  aria-label="text area"
-					          simplemde="newPostVm.editorOptions"
+					          simplemde="postVm.editorOptions"
 					          id="theText"
-					          ng-model="newPostVm.currentNotebook.description"
+					          ng-model="postVm.notebook.description"
 					          required
 					          ></textarea>
 				</md-input-container>
 
 
 				<div layout="row" layout-align="space-between center ">
-					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
+					<basic-upload parentbinding="postVm.notebook.media.image"
 					              buttonicon="camera_alt" button-id="uploadImage"
 					              type="image"
 					              filetypes=".jpg, .png, .svg"></basic-upload>
-					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
-					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
-					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
+					<span>{{postVm.notebook.media.image.name}}</span>
+					<span>{{postVm.notebook.media.audio.name}}</span>
+					<basic-upload parentbinding="postVm.notebook.media.audio"
 					              buttonicon="volume_up" button-id="uploadAudio"
 					              type="audio"
 					              filetypes=".mp3, .m4a"></basic-upload>
@@ -34,8 +34,8 @@
 
 		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
 		<md-dialog-actions layout="row" >
-			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
-			<md-button ng-disabled="!addPost.$valid" ng-click="newPostVm.save('Create Normal Post')">Add Post</md-button>
+			<md-button ng-click="postVm.cancel('cancel')">Cancel</md-button>
+			<md-button ng-disabled="!addPost.$valid" ng-click="postVm.postDetails.button.action('Create Normal Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 	</form>
 </md-dialog>

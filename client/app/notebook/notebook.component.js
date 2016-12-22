@@ -97,15 +97,15 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
      * @param type - the type of post
      */
     function openNBDialog(ev, type) {
-        postSrvc.newPostDialog(ev, type, nbVm.currentNotebook).then(function(result) {
+        postSrvc.postDialog(ev, type, nbVm.currentNotebook).then(function(result) {
             nbVm.currentNotebook = {
                 media: {}
             };
             //if there was data changed
-            if (result.dataChanged) {
-                return nbVm.notebooks.push(result.data.data);
+            if (!result.dataChanged) {
+                return;
             }
-             return console.log('this was not saved', result);
+            return nbVm.notebooks.push(result.data.data);
         });
     }
 

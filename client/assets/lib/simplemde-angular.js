@@ -1,6 +1,6 @@
 angular.module('simplemde', [])
     .directive('simplemde', [
-        '$parse', '$timeout', 'simpleParse', '$q', 'hashtagSrvc', function ($parse, $timeout, simpleParse, $q, hashtagSrvc) {
+        '$parse', '$timeout', 'simpleParse', '$q', 'hashtagSrvc', 'simpleSrvc', function ($parse, $timeout, simpleParse, $q, hashtagSrvc, simpleSrvc) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
@@ -27,6 +27,8 @@ angular.module('simplemde', [])
                     //this is the specific instance - much more limited
                     var editor = mde.codemirror;
 
+                    //I set the editor because, I need to refresh it some times and this was a quick little way to have access though I'm sure there is a better way
+                    // simpleSrvc.setEditor(editor);
 
 
                     //TODO: I don't like query every instance of simplmde
@@ -59,7 +61,11 @@ angular.module('simplemde', [])
                         if (!val) {
                             val = '';
                         }
-                        mde.value(val);
+                        //I put a delay on this because in dialogs, it does not show content, and If it is any less than 300 the cursor is misplaced
+                        $timeout(function(){
+                            mde.value(val);
+                        }, 300);
+
                         if (mde.isPreviewActive()) {
                             rerenderPreview(val);
                         }

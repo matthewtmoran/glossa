@@ -5,6 +5,7 @@
 				<h2>Create New Audio Post</h2>
 			</div>
 		</md-toolbar>
+
 		<md-dialog-content>
 			<div class="md-dialog-content">
 				<md-input-container layout="row" layout-align="start center">
@@ -17,14 +18,14 @@
 				</md-input-container>
 
 				<h3 class="md-padding">Audio Caption</h3>
+
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="audioCaption"
 					          aria-label="text area"
-					          ng-model="newPostVm.currentNotebook.caption"
+					          ng-model="newPostVm.currentNotebook.media.audio.caption"
 					          simplemde="newPostVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
-
 		</md-dialog-content>
 
 		<md-dialog-actions layout="row" >

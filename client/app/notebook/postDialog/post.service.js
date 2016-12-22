@@ -81,9 +81,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         }
     };
     var service = {
-        // parseTitle: parseTitle,
-        newPostDialog: newPostDialog,
-        existingPostDialog: existingPostDialog,
+        postDialog: postDialog,
         save: save
     };
     return service;
@@ -92,12 +90,13 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         console.log('test', e);
     }
 
-    function newPostDialog(ev, type, currentNotebook) {
+    function postDialog(ev, type, currentNotebook) {
         var options = {
             simplemde: {},
             template: ''
         };
         currentNotebook.postType = type;
+
         switch(type) {
             case 'image':
                 options.template = 'app/notebook/postDialog/imagePost.html';
@@ -106,9 +105,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     status: false,
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
-                    placeholder: 'image caption...',
-
+                    // forceSync: true,
+                    placeholder: 'Image caption...',
                 };
                 break;
             case 'audio':
@@ -118,18 +116,18 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     status: false,
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
-                    placeholder: 'audio caption...'
+                    // forceSync: true,
+                    placeholder: 'Audio caption...'
                 };
                 break;
             case 'normal':
-                options.template = 'app/notebook/postDialog/newPost.html';
+                options.template = 'app/notebook/postDialog/normalPost.html';
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,
                     status: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
+                    // forceSync: true,
                     placeholder: 'Post description...',
                 };
                 break;
@@ -150,8 +148,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
      */
     function openPostDialog(ev, options, currentNotebook) {
         return $mdDialog.show({
-            controller: newPostCtrl,
-            controllerAs: 'newPostVm',
+            controller: postDetailsCtrl,
+            controllerAs: 'postVm',
             templateUrl: options.template,
             parent: angular.element(document.body),
             targetEvent: ev,
@@ -163,36 +161,37 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
             }
         }).then(function(data) {
 
-            console.log('Dialog is closed. data', data);
+            console.log('Dialog is saved. data', data);
 
             return data;
-        }, function(data) {
-            return data;
-        });
-    }
-
-    function existingPostDialog(currentNotebook) {
-        return $mdDialog.show({
-            templateUrl: 'app/notebook/postDialog/existingPost.html',
-            parent: angular.element(document.body),
-            // targetEvent: ev,
-            controller: newPostCtrl,
-            controllerAs: 'newPostVm',
-            bindToController: true,
-            clickOutsideToClose: false,
-            locals: {
-                simplemdeOptions: '',
-                currentNotebook: currentNotebook
-            }
-        }).then(function(data) {
-
-            console.log('Dialog is closed. data', data);
-
-            return data;
-        }, function(data) {
+        }).catch(function(data) {
+            console.log('Dialog is canceled', data);
             return data;
         });
     }
+
+    // function existingPostDialog(currentNotebook) {
+    //     return $mdDialog.show({
+    //         templateUrl: 'app/notebook/postDialog/existingPost.html',
+    //         parent: angular.element(document.body),
+    //         // targetEvent: ev,
+    //         controller: newPostCtrl,
+    //         controllerAs: 'newPostVm',
+    //         bindToController: true,
+    //         clickOutsideToClose: false,
+    //         locals: {
+    //             simplemdeOptions: '',
+    //             currentNotebook: currentNotebook
+    //         }
+    //     }).then(function(data) {
+    //
+    //         console.log('Dialog is closed. data', data);
+    //
+    //         return data;
+    //     }, function(data) {
+    //         return data;
+    //     });
+    // }
 
     /**
      * Here we create a promise object.  This enables us to 'wait' for the file system copy/write and the databse save.

@@ -302,7 +302,6 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
 
 
     function deleteCorpus(corpus) {
-        console.log('delete corpus', corpus);
         var dialogOptions = {
             title: 'Are you sure you want to delete ' + corpus.name + ' corpus?',
             textContent: 'This will delete all files associated with this corpus! (does not do anything yet...)'

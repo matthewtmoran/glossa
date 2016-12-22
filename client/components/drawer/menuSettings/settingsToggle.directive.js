@@ -29,7 +29,6 @@ function menuToggle($timeout, drawerMenu, dialogSrvc) {
         }
 
         function deleteCorpus(val) {
-            console.log('deleteCorpus');
             drawerMenu.deleteCorpus(val);
         }
 
