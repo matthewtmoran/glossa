@@ -26,7 +26,6 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     atVm.attachNotebook = attachNotebook;
 
     function attachNotebook(notebook, currentFile) {
-        console.log('notebook', notebook)
 
         atVm.activeNotebook = notebook;
 
@@ -47,7 +46,6 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     }
     function save() {
         if (atVm.currentFileEditable.mediaType === 'notebook') {
-            console.log('this is happening');
             //TODO: attach notebook
             fileSrvc.saveNotebookAttachment(atVm.currentFileEditable, atVm.notebook, function(err, result) {
                 if (err) {return console.log('There was an error attaching notebook:', err)}

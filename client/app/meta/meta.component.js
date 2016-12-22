@@ -17,8 +17,6 @@ angular.module('glossa')
 function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse) {
     var metaVm = this;
 
-    console.log('metaVm.currentFile',metaVm.currentFile);
-
     metaVm.hidden = false;
     metaVm.isOpen = false;
     metaVm.hover = false;

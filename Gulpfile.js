@@ -21,7 +21,8 @@ var paths = {
         styles: [clientPath + '/{app,components}/**/*.scss'],
         mainStyle: clientPath + '/app/app.scss',
         views: clientPath + '/{app,components}/**/*.html',
-        mainView: clientPath + '/index.html'
+        mainView: clientPath + '/index.html',
+        scripts: [clientPath + '/**/!(*.spec|*.mock)/*.js']
     }
 };
 
@@ -64,6 +65,10 @@ gulp.task('inject:sass', function() {
         .pipe(gulp.dest(clientPath + '/app'));
 });
 
+gulp.task('inject:js', function() {
+    return gulp.src()
+})
+
 
 gulp.task('styles', function() {
     return gulp.src(paths.client.mainStyle)
@@ -73,7 +78,7 @@ gulp.task('styles', function() {
 
 
 
-gulp.task('index', function () {
+gulp.task('index', function() {
     var sources = gulp.src([clientPath + '/app/*.css'], {read: false});
 
     return gulp.src(paths.client.mainView)
@@ -87,25 +92,10 @@ gulp.task('index', function () {
 });
 
 
+
 gulp.task('watch', function() {
-
     gulp.watch(paths.client.styles, ['styles']);
-
-
-    // gulp.watch('app/Resources/assets/sass/**/*.scss', ['sass'])
 });
-
-
-
-gulp.task('webpack:dev', function () {
-    var webpackDevConfig = makeWebpackConfig({ DEV: true });
-    return gulp.src(webpackDevConfig.entry.app).pipe(plugins.plumber()).pipe(webpack(webpackDevConfig)).pipe(gulp.dest('.tmp'));
-});
-gulp.task('clean:tmp', function() {
-    del(['.tmp/**/*'], {dot: true});
-});
-
-
 
 
 
@@ -128,5 +118,3 @@ gulp.task('serve', function (cb) {
     );
 });
 
-
-// .pipe(gulp.dest('.tmp'));
