@@ -198,7 +198,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     //Queryies the attached notebook data
     function queryAttachedNotebook() {
 
-        console.log('change in currentfile', metaVm.currentFile);
         if (metaVm.currentFile.mediaType === 'notebook') {
             notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
                 metaVm.attachedNotebook = result.data[0];

@@ -8,7 +8,8 @@ function dialogSrvc($mdDialog) {
         hide: hide,
         manageTags: manageTags,
         attachToNotebook: attachToNotebook,
-        cancel: cancel
+        cancel: cancel,
+        settingsFull: settingsFull
     };
     return service;
 
@@ -34,7 +35,6 @@ function dialogSrvc($mdDialog) {
             return data;
         });
     }
-
     function attachToNotebook(ev, currentFile) {
        return $mdDialog.show({
             controller: attachfileCtrl,
@@ -52,6 +52,24 @@ function dialogSrvc($mdDialog) {
         }, function(data) {
             return data;
         });
+    }
+    function settingsFull() {
+
+        return $mdDialog.show({
+            controller: settingsCtrl,
+            controllerAs: 'sVm',
+            templateUrl: 'components/settings/settings.html',
+            parent: angular.element(document.body),
+            clickOutsideToClose: true,
+            bindToController: true,
+            fullscreen: true
+
+        }).then(function(data) {
+            console.log('close on save?', data);
+        }).catch(function(data) {
+            console.log('close on cancel or hide?', data);
+        });
+
     }
 
 }

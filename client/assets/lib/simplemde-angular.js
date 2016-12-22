@@ -32,15 +32,14 @@ angular.module('simplemde', [])
                     //TODO: I don't like query every instance of simplmde
                     //Get all tags an map each one to have the required field 'text'
                     getAllTags().then(function (result) {
-                        if (!result.success) {
-                            return console.log(result);
-                        }
                         //Modify the tags to what codemirror's hints require
                         hashtagList = result.data.map(function (tag) {
                             tag.displayText = tag.tag;
                             tag.text = tag.tag;
                             return tag;
                         });
+                    }).catch(function(err) {
+                        console.log('there was an error querying hashtagas', err);
                     });
 
 

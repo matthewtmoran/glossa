@@ -4,7 +4,7 @@
 		<!-- SHOULD LIST ALL THE FILES IN SELECTED COPRUS. MAIN TITLE (H3) OF ITEM SHOULD BE THE (FIRST) MARKDOWN H1. -->
 		<!-- <md-subheader>NAME OF CORPUS (WHEN BROWSING ALL OF THEM)</md-subheader> -->
 		<md-list-item ng-repeat="file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)" class="md-2-line" ng-click="fbVm.fileSelection(file)">
-			<a ng-if="file.category != 'audio'" >
+			<a>
 				<md-item-content md-ink-ripple layout="row" layout-align="start center">
 					<div class="md-list-item-text" layout="column">
 						<h3>{{file.name}}</h3>
