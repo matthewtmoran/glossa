@@ -8,31 +8,31 @@ TODO:
 TODO:
 -->
 
+<!doctype html>
 <html lang="en" >
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
 	<!-- Angular Material style sheet -->
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-	<link data-require="font-awesome@4.3.0" data-semver="4.3.0" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
-
-	<!--<link rel="stylesheet" href="assets/app.css">-->
-	<!--<link rel="stylesheet" href="assets/tutorial_3.css">-->
-
-	<!--<link rel="stylesheet" href="assets/css/style.css">-->
+	<link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
 
 	<!-- inject:css -->
 	<link rel="stylesheet" href="app/app.css">
 	<!-- endinject -->
+	<!--<link rel="stylesheet" href="bower_components/simplemde/dist/simplemde.min.css">-->
+	<link rel="stylesheet" href="bower_components/simplemde/debug/simplemde.css">
+	<link rel="stylesheet" href="assets/lib/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="bower_components/codemirror/addon/hint/show-hint.css">
+	<link href="bower_components/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css"/>
 
 
 </head>
 <title>Glossa</title>
 
-<body ng-app="glossa" layout="column"  ng-cloak>
+<body ng-app="glossa" layout="column" ng-cloak>
 
-<div ui-view></div>
+	<div ui-view flex layout="column"></div>
+
 
 <!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
 <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
@@ -46,42 +46,88 @@ TODO:
 <script src="bower_components/angular-messages/angular-messages.js"></script>
 <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 
-<script type="text/javascript" src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
-<script type="text/javascript" src="bower_components/angular-ui-ace/ui-ace.js"></script>
+<script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+<script src="bower_components/angular-ui-ace/ui-ace.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
 
-<!--<script type="text/javascript" src="assets/lib/wavesurfer.min.js"></script>-->
+<script type="text/javascript" src="bower_components/angular-material-data-table/dist/md-data-table.min.js"></script>
+
+<script src="assets/lib/simplemde.js"></script>
+<script src="assets/lib/simplemde-angular.js"></script>
+<script src="assets/lib/codemirror.js"></script>
+
 <script type="text/javascript" src="assets/lib/wavesurfer.js"></script>
 
 
 <!-- Your application bootstrap  -->
 <script type="text/javascript" src="app/app.js"></script>
-<script type="text/javascript" src="app/main/main.js"></script>
-<script type="text/javascript" src="app/main/main.controller.js"></script>
+<script type="text/javascript" src="app/corpus/corpus.js"></script>
+<script type="text/javascript" src="app/corpus/corpus.component.js"></script>
+<script type="text/javascript" src="app/meta/meta.js"></script>
+<script type="text/javascript" src="app/meta/meta.component.js"></script>
+<script type="text/javascript" src="app/meta/modal/attachfile.controller.js"></script>
+
+<script type="text/javascript" src="app/meta/editAttachedDialog/editAttached.controller.js"></script>
+
+<script type="text/javascript" src="app/baseline/baseline.js"></script>
+<script type="text/javascript" src="app/baseline/baseline.component.js"></script>
 
 <script type="text/javascript" src="app/audioSandbox/waveform.js"></script>
 <script type="text/javascript" src="app/audioSandbox/waveform.controller.js"></script>
 
 <script type="text/javascript" src="app/audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer.directive.js"></script>
 <script type="text/javascript" src="app/audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer.controller.js"></script>
-<!--<script type="text/javascript" src="app/audioSandbox/wavesurfer.directive.js"></script>-->
+<script type="text/javascript" src="components/dataServices/notebook.service.js"></script>
+<script type="text/javascript" src="components/dataServices/hashtags.service.js"></script>
+<script type="text/javascript" src="app/notebook/notebook.js"></script>
+<script type="text/javascript" src="app/notebook/notebook.component.js"></script>
 
-<script type="text/javascript" src="components/navbar/navbar.controller.js"></script>
+
+<script type="text/javascript" src="components/navbar/navbar.component.js"></script>
 <script type="text/javascript" src="components/uploadbutton/uploadbtn.directive.js"></script>
 <script type="text/javascript" src="components/node/node.service.js"></script>
-<script type="text/javascript" src="components/sidebar/menu.service.js"></script>
-<script type="text/javascript" src="components/sidebar/drawer.controller.js"></script>
-<script type="text/javascript" src="components/sidebar/menuLink/menuLink.directive.js"></script>
-<script type="text/javascript" src="components/sidebar/menutoggle/menuToggle.driective.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.service.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.controller.js"></script>
+<script type="text/javascript" src="components/drawer/drawer.directive.js"></script>
+<script type="text/javascript" src="components/drawer/menuLink/menuLink.directive.js"></script>
+<script type="text/javascript" src="components/drawer/menutoggle/menuToggle.driective.js"></script>
+<script type="text/javascript" src="components/drawer/menuSettings/settingsToggle.directive.js"></script>
+
+<script type="text/javascript" src="components/simplemdeDirectives/converticons.directive.js"></script>
+
+<script type="text/javascript" src="components/viewerEditor/viewerEditor.component.js"></script>
+
 <script type="text/javascript" src="components/filters/humanize.js"></script>
 <script type="text/javascript" src="components/filters/nospace.js"></script>
-<script type="text/javascript" src="components/sidebar/menuSettings/settingsToggle.directive.js"></script>
+<script type="text/javascript" src="components/filebrowser/filebrowser.component.js"></script>
 
 <script type="text/javascript" src="components/dataServices/file.service.js"></script>
-<script type="text/javascript" src="components/tabbar/tabcontent/meta.controller.js"></script>
-<script type="text/javascript" src="components/tabbar/tabcontent/dyanamicUpload.js"></script>
+<script type="text/javascript" src="components/dataServices/baseline.service.js"></script>
+<script type="text/javascript" src="app/meta/modal/dyanamicUpload.js"></script>
+<script type="text/javascript" src="components/tabbar/tabbar.directive.js"></script>
+
+
+
+<script type="text/javascript" src="components/wavesurferDirectives/wavePreview/wavePreview.directive.js"></script>
+
 
 <script type="text/javascript" src="../db/db.service.js"></script>
 
+
+<script type="text/javascript" src="app/mentions/mentions.js"></script>
+<script type="text/javascript" src="app/mentions/mentions.controller.js"></script>
+<script type="text/javascript" src="app/notebook/postDialog/newPost.controller.js"></script>
+<script type="text/javascript" src="app/notebook/postDialog/post.service.js"></script>
+<script type="text/javascript" src="components/basicUploadButton/basicUpload.directive.js"></script>
+<script type="text/javascript" src="app/notebook/cards/notebookcard.directive.js"></script>
+
+<script type="text/javascript" src="app/tagManagement/manageTags.js"></script>
+<script type="text/javascript" src="app/tagManagement/manageTags.component.js"></script>
+<script type="text/javascript" src="app/tagManagement/manageDialog.controller.js"></script>
+<script type="text/javascript" src="components/drawer/dialogs/corpusDialog.controller.js"></script>
+<script type="text/javascript" src="components/dialogService/dialog.service.js"></script>
+<script type="text/javascript" src="components/simplemdeDirectives/parse.service.js"></script>
+<script type="text/javascript" src="components/settings/settings.controller.js"></script>
 
 
 

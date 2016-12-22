@@ -52,7 +52,19 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
                 height: '200'
             };
 
-            options = angular.extend(defaults, $attrs, (control.properties || {}), options);
+            control.playerProperties = {};
+            var nKey;
+            for (var attr in $attrs) {
+                if (attr.match(/^player/)) {
+                    nKey = attr.replace(/^player([A-Z])/, function (m, $1) {
+                        return $1.toLowerCase();
+                    });
+                    control.playerProperties[nKey] = $attrs[attr];
+                }
+            }
+
+            options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);
+
             control.surfer.init(options);
 
             control.surfer.on('ready', function () {
@@ -83,8 +95,10 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
 
         }
 
+
         control.title = control.title || control.src.split('/').pop();
         control.surfer.load(control.src);
+
     };
 
     var startInterval = function () {

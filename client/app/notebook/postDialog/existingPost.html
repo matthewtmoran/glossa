@@ -1,0 +1,37 @@
+<md-dialog class="post-dialog" flex="50" class="md-padding">
+	<form name="addPost">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{newPostVm.currentNotebook.name}}</h2>
+			</div>
+		</md-toolbar>
+		<md-dialog-content>
+			<div class="md-dialog-content">
+
+				<md-input-container class="simplemde-wrapper">
+					<textarea ng-disabled="true" class="simplemde-textarea" aria-label="text area" ng-model="newPostVm.currentNotebook.description" ></textarea>
+				</md-input-container>
+
+					<span>Does not work yet</span>
+				<div layout="row" layout-align="space-between center ">
+					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
+					              buttonicon="camera_alt" button-id="uploadImage"
+					              filetypes=".jpg, .png, .svg"></basic-upload>
+					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
+					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
+					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
+					              buttonicon="volume_up" button-id="uploadAudio"
+					              filetypes=".mp3, .m4a"></basic-upload>
+				</div>
+
+			</div>
+		</md-dialog-content>
+
+		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
+		<md-dialog-actions layout="row" >
+			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
+			<md-button ng-disabled="true" ng-click="newPostVm.save('Update Attached File')">Update Post(disabled for now)</md-button>
+		</md-dialog-actions>
+	</form>
+
+</md-dialog>

@@ -1,0 +1,41 @@
+<md-dialog id="attach-file-dialog" flex="50" aria-label="Edit Attached files"  >
+	<form ng-cloak>
+		<md-dialog-content>
+			<div class="md-dialog-content">
+				<div>
+					<h2>Edit Attached File</h2>
+					<div class="md-padding" layout="row" layout-align="space-between center">
+						<h3>{{edVm.attachment.name}}</h3>
+						<img  ng-if="edVm.attachedType === 'image'" ng-src="{{edVm.attachedPath}}" alt="">
+					</div>
+				</div>
+
+				<md-input-container class="md-block" flex-gt-sm="">
+					<label>File Name</label>
+					<input ng-blur=""
+					       ng-model="edVm.attachment.name"
+					       value="edVm.attachment.name">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>Description</label>
+					<!--<textarea ng-change="edVm.updateData({fileId: metaVm.currentFile._id, field: 'description'})"-->
+					<textarea
+					          ng-model="edVm.attachment.description"
+					          rows="5"></textarea>
+				</md-input-container>
+
+			</div>
+		</md-dialog-content>
+
+
+		<md-dialog-actions layout="row" layout-align="space-between">
+			<md-button ng-click="edVm.cancel('cancel')">
+				Cancel
+			</md-button>
+			<md-button ng-click="edVm.save('Update Attached File')">
+				Update
+			</md-button>
+		</md-dialog-actions>
+
+	</form>
+</md-dialog>

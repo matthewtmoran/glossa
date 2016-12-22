@@ -1,0 +1,19 @@
+<md-button aria-label="{{item.name}}"
+           id="mini-btn-{{item.type}}"
+           class="md-mini md-large-btn"
+           ng-disabled="currentFile.media[item.type]">
+
+	<span>{{item.name}}</span>
+
+	<span flex></span>
+
+	<!--<md-icon aria-label="{{item.name}}">{{item.icon}}</md-icon>-->
+
+	<md-tooltip md-direction="{{item.direction}}"
+	            md-visible="tooltipVisible"
+	            md-autohide="true">
+		{{item.name}}
+	</md-tooltip>
+</md-button>
+<input type="file" class="ng-hide" accept>
+

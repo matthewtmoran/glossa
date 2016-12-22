@@ -7,8 +7,6 @@ function config($stateProvider) {
     $stateProvider
         .state('main', {
             url: '/',
-            templateUrl: 'app/main/main.html',
-            controller: 'MainCtrl',
-            controllerAs: 'vm'
+            template: '<main-component flex layout="column">'
         });
 }

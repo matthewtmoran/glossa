@@ -1,0 +1,39 @@
+<navbar-component
+		layout="row"
+		search-text="navVm.searchText">
+</navbar-component>
+
+<md-content id="manageTags-container" layout="row" flex>
+
+
+	<md-content flex="25" layout-padding>
+		<h2>Create Hashtag</h2>
+		<form ng-submit="vm.createHashtag()">
+			<md-input-container>
+				<label>Tag Name</label>
+				<input required type="text" ng-model="vm.newHashtag.tag" aria-label="tag name">
+			</md-input-container>
+			<md-input-container>
+				<label>Tag Description</label>
+				<textarea required ng-model="vm.newHashtag.tagDescription" aria-label="tag description"></textarea>
+			</md-input-container>
+			<md-button type="submit">Create</md-button>
+		</form>
+		<span>New Hashtag: {{vm.newHashtag}}</span>
+	</md-content>
+
+
+	<!--<md-content layout-padding>-->
+	<md-content class="tag-management" layout-padding flex>
+
+		<div ng-repeat="hashtag in vm.hashtagList | orderBy: 'createdAt'" layout="row" layout-align="space-between center" ng-style="{background: hashtag.tagColor}">
+			<span>{{hashtag.tag}}</span>
+			<span>Can Edit: {{hashtag.canEdit}}</span>
+		</div>
+
+	</md-content>
+
+</md-content>
+<!--drawer-->
+<drawer-directive></drawer-directive>
+

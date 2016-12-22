@@ -1,0 +1,36 @@
+<md-dialog class="post-dialog" flex="50">
+	<form name="addPost" ng-cloak>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Create New Image Post</h2>
+			</div>
+		</md-toolbar>
+		<md-dialog-content>
+			<div class="md-dialog-content">
+				<md-input-container layout="row" layout-align="start center">
+					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
+					              buttonicon="camera_alt"
+					              button-id="uploadImage"
+					              type="image"
+					              filetypes=".jpg, .png, .svg"></basic-upload>
+					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
+				</md-input-container>
+
+				<h3 class="md-padding">Image Caption</h3>
+				<md-input-container class="simplemde-wrapper">
+					<textarea id="imageCaption"
+					          aria-label="text area"
+					          ng-model="newPostVm.currentNotebook.caption"
+					          simplemde="newPostVm.editorOptions"></textarea>
+				</md-input-container>
+			</div>
+
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" >
+			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
+			<md-button ng-disabled="!newPostVm.currentNotebook.media.image" ng-click="newPostVm.save('Create Image Post')">Add Post</md-button>
+		</md-dialog-actions>
+	</form>
+
+</md-dialog>

@@ -1,0 +1,21 @@
+<div layout="column" class="audioPlayerWrapper">
+	<md-content flex class="wave-content-wrapper">
+		<div class="waveSurferWave"></div>
+	</md-content>
+	<md-fab-toolbar class="md-player-controls transparent md-fab-bottom-right">
+		<div layout="row" class="md-toolbar-tools">
+			<div flex layout="row" layout-align="end center">
+				<md-button class="md-button md-fab md-mini"
+				           ng-disabled="!control.isReady"
+				           type="button"
+				           ng-click="control.surfer.playPause()">
+					<!--<md-tooltip>-->
+						<!--{{control.surfer.isPlaying() ? 'Pause' : 'Play'}}-->
+					<!--</md-tooltip>-->
+					<md-icon ng-show="control.surfer.isPlaying()" class="material-icons">pause</md-icon>
+					<md-icon ng-show="!control.surfer.isPlaying()"  class="material-icons">play_arrow</md-icon>
+				</md-button>
+			</div>
+		</div>
+	</md-fab-toolbar>
+</div>

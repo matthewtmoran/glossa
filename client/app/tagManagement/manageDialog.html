@@ -1,0 +1,80 @@
+<md-dialog class="manage-dialog " flex="90" aria-label="New Notebook">
+
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2>Manage Hashtags</h2>
+		</div>
+	</md-toolbar>
+
+	<md-dialog-content>
+		<div layout-gt-xs="row">
+			<md-input-container  md-no-float class="md-block md-padding search-text-container" flex-gt-sm>
+				<!--<label>Search hashtags</label>-->
+				<md-icon class="material-icons">search</md-icon>
+				<input ng-model="dialogVm.searchText" type="text"  placeholder="Search hashtags...">
+			</md-input-container>
+
+			<md-input-container>
+				<md-switch ng-model="dialogVm.onlyCreated"  md-no-ink  aria-label="Switch 2" class="md-warn">
+					Created Tags Only
+				</md-switch>
+			</md-input-container>
+		</div>
+
+		<!--//file in fbVm.filteredFiles = (fbVm.fileList | filter: fbVm.searchText)-->
+		<!--<md-virtual-repeat-container id="vertical-container">-->
+			<!--<div md-virtual-repeat="item in dialogVm.infiniteItems | filter: dialogVm.searchText " md-on-demand-->
+			     <!--class="repeated-item" flex>-->
+				<!--{{item.tag}}-->
+			<!--</div>-->
+		<!--</md-virtual-repeat-container>-->
+		<md-divider></md-divider>
+
+		<md-content class="table-container" >
+			<md-table-container>
+				<table md-table md-row-select="dialogVm.tableOptions.rowSelection" multiple="{{dialogVm.tableOptions.multiSelect}}" ng-model="dialogVm.selected" md-progress="promise">
+					<thead md-head md-order="query.order" md-on-reorder="getDesserts">
+					<tr md-row>
+						<th md-column >Tag</th>
+						<th md-column >Description</th>
+						<th md-column >Real Title</th>
+						<th md-column >Action</th>
+					</tr>
+					</thead>
+					<tbody md-body>
+						<tr md-row md-select="item" md-select-id="name" md-auto-select ng-diabled="!item.canEdit" ng-repeat="item in dialogVm.infiniteItems | filter: {'tag': dialogVm.searchText, 'canEdit': dialogVm.onlyCreated}">
+							<td md-cell
+							    ng-click="!item.canEdit || dialogVm.editField($event, item, item.tag, 'tag');"
+							    ng-class="{'md-placeholder': !item.tag, 'disabled-cell': !item.canEdit}">{{item.tag || 'Add tag'}}</td>
+
+							<td md-cell
+							    ng-click="!item.canEdit || dialogVm.editField($event, item, item.tagDescription || '', 'tagDescription');"
+							    ng-class="{'md-placeholder': !item.tagDescription, 'disabled-cell': !item.canEdit}">{{item.tagDescription || 'Add description'}}</td>
+
+							<td md-cell
+							    ng-click="!item.canEdit || dialogVm.editField($event, item, item.realTitle, 'realTitle');"
+							    ng-class="{'md-placeholder': !item.realTitle, 'disabled-cell': !item.canEdit}">{{item.realTitle || 'Add realTitle'}}</td>
+
+							<td md-cell
+							    ng-class="{'md-placeholder': !item.realTitle, 'disabled-cell': !item.canEdit}">
+								<md-button  md-no-ink ng-click="!item.canEdit || dialogVm.removeTag($event, item)" class="md-icon-button">
+									<i  class="material-icons">delete_forever</i>
+								</md-button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</md-table-container>
+		</md-content>
+
+	</md-dialog-content>
+
+		<md-divider></md-divider>
+
+
+	<md-dialog-actions layout="row" class="md-padding">
+		<md-button ng-click="dialogVm.cancel('cancel')">Close</md-button>
+		<!--<md-button ng-click="newPostVm.save('Update Attached File')">Add Post</md-button>-->
+	</md-dialog-actions>
+
+</md-dialog>

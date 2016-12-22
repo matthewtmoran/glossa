@@ -1,0 +1,99 @@
+<div layout-padding="" class="meta-tab">
+	<form name="fileMeta">
+		<md-input-container class="md-block" flex-gt-sm="">
+			<label>File Name</label>
+			<input ng-blur="metaVm.newUpdate('name')"
+			       ng-model-options='{ debounce: 1000 }'
+			       ng-model="metaVm.currentFile.name"
+			       value="metaVm.currentFile.name">
+		</md-input-container>
+		<md-input-container class="md-block">
+			<!--<label>Description</label>-->
+
+			<textarea aria-label="textarea"
+			          simplemde="metaVm.editorOptions"
+			          update-function="metaVm.newUpdate('description')"
+			          ng-model="metaVm.currentFile.description"
+			          ng-trim="false"
+			          autocomplete="off"
+			          id="meta-description"
+			          rows="5"></textarea>
+
+		</md-input-container>
+	</form>
+	<div layout="row" layout-align="space-between center">
+		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
+		<md-button ng-disabled="metaVm.currentFile.media.image && metaVm.currentFile.media.audio" ng-click="metaVm.newAttachDialog($event)">Attach</md-button>
+	</div>
+	<div layout="column" class="attached-media">
+		<h3>Associated Media</h3>
+		<md-content layout="row">
+			<!--Independent Media-->
+			<md-card flex="50"
+					class="mdl-shadow--2dp attachment-card"
+					ng-repeat="(type, attachment) in metaVm.currentFile.media"
+					ng-if="attachment != null && type != 'type' && metaVm.currentFile.mediaType !== 'notebook'">
+
+				<md-card-content class="media-content">
+					<md-card-title ng-if="type !== 'image'" class="media-title" layout-align="center space-between">
+						<md-card-title-text>
+							<span class="md-headline">{{attachment.name}}</span>
+							<span class="md-subhead">Independent Media File</span>
+						</md-card-title-text>
+					</md-card-title>
+
+					<div ng-if="type === 'image'" class="media-image">
+						<img ng-src="{{'../' + metaVm.currentFile.media.image.path}}" alt="">
+					</div>
+
+					<div ng-if="type === 'audio'">
+						<wave-preview
+								flex
+								url="{{'../' + metaVm.currentFile.media.audio.path}}"
+								auto-play="false"
+								back-img="{{metaVm.currentFile.media.image.path}}"
+								player-wave-color="white"
+								player-height="150"
+								player-progress-color="black">
+						</wave-preview>
+					</div>
+
+				</md-card-content>
+				<span flex></span>
+
+				<md-divider></md-divider>
+
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="metaVm.disconnectDialog($event, attachment, type)">Delete</md-button>
+				</md-card-actions>
+
+			</md-card><!--Independent Media-->
+			<!--Notebook Attachment-->
+			<md-card flex="50"
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-if="metaVm.currentFile.mediaType === 'notebook'">
+
+				<md-card-content class="media-content">
+					<div ng-if="metaVm.attachedNotebook.media.image" class="media-image">
+						<img ng-src="{{'../' + metaVm.attachedNotebook.media.image.path}}" alt="">
+					</div>
+					<div class="media-description">
+						<span class="md-headline">{{metaVm.attachedNotebook.name}}</span>
+						<p>{{metaVm.attachedNotebook.description}}</p>
+					</div>
+				</md-card-content>
+
+				<md-divider></md-divider>
+
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="metaVm.disconnectDialog($event, metaVm.attachedNotebook)">Disconnect</md-button>
+					<span flex></span>
+					<md-button ng-click="metaVm.openExistinDialog(metaVm.attachedNotebook)" class="md-icon-button">
+						<md-icon>open_in_new</md-icon>
+					</md-button>
+				</md-card-actions>
+			</md-card><!--Notebook Media-->
+		</md-content>
+	</div>
+	<md-divider></md-divider>
+</div>

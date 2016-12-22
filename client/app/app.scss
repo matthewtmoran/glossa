@@ -2,10 +2,13 @@ $mGrey: #9E9E9E; //- primary
 $white: #F5F5F5; // -light primary
 $dGrey: #616161; // - dark primary
 $black: #212121; // - text/icons
+$bFaint: rgba(0,0,0,.54);
 
 $red: #FF5252; // - accent color
 $lBlack: #757575; // secondary text
 $lGrey: #BDBDBD; // - divider color
+
+$lBlue: #40C4FF; //
 
 //This the new grey that you used for the fab button @MattM
 $newGrey: #9E9E9E;
@@ -21,6 +24,44 @@ $secondary-text: $lBlack;
 
 
 @font-face {
+	font-family: 'Material Icons';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Material Icons'),
+	local('MaterialIcons-Regular'),
+	url(../assets/fonts/icons/MaterialIcons-Regular.woff2) format('woff2'),
+	url(../assets/fonts/icons/MaterialIcons-Regular.woff) format('woff'),
+	url(../assets/fonts/icons/MaterialIcons-Regular.ttf) format('truetype');
+}
+.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;  /* Preferred icon size */
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+
+	/* Support for all WebKit browsers. */
+	-webkit-font-smoothing: antialiased;
+	/* Support for Safari and Chrome. */
+	text-rendering: optimizeLegibility;
+
+	/* Support for Firefox. */
+	-moz-osx-font-smoothing: grayscale;
+
+	/* Support for IE. */
+	font-feature-settings: 'liga';
+}
+
+
+
+
+@font-face {
 	font-family: "DejaVu Mono";
 	src: url(../assets/fonts/DejaVuSansMono.ttf);
 }
@@ -31,8 +72,13 @@ $secondary-text: $lBlack;
 }
 
 @font-face {
-	font-family: "Roboto Mono";
-	src: url(../assets/fonts/RobotoMono-Regular.ttf);
+	font-family: "Roboto";
+	src: url(../assets/fonts/Roboto-Regular.ttf);
+}
+@font-face {
+	font-family: "Roboto";
+	src: url(../assets/fonts/Roboto-Light.ttf);
+	font-weight: 300;
 }
 
 
@@ -48,6 +94,10 @@ $secondary-text: $lBlack;
 	transition: .3s;
 }
 
+.md-large-btn {
+	width: 15em;
+}
+
 //TODO: there should be a way to style button through themeing
 .md-grey-fab {
 	background-color: $newGrey !important;
@@ -57,13 +107,102 @@ $secondary-text: $lBlack;
 	}
 }
 
+.vertical-align {
+	position: relative;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
 
 
+md-backdrop.md-sidenav-backdrop {
+	z-index: 62 !important;
+}
 
 /* inject:scss */
 @import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
+@import 'baseline/baseline';
+@import 'corpus/corpus';
+@import 'main/main';
+@import 'mentions/mentions';
+@import 'meta/editAttachedDialog/editAttached';
+@import 'meta/meta';
+@import 'meta/modal/attachfile';
+@import 'notebook/notebook';
+@import 'tagManagement/manageTags';
+@import '../components/drawer/drawer';
 @import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
-@import '../components/sidebar/sidebar';
-@import '../components/tabbar/tabbar';
+@import '../components/settings/settings';
+@import '../components/wavesurferDirectives/mdWavesurferPlayer';
+@import '../components/wavesurferDirectives/wavePreview/wavePreview';
 /* endinject */
+
+
+.material-icons {
+	// ...but you need to add your own CSS class names for the icons you want to use:
+	&.arrow-backward::before {
+		content: '\e5c4';
+	}
+	&.arrow-forward::before {
+		content: '\e5c8';
+	}
+	&.add::before {
+		content: '\e145';
+	}
+	&.format_bold::before {
+		content: '\e238';
+	}
+
+	&.help::before {
+		content: '\e887';
+	}
+	&.visibility::before {
+		content: '\e8f4';
+	}
+	&.format_list_numbered::before {
+		content: '\e242';
+	}
+	&.format_list_bulleted::before {
+		content: '\e241';
+	}
+	&.format_quote::before {
+		content: '\e244';
+	}
+	&.title::before {
+		content: '\e264';
+	}
+	&.format_italic::before {
+		content: '\e23f';
+	}
+}
+
+md-dialog {
+	border-top: 1px solid rgba(0,0,0,0.12) !important;
+}
+
+.CodeMirror-hints {
+	z-index: 99999 !important;
+	color: black !important;
+
+	//position: absolute;
+	//top: 0;
+
+
+	.enter-space {
+		font-family: Roboto, "Ti", sans-serif !important;
+		font-size:1.1em;
+		line-height: 2em;
+		display: block;
+		font-style: italic;
+		margin-bottom: 10px;
+	}
+
+	li {
+		font-family: Roboto, "Ti", sans-serif !important;
+		color: black !important;
+		font-size:1.2em;
+		line-height: 1.8em;
+	}
+}
