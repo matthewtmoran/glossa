@@ -9,7 +9,7 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu(dbSrvc, $mdDialog) {
+function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
 
     var section = [
         {
@@ -47,9 +47,13 @@ function drawerMenu(dbSrvc, $mdDialog) {
             ],
             settings: [
                 {
+                    name: 'View All',
+                    type: ''
+                },
+                {
                     name: 'Add Corpus',
                     type: '',
-                    action: corpusDialog
+                    action: 'corpusDialog'
                 },
                 {
                   // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
@@ -58,15 +62,18 @@ function drawerMenu(dbSrvc, $mdDialog) {
                 }, 
                 {
                     name: 'Bulk-Edit Word Forms',
-                    type: ''
+                    type: '',
+                    disabled: true
                 },
                 {
                     name: 'Phonology Assistant',
-                    type: ''
+                    type: '',
+                    disabled: true
                 },
                 {
                     name: 'Primer Assistant',
-                    type: ''
+                    type: '',
+                    disabled: true
                 },
                 {
                     name: 'Export',
@@ -241,7 +248,8 @@ function drawerMenu(dbSrvc, $mdDialog) {
         toggleSettingsSection: toggleSettingsSection,
         isSectionSettingsSelected: isSectionSettingsSelected,
         createCorpus: createCorpus,
-        addCreatedCorpus: addCreatedCorpus
+        addCreatedCorpus: addCreatedCorpus,
+        deleteCorpus: deleteCorpus
 };
 
     return service;
@@ -276,6 +284,7 @@ function drawerMenu(dbSrvc, $mdDialog) {
         });
     }
 
+    //called after a corpus is created
     function addCreatedCorpus(corpus) {
         section.forEach(function(sec) {
             if (sec.name === 'Corpora') {
@@ -284,39 +293,71 @@ function drawerMenu(dbSrvc, $mdDialog) {
         });
     }
 
+    //queries all corporas
     function queryCorporaMenus() {
         return dbSrvc.find(corporaMenus, {}).then(function(docs) {
             return docs;
         })
     }
 
-    function corpusDialog() {
-        $mdDialog.show({
-            templateUrl: 'components/drawer/dialogs/corpusDialog.html',
-            parent: angular.element(document.body),
-            // targetEvent: ev,
-            controller: corpusDialogCtrl,
-            controllerAs: 'dialogVm',
-            bindToController: true,
-            clickOutsideToClose: false,
-        }).then(function(data) {
 
-            console.log('Dialog is closed. data', data);
+    function deleteCorpus(corpus) {
+        console.log('delete corpus', corpus);
+        var dialogOptions = {
+            title: 'Are you sure you want to delete ' + corpus.name + ' corpus?',
+            textContent: 'This will delete all files associated with this corpus! (does not do anything yet...)'
+        };
 
-            return data;
-        }, function(data) {
-            return data;
+        dialogSrvc.confirmDialog(dialogOptions).then(function(result) {
+            console.log('dialog has closed and data has returned', result);
         });
     }
 
+    //creates new corpus returns promise
     function createCorpus(corpus) {
+
+        var settings = [
+            {
+                name: 'Duplicate',
+                type: ''
+            },
+            {
+                name: 'Bulk-Edit Word Forms',
+                type: '',
+                disabled: true
+            },
+            {
+                name: 'Phonology Assistant',
+                type: '',
+                disabled: true
+            },
+            {
+                name: 'Primer Assistant',
+                type: '',
+                disabled: true
+            },
+            {
+                name: 'Export',
+                type: ''
+            },
+            {
+                name: 'Delete',
+                type: '',
+                action: 'deleteCorpus'
+            }
+        ];
 
         corpus.params.corpus = corpus.name.replace(/\s/g,'').toLowerCase();
         corpus.type = 'link';
         corpus.state = 'corpus';
+        corpus.settings = settings;
+
 
        return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
             return docs.data;
-        })
+        }).catch(function(err) {
+           console.log('there was an error saving corpus', err);
+           return err;
+       })
     }
 }

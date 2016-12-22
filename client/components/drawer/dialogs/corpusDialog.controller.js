@@ -18,7 +18,6 @@ function corpusDialogCtrl($mdDialog, drawerMenu) {
     dialogVm.save = save;
 
     function cancel() {
-        console.log('....')
         $mdDialog.cancel('cancel');
     }
     function hide() {
@@ -27,8 +26,8 @@ function corpusDialogCtrl($mdDialog, drawerMenu) {
 
     function save() {
 
-
         drawerMenu.createCorpus(dialogVm.newCorpus).then(function(result) {
+
             drawerMenu.addCreatedCorpus(result);
 
             $mdDialog.hide(result);
@@ -39,7 +38,7 @@ function corpusDialogCtrl($mdDialog, drawerMenu) {
                     corpus: ''
                 }
             };
-        });
+        })
 
     }
 

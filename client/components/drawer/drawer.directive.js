@@ -10,23 +10,8 @@ function drawerDirective(dialogSrvc) {
         controller: 'drawerCrtl',
         controllerAs: 'dVm',
         templateUrl: 'components/drawer/drawer.html',
-        link: drawerDirectiveLink,
+        // link: drawerDirectiveLink,
         bindToController: true
     };
     return directive;
-
-
-    function drawerDirectiveLink(scope, element, attrs) {
-
-
-        scope.showSettings = showSettings;
-
-        function showSettings() {
-
-            dialogSrvc.settingsFull();
-            console.log('showsettings clicked');
-        }
-
-
-    }
 }
