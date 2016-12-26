@@ -11,7 +11,8 @@ function dialogSrvc($mdDialog) {
         cancel: cancel,
         settingsFull: settingsFull,
         corpusDialog: corpusDialog,
-        confirmDialog: confirmDialog
+        confirmDialog: confirmDialog,
+        openPostDialog: openPostDialog
     };
     return service;
 
@@ -112,6 +113,30 @@ function dialogSrvc($mdDialog) {
             return data;
         });
 
+    }
+
+    function openPostDialog(ev, options, currentNotebook) {
+        return $mdDialog.show({
+            controller: postDetailsCtrl,
+            controllerAs: 'postVm',
+            templateUrl: options.template,
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: false,
+            bindToController: true,
+            locals: {
+                simplemdeOptions: options.simplemde,
+                currentNotebook: currentNotebook
+            }
+        }).then(function(data) {
+
+            console.log('Dialog is saved. data', data);
+
+            return data;
+        }).catch(function(data) {
+            console.log('Dialog is canceled', data);
+            return data;
+        });
     }
 
 }

@@ -1,16 +1,17 @@
 'use strict';
 
+var util = require('../client/components/node/file.utils');
+
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);
 
-function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q, simpleSrvc, $timeout) {
+function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q, simpleSrvc, $timeout, dialogSrvc, notebookSrvc ) {
     var postVm = this;
     var dialogObject = {
         dataChanged: false,
         event: 'hide',
         data: null
     };
-    postVm.notebook = angular.copy(postVm.currentNotebook);
     postVm.isNewPost = false;
     postVm.actionItems = {
 
@@ -18,15 +19,10 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
 
     activate();
     function activate() {
-        console.log('postVm.currentNotebook', postVm.currentNotebook);
+        postVm.notebook = angular.copy(postVm.currentNotebook);
         findDetailType();
         setDynamicItems();
     }
-
-
-
-
-
 
 
 
@@ -35,10 +31,22 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
     postVm.save = save;
     postVm.editorOptions = simplemdeOptions;
 
-    function cancel() {
-        console.log('cancel');
+    function cancel(ev, notebook) {
+        if ($scope.addPost.$dirty) {
+
+            if (notebook.media.image && !postVm.currentNotebook.media.image) {
+                util.removeItem('uploads/image/'+ notebook.media.image.name).then(function(result) {
+                    console.log('item removed', result);
+                })
+            }
+            if (notebook.media.audio && !postVm.currentNotebook.media.audio) {
+                util.removeItem('uploads/audio/'+ notebook.media.audio.name).then(function(result) {
+                    console.log('item removed', result);
+                });
+            }
+        }
+
         postVm.notebook = {};
-        console.log('postVm.currentNotebook', postVm.currentNotebook);
 
         $mdDialog.cancel(dialogObject);
     }
@@ -54,18 +62,23 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
             event: 'save',
             data: {}
         };
-        postSrvc.save[currentNotebook.postType](postVm.notebook).then(function(result) {
-            postVm.currentNotebook = {
-                media: {}
-            };
+
+        return notebookSrvc.save(postVm.notebook).then(function(result) {
             dialogObject.data = result;
             $mdDialog.hide(dialogObject);
         });
     }
 
     function update() {
-
-        console.log('update', postVm.notebook);
+        return notebookSrvc.update(postVm.notebook).then(function(result) {
+            dialogObject = {
+                dataChanged: true,
+                event: 'update',
+                data: {}
+            };
+            dialogObject.data = result.data;
+            $mdDialog.hide(dialogObject)
+        });
     }
 
     //Hack for issue where simplemde does not display content until editor is clicked; https://github.com/NextStepWebs/simplemde-markdown-editor/issues/344

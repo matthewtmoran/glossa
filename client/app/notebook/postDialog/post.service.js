@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
-function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
+function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
     var simplemdeTollbar = [
         {
             name: "italic",
@@ -81,8 +81,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         }
     };
     var service = {
-        postDialog: postDialog,
-        save: save
+        postOptions: postOptions,
+        save: save,
     };
     return service;
 
@@ -90,14 +90,13 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         console.log('test', e);
     }
 
-    function postDialog(ev, type, currentNotebook) {
+    function postOptions(ev, notebook) {
         var options = {
             simplemde: {},
             template: ''
         };
-        currentNotebook.postType = type;
 
-        switch(type) {
+        switch(notebook.postType) {
             case 'image':
                 options.template = 'app/notebook/postDialog/imagePost.html';
                 options.simplemde = {
@@ -134,7 +133,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
             case 'default':
                 console.log('error');
         }
-        return openPostDialog(ev, options, currentNotebook);
+        return options;
+        // return dialogSrvc.openPosttDialog(ev, options, notebook);
     }
 
     /**
@@ -146,29 +146,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
      * @param currentNotebook - the data object we are modifying
      * @returns {*} the modified data.
      */
-    function openPostDialog(ev, options, currentNotebook) {
-        return $mdDialog.show({
-            controller: postDetailsCtrl,
-            controllerAs: 'postVm',
-            templateUrl: options.template,
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: false,
-            bindToController: true,
-            locals: {
-                simplemdeOptions: options.simplemde,
-                currentNotebook: currentNotebook
-            }
-        }).then(function(data) {
 
-            console.log('Dialog is saved. data', data);
-
-            return data;
-        }).catch(function(data) {
-            console.log('Dialog is canceled', data);
-            return data;
-        });
-    }
 
     // function existingPostDialog(currentNotebook) {
     //     return $mdDialog.show({
@@ -214,6 +192,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                 };
                 deferred.resolve(r);
             });
+
         });
         return deferred.promise;
     }

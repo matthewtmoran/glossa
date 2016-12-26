@@ -33,7 +33,7 @@
 					ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
 					md-colspan="1">
 
-				<notebook-card notebook="notebook" flex layout-fill></notebook-card>
+				<notebook-card notebook="notebook" open-details="nbVm.openNBDialog($event, notebook)" flex layout-fill></notebook-card>
 
 			</md-grid-tile>
 		</md-grid-list>
@@ -54,7 +54,7 @@
 		</md-fab-trigger>
 
 		<md-fab-actions>
-			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.openNBDialog($event, item.type)">
+			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.newPost($event, item.type)">
 				<md-icon>{{item.icon}}</md-icon>
 			</md-button>
 		</md-fab-actions>

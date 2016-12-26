@@ -19,14 +19,12 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         { name: "Create Image Post", icon: "add_a_photo", direction: "left", type: 'image' },
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
-    nbVm.currentNotebook = {
-        media: {}
-    };
     nbVm.notebooks = [];
 
     nbVm.openNBDialog = openNBDialog;
-    nbVm.openExistinDialog = openExistinDialog;
+    // nbVm.openExistinDialog = openExistinDialog;
     nbVm.tagManageDialog = tagManageDialog;
+    nbVm.newPost = newPost;
 
     nbVm.commonTags = [];
 
@@ -35,7 +33,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
     activate();
-
     function activate() {
         queryNotebooks();
     }
@@ -96,16 +93,17 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
      * @param ev - the event
      * @param type - the type of post
      */
-    function openNBDialog(ev, type) {
-        postSrvc.postDialog(ev, type, nbVm.currentNotebook).then(function(result) {
-            nbVm.currentNotebook = {
-                media: {}
-            };
+    function openNBDialog(ev, notebook) {
+        var postOptions = postSrvc.postOptions(ev, notebook);
+
+        dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
             //if there was data changed
-            if (!result.dataChanged) {
+            if (result && !result.dataChanged) {
                 return;
             }
-            return nbVm.notebooks.push(result.data.data);
+            queryNotebooks();
+        }).catch(function(result) {
+            console.log('catch result', result);
         });
     }
 
@@ -117,10 +115,19 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
         })
     }
 
-    function openExistinDialog(notebook) {
-         postSrvc.existingPostDialog(notebook).then(function(res) {
-            console.log('existingPostDialog response:', res);
-        })
+    // function openExistinDialog(notebook) {
+    //     console.log('openExistinDialog');
+    //      postSrvc.existingPostDialog(notebook).then(function(res) {
+    //         console.log('existingPostDialog response:', res);
+    //     })
+    // }
+
+    function newPost(event, type) {
+        var notebook = {
+            media: {},
+            postType: type
+        };
+        openNBDialog(event, notebook)
     }
 
     function isOpenWatch(isOpen) {

@@ -1,0 +1,29 @@
+<div flex class="upload-selection">
+	<div layout="row" layout-align="center center">
+		<md-button class="md-icon-button" >
+			<md-icon>{{buttonicon}}</md-icon>
+		</md-button>
+	</div>
+	<input required="required" aria-label="Upload" type="file" class="ng-hide upload-input"  accept="{{filetypes}}">
+	<div flex class="md-padding media-container" ng-if="filePath && type === 'image'" >
+		<md-button class="md-icon-button remove-preview" ng-click="removePreview($event)" >
+			<md-icon>cancel</md-icon>
+		</md-button>
+		<img ng-src="{{'../' + filePath}}" alt="">
+	</div>
+	<div flex class="md-padding media-container" ng-if="filePath && type === 'audio'">
+		<md-button class="md-icon-button remove-preview" ng-click="removePreview($event)" >
+			<md-icon>cancel</md-icon>
+		</md-button>
+		<wave-preview
+			flex
+			url="{{'../' + filePath}}"
+			auto-play="false"
+			player-wave-color="white"
+			player-cursor-color="#FF5252"
+			player-height="100"
+			player-progress-color="black">
+		</wave-preview>
+	</div>
+</div>
+

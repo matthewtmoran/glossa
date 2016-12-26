@@ -14,12 +14,14 @@ var db = require('../db/database'),
 angular.module('glossa')
     .factory('notebookSrvc', notebookSrvc);
 
-function notebookSrvc(dbSrvc) {
+function notebookSrvc(dbSrvc, $q, simpleParse) {
 
     var service = {
         createNotebook: createNotebook,
         queryNotebooks: queryNotebooks,
-        findNotebook: findNotebook
+        findNotebook: findNotebook,
+        update: update,
+        save: save
     };
 
     return service;
@@ -123,5 +125,31 @@ function notebookSrvc(dbSrvc) {
             return result;
         })
     }
+
+    function save(notebook) {
+
+        notebook.createdBy = 'Moran';
+        notebook.createdAt = Date.now();
+        notebook.isAttached = false;
+        notebook.attachedToId = null;
+
+
+       return $q.when(simpleParse.parseNotebook(notebook)).then(function(result) {
+            console.log('simpleParse.parseNotebook result during save call', result);
+            return dbSrvc.insert(nbCollection, notebook).then(function(result) {
+                console.log('dbSrvc.insert result during save call', result);
+                return result;
+            });
+        });
+    }
+
+    function update(notebook) {
+        return dbSrvc.basicUpdate(nbCollection, notebook).then(function(result) {
+            return result;
+        }).catch(function(result) {
+            console.log('There was an error updating notebook', result);
+        });
+    }
+
 }
 

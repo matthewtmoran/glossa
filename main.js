@@ -1,9 +1,21 @@
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-var path = require('path');
+// const userData = app.getPath('userData');
+// const uploadPath = path.join(userData + '/uploads');
+var path = require('path'),
+    fs = require('fs');
 
 var mainWindow = null;
+
+
+
+// console.log('User Data', uData);
+// console.log('uploadPath', uploadPath);
+//
+// if (!fs.existsSync(uploadPath)){
+//     fs.mkdirSync(uploadPath);
+// }
 
 
 // Quit when all windows are closed.

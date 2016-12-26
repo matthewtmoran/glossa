@@ -3,12 +3,13 @@
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
 
-function notebookCard(postSrvc, $mdDialog,$sce) {
+function notebookCard($sce) {
 
     var directive = {
         restrict: 'E',
         scope: {
-            notebook: '='
+            notebook: '=',
+            openDetails: '&'
         },
         templateUrl: 'app/notebook/cards/normalcard.html',
         link: notebookCardLink
@@ -16,6 +17,7 @@ function notebookCard(postSrvc, $mdDialog,$sce) {
     return directive;
 
     function notebookCardLink(scope, element, attrs) {
+
 
         if (scope.notebook.description && scope.notebook.postType === 'normal') {
             scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
@@ -27,10 +29,10 @@ function notebookCard(postSrvc, $mdDialog,$sce) {
             scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.audio.caption));
         }
 
-        scope.notebookDialog = function(event, type, notebook) {
-            postSrvc.postDialog(event, type, notebook).then(function(res) {
-                console.log('the response is here', res);
-            });
+
+        scope.open = function(event, notebook) {
+            scope.openDetails(event, notebook);
         };
+
     }
 }
