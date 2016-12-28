@@ -344,12 +344,16 @@
 }
 
 .upload-selection {
+	max-height: 200px;
+	overflow: hidden;
+
 	.remove-preview {
 		color: white;
 		position: absolute;
 		top: 12px;
 		right: 12px;
 		z-index: 82;
+
 		md-icon{
 			color: $red;
 		}

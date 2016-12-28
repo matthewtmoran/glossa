@@ -1,5 +1,5 @@
 <md-dialog class="post-dialog" flex="50">
-	<form name="addPost" ng-cloak>
+	<form name="postForm" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
 				<h2>{{postVm.postDetails.title}}</h2>
@@ -40,7 +40,7 @@
 		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
 		<md-dialog-actions layout="row" >
 			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
-			<md-button ng-disabled="!addPost.$valid" ng-click="postVm.postDetails.button.action('Create Normal Post')">{{postVm.postDetails.button.text}}</md-button>
+			<md-button ng-disabled="!postForm.$valid" ng-click="postVm.postDetails.button.action('Create Normal Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 
 		<!--<pre>{{addPost | json}}</pre>-->

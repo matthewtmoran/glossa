@@ -23,10 +23,10 @@ function notebookCard($sce) {
             scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
         }
         if (scope.notebook.media.image && scope.notebook.postType === 'image') {
-            scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.image.caption));
+            scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.image.caption || ''));
         }
         if (scope.notebook.media.audio && scope.notebook.postType === 'audio') {
-            scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.audio.caption));
+            scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.media.audio.caption || ''));
         }
 
 

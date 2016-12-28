@@ -91,6 +91,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
     }
 
     function postOptions(ev, notebook) {
+        console.log('notebook', notebook);
         var options = {
             simplemde: {},
             template: ''
@@ -133,6 +134,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
             case 'default':
                 console.log('error');
         }
+        console.log('options', options);
         return options;
         // return dialogSrvc.openPosttDialog(ev, options, notebook);
     }

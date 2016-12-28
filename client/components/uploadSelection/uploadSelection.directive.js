@@ -61,6 +61,8 @@ function uploadSelection(fileSrvc, $q) {
             util.copyWrite2(file.path, writePath).then(function(result) {
                 scope.filePath = 'uploads/' + scope.type + '/' + file.name;
 
+                console.log('scope.parentbinding', scope.parentbinding);
+
                 scope.parentbinding = {
                     name: file.name,
                     path: scope.filePath,

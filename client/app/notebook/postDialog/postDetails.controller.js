@@ -5,17 +5,19 @@ var util = require('../client/components/node/file.utils');
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);
 
-function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, currentNotebook, $scope, $q, simpleSrvc, $timeout, dialogSrvc, notebookSrvc ) {
+function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     var postVm = this;
+
     var dialogObject = {
         dataChanged: false,
         event: 'hide',
         data: null
     };
     postVm.isNewPost = false;
-    postVm.actionItems = {
-
-    };
+    postVm.cancel = cancel;
+    postVm.hide = hide;
+    postVm.save = save;
+    postVm.editorOptions = simplemdeOptions;
 
     activate();
     function activate() {
@@ -24,15 +26,10 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
         setDynamicItems();
     }
 
-
-
-    postVm.cancel = cancel;
-    postVm.hide = hide;
-    postVm.save = save;
-    postVm.editorOptions = simplemdeOptions;
-
     function cancel(ev, notebook) {
-        if ($scope.addPost.$dirty) {
+        console.log('notebook', notebook);
+        if ($scope.postForm.$dirty) {
+            console.log('postForm is dirty');
 
             if (notebook.media.image && !postVm.currentNotebook.media.image) {
                 util.removeItem('uploads/image/'+ notebook.media.image.name).then(function(result) {
@@ -52,7 +49,6 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
     }
 
     function hide() {
-        console.log('hide');
         $mdDialog.hide(dialogObject);
     }
 
@@ -79,13 +75,6 @@ function postDetailsCtrl($mdDialog, hashtagSrvc, simplemdeOptions, postSrvc, cur
             dialogObject.data = result.data;
             $mdDialog.hide(dialogObject)
         });
-    }
-
-    //Hack for issue where simplemde does not display content until editor is clicked; https://github.com/NextStepWebs/simplemde-markdown-editor/issues/344
-    function refreshEditor() {
-        $timeout(function() {
-            simpleSrvc.refreshEditor();
-        }, 100);
     }
 
     function findDetailType() {

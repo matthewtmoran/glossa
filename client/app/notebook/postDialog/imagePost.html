@@ -1,5 +1,5 @@
 <md-dialog class="post-dialog" flex="50">
-	<form name="addPost" ng-cloak>
+	<form name="postForm" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
 				<h2>Create New Image Post</h2>
@@ -8,28 +8,28 @@
 		<md-dialog-content>
 			<div class="md-dialog-content">
 				<md-input-container layout="row" layout-align="start center">
-					<basic-upload parentbinding="newPostVm.currentNotebook.media.image"
+					<upload-selection flex="50"
+				                  parentbinding="postVm.notebook.media.image"
 					              buttonicon="camera_alt"
 					              button-id="uploadImage"
 					              type="image"
-					              filetypes=".jpg, .png, .svg"></basic-upload>
-					<span>{{newPostVm.currentNotebook.media.image.name}}</span>
+					              filetypes=".jpg, .png, .svg"></upload-selection>
 				</md-input-container>
 
 				<h3 class="md-padding">Image Caption</h3>
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="imageCaption"
 					          aria-label="text area"
-					          ng-model="newPostVm.currentNotebook.media.image.caption"
-					          simplemde="newPostVm.editorOptions"></textarea>
+					          ng-model="postVm.notebook.media.image.caption"
+					          simplemde="postVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
 
 		</md-dialog-content>
 
 		<md-dialog-actions layout="row" >
-			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
-			<md-button ng-disabled="!newPostVm.currentNotebook.media.image" ng-click="newPostVm.save('Create Image Post')">Add Post</md-button>
+			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
+			<md-button ng-disabled="!postVm.notebook.media.image" ng-click="postVm.postDetails.button.action('Create Image Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 	</form>
 
