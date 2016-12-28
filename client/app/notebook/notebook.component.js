@@ -16,13 +16,12 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     nbVm.hover = false;
     nbVm.items = [
         { name: "Create Audio Post", icon: "volume_up", direction: "left", type: 'audio' },
-        { name: "Create Image Post", icon: "add_a_photo", direction: "left", type: 'image' },
+        { name: "Create Image Post", icon: "camera_alt", direction: "left", type: 'image' },
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
     nbVm.notebooks = [];
 
     nbVm.openNBDialog = openNBDialog;
-    // nbVm.openExistinDialog = openExistinDialog;
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
 
@@ -114,13 +113,6 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
             }
         })
     }
-
-    // function openExistinDialog(notebook) {
-    //     console.log('openExistinDialog');
-    //      postSrvc.existingPostDialog(notebook).then(function(res) {
-    //         console.log('existingPostDialog response:', res);
-    //     })
-    // }
 
     function newPost(event, type) {
         var notebook = {
