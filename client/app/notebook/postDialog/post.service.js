@@ -134,7 +134,6 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
             case 'default':
                 console.log('error');
         }
-        console.log('options', options);
         return options;
         // return dialogSrvc.openPosttDialog(ev, options, notebook);
     }

@@ -27,9 +27,7 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     }
 
     function cancel(ev, notebook) {
-        console.log('notebook', notebook);
         if ($scope.postForm.$dirty) {
-            console.log('postForm is dirty');
 
             if (notebook.media.image && !postVm.currentNotebook.media.image) {
                 util.removeItem('uploads/image/'+ notebook.media.image.name).then(function(result) {

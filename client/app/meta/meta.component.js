@@ -41,7 +41,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
-    metaVm.openExistinDialog = openExistinDialog;
+    metaVm.openNBDialog = openNBDialog;
     metaVm.newAttachDialog = newAttachDialog;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
@@ -164,10 +164,18 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         });
     }
 
-    function openExistinDialog(notebook) {
-        postSrvc.existingPostDialog(notebook).then(function(res) {
-            console.log('the response is here', res);
-        })
+    function openNBDialog(ev, notebook) {
+        console.log('notebook', notebook);
+        var postOptions = postSrvc.postOptions(ev, notebook);
+
+        dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
+            if (result && !result.dataChanged) {
+                return;
+            }
+            queryAttachedNotebook();
+        }).catch(function(result) {
+            console.log('error', result);
+        });
     }
 
     function editAttachedFile(ev, attachment, type) {
