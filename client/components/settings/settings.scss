@@ -5,6 +5,16 @@ md-dialog.fullscreen-dialog {
 	height: 100%;
 	border-radius: 0;
 
+	input {
+		color: black !important;
+	}
+
+	.close-button {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+	}
+
 	.tag-container {
 		//max-height: 100%;
 	}
