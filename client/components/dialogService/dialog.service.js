@@ -27,11 +27,11 @@ function dialogSrvc($mdDialog) {
     function manageTags() {
         return $mdDialog.show({
             controller: manageTagsCtrl,
-            controllerAs: 'dialogVm',
+            controllerAs: 'tagVm',
             templateUrl: 'app/tagManagement/manageDialog.html',
             parent: angular.element(document.body),
             clickOutsideToClose: false,
-            bindToController: true,
+            // bindToController: true,
         }).then(function(data) {
             return data;
         }, function(data) {
