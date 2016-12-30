@@ -10,8 +10,7 @@ var db = require('../db/database'),
     MDRelPath = 'uploads/',
     util = require('../client/components/node/file.utils'),
     remote = require('electron').remote,
-    MDRootPath = remote.getGlobal('userPaths').static.markdown,
-    MDRelPath = remote.getGlobal('userPaths').relative.markdown;
+    globalPaths = remote.getGlobal('userPaths');
 
 
 angular.module('glossa')
@@ -115,7 +114,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
 
             // targetPath = uploadRoot + file.name + file.extension;
 
-            targetPath = path.join(MDRootPath, file.name + file.extension);
+            targetPath = path.join(globalPaths.static.markdown, file.name + file.extension);
 
             //if a file exists with the same name...
             if (util.doesExist(targetPath)) {
@@ -124,7 +123,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 //    if a file with the same name does not exists...
             } else {
                 //define the path
-                var newPath = path.join(MDRootPath, file.name + file.extension);
+                var newPath = path.join(globalPaths.static.markdown, file.name + file.extension);
                 //write the file to that path
                 //second argument will be the default text in the document
                 return createAndSaveFile(file, newPath);
@@ -191,14 +190,14 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 if (currentFile.media.hasOwnProperty(key) ) {
                     if (currentFile.media[key]) {
                         var attachment = currentFile.media[key];
-                        var writePath = path.join(MDRootPath, key, attachment.name);
+                        var writePath = path.join(globalPaths.static.markdown, key, attachment.name);
                         fs.unlink(writePath);
                     }
                 }
             }
         }
 
-        var parentFile = path.join(MDRootPath, currentFile.name + currentFile.extension);
+        var parentFile = path.join(globalPaths.static.markdown, currentFile.name + currentFile.extension);
 
         fs.unlink(parentFile);
 
@@ -278,7 +277,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         };
         if (data.field === 'name') {
 
-            data.newObj.path = path.join(MDRootPath, data.newObj.name + data.file.extension);
+            data.newObj.path = path.join(globalPaths.static.markdown, data.newObj.name + data.file.extension);
 
             console.log('data.newObj.path', data.newObj.path);
 
@@ -311,10 +310,12 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function renameFileToSystem(objToMod) {
         var deferred = $q.defer();
-        var oldPath = objToMod.path,
-            newPath = MDRelPath + objToMod.name + objToMod.extension;
+        var oldRelPath = objToMod.path,
+            newRelPath = path.join(globalPaths.relative.markdown, objToMod.name + objToMod.extension),
+            oldStaticPath = path.join(globalPaths.static.trueRoot, objToMod.path),
+            newStaticPath = path.join(globalPaths.static.markdown, objToMod.name + objToMod.extension);
 
-        fs.rename(oldPath, newPath, function(err) {
+        fs.rename(oldStaticPath, newStaticPath, function(err) {
             if (err) {
                 deferred.reject({
                     success: false,
@@ -322,7 +323,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                     error: err
                 });
             }
-            objToMod.path = newPath;
+            objToMod.path = newRelPath;
             deferred.resolve({
                 success: true,
                 msg: 'File renamed in filesystem success',
@@ -388,7 +389,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 //closure to make current key always accessible
                 (function(key){
                     //write to this path
-                    var writePath = path.join(MDRootPath, key, currentFile.media[key].name);
+                    var writePath = path.join(globalPaths.static.markdown, key, currentFile.media[key].name);
 
                     //call copy and write function; pass in file location, new location, notebook data, and callback
                     util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
@@ -473,7 +474,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     // function attachFile(file, type, currentFile) {
     //     console.log('attachFile');
     //     stagedUpdate.push(type);
-    //     var writePath = path.join(MDRootPath, type, file.name);
+    //     var writePath = path.join(globalPaths.static.markdown, type, file.name);
     //     var targetPath = MDRelPath + type + '/' + file.name;
     //
     //     //check if file with the same name exists in file system
@@ -533,7 +534,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     }
 
     function deleteMediaFile(attachment, type, currentFile) {
-        var writePath = path.join(MDRootPath, type, attachment.name);
+        var writePath = path.join(globalPaths.static.markdown, type, attachment.name);
 
         fs.unlink(writePath);
 

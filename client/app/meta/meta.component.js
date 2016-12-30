@@ -57,8 +57,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     //I believe this is the one we use...
     function newUpdate(field) {
 
-        console.log('field', field);
-
         $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
 
             metaVm.currentFile.hashtags = [];
@@ -85,6 +83,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
      * @param data - object = {fileId: String, field: String}
      */
     function updateData(data) {
+        console.log('metaComponent: updateData', data);
         var changeData = {
             fileId: data.fileId,
             options: {},
