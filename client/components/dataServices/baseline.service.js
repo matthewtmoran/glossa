@@ -2,7 +2,9 @@
 
 var fs = require('fs'),
     path = require('path'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    MDRootPath = remote.getGlobal('userPaths').static.markdown;
+    console.log('MDRootPath', MDRootPath);
 
 angular.module('glossa')
     .factory('baselineSrvc', baselineSrvc);
@@ -17,9 +19,8 @@ function baselineSrvc() {
     };
     return service;
 
-
     function readContent(file, cb) {
-       return fs.readFile(file.path, "utf8", function read(err, data) {
+       return fs.readFile(path.join(MDRootPath, file.name + file.extension), "utf8", function read(err, data) {
             if (err) {
                 return console.log('there was an error', err);
             }

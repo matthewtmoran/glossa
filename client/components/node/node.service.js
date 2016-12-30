@@ -10,12 +10,6 @@ angular.module('glossa')
 
 function nodeSrvc() {
 
-    var uploadPath = path.join(__dirname,'../uploads/');
-
-    if (!fs.existsSync(uploadPath)){
-        fs.mkdirSync(uploadPath);
-    }
-
     var fileArray = [];
     var editorInstance = {};
 
@@ -39,6 +33,7 @@ function nodeSrvc() {
      * @param files
      */
     function addFiles(files) {
+        console.log('nodeSrvc: addFiles');
         for (var key in files) {
             if (files.hasOwnProperty(key)) {
 
@@ -60,6 +55,7 @@ function nodeSrvc() {
      * @param file - a string of the file name
      */
     function buildFileObject(file) {
+        console.log('nodeSrvc:buildFileObject');
         var filePath = path.join(uploadPath, file);
         var tObj = {
             fileName: file,
@@ -72,7 +68,7 @@ function nodeSrvc() {
     }
 
     function defineCategory(fileExt) {
-
+        console.log('nodeSrvc:defineCategory');
         if (_.includes(acceptedAudio, fileExt)) {
             return 'audio';
         } else if (fileExt === 'txt') {
@@ -89,12 +85,13 @@ function nodeSrvc() {
      * TODO: I don't like having to define the file path here and also in the build function
      */
     function getFiles() {
-        fs.readdirSync(uploadPath).forEach(function(file) {
-            var filePath = path.join(uploadPath, file);
-            if (!fs.statSync(filePath).isDirectory()) {
-                buildFileObject(file);
-            }
-        });
+        console.log('nodeSrvc:getfiles');
+        // fs.readdirSync(uploadPath).forEach(function(file) {
+        //     var filePath = path.join(uploadPath, file);
+        //     if (!fs.statSync(filePath).isDirectory()) {
+        //         buildFileObject(file);
+        //     }
+        // });
         return fileArray;
     }
 
@@ -104,6 +101,7 @@ function nodeSrvc() {
      * @returns content of file as string
      */
     function getFileContent(srcpath) {
+        console.log('nodeSrvc:getFileContent');
         return fs.readFileSync(srcpath, {encoding: 'utf-8'});
     }
 

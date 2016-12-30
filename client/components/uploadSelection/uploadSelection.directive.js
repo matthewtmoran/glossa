@@ -1,6 +1,8 @@
 'use strict';
 var util = require('../client/components/node/file.utils'),
-    uploadPathStatic = path.join(__dirname,'../uploads/');
+    path = require('path'),
+    remote = require('electron').remote,
+    globalPaths = remote.getGlobal('userPaths');
 
 
 angular.module('glossa')
@@ -26,7 +28,9 @@ function uploadSelection(fileSrvc, $q) {
     function apsUploadFileLink(scope, element, attrs, form) {
 
         if (scope.parentbinding) {
-            scope.filePath = scope.parentbinding.path || 'uploads/' + scope.type + '/' + scope.parentbinding.name;
+            console.log('scope.parentbinding', scope.parentbinding);
+            console.log('globalPaths.static.root', globalPaths.static.root);
+            scope.filePath = path.join(globalPaths.static.trueRoot, scope.parentbinding.path);
         }
 
 
@@ -47,7 +51,8 @@ function uploadSelection(fileSrvc, $q) {
             if (!file) {
                 return;
             } else {
-                targetPath = 'uploads/' + scope.type + '/' + file.name;
+                targetPath = path.join(globalPaths.static.root, scope.type, file.name);
+                console.log('targetPath', targetPath);
                 if (util.doesExist(targetPath)) {
                     return alert('A file with this name already exists.  Choose another file');
                 }
@@ -56,19 +61,24 @@ function uploadSelection(fileSrvc, $q) {
             form.$dirty = true;
             form.$pristine = false;
 
-            var writePath = path.join(uploadPathStatic, scope.type, file.name);
+            var writePath = path.join(globalPaths.static.root, scope.type, file.name);
 
             util.copyWrite2(file.path, writePath).then(function(result) {
-                scope.filePath = 'uploads/' + scope.type + '/' + file.name;
+                console.log('globalPaths.static.root', globalPaths.static.root);
+                scope.filePath = path.join(globalPaths.static.root, scope.type, file.name);
+
+                console.log('scope.filePath', scope.filePath);
 
                 console.log('scope.parentbinding', scope.parentbinding);
 
                 scope.parentbinding = {
                     name: file.name,
-                    path: scope.filePath,
+                    path: path.join(globalPaths.relative.root, scope.type, file.name),
                     type: file.type,
                     extension: file.extension
                 };
+
+                console.log('scope.parentbinding', scope.parentbinding);
 
                 scope.$apply();
                 //create object for database

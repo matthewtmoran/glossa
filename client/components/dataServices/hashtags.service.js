@@ -3,7 +3,7 @@
 var db = require('../db/database'),
     _ = require('lodash'),
     hashtagsCol = db.hashtags,
-    fileCollection = db.uploadedFiles,
+    fileCollection = db.transMarkdown,
     nbCollection = db.notebooks,
     util = require('../client/components/node/file.utils');
 

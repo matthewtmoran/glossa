@@ -1,5 +1,9 @@
 'use strict';
 
+var path = require('path'),
+    remote = require('electron').remote,
+    globalPaths = remote.getGlobal('userPaths');
+
 angular.module('glossa')
     .controller('attachfileCtrl', attachfileCtrl);
 
@@ -17,7 +21,16 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
     ];
 
     notebookSrvc.queryNotebooks().then(function(docs) {
+
+        docs.data.forEach(function(nb) {
+            if (nb.media.image) {
+                nb.imagePath = path.join(globalPaths.static.trueRoot, nb.media.image.path);
+            }
+        });
+
         atVm.notebooks = docs.data;
+
+
     });
 
     atVm.cancel = cancel;

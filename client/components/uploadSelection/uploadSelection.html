@@ -9,7 +9,7 @@
 		<md-button class="md-icon-button remove-preview" ng-click="removePreview($event)" >
 			<md-icon>cancel</md-icon>
 		</md-button>
-		<img ng-src="{{'../' + filePath}}" alt="">
+		<img ng-src="{{filePath}}" alt="">
 	</div>
 	<div flex class="md-padding media-container" ng-if="filePath && type === 'audio'">
 		<md-button class="md-icon-button remove-preview" ng-click="removePreview($event)" >
@@ -17,7 +17,7 @@
 		</md-button>
 		<wave-preview
 			flex
-			url="{{'../' + filePath}}"
+			url="{{filePath}}"
 			auto-play="false"
 			player-wave-color="white"
 			player-cursor-color="#FF5252"

@@ -22,7 +22,7 @@ function dbSrvc($q, $timeout) {
             if (err) {
                 console.log('There was an error with the query: ' + query + 'with db: ' + db);
                 deferred.reject({
-                    success: true,
+                    success: false,
                     msg: 'Query not successful',
                     data: err
                 });

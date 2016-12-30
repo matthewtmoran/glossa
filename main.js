@@ -1,21 +1,43 @@
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
+const path = require('path');
+const fs = require('fs');
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-// const userData = app.getPath('userData');
-// const uploadPath = path.join(userData + '/uploads');
-var path = require('path'),
-    fs = require('fs');
-
+const globalPaths = require('./globalPaths');
+const userDataPath = (app).getPath('userData');
+const userDataRoot = path.join(userDataPath, '/data');
 var mainWindow = null;
 
 
+/* create object of paths
 
-// console.log('User Data', uData);
-// console.log('uploadPath', uploadPath);
-//
-// if (!fs.existsSync(uploadPath)){
-//     fs.mkdirSync(uploadPath);
-// }
+ var remote = require('electron').remote;
+ console.log('remote', remote);
+ console.log(remote.getGlobal('userPaths'));
+
+*/
+
+
+globalPaths.static = {
+    root: userDataRoot,
+    markdown: path.join(userDataRoot, '/markdown'),
+    image: path.join(userDataRoot, '/image'),
+    audio: path.join(userDataRoot, '/audio'),
+    database: path.join(userDataRoot, '/database')
+};
+
+
+//verify paths exist if not create it
+for (var key in globalPaths.static) {
+    if (globalPaths.static.hasOwnProperty(key)) {
+        if (!fs.existsSync(globalPaths.static[key])){
+            console.log('making directory');
+            fs.mkdirSync(globalPaths.static[key]);
+        }
+    }
+}
+globalPaths.static.trueRoot = userDataPath;
+global.userPaths = globalPaths;
 
 
 // Quit when all windows are closed.

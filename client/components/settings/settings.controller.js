@@ -17,7 +17,6 @@ function settingsCtrl($mdDialog, $scope) {
     activate();
     function activate() {
     //    init functions
-        console.log('this is the settings controller');
     }
 
     sVm.data = {

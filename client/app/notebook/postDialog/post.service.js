@@ -1,5 +1,8 @@
 'use strict';
 
+var remote = require('electron').remote,
+    globalPaths = remote.getGlobal('userPaths');
+
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 

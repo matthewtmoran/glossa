@@ -1,5 +1,9 @@
 'use strict';
 
+var remote = require('electron').remote,
+    path = require('path'),
+    globalPaths = remote.getGlobal('userPaths');
+
 angular.module('glossa')
     .component('metaComponent', {
         controller: metaCtrl,
@@ -52,6 +56,8 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
     //I believe this is the one we use...
     function newUpdate(field) {
+
+        console.log('field', field);
 
         $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
 
@@ -207,6 +213,12 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         if (metaVm.currentFile.mediaType === 'notebook') {
             notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
                 metaVm.attachedNotebook = result.data[0];
+                if (metaVm.attachedNotebook.media.image) {
+                    metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);
+                }
+                if (metaVm.attachedNotebook.media.audio) {
+                    metaVm.audioPath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.audio.path);
+                }
             })
         }
 

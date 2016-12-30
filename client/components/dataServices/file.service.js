@@ -5,24 +5,19 @@ var db = require('../db/database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
-    fileCollection = db.uploadedFiles,
+    fileCollection = db.transMarkdown,
     nbCollection = db.notebooks,
-    uploadPathStatic = path.join(__dirname,'../uploads/'),
-    uploadPathRelative = 'uploads/',
-    imagesDir = 'uploads/image/',
-    audioDir = 'uploads/image/',
-    util = require('../client/components/node/file.utils');
+    MDRelPath = 'uploads/',
+    util = require('../client/components/node/file.utils'),
+    remote = require('electron').remote,
+    MDRootPath = remote.getGlobal('userPaths').static.markdown,
+    MDRelPath = remote.getGlobal('userPaths').relative.markdown;
 
 
 angular.module('glossa')
     .factory('fileSrvc', fileSrvc);
 
 function fileSrvc(dbSrvc, $stateParams, $q) {
-
-    var file = {},
-        fileList = [],
-        stagedUpdate = [];
-
 
     var data = {
         searchText: '',
@@ -35,26 +30,37 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         queryAllFiles: queryAllFiles,
         createNewTextFile: createNewTextFile,
         updateFileData: updateFileData,
-        // attachFile: attachFile,
         saveIndependentAttachment: saveIndependentAttachment,
         saveNotebookAttachment: saveNotebookAttachment,
-        setCurrentFile: setCurrentFile,
-        getCurrentFile: getCurrentFile,
         isAttached: isAttached,
         getFileList: getFileList,
         deleteMediaFile: deleteMediaFile,
         updateAttached: updateAttached,
         deleteTextFile: deleteTextFile,
-        clearStaged: clearStaged,
-        getStagedUpdate: getStagedUpdate,
         attachNotebook: attachNotebook,
         unattachNotebook: unattachNotebook,
         newUpdate: newUpdate,
-        data: data
+        setCurrentFile: setCurrentFile,
+        getCurrentFile: getCurrentFile
     };
 
     return service;
     ///////////////
+
+    /**
+     * Set the current file
+     * @param file
+     */
+    function setCurrentFile(file) {
+        data.currentFile = file;
+    }
+    /**
+     * Return the current file
+     * @returns {*}
+     */
+    function getCurrentFile() {
+        return data.currentFile;
+    }
 
     /**
      * Queries db for all files
@@ -107,15 +113,18 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
             file.name = fileName + fileNumber_str;
             file.extension = '.md';
 
-            targetPath = uploadPathRelative + file.name + file.extension;
+            // targetPath = uploadRoot + file.name + file.extension;
+
+            targetPath = path.join(MDRootPath, file.name + file.extension);
+
             //if a file exists with the same name...
-            if (doesExist(targetPath)) {
+            if (util.doesExist(targetPath)) {
                 //increment the number
                 fileNumber++;
                 //    if a file with the same name does not exists...
             } else {
                 //define the path
-                var newPath = uploadPathStatic + file.name + file.extension;
+                var newPath = path.join(MDRootPath, file.name + file.extension);
                 //write the file to that path
                 //second argument will be the default text in the document
                 return createAndSaveFile(file, newPath);
@@ -126,11 +135,12 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      * Creates titled text file
      */
     function namedFile(searchInput) {
-        var file = {};
-        file.name = searchInput;
-        file.extension = ".md";
-        var fullFilePath = path.join(__dirname, file.name + file.extension);
-        return createAndSaveFile(file, fullFilePath);
+        console.log('TODO: fix this function');
+        // var file = {};
+        // file.name = searchInput;
+        // file.extension = ".md";
+        // var fullFilePath = path.join(__dirname, file.name + file.extension);
+        // return createAndSaveFile(file, fullFilePath);
     }
     /**
      * Writes text file to directory and saves the data in the database
@@ -144,8 +154,6 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         return dbSrvc.insert(fileCollection, buildFileObject(file))
             .then(function(doc) {
                 //when promise returns, push the document to the fileList
-                fileList.push(doc);
-
                 //when the promise resolves write the file to the file system
                 fs.createWriteStream(fullFilePath)
                     .on('close', function() {
@@ -183,14 +191,14 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 if (currentFile.media.hasOwnProperty(key) ) {
                     if (currentFile.media[key]) {
                         var attachment = currentFile.media[key];
-                        var writePath = path.join(uploadPathStatic, key, attachment.name);
+                        var writePath = path.join(MDRootPath, key, attachment.name);
                         fs.unlink(writePath);
                     }
                 }
             }
         }
 
-        var parentFile = path.join(uploadPathStatic, currentFile.name + currentFile.extension);
+        var parentFile = path.join(MDRootPath, currentFile.name + currentFile.extension);
 
         fs.unlink(parentFile);
 
@@ -231,63 +239,13 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
             media: {},
             corpus: $stateParams.corpus
         };
-        // fileDoc.mediaType = '';
 
-        fileDoc.path = uploadPathRelative + fileDoc.name + file.extension;
-        // fileDoc.path = uploadPath + fileDoc.fullName;
+        fileDoc.path = path.join(MDRelPath, file.name + file.extension);
 
         if (!file.type && fileDoc.extension === '.md')  {
             fileDoc.type = 'md';
         }
-        fileDoc.category = defineCategory(fileDoc.type);
         return fileDoc;
-    }
-    /**
-     * Defines The category for the file
-     * @param type
-     * @returns {*}
-     */
-    function defineCategory(type) {
-        if (type.indexOf('audio') > -1) {
-            return 'audio';
-        } else if (type.indexOf('text') > 0) {
-            return 'text';
-        } else if (type === '') {
-            return 'text';
-        }
-        else {
-            return 'other';
-        }
-    }
-    /**
-     * Check if file exists
-     * Returns true if the file exists and false if the file does not exist
-     * @param dir
-     * @returns {boolean}
-     *
-     * TODO: consider just querying the db for an existing file by the name(path)
-     */
-    function doesExist(dir) {
-        try {
-            fs.statSync(dir);
-            return true;
-        } catch (err) {
-            return !(err && err.code === 'ENOENT');
-        }
-    }
-    /**
-     * Set the current file
-     * @param file
-     */
-    function setCurrentFile(file) {
-        data.currentFile = file;
-    }
-    /**
-     * Return the current file
-     * @returns {*}
-     */
-    function getCurrentFile() {
-        return data.currentFile;
     }
     /**
      * Does the text file already have audio/image files attached?
@@ -300,13 +258,6 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         }
         return false;
     }
-    function clearStaged() {
-        stagedUpdate = [];
-    }
-    function getStagedUpdate() {
-        return stagedUpdate;
-    }
-
 
     ////////////////////////
     ////Update Meta Data////
@@ -321,15 +272,20 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      * @param data
      */
     function updateFileData(data) {
+        console.log('TODO: name change will not work');
         data.options = {
             returnUpdatedDocs: true
         };
         if (data.field === 'name') {
 
-            data.newObj.path = uploadPathRelative + data.newObj.name + data.file.extension;
+            data.newObj.path = path.join(MDRootPath, data.newObj.name + data.file.extension);
+
+            console.log('data.newObj.path', data.newObj.path);
 
             return dbSrvc.update(fileCollection, data).then(function(result) {
                 fileCollection.persistence.compactDatafile();
+
+                console.log('data.file.path', data.file.path);
 
                 renameFileToSystem(data.file.path, data.newObj.path, function() {
                     console.log('probably dont need thie cb anymore...');
@@ -356,7 +312,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     function renameFileToSystem(objToMod) {
         var deferred = $q.defer();
         var oldPath = objToMod.path,
-            newPath = uploadPathRelative + objToMod.name + objToMod.extension;
+            newPath = MDRelPath + objToMod.name + objToMod.extension;
 
         fs.rename(oldPath, newPath, function(err) {
             if (err) {
@@ -432,7 +388,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 //closure to make current key always accessible
                 (function(key){
                     //write to this path
-                    var writePath = path.join(uploadPathStatic, key, currentFile.media[key].name);
+                    var writePath = path.join(MDRootPath, key, currentFile.media[key].name);
 
                     //call copy and write function; pass in file location, new location, notebook data, and callback
                     util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
@@ -517,8 +473,8 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     // function attachFile(file, type, currentFile) {
     //     console.log('attachFile');
     //     stagedUpdate.push(type);
-    //     var writePath = path.join(uploadPathStatic, type, file.name);
-    //     var targetPath = uploadPathRelative + type + '/' + file.name;
+    //     var writePath = path.join(MDRootPath, type, file.name);
+    //     var targetPath = MDRelPath + type + '/' + file.name;
     //
     //     //check if file with the same name exists in file system
     //     if (doesExist(targetPath)) {
@@ -577,7 +533,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     }
 
     function deleteMediaFile(attachment, type, currentFile) {
-        var writePath = path.join(uploadPathStatic, type, attachment.name);
+        var writePath = path.join(MDRootPath, type, attachment.name);
 
         fs.unlink(writePath);
 

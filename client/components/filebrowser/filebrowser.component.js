@@ -65,8 +65,9 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
      * @param file
      */
     function updateFileSelection(file) {
-        fileSrvc.setCurrentFile(file);
-        fbVm.currentFile = fileSrvc.getCurrentFile();
+        // fileSrvc.setCurrentFile(file);
+        // fbVm.currentFile = fileSrvc.getCurrentFile();
+        fbVm.currentFile = file;
     }
 
     /**

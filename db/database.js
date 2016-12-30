@@ -1,10 +1,16 @@
 var Datastore = require('nedb'),
-    fs = require('fs');
+    fs = require('fs'),
+    path = require('path'),
+    remote = require('electron').remote;
 
-var uploadedFiles = new Datastore({filename: './db/data/files', autoload: true});
-var notebooks = new Datastore({filename: './db/data/notebooks', autoload: true});
-var hashtags = new Datastore({filename: './db/data/hashtags', autoload: true});
-var corporaMenu = new Datastore({filename: './db/data/corporaMenu', autoload: true});
+const databasePath = remote.getGlobal('userPaths').static.database;
+
+var transMarkdown = new Datastore({filename: databasePath + '/transMarkdown', autoload: true}),
+    notebooks = new Datastore({filename: databasePath + '/notebooks', autoload: true}),
+    hashtags = new Datastore({filename: databasePath + '/hashtags', autoload: true}),
+    corporaMenu = new Datastore({filename: databasePath + '/corporaMenu', autoload: true});
+
+
 
 // guitars.ensureIndex({fieldName: 'id', unique: true});
 
@@ -65,7 +71,7 @@ var corporaMenu = new Datastore({filename: './db/data/corporaMenu', autoload: tr
 
 module.exports = {
     notebooks: notebooks,
-    uploadedFiles: uploadedFiles,
+    transMarkdown: transMarkdown,
     hashtags: hashtags,
     corporaMenu: corporaMenu
 };
