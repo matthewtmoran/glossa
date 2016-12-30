@@ -97,6 +97,14 @@ gulp.task('watch', function() {
     gulp.watch(paths.client.styles, ['styles']);
 });
 
+gulp.task('build:data', function() {
+
+});
+
+gulp.task('populate:hashtags', function() {
+
+});
+
 
 
 gulp.task('serve', function (cb) {

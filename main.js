@@ -36,6 +36,7 @@ for (var key in globalPaths.static) {
         }
     }
 }
+
 globalPaths.static.trueRoot = userDataPath;
 global.userPaths = globalPaths;
 
