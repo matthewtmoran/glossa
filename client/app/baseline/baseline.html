@@ -1,5 +1,4 @@
 <div layout="column" flex>
-
 	<div layout="row">
 		<md-wavesurfer-player
 				ng-if="blVm.currentFile.media.audio.path.length"
@@ -7,11 +6,8 @@
 				url="{{blVm.audioPath}}"
 				auto-play="false"
 				back-img="{{blVm.imagePath}}">
-			<!--back-img="{{vm.selectedFile.image}}">-->
-				<!--layout="row"-->
 		</md-wavesurfer-player>
 	</div>
-
 	<div layout="row" flex >
 		<md-content  id="ace-wrapper" class="content-wrapper " layout="row" flex >
 			<div flex
@@ -20,20 +16,7 @@
 			     class="md-whiteframe-3dp"
 				 ng-change="blVm.update()"
 				 ng-model-options='{ debounce: 1000 }'>
-
 			</div>
-				<!--<p>content</p>-->
-			<!--<div flex layout="row" ui-ace ng-model="blVm.aceContent"></div>-->
-
 		</md-content>
-
 	</div>
 </div>
-
-
-
-<!--useWrapMode : true,-->
-<!--mode: 'xml',-->
-<!--firstLineNumber: 5,-->
-<!--showGutter: false,-->
-<!--theme:'twilight',-->

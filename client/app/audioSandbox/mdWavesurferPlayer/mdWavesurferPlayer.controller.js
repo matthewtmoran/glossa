@@ -7,13 +7,12 @@ angular.module('glossa')
     .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
     .directive('backImg', function(){
         return function(scope, element, attrs){
+            //element where background image should be attached to
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
             attrs.$observe('backImg', function(value) {
-                console.log('value', value);
 
-
+                //fix for windows paths... I'm not sure how this will effect mac/linux
                 var pathFix = value.replace(/\\/g, "\\\\");
-
 
                 if (value) {
                     waveEl.css({
