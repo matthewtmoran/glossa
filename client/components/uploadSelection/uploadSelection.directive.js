@@ -28,11 +28,8 @@ function uploadSelection(fileSrvc, $q) {
     function apsUploadFileLink(scope, element, attrs, form) {
 
         if (scope.parentbinding) {
-            console.log('scope.parentbinding', scope.parentbinding);
-            console.log('globalPaths.static.root', globalPaths.static.root);
             scope.filePath = path.join(globalPaths.static.trueRoot, scope.parentbinding.path);
         }
-
 
         var button = angular.element(element).find('.md-icon-button');
         var input = angular.element(element).find('.upload-input');
