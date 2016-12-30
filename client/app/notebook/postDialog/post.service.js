@@ -70,7 +70,13 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
     };
     return service;
 
-
+    /**
+     * Sets the simplemde options based on post types
+     * @param ev - target event
+     * @param notebook = the notebook that was selected
+     * @returns options for post type template and simplemde {{simplemde: {}, template: string}}
+     * TODO: should refractor these template to just use the same one?
+     */
     function postOptions(ev, notebook) {
         var options = {
             simplemde: {},

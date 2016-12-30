@@ -170,7 +170,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     }
 
     function openNBDialog(ev, notebook) {
-        console.log('notebook', notebook);
         var postOptions = postSrvc.postOptions(ev, notebook);
 
         dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
@@ -210,7 +209,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     function queryAttachedNotebook() {
 
         if (metaVm.currentFile.mediaType === 'notebook') {
-            notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
+            notebookSrvc.find(metaVm.currentFile.notebookId).then(function(result) {
                 metaVm.attachedNotebook = result.data[0];
                 if (metaVm.attachedNotebook.media.image) {
                     metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);

@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postSrvc, dialogSrvc, $sce) {
+function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
     var nbVm = this;
 
     nbVm.hidden = false;
@@ -42,7 +42,7 @@ function notebookCtrl(fileSrvc, notebookSrvc, $scope, $mdDialog, $timeout, postS
     function queryNotebooks() {
         hashtagsUsed = [];
         nbVm.commonTags = [];
-        notebookSrvc.queryNotebooks().then(function(result) {
+        notebookSrvc.query().then(function(result) {
 
             //iterates over all notebooks
             result.data.forEach(function(doc) {

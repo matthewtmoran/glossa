@@ -7,7 +7,6 @@ var db = require('../db/database'),
     _ = require('lodash'),
     fileCollection = db.transMarkdown,
     nbCollection = db.notebooks,
-    MDRelPath = 'uploads/',
     util = require('../client/components/node/file.utils'),
     remote = require('electron').remote,
     globalPaths = remote.getGlobal('userPaths');
@@ -239,7 +238,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
             corpus: $stateParams.corpus
         };
 
-        fileDoc.path = path.join(MDRelPath, file.name + file.extension);
+        fileDoc.path = path.join(globalPaths.relative.markdown, file.name + file.extension);
 
         if (!file.type && fileDoc.extension === '.md')  {
             fileDoc.type = 'md';
@@ -271,7 +270,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      * @param data
      */
     function updateFileData(data) {
-        console.log('TODO: name change will not work');
+        console.log('fileSrvc: updateFileData');
         data.options = {
             returnUpdatedDocs: true
         };
@@ -330,6 +329,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 data: objToMod
             });
         });
+
         return deferred.promise;
     }
 
@@ -461,78 +461,6 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     }
 
 
-    // /**
-    //  * Attaches a file to the current file by writing new file to system and saving file in db.
-    //  * @param file - the new file being we are working with.
-    //  * @param type -
-    //  * @returns {*}
-    //  *
-    //  * TODO: here we need some set of events.
-    //  * TODO: Are they allowed to attach the same file to different text files?
-    //  *
-    //  */
-    // function attachFile(file, type, currentFile) {
-    //     console.log('attachFile');
-    //     stagedUpdate.push(type);
-    //     var writePath = path.join(globalPaths.static.markdown, type, file.name);
-    //     var targetPath = MDRelPath + type + '/' + file.name;
-    //
-    //     //check if file with the same name exists in file system
-    //     if (doesExist(targetPath)) {
-    //         //TODO: use angular material alert/confirm
-    //         return alert('A file with this name already exists.');
-    //     }
-    //     return util.copyAndWrite(file.path, writePath, null, function(err, res) {
-    //         if (err) {
-    //             return console.log('There was an error', err);
-    //         }
-    //
-    //         currentFile.mediaType = 'independent';
-    //
-    //         return updateFileInDb(targetPath, type, file, currentFile).then(function(result) {
-    //             //TODO: Might be better just to update property
-    //             data.currentFile = result;
-    //             return result;
-    //         })
-    //     });
-    // }
-    /**
-     * Attach Audio File to the current file
-     * @param path - the path where the file exists in the app.
-     * @param type -
-     * @param file -
-     * @param currentFile - the current file that is selected
-     * Current file is passed in so i can set the tempData.newObj.media to the existing media otherwise, saving the media object, even though we are targeting a nested object, overwrites the media object completely.
-     */
-    function updateFileInDb(path, type, file, currentFile) {
-        var tempData = {
-            newObj: {}
-        };
-
-        if (!currentFile.media.type || currentFile.media.type !== 'independent') {
-            tempData.newObj.type = 'independent';
-        }
-
-        tempData.newObj.media = currentFile.media;
-
-        tempData.newObj.media[type] = {
-            name: file.name,
-            description: '',
-            path: path,
-            extension: file.extension
-        };
-
-        tempData.fileId = currentFile._id;
-        tempData.options = {
-            returnUpdatedDocs: true
-        };
-
-        return dbSrvc.update(fileCollection, tempData).then(function(result) {
-            fileCollection.persistence.compactDatafile();
-            return result;
-        });
-    }
-
     function deleteMediaFile(attachment, type, currentFile) {
         var writePath = path.join(globalPaths.static.markdown, type, attachment.name);
 
@@ -639,18 +567,15 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
              * Updates in the db if the filesystem write is successful
              * @returns a promise object {success: Boolean, msg: 'message to diplay to user', (data/error): data object or error message}
              */
-            renameFileToSystem(objectToUpdate).then(function(result) {
+           return renameFileToSystem(objectToUpdate).then(function(result) {
                 if (!result.success) {
                     return alert('There was an error modifying data: ' + result);
                 }
                return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
             })
+        } else {
+            return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
         }
-        return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
-    }
-
-    function extractHashtags() {
-
     }
 
 }

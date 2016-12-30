@@ -1,4 +1,7 @@
 'use strict';
+
+var path = require('path');
+
 // TODO: Need to separate the directive and controller
 angular.module('glossa')
     .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
@@ -6,10 +9,15 @@ angular.module('glossa')
         return function(scope, element, attrs){
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
             attrs.$observe('backImg', function(value) {
+                console.log('value', value);
+
+
+                var pathFix = value.replace(/\\/g, "\\\\");
+
 
                 if (value) {
                     waveEl.css({
-                        'background-image': 'url(../' + value +')',
+                        'background-image': 'url(' + pathFix + ')',
                         'background-size' : 'cover',
                         'background-position' : 'center center'
                     });

@@ -4,9 +4,9 @@
 		<md-wavesurfer-player
 				ng-if="blVm.currentFile.media.audio.path.length"
 				flex
-				url="{{'../' + blVm.currentFile.media.audio.path}}"
+				url="{{blVm.audioPath}}"
 				auto-play="false"
-				back-img="{{blVm.currentFile.media.image.path}}">
+				back-img="{{blVm.imagePath}}">
 			<!--back-img="{{vm.selectedFile.image}}">-->
 				<!--layout="row"-->
 		</md-wavesurfer-player>
