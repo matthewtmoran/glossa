@@ -69,10 +69,10 @@ function simpleParse(hashtagSrvc, $q) {
         //for each tag
         tags.forEach(function(tag) {
             //query db for tag
-            promises.push(hashtagSrvc.searchHastags(tag).then(function(result) {
+            promises.push(hashtagSrvc.termQuery(tag).then(function(result) {
                 //if the tag returns but is undefined it does not exist
                 if (!result.data.length) {
-                    return hashtagSrvc.createHashtag(tag);
+                    return hashtagSrvc.save(tag);
                 } else {
                     //otherwise, there is a result that is defined so just push it to the array
                     return $q.when(result.data[0]);

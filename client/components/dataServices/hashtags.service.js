@@ -1,11 +1,9 @@
 'use strict';
 //node modules
 var db = require('../db/database'),
-    _ = require('lodash'),
     hashtagsCol = db.hashtags,
     fileCollection = db.transMarkdown,
-    nbCollection = db.notebooks,
-    util = require('../client/components/node/file.utils');
+    nbCollection = db.notebooks;
 
 angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);
@@ -18,7 +16,8 @@ function hashtagSrvc(dbSrvc, $q) {
         update: update,
         save: save,
         normalizeHashtag: normalizeHashtag,
-        removeHashtag: removeHashtag
+        removeHashtag: removeHashtag,
+        countHashtags: countHashtags
     };
 
     return service;
@@ -28,7 +27,7 @@ function hashtagSrvc(dbSrvc, $q) {
      * Queries all hashtags
      */
     function query() {
-        return dbSrvc.termQuery(hashtagsCol, {}).then(function(docs) {
+        return dbSrvc.find(hashtagsCol, {}).then(function(docs) {
             return docs;
         })
     }
@@ -174,5 +173,54 @@ function hashtagSrvc(dbSrvc, $q) {
         }).catch(function(err) {
             console.log('Error removing tags', err);
         });
+    }
+
+    /**
+     * Counts hashtags across notebooks
+     */
+    function countHashtags() {
+        //store all occurring tags
+        var occurringTags = [];
+
+        //query all tags
+        dbSrvc.find(hashtagsCol, {}).then(function(result) {
+            result.data.forEach(function(tag) {
+                //store occurrence of tag
+                var totalOccurrence = 0;
+                //store count promise
+                var notebookPromise = dbSrvc.count(nbCollection, {'hashtags._id': tag._id}).then(function(result) {
+                    if (result.data > 0) {
+                        //add occurrence to total
+                        totalOccurrence += result.data;
+                    }
+                }).catch(function(result) {
+                    console.log('nb catch result', result);
+                });
+
+                // var tfilePormise = dbSrvc.count(fileCollection, {'hashtags._id': tag._id}).then(function(result) {
+                //     if (result.data > 0) {
+                //         totalOccurence += result.data;
+                //     }
+                // }).catch(function(result) {
+                //     console.log('tf catch result', result);
+                // });
+
+                //once the promise has resolved
+                $q.when(notebookPromise).then(function(result) {
+                    //if tag occurs and that occurrence is greater than 0;
+                    if (totalOccurrence && totalOccurrence > 0) {
+                        //add property to tag
+                        tag.occurence = totalOccurrence;
+                        //push tag to array
+                        occurringTags.push(tag);
+                    }
+                });
+            });
+
+        }).catch(function(result) {
+            console.log('Error finding hashtag occurrences ', result)
+        });
+        //return array of occurring tags
+        return occurringTags;
     }
 }

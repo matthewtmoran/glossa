@@ -11,7 +11,7 @@
 		<h3>Common Tags</h3>
 		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised">Tag Management</md-button>
 		<md-list>
-			<md-list-item class="chip-item" ng-repeat="tag in nbVm.commonTags">
+			<md-list-item class="chip-item" ng-repeat="tag in nbVm.occurringTags | orderBy: tag.occurence">
 				<md-chip class="chip-container">
 					<span>
 						<span class="chip-icon">#</span>

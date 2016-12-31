@@ -111,7 +111,7 @@ angular.module('simplemde', [])
 
                     //just a gets all the tags and return promise.
                     function getAllTags() {
-                        return hashtagSrvc.get().then(function (result) {
+                        return hashtagSrvc.query().then(function (result) {
                             return result
                         });
                     }

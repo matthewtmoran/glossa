@@ -9,6 +9,7 @@ function dbSrvc($q, $timeout) {
         insert: insert,
         update: update,
         remove: remove,
+        count: count,
         updateAll: updateAll,
         basicUpdate: basicUpdate
     };
@@ -110,7 +111,7 @@ function dbSrvc($q, $timeout) {
             if (err) {
                 console.log('There was an error deleting the file');
                 deferred.reject({
-                    success: true,
+                    success: false,
                     msg: 'Update not successful',
                     data: err
                 });
@@ -119,6 +120,26 @@ function dbSrvc($q, $timeout) {
                     success: true,
                     msg: 'Update successful',
                     data: docs
+                });
+            }
+        });
+        return deferred.promise;
+    }
+    function count(db, query) {
+        var deferred = $q.defer();
+        db.count(query, function(err, result) {
+            if (err) {
+                console.log('There was an error deleting the file');
+                deferred.reject({
+                    success: false,
+                    msg: 'Update not successful',
+                    data: err
+                });
+            } else {
+                deferred.resolve({
+                    success: true,
+                    msg: 'Update successful',
+                    data: result
                 });
             }
         });

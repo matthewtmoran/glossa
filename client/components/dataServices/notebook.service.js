@@ -12,7 +12,8 @@ function notebookSrvc(dbSrvc, $q, simpleParse) {
         query: query,
         find: find,
         update: update,
-        save: save
+        save: save,
+        findAny: findAny
     };
 
     return service;
@@ -33,12 +34,21 @@ function notebookSrvc(dbSrvc, $q, simpleParse) {
      * Finds specific notebook
      * @param nbId
      * @returns {*}
+     * TODO: refractor to take an query as argument
      */
     function find(nbId) {
         var query = {
             _id: nbId
         };
 
+        return dbSrvc.find(nbCollection, query).then(function(result) {
+            return result;
+        }).catch(function(err) {
+            console.log('there was en error finding notebook', err);
+        })
+    }
+
+    function findAny(query) {
         return dbSrvc.find(nbCollection, query).then(function(result) {
             return result;
         }).catch(function(err) {

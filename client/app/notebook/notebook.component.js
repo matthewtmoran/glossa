@@ -8,8 +8,9 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
+function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hashtagSrvc) {
     var nbVm = this;
+    var hashtagsUsed = [];
 
     nbVm.hidden = false;
     nbVm.isOpen = false;
@@ -20,20 +21,18 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
     nbVm.notebooks = [];
+    nbVm.commonTags = [];
 
     nbVm.openNBDialog = openNBDialog;
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
-
-    nbVm.commonTags = [];
-
-    var hashtagsUsed = [];
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
     activate();
     function activate() {
         queryNotebooks();
+        nbVm.occurringTags = hashtagSrvc.countHashtags();
     }
 
     /**
@@ -43,22 +42,6 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
         hashtagsUsed = [];
         nbVm.commonTags = [];
         notebookSrvc.query().then(function(result) {
-
-            //iterates over all notebooks
-            result.data.forEach(function(doc) {
-                if (doc.hashtags) {
-
-                    doc.hashtags.forEach(function(tag) {
-                        //pushes each hashtag to an array
-                        hashtagsUsed.push(tag);
-                    })
-                }
-            });
-
-            findCommon(hashtagsUsed).forEach(function(item) {
-                nbVm.commonTags.push(item.item);
-            });
-
             nbVm.notebooks = result.data;
         }).catch(function(err) {
             console.log('there was an error querying notebooks', err);
@@ -68,29 +51,6 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
     // TODO: move to service
     // TODO: refractor to store use data within tag document vs creating every time
     //find the common tags accross notebooks
-    function findCommon(arr) {
-        var uniqs = {};
-
-        for(var i = 0; i < arr.length; i++) {
-            uniqs[arr[i].tag] = (uniqs[arr[i].tag] || {});
-            uniqs[arr[i].tag]['item'] = arr[i];
-            uniqs[arr[i].tag]['occurance'] = (uniqs[arr[i].tag]['occurance'] || 0) + 1;
-        }
-
-        var props = Object.keys(uniqs).map(function(key) {
-            return { item: this[key].item, occurance: this[key].occurance };
-        }, uniqs);
-
-        props.sort(function(p1, p2) {
-            return p2.occurance - p1.occurance;
-        });
-
-        var topThree = props.slice(0, 5);
-
-        return topThree;
-    }
-
-
     /**
      * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebook to the array
      * @param ev - the event
@@ -121,7 +81,6 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc) {
             }
         })
     }
-
 
     function isOpenWatch(isOpen) {
         if (isOpen) {
