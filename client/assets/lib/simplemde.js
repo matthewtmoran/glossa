@@ -16248,12 +16248,10 @@
                     var widget = this, cm = completion.cm;
 
 
-
-
                     var hints = this.hints = document.createElement("ul");
                     hints.className = "CodeMirror-hints";
                     this.selectedHint = data.selectedHint || 0;
-
+                    //for glossa
                     var staticEl = document.createElement("span");
                     staticEl.className = "enter-space";
                     staticEl.innerHTML = 'Type space to create new tag...';
@@ -16262,7 +16260,7 @@
 
 
                     var completions = data.list;
-                    for (var i = 1; i < completions.length; ++i) {
+                    for (var i = 0; i < completions.length; ++i) {
                         var elt = hints.appendChild(document.createElement("li")), cur = completions[i];
                         var className = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
                         if (cur.className != null) className = cur.className + " " + className;
@@ -16470,7 +16468,8 @@
                     var regex = new RegExp('^' + curWord, 'i');
                     var result = {
                         list: (!curWord ? list : list.filter(function (item) {
-                                return item.text.toLowerCase().indexOf(curWord.toLowerCase()) > -1;
+                                item.description = item.tagDescription || '';
+                                return item.text.toLowerCase().indexOf(curWord.toLowerCase()) > -1 || item.description.toLowerCase().indexOf(curWord.toLowerCase()) > -1;
                                 // return item.match(regex);
                             })).sort(),
                         from: CodeMirror.Pos(cursor.line, start),
