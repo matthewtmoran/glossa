@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/tagManagement/manageTags.html'
     });
 
-function manageTagsCtrl(hashtagSrvc, $mdEditDialog) {
+function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope) {
     var tagVm = this;
     var changesMade = false;
 
@@ -27,10 +27,19 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog) {
     };
 
     tagVm.showData = 'alldata';
+    tagVm.infiniteItems = [];
 
-    hashtagSrvc.get().then(function(result) {
-        console.log('result', result);
-        tagVm.infiniteItems = result.data;
+    hashtagSrvc.query().then(function(result) {
+        result.data.forEach(function(tag, index) {
+            hashtagSrvc.findOccurrenceOfTag(tag).then(function(result) {
+                if (!result) {
+                    tag.occurrence = 0;
+                } else {
+                    tag.occurrence = result;
+                }
+                tagVm.infiniteItems.push(tag);
+            })
+        });
     });
 
 
@@ -52,6 +61,18 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog) {
         pageSelect: true
     };
     tagVm.selected = [];
+
+    tagVm.filterOptions = {
+        userTags: false,
+        systemTags: false,
+        usedTags: false,
+        unusedTags: false
+    };
+
+    $scope.$watch('tagVm.orederOptions', function() {
+        console.log('tagVm.orederOptions change');
+    })
+
 
     function showAll() {
         tagVm.showData = 'alldata';
@@ -107,7 +128,7 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog) {
     }
 
     function updateTag(item) {
-        hashtagSrvc.updateTag(item).then(function(result) {
+        hashtagSrvc.update(item).then(function(result) {
             hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
                 changesMade = true;
 

@@ -17,7 +17,8 @@ function hashtagSrvc(dbSrvc, $q) {
         save: save,
         normalizeHashtag: normalizeHashtag,
         removeHashtag: removeHashtag,
-        countHashtags: countHashtags
+        countHashtags: countHashtags,
+        findOccurrenceOfTag:findOccurrenceOfTag
     };
 
     return service;
@@ -184,37 +185,15 @@ function hashtagSrvc(dbSrvc, $q) {
 
         //query all tags
         dbSrvc.find(hashtagsCol, {}).then(function(result) {
+
             result.data.forEach(function(tag) {
-                //store occurrence of tag
-                var totalOccurrence = 0;
-                //store count promise
-                var notebookPromise = dbSrvc.count(nbCollection, {'hashtags._id': tag._id}).then(function(result) {
-                    if (result.data > 0) {
-                        //add occurrence to total
-                        totalOccurrence += result.data;
-                    }
-                }).catch(function(result) {
-                    console.log('nb catch result', result);
-                });
 
-                // var tfilePormise = dbSrvc.count(fileCollection, {'hashtags._id': tag._id}).then(function(result) {
-                //     if (result.data > 0) {
-                //         totalOccurence += result.data;
-                //     }
-                // }).catch(function(result) {
-                //     console.log('tf catch result', result);
-                // });
-
-                //once the promise has resolved
-                $q.when(notebookPromise).then(function(result) {
-                    //if tag occurs and that occurrence is greater than 0;
-                    if (totalOccurrence && totalOccurrence > 0) {
-                        //add property to tag
-                        tag.occurence = totalOccurrence;
-                        //push tag to array
-                        occurringTags.push(tag);
-                    }
-                });
+               findOccurrenceOfTag(tag).then(function(result) {
+                   if (result) {
+                       tag.occurrence = result;
+                       occurringTags.push(tag);
+                   }
+               });
             });
 
         }).catch(function(result) {
@@ -223,4 +202,45 @@ function hashtagSrvc(dbSrvc, $q) {
         //return array of occurring tags
         return occurringTags;
     }
+
+    function findOccurrenceOfTag(tag) {
+        //store occurrence of tag
+        var totalOccurrence = 0;
+
+        //store count promise
+        var notebookPromise = dbSrvc.count(nbCollection, {'hashtags._id': tag._id}).then(function(result) {
+            if (result.data > 0) {
+                //add occurrence to total
+                totalOccurrence += result.data;
+            }
+        }).catch(function(result) {
+            console.log('nb catch result', result);
+        });
+
+        var tfilePormise = dbSrvc.count(fileCollection, {'hashtags._id': tag._id}).then(function(result) {
+            if (result.data > 0) {
+                totalOccurrence += result.data;
+            }
+        }).catch(function(result) {
+            console.log('tf catch result', result);
+        });
+
+        //once the promise has resolved
+        return $q.all([notebookPromise, tfilePormise]).then(function(result) {
+            //if tag occurs and that occurrence is greater than 0;
+            if (totalOccurrence && totalOccurrence > 0) {
+                //add property to tag
+                // tag.occurence = totalOccurrence;
+                //push tag to array
+                // return tag;
+                return totalOccurrence;
+                // occurringTags.push(tag);
+            }
+        });
+    }
+
+
 }
+
+
+
