@@ -15,34 +15,25 @@
 					          required
 					          ></textarea>
 				</md-input-container>
-
-
 				<div layout="row">
 					<upload-selection flex="50" parentbinding="postVm.notebook.media.image"
 					              buttonicon="camera_alt" button-id="uploadImage"
 					              type="image"
 					              filetypes=".jpg, .png, .svg"></upload-selection>
-					<!--<a>-->
-						<!--{{postVm.notebook.media.image.name}}-->
-						<!--<md-button>-->
-							<!--<md-icon>remove</md-icon>-->
-						<!--</md-button>-->
-					<!--</a>-->
-					<!--<span>{{postVm.notebook.media.audio.name}}</span>-->
 					<upload-selection flex="50" parentbinding="postVm.notebook.media.audio"
 					              buttonicon="volume_up" button-id="uploadAudio"
 					              type="audio"
 					              filetypes=".mp3, .m4a"></upload-selection>
 				</div>
 			</div>
+			<md-divider></md-divider>
 		</md-dialog-content>
 
-		<!--<md-button ng-click="nbVm.createNotebook(addNotebook)">Submit</md-button>-->
+
 		<md-dialog-actions layout="row" >
 			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
 			<md-button ng-disabled="!postForm.$valid" ng-click="postVm.postDetails.button.action('Create Normal Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 
-		<!--<pre>{{addPost | json}}</pre>-->
 	</form>
 </md-dialog>
