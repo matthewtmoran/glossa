@@ -1,6 +1,6 @@
 # Glossa
 
-Glossa is a culture and language documentation notebook for doing linguistic analysis and cultural research. It is intended to be aproachable for a non-technical user.
+[Glossa](http://glossa.io/) is a culture and language documentation notebook for doing linguistic analysis and cultural research. It is intended to be aproachable for a non-technical user.
 
 ## Table of Contents
 
