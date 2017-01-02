@@ -4,7 +4,6 @@ var fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     MDRootPath = remote.getGlobal('userPaths').static.markdown;
-    console.log('MDRootPath', MDRootPath);
 
 angular.module('glossa')
     .factory('baselineSrvc', baselineSrvc);
