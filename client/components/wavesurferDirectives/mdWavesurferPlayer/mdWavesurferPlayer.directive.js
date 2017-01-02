@@ -6,7 +6,7 @@ function mdWavesurferPlayer() {
 
     return {
         restrict: 'E',
-        templateUrl: 'app/audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer.html',
+        templateUrl: 'components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer.html',
         scope: {
             src: '@url',
             title: '@',

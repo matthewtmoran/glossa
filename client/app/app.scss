@@ -116,7 +116,6 @@ md-backdrop.md-sidenav-backdrop {
 }
 
 /* inject:scss */
-@import 'audioSandbox/mdWavesurferPlayer/mdWavesurferPlayer';
 @import 'baseline/baseline';
 @import 'corpus/corpus';
 @import 'main/main';
@@ -131,6 +130,7 @@ md-backdrop.md-sidenav-backdrop {
 @import '../components/navbar/navbar';
 @import '../components/settings/settings';
 @import '../components/wavesurferDirectives/mdWavesurferPlayer';
+@import '../components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer';
 @import '../components/wavesurferDirectives/wavePreview/wavePreview';
 /* endinject */
 

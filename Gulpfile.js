@@ -30,6 +30,7 @@ var paths = {
             "./client/db/**/*.js",
             "!./client/**/*.utils.js",
             "!./client/**/database.js",
+            "!./client/assets/**/*.min.js",
         ]
     }
 };
