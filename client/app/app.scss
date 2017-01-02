@@ -147,12 +147,17 @@ md-dialog {
 	//top: 0;
 
 
-	.enter-space {
+	&:before {
+		content: 'Type space to create new tag...';
+		height: 30px;
 		font-family: Roboto, "Ti", sans-serif !important;
-		font-size:1.1em;
+		font-size: 1.1em;
 		line-height: 2em;
 		display: block;
 		font-style: italic;
+	}
+
+	.enter-space {
 		margin-bottom: 10px;
 	}
 

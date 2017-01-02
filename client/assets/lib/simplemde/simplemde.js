@@ -16248,15 +16248,18 @@
                     var widget = this, cm = completion.cm;
 
 
+                    var hintContainer = document.createElement('div');
+                    hintContainer.className = 'CodeMirror-hints-container';
+
                     var hints = this.hints = document.createElement("ul");
                     hints.className = "CodeMirror-hints";
                     this.selectedHint = data.selectedHint || 0;
                     //for glossa
-                    var staticEl = document.createElement("span");
-                    staticEl.className = "enter-space";
-                    staticEl.innerHTML = 'Type space to create new tag...';
+                    // var staticEl = document.createElement("span");
+                    // staticEl.className = "enter-space";
+                    // staticEl.innerHTML = 'Type space to create new tag...';
 
-                    hints.insertBefore(staticEl, hints.firstChild);
+                    // hints.insertBefore(staticEl, hints.firstChild);
 
 
                     var completions = data.list;

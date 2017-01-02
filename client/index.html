@@ -23,8 +23,8 @@
 	<div ui-view flex layout="column"></div>
 
 
-<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
-<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+	<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
 	<!-- bower:js -->
 	<script src="bower_components/jquery/dist/jquery.js"></script>
@@ -63,10 +63,10 @@
 	<script src="components/settings/settings.service.js"></script>
 	<script src="components/settings/settings.controller.js"></script>
 	<script src="components/node/node.service.js"></script>
-	<script src="components/navbar/navbar.component.js"></script>
 	<script src="components/filters/nospace.js"></script>
 	<script src="components/filters/humanize.js"></script>
 	<script src="components/filebrowser/filebrowser.component.js"></script>
+	<script src="components/navbar/navbar.component.js"></script>
 	<script src="components/drawer/drawer.service.js"></script>
 	<script src="components/drawer/drawer.directive.js"></script>
 	<script src="components/drawer/drawer.controller.js"></script>
@@ -80,29 +80,29 @@
 	<script src="assets/lib/simplemde-angular.js"></script>
 	<script src="assets/lib/codemirror.js"></script>
 	<script src="assets/lib/simplemde/codemirror/tablist.js"></script>
+	<script src="app/meta/modal/attachfile.controller.js"></script>
 	<script src="app/notebook/postDialog/postDetails.controller.js"></script>
 	<script src="app/notebook/postDialog/post.service.js"></script>
 	<script src="app/notebook/cards/notebookcard.directive.js"></script>
-	<script src="app/meta/modal/attachfile.controller.js"></script>
 	<script src="app/audioSandbox/mdWavesurferAudio/mdWavesurferAudio.directive.js"></script>
 	<script src="app/audioSandbox/mdWavesurferAudio/mdWavesurferAudio.controller.js"></script>
 	<script src="app/tagManagement/manageTags.js"></script>
 	<script src="app/tagManagement/manageTags.filter.js"></script>
 	<script src="app/tagManagement/manageTags.component.js"></script>
 	<script src="app/tagManagement/manageDialog.controller.js"></script>
-	<script src="app/notebook/notebook.js"></script>
-	<script src="app/notebook/notebook.component.js"></script>
 	<script src="app/meta/meta.js"></script>
 	<script src="app/meta/meta.component.js"></script>
+	<script src="app/notebook/notebook.js"></script>
+	<script src="app/notebook/notebook.component.js"></script>
 	<script src="app/mentions/mentions.js"></script>
 	<script src="app/mentions/mentions.controller.js"></script>
 	<script src="app/main/main.js"></script>
 	<script src="app/main/main.component.js"></script>
+	<script src="app/corpus/corpus.js"></script>
+	<script src="app/corpus/corpus.component.js"></script>
 	<script src="app/baseline/baseline.js"></script>
 	<script src="app/baseline/baseline.controller.js"></script>
 	<script src="app/baseline/baseline.component.js"></script>
-	<script src="app/corpus/corpus.js"></script>
-	<script src="app/corpus/corpus.component.js"></script>
 	<script src="app/audioSandbox/wavesurfer.directive.js"></script>
 	<script src="app/audioSandbox/waveform.controller.js"></script>
 	<!-- endinject -->
