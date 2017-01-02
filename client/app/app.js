@@ -4,7 +4,6 @@ angular.module('glossa', [
     'ngAnimate',
     'ngMaterial',
     'ui.router',
-    'ui.ace',
     'simplemde',
     'ngSanitize',
     'md.data.table'

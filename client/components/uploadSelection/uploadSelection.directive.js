@@ -31,7 +31,7 @@ function uploadSelection(fileSrvc, $q) {
             scope.filePath = path.join(globalPaths.static.trueRoot, scope.parentbinding.path);
         }
 
-        var button = angular.element(element).find('.md-icon-button');
+        var button = angular.element(element).find('.upload-button');
         var input = angular.element(element).find('.upload-input');
         scope.removePreview = removePreview;
 
@@ -49,7 +49,6 @@ function uploadSelection(fileSrvc, $q) {
                 return;
             } else {
                 targetPath = path.join(globalPaths.static.root, scope.type, file.name);
-                console.log('targetPath', targetPath);
                 if (util.doesExist(targetPath)) {
                     return alert('A file with this name already exists.  Choose another file');
                 }
@@ -61,12 +60,8 @@ function uploadSelection(fileSrvc, $q) {
             var writePath = path.join(globalPaths.static.root, scope.type, file.name);
 
             util.copyWrite2(file.path, writePath).then(function(result) {
-                console.log('globalPaths.static.root', globalPaths.static.root);
                 scope.filePath = path.join(globalPaths.static.root, scope.type, file.name);
 
-                console.log('scope.filePath', scope.filePath);
-
-                console.log('scope.parentbinding', scope.parentbinding);
 
                 scope.parentbinding = {
                     name: file.name,
@@ -74,8 +69,6 @@ function uploadSelection(fileSrvc, $q) {
                     type: file.type,
                     extension: file.extension
                 };
-
-                console.log('scope.parentbinding', scope.parentbinding);
 
                 scope.$apply();
                 //create object for database
