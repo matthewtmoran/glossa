@@ -5,13 +5,13 @@ angular.module('glossa')
 
         return function( items, filterOptions) {
             var filtered = [];
-            var anyChecked = false;
-            for (var key in filterOptions) {
-                if (filterOptions.hasOwnProperty(key)) {
-                    anyChecked = anyChecked || filterOptions[key];
-                }
-            }
-            if (!anyChecked) return items;
+            // var anyChecked = false;
+            // for (var key in filterOptions) {
+            //     if (filterOptions.hasOwnProperty(key)) {
+            //         anyChecked = anyChecked || filterOptions[key];
+            //     }
+            // }
+            // if (!anyChecked) return items;
 
             angular.forEach(items, function (tag) {
 

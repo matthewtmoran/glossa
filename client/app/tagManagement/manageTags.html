@@ -41,7 +41,7 @@
 			    md-select-id="name"
 			    md-auto-select
 			    ng-diabled="!item.canEdit"
-			    ng-repeat="item in tagVm.infiniteItems | filter: {'tag': tagVm.searchText} | tagFilter: tagVm.filterOptions">
+			    ng-repeat="item in tagVm.infiniteItems | filter: tagVm.searchText | tagFilter: tagVm.filterOptions">
 				<td md-cell
 				    ng-click="!item.canEdit || tagVm.editField($event, item, item.tag, 'tag');"
 				    ng-class="{'md-placeholder': !item.tag, 'disabled-cell': !item.canEdit}">{{item.tag || 'Add tag'}}
