@@ -12,9 +12,20 @@ function simpleParse(hashtagSrvc, $q) {
 
 
     function parseNotebook(notebook) {
-        notebook.name = parseTitle(notebook.description);
+        var textArea;
 
-       return $q.when(findHashtags(notebook.description)).then(function(re) {
+        if (notebook.postType === 'normal') {
+            textArea = notebook.description;
+            notebook.name = parseTitle(notebook.description);
+        } else if (notebook.postType === 'image') {
+            textArea = notebook.media.image.caption || '';
+            notebook.name = notebook.media.image.name;
+        } else if (notebook.postType === 'audio') {
+            textArea = notebook.media.audio.caption || '';
+            notebook.name = notebook.media.audio.name;
+        }
+
+        return $q.when(findHashtags(textArea)).then(function(re) {
 
             notebook.hashtags = [];
 
@@ -58,10 +69,10 @@ function simpleParse(hashtagSrvc, $q) {
         //for each tag
         tags.forEach(function(tag) {
             //query db for tag
-            promises.push(hashtagSrvc.searchHastags(tag).then(function(result) {
+            promises.push(hashtagSrvc.termQuery(tag).then(function(result) {
                 //if the tag returns but is undefined it does not exist
                 if (!result.data.length) {
-                    return hashtagSrvc.createHashtag(tag);
+                    return hashtagSrvc.save(tag);
                 } else {
                     //otherwise, there is a result that is defined so just push it to the array
                     return $q.when(result.data[0]);

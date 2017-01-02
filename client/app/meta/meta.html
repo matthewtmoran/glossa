@@ -3,7 +3,6 @@
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>File Name</label>
 			<input ng-blur="metaVm.newUpdate('name')"
-			       ng-model-options='{ debounce: 1000 }'
 			       ng-model="metaVm.currentFile.name"
 			       value="metaVm.currentFile.name">
 		</md-input-container>
@@ -43,15 +42,15 @@
 					</md-card-title>
 
 					<div ng-if="type === 'image'" class="media-image">
-						<img ng-src="{{'../' + metaVm.currentFile.media.image.path}}" alt="">
+						<img ng-src="{{metaVm.imagePath}}" alt="">
 					</div>
 
 					<div ng-if="type === 'audio'">
 						<wave-preview
 								flex
-								url="{{'../' + metaVm.currentFile.media.audio.path}}"
+								url="{{metaVm.audioPath}}"
 								auto-play="false"
-								back-img="{{metaVm.currentFile.media.image.path}}"
+								back-img="{{metaVm.imagePath}}"
 								player-wave-color="white"
 								player-height="150"
 								player-progress-color="black">
@@ -75,7 +74,7 @@
 
 				<md-card-content class="media-content">
 					<div ng-if="metaVm.attachedNotebook.media.image" class="media-image">
-						<img ng-src="{{'../' + metaVm.attachedNotebook.media.image.path}}" alt="">
+						<img ng-src="{{metaVm.imagePath}}" alt="">
 					</div>
 					<div class="media-description">
 						<span class="md-headline">{{metaVm.attachedNotebook.name}}</span>
@@ -88,7 +87,7 @@
 				<md-card-actions layout="row" layout-align="start center">
 					<md-button ng-click="metaVm.disconnectDialog($event, metaVm.attachedNotebook)">Disconnect</md-button>
 					<span flex></span>
-					<md-button ng-click="metaVm.openExistinDialog(metaVm.attachedNotebook)" class="md-icon-button">
+					<md-button ng-click="metaVm.openNBDialog($event, metaVm.attachedNotebook)" class="md-icon-button">
 						<md-icon>open_in_new</md-icon>
 					</md-button>
 				</md-card-actions>

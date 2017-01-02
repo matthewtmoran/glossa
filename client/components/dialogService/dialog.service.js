@@ -9,7 +9,10 @@ function dialogSrvc($mdDialog) {
         manageTags: manageTags,
         attachToNotebook: attachToNotebook,
         cancel: cancel,
-        settingsFull: settingsFull
+        settingsFull: settingsFull,
+        corpusDialog: corpusDialog,
+        confirmDialog: confirmDialog,
+        openPostDialog: openPostDialog
     };
     return service;
 
@@ -24,11 +27,11 @@ function dialogSrvc($mdDialog) {
     function manageTags() {
         return $mdDialog.show({
             controller: manageTagsCtrl,
-            controllerAs: 'dialogVm',
+            controllerAs: 'tagVm',
             templateUrl: 'app/tagManagement/manageDialog.html',
             parent: angular.element(document.body),
             clickOutsideToClose: false,
-            bindToController: true,
+            // bindToController: true,
         }).then(function(data) {
             return data;
         }, function(data) {
@@ -53,6 +56,7 @@ function dialogSrvc($mdDialog) {
             return data;
         });
     }
+
     function settingsFull() {
 
         return $mdDialog.show({
@@ -70,6 +74,69 @@ function dialogSrvc($mdDialog) {
             console.log('close on cancel or hide?', data);
         });
 
+    }
+
+    function corpusDialog() {
+        $mdDialog.show({
+            templateUrl: 'components/drawer/dialogs/corpusDialog.html',
+            parent: angular.element(document.body),
+            // targetEvent: ev,
+            controller: corpusDialogCtrl,
+            controllerAs: 'dialogVm',
+            bindToController: true,
+            clickOutsideToClose: false,
+        }).then(function(data) {
+
+            console.log('corpusDialog is closed. data', data);
+
+            return data;
+        }).catch(function(data) {
+            console.log('corpusDialog is closed. data', data);
+            return data;
+        });
+    }
+
+    function confirmDialog(options) {
+
+        var confirm = $mdDialog.confirm()
+            .title(options.title || 'Are you sure you want to do this?' )
+            .textContent(options.textContent || 'This will change things....')
+            .ariaLabel('Confirm Dialog')
+            .ok(options.okBtn || 'Yes')
+            .cancel(options.cancelBtn || 'Cancel');
+
+        return $mdDialog.show(confirm).then(function(data) {
+            console.log('Yes selection', data);
+            return data;
+        }).catch(function(data) {
+            console.log('Cancel selection', data);
+            return data;
+        });
+
+    }
+
+    function openPostDialog(ev, options, currentNotebook) {
+        return $mdDialog.show({
+            controller: postDetailsCtrl,
+            controllerAs: 'postVm',
+            templateUrl: options.template,
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: false,
+            bindToController: true,
+            locals: {
+                simplemdeOptions: options.simplemde,
+                currentNotebook: currentNotebook
+            }
+        }).then(function(data) {
+
+            console.log('Dialog is saved. data', data);
+
+            return data;
+        }).catch(function(data) {
+            console.log('Dialog is canceled', data);
+            return data;
+        });
     }
 
 }

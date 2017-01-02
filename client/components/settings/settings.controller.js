@@ -4,7 +4,7 @@ angular.module('glossa')
     .controller('settingsCtrl', settingsCtrl);
 
 
-function settingsCtrl($mdDialog) {
+function settingsCtrl($mdDialog, $scope) {
     var sVm = this;
     var returnObj;
 
@@ -17,8 +17,14 @@ function settingsCtrl($mdDialog) {
     activate();
     function activate() {
     //    init functions
-        console.log('this is the settings controller');
     }
+
+    sVm.data = {
+        selectedIndex: 0,
+        secondLocked:  false,
+        secondLabel:   "Item Two",
+        bottom:        false
+    };
 
 
     function cancel() {

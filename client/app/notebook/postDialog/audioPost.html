@@ -1,5 +1,5 @@
 <md-dialog class="post-dialog" flex="50">
-	<form name="addPost" ng-cloak>
+	<form name="postForm" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
 				<h2>Create New Audio Post</h2>
@@ -8,28 +8,29 @@
 		<md-dialog-content>
 			<div class="md-dialog-content">
 				<md-input-container layout="row" layout-align="start center">
-					<basic-upload parentbinding="newPostVm.currentNotebook.media.audio"
+					<upload-selection flex="50"
+				                  parentbinding="postVm.notebook.media.audio"
 					              buttonicon="volume_up"
 					              button-id="uploadAudio"
 					              type="audio"
-					              filetypes=".mp3, .m4a"></basic-upload>
-					<span>{{newPostVm.currentNotebook.media.audio.name}}</span>
+					              filetypes=".mp3, .m4a"></upload-selection>
 				</md-input-container>
 
 				<h3 class="md-padding">Audio Caption</h3>
+
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="audioCaption"
 					          aria-label="text area"
-					          ng-model="newPostVm.currentNotebook.caption"
-					          simplemde="newPostVm.editorOptions"></textarea>
+					          ng-model="postVm.notebook.media.audio.caption"
+					          simplemde="postVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
-
+			<md-divider></md-divider>
 		</md-dialog-content>
 
 		<md-dialog-actions layout="row" >
-			<md-button ng-click="newPostVm.cancel('cancel')">Cancel</md-button>
-			<md-button ng-disabled="!newPostVm.currentNotebook.media.audio" ng-click="newPostVm.save('Create Audio Post')">Add Post</md-button>
+			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
+			<md-button ng-disabled="!postVm.notebook.media.audio" ng-click="postVm.postDetails.button.action('Create Audio Post')">Add Post</md-button>
 		</md-dialog-actions>
 	</form>
 

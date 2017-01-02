@@ -1,28 +1,37 @@
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
-    inject = require('gulp-inject'),
-    sass = require('gulp-sass'),
     childProcess = require('child_process'),
+    mainBowerFiles = require('main-bower-files'),
     gulpLoadPlugins = require('gulp-load-plugins'),
-    electron = require('electron-prebuilt'),
+    // electron = require('electron-prebuilt'),
     _ = require('lodash'),
     runSequence = require('run-sequence'),
-    webpack = require('webpack-stream'),
     plugins = gulpLoadPlugins();
+    electron = require('electron-connect').server.create();
 
 var clientPath = 'client';
 var serverPath = 'server';
 
 var paths = {
     client: {
-        assests: clientPath + '/assests/**/*',
-        images: clientPath + '/assests/images/**/*',
+        root: clientPath,
+        assets: clientPath + '/assets/**/*',
+        images: clientPath + '/assets/images/**/*',
         // styles: [clientPath + '/app/**/*.scss'],
-        styles: [clientPath + '/{app,components}/**/*.scss'],
+        styles: [clientPath + '/{app,components,assets}/**/*.scss'],
         mainStyle: clientPath + '/app/app.scss',
         views: clientPath + '/{app,components}/**/*.html',
         mainView: clientPath + '/index.html',
-        scripts: [clientPath + '/**/!(*.spec|*.mock)/*.js']
+        scripts: [clientPath + '/**/!(*.spec|*.mock)/*.js'],
+        jsScripts: [
+            "./client/app/**/*.js",
+            "./client/assets/**/*.js",
+            "./client/components/**/*.js",
+            "./client/db/**/*.js",
+            "!./client/**/*.utils.js",
+            "!./client/**/database.js",
+            "!./client/assets/**/*.min.js",
+        ]
     }
 };
 
@@ -33,68 +42,105 @@ gulp.task('default', function() {
 
 // This runs electron
 gulp.task('run', function () {
-    childProcess.spawn(electron, ['./'], { stdio: 'inherit' });
+
+    electron.start();
+
+    // childProcess.spawn(electron, ['./'], { stdio: 'inherit' });
 });
 
 
 //call the inject
 gulp.task('inject', function (cb) {
-    runSequence(['inject:sass'], cb);
+    runSequence('inject:sass', cb);
 });
 
-//injects all scss files that I want and creates css
+/**
+ * Injects scss
+ * gets all scss files as defined by path
+ * sorts them into a single array (_union)
+ * sorts the files accordingly
+ * transforms the path into the correct relative path
+ * checks for errors
+ * injects into app.scss
+ */
 gulp.task('inject:sass', function() {
     return gulp.src(paths.client.mainStyle)
         .pipe(plugins.inject(
             gulp.src(_.union(paths.client.styles, ['!' + paths.client.mainStyle]), {read: false})
-                .pipe(plugins.sort()),
+                .pipe(plugins.sort()), //sorts files...
             {
-                transform: function(filepath) {
+                transform: function(filepath) { //transform path to a realtive path
                     var newPath = filepath
                         .replace('/' + clientPath + '/app/', '')
                         .replace('/' + clientPath + '/components/', '../components/')
+                        .replace('/' + clientPath + '/assets/', '../assets/')
                         .replace(/_(.*).scss/, function(match, p1, offset, string) {
                             return p1
                         })
                         .replace('.scss', '');
                     return '@import \'' + newPath + '\';';
                 }
-
-            }))
-        // .pipe(sass().on('error', sass.logError))
+            }
+            ))
+        // .pipe(plugins.sass().on('error', plugins.sass.logError))
         .pipe(gulp.dest(clientPath + '/app'));
 });
 
 gulp.task('inject:js', function() {
-    return gulp.src()
-})
+    console.log('gulpTask: inject:js');
 
+   // return gulp.src(paths.client.mainView)
+   //      .pipe(plugins.inject(
+   //          gulp.src(paths.client.jsScripts).pipe(plugins.angularFilesort()), {ignorePath: 'client', addRootSlash: false}
+   //      ))
+   //      .pipe(gulp.dest(paths.client.root));
 
+    // return gulp.src(paths.client.mainView)
+    //     .pipe(plugins.inject(
+    //         gulp.src(paths.client.jsScripts, { read: false }), {ignorePath: 'client', addRootSlash: false}
+    //     ))
+    //     .pipe(gulp.dest(paths.client.root));
+});
+
+gulp.task('inject:bower', function() {
+    console.log('gulpTask: inject:bower');
+    // return gulp.src(paths.client.mainView)
+    //     .pipe(plugins.inject(
+    //         gulp.src(mainBowerFiles(), { base: 'client/bower_components' }, {read: false}), {ignorePath: 'client', addRootSlash: false, starttag: '<!-- bower:{{ext}} -->'}
+    //     ))
+    //     .pipe(gulp.dest(paths.client.root));
+});
+
+/**
+ * Take main style sheet
+ */
 gulp.task('styles', function() {
+    console.log('gulp.task:styles');
     return gulp.src(paths.client.mainStyle)
-        .pipe(sass())
+        .pipe(plugins.sass())
+        .pipe(plugins.sass().on('error', plugins.sass.logError))
         .pipe(gulp.dest(clientPath + '/app'));
 });
 
 
 
 gulp.task('index', function() {
-    var sources = gulp.src([clientPath + '/app/*.css'], {read: false});
+    var cssSources = gulp.src([clientPath + '/app/*.css'], {read: false});
+    var appSources = gulp.src(paths.client.jsScripts).pipe(plugins.angularFilesort());
+    var bowerSources = gulp.src(mainBowerFiles(), { base: 'client/bower_components' }, {read: false});
 
     return gulp.src(paths.client.mainView)
-        .pipe(inject(sources,
-            {
-                ignorePath: clientPath,
-                addRootSlash: false
-            }
-        ))
+        .pipe(plugins.inject(cssSources, { ignorePath: clientPath, addRootSlash: false}))
+        .pipe(plugins.inject(appSources, { ignorePath: clientPath, addRootSlash: false}))
+        .pipe(plugins.inject(bowerSources, { ignorePath: clientPath, addRootSlash: false, starttag: '<!-- bower:{{ext}} -->'}))
         .pipe(gulp.dest(clientPath));
 });
 
 
 
 gulp.task('watch', function() {
-    gulp.watch(paths.client.styles, ['styles']);
+    gulp.watch(paths.client.styles, ['styles', electron.reload] );
+    gulp.watch(paths.client.jsScripts, electron.reload);
 });
 
 
@@ -102,19 +148,16 @@ gulp.task('watch', function() {
 gulp.task('serve', function (cb) {
     runSequence(
         [
-            // 'clean:tmp',
-            // 'lint:scripts',
-            'inject',
             'styles',
-            'index',
+            'inject',
+            'index'
+        ],[
             'run',
             'watch'
-            // 'copy:fonts:dev',
-            // 'env:all'
         ],
-        // ['start:server', 'start:client'],
-        // 'watch',
         cb
     );
 });
+
+
 

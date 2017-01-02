@@ -1,5 +1,9 @@
 'use strict';
 
+var remote = require('electron').remote,
+    path = require('path'),
+    globalPaths = remote.getGlobal('userPaths');
+
 angular.module('glossa')
     .component('metaComponent', {
         controller: metaCtrl,
@@ -41,7 +45,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
     metaVm.editAttachedFile = editAttachedFile;
-    metaVm.openExistinDialog = openExistinDialog;
+    metaVm.openNBDialog = openNBDialog;
     metaVm.newAttachDialog = newAttachDialog;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
@@ -79,6 +83,7 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
      * @param data - object = {fileId: String, field: String}
      */
     function updateData(data) {
+        console.log('metaComponent: updateData', data);
         var changeData = {
             fileId: data.fileId,
             options: {},
@@ -164,10 +169,17 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         });
     }
 
-    function openExistinDialog(notebook) {
-        postSrvc.existingPostDialog(notebook).then(function(res) {
-            console.log('the response is here', res);
-        })
+    function openNBDialog(ev, notebook) {
+        var postOptions = postSrvc.postOptions(ev, notebook);
+
+        dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
+            if (result && !result.dataChanged) {
+                return;
+            }
+            queryAttachedNotebook();
+        }).catch(function(result) {
+            console.log('error', result);
+        });
     }
 
     function editAttachedFile(ev, attachment, type) {
@@ -197,8 +209,14 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
     function queryAttachedNotebook() {
 
         if (metaVm.currentFile.mediaType === 'notebook') {
-            notebookSrvc.findNotebook(metaVm.currentFile.notebookId).then(function(result) {
+            notebookSrvc.find(metaVm.currentFile.notebookId).then(function(result) {
                 metaVm.attachedNotebook = result.data[0];
+                if (metaVm.attachedNotebook.media.image) {
+                    metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);
+                }
+                if (metaVm.attachedNotebook.media.audio) {
+                    metaVm.audioPath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.audio.path);
+                }
             })
         }
 

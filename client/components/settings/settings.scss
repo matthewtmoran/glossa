@@ -4,4 +4,22 @@ md-dialog.fullscreen-dialog {
 	width: 100%;
 	height: 100%;
 	border-radius: 0;
+
+	input {
+		color: black !important;
+	}
+
+	.close-button {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+	}
+
+	.tag-container {
+		//max-height: 100%;
+	}
+
+	.table-container {
+		max-height: 650px;
+	}
 }

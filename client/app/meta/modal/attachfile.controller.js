@@ -1,5 +1,9 @@
 'use strict';
 
+var path = require('path'),
+    remote = require('electron').remote,
+    globalPaths = remote.getGlobal('userPaths');
+
 angular.module('glossa')
     .controller('attachfileCtrl', attachfileCtrl);
 
@@ -16,7 +20,12 @@ function attachfileCtrl($mdDialog, currentFile, fileSrvc, notebookSrvc) {
         { name: "Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
     ];
 
-    notebookSrvc.queryNotebooks().then(function(docs) {
+    notebookSrvc.query().then(function(docs) {
+        docs.data.forEach(function(nb) {
+            if (nb.media.image) {
+                nb.imagePath = path.join(globalPaths.static.trueRoot, nb.media.image.path);
+            }
+        });
         atVm.notebooks = docs.data;
     });
 

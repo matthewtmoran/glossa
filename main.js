@@ -1,9 +1,52 @@
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
+const path = require('path');
+const fs = require('fs');
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-var path = require('path');
-
+const userDataPath = (app).getPath('userData');
+const userDataRoot = path.join(userDataPath, '/data');
+const client = require('electron-connect').client;
 var mainWindow = null;
+
+
+/* create object of paths
+
+ var remote = require('electron').remote;
+ console.log('remote', remote);
+ console.log(remote.getGlobal('userPaths'));
+
+*/
+
+
+const globalPaths = {
+    static: {
+        root: userDataRoot,
+        markdown: path.join(userDataRoot, '/markdown'),
+        image: path.join(userDataRoot, '/image'),
+        audio: path.join(userDataRoot, '/audio'),
+        database: path.join(userDataRoot, '/database')
+    },
+    relative: {
+        root: '/data',
+        markdown: '/data/markdown',
+        image: '/data/image',
+        audio: '/data/audio'
+    }
+};
+
+
+//verify paths exist if not create it
+for (var key in globalPaths.static) {
+    if (globalPaths.static.hasOwnProperty(key)) {
+        if (!fs.existsSync(globalPaths.static[key])){
+            console.log('making directory');
+            fs.mkdirSync(globalPaths.static[key]);
+        }
+    }
+}
+
+globalPaths.static.trueRoot = userDataPath;
+global.userPaths = globalPaths;
 
 
 // Quit when all windows are closed.
@@ -23,6 +66,9 @@ app.on('ready', function () {
 
     // Open the devtools.
     mainWindow.openDevTools();
+
+    client.create(mainWindow);
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
 

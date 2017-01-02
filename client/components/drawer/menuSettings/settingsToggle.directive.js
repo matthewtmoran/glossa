@@ -3,33 +3,40 @@
 angular.module('glossa')
     .directive('settingsToggle', menuToggle);
 
-function menuToggle($timeout) {
+function menuToggle($timeout, drawerMenu, dialogSrvc) {
     var directive = {
         restrict: 'E',
-        scope: {
-            section: '='
-        },
+        scope: true,
         templateUrl: 'components/drawer/menuSettings/settingsToggle.html',
         link: menuSettingslink
     };
     return directive;
 
     function menuSettingslink(scope, element, attrs) {
-        var controller = element.parent().controller();
 
         var originatorEv;
 
-        scope.settingsOpen = settingsOpen;
-        scope.toggleSettings = toggleSettings;
         scope.openMenu = openMenu;
+        scope.execute = execute;
+        scope.deleteCorpus = deleteCorpus;
+        scope.corpusDialog = corpusDialog;
 
-        function settingsOpen() {
-            return controller.isSettingsOpen(scope.section);
+
+        function execute(action, object) {
+            if(angular.isFunction(scope[action])) {
+                scope[action](object);
+            }
         }
 
-        function toggleSettings() {
-            controller.toggleSettingsOpen(scope.section);
+        function deleteCorpus(val) {
+            drawerMenu.deleteCorpus(val);
         }
+
+        function corpusDialog() {
+            dialogSrvc.corpusDialog();
+        }
+
+
         function openMenu($mdOpenMenu, ev) {
             originatorEv = ev;
             $mdOpenMenu(ev);

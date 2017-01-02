@@ -10,9 +10,8 @@
 		<md-divider></md-divider>
 		<h3>Common Tags</h3>
 		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised">Tag Management</md-button>
-		<!--<md-button ui-sref="managetags" class="md-raised">Tag Management</md-button>-->
 		<md-list>
-			<md-list-item class="chip-item" ng-repeat="tag in nbVm.commonTags">
+			<md-list-item class="chip-item" ng-repeat="tag in nbVm.occurringTags | orderBy: tag.occurence">
 				<md-chip class="chip-container">
 					<span>
 						<span class="chip-icon">#</span>
@@ -20,18 +19,6 @@
 					</span>
 				</md-chip>
 			</md-list-item>
-			<!--<md-list-item class="switch-item" ng-repeat="tag in nbVm.commonTags" ng-class="{selected: $index === nbVm.selectedIndex}" >-->
-				<!--<div class="switch-container">-->
-					<!--<div class="switch-bar">-->
-						<!--&lt;!&ndash;<span>{{tag.tag}}</span>&ndash;&gt;-->
-					<!--</div>-->
-					<!--<div class="circle-container">-->
-						<!--<div class="circle">-->
-							<!--<div class="md-ripple-continaer"></div>-->
-						<!--</div>-->
-					<!--</div>-->
-				<!--</div>-->
-			<!--</md-list-item>-->
 		</md-list>
 	</md-content>
 
@@ -46,7 +33,7 @@
 					ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
 					md-colspan="1">
 
-				<notebook-list-item notebook="notebook" flex layout-fill></notebook-list-item>
+				<notebook-card notebook="notebook" open-details="nbVm.openNBDialog($event, notebook)" flex layout-fill></notebook-card>
 
 			</md-grid-tile>
 		</md-grid-list>
@@ -62,15 +49,12 @@
 
 		<md-fab-trigger>
 			<md-button aria-label="menu" class="md-fab md-grey-fab">
-				<!--<md-tooltip md-direction="left"-->
-				            <!--md-visible="false"-->
-				            <!--md-autohide="true">Attach Files</md-tooltip>-->
 				<md-icon aria-label="menu">add</md-icon>
 			</md-button>
 		</md-fab-trigger>
 
 		<md-fab-actions>
-			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.openNBDialog($event, item.type)">
+			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.newPost($event, item.type)">
 				<md-icon>{{item.icon}}</md-icon>
 			</md-button>
 		</md-fab-actions>

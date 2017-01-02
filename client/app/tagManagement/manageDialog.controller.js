@@ -23,9 +23,20 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
 
     dialogVm.showData = 'alldata';
 
-    hashtagSrvc.get().then(function(result) {
-        dialogVm.infiniteItems = result.data;
-    });
+    // hashtagSrvc.query().then(function(result) {
+    //     result.data.forEach(function(tag, index) {
+    //         hashtagSrvc.findOccurrenceOfTag(tag).then(function(result) {
+    //             if (!result) {
+    //                 tag[index].occurrence = 0;
+    //             } else {
+    //                 tag[index].occurrence = result;
+    //             }
+    //         })
+    //     });
+    //     dialogVm.infiniteItems = result.data;
+    //
+    //
+    // });
 
 
     dialogVm.showAll = showAll;
@@ -101,7 +112,7 @@ function manageTagsCtrl(dialogSrvc, hashtagSrvc, $mdEditDialog, $mdDialog, $q) {
     }
 
     function updateTag(item) {
-        hashtagSrvc.updateTag(item).then(function(result) {
+        hashtagSrvc.update(item).then(function(result) {
             hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
                 changesMade = true;
 

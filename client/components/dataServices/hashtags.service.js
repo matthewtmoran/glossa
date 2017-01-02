@@ -1,11 +1,9 @@
 'use strict';
 //node modules
-var db = require('../db/database'),
-    _ = require('lodash'),
+var db = require('./db/database'),
     hashtagsCol = db.hashtags,
-    fileCollection = db.uploadedFiles,
-    nbCollection = db.notebooks,
-    util = require('../client/components/node/file.utils');
+    fileCollection = db.transMarkdown,
+    nbCollection = db.notebooks;
 
 angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);
@@ -13,24 +11,33 @@ angular.module('glossa')
 
 function hashtagSrvc(dbSrvc, $q) {
     var service = {
-        searchHastags: searchHastags,
-        updateTag: updateTag,
-        createHashtag: createHashtag,
+        query: query,
+        termQuery: termQuery,
+        update: update,
+        save: save,
         normalizeHashtag: normalizeHashtag,
-        get: get,
-        removeHashtag: removeHashtag
+        removeHashtag: removeHashtag,
+        countHashtags: countHashtags,
+        findOccurrenceOfTag:findOccurrenceOfTag
     };
 
     return service;
     ///////////////
 
-    function get() {
+    /**
+     * Queries all hashtags
+     */
+    function query() {
         return dbSrvc.find(hashtagsCol, {}).then(function(docs) {
             return docs;
         })
     }
 
-    function searchHastags(term) {
+    /**
+     * Searches by term
+     * @param term
+     */
+    function termQuery(term) {
         var query = {
             tag:  new RegExp('^' + term + '$', 'i')
         };
@@ -39,13 +46,22 @@ function hashtagSrvc(dbSrvc, $q) {
         })
     }
 
-    function updateTag(objectToUpdate) {
+    /**
+     * Update Existing tag
+     * @param objectToUpdate
+     * @returns {*}
+     */
+    function update(objectToUpdate) {
         return dbSrvc.basicUpdate(hashtagsCol, objectToUpdate)
     }
 
-    function createHashtag(term) {
+    /**
+     * Save new term as hashtag
+     * @param term
+     */
+    function save(term) {
         var hashtag = {
-            tag: term,
+            tag: term
         };
 
         hashtag.tagColor = '#4285f4';
@@ -58,23 +74,25 @@ function hashtagSrvc(dbSrvc, $q) {
         });
     }
 
+    /**
+     * Normalizes hashtags accross application
+     * @param tag
+     */
     function normalizeHashtag(tag) {
-
+        //store pormises
         var promises = [];
 
+        //Save transcription file promise
         var filePromise = dbSrvc.find(fileCollection, {"hashtags._id": tag._id}).then(function(result) {
 
             result.data.forEach(function(file, i) {
-
                 //Modify the data
                 file.hashtags.forEach(function(t, index) {
                     if (t._id === tag._id) {
                         file.hashtags[index] = tag;
                     }
                 });
-
                return dbSrvc.basicUpdate(fileCollection, file);
-
             });
         });
 
@@ -88,21 +106,25 @@ function hashtagSrvc(dbSrvc, $q) {
                         nb.hashtags[index] = tag;
                     }
                 });
-
                 return dbSrvc.basicUpdate(nbCollection, nb);
             });
-
         });
 
+        //push promises to promise array
         promises.push(filePromise);
         promises.push(notebookPromise);
 
         return $q.all(promises).then(function(result) {
             return result;
         });
-
     }
 
+    /**
+     * Removes hashtag
+     * Should normalize across application
+     * @param tag
+     * @returns {*}
+     */
     function removeHashtag(tag) {
         var promises = [];
 
@@ -111,6 +133,7 @@ function hashtagSrvc(dbSrvc, $q) {
         var notebookPromise = dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
             var re = new RegExp('#'+ tag.tag, "gi");
             result.data.forEach(function(nb, i) {
+                //remove the # character from instances
                 nb.description = nb.description.replace(re, tag.tag);
                 //Modify the data
                 nb.hashtags.forEach(function(t, index) {
@@ -128,6 +151,7 @@ function hashtagSrvc(dbSrvc, $q) {
         var filePromise = dbSrvc.find(fileCollection, {"hashtags._id": tag._id}).then(function(result) {
             var re = new RegExp('#'+ tag.tag, "gi");
             result.data.forEach(function(file, i) {
+                //remove hash characters from instances
                 file.description = file.description.replace(re, tag.tag);
                 //Modify the data
                 file.hashtags.forEach(function(t, index) {
@@ -148,7 +172,75 @@ function hashtagSrvc(dbSrvc, $q) {
         return $q.all(promises).then(function(result) {
             return result;
         }).catch(function(err) {
-            console.log('there was an error ', err);
+            console.log('Error removing tags', err);
         });
     }
+
+    /**
+     * Counts hashtags across notebooks
+     */
+    function countHashtags() {
+        //store all occurring tags
+        var occurringTags = [];
+
+        //query all tags
+        dbSrvc.find(hashtagsCol, {}).then(function(result) {
+
+            result.data.forEach(function(tag) {
+
+               findOccurrenceOfTag(tag).then(function(result) {
+                   if (result) {
+                       tag.occurrence = result;
+                       occurringTags.push(tag);
+                   }
+               });
+            });
+
+        }).catch(function(result) {
+            console.log('Error finding hashtag occurrences ', result)
+        });
+        //return array of occurring tags
+        return occurringTags;
+    }
+
+    function findOccurrenceOfTag(tag) {
+        //store occurrence of tag
+        var totalOccurrence = 0;
+
+        //store count promise
+        var notebookPromise = dbSrvc.count(nbCollection, {'hashtags._id': tag._id}).then(function(result) {
+            if (result.data > 0) {
+                //add occurrence to total
+                totalOccurrence += result.data;
+            }
+        }).catch(function(result) {
+            console.log('nb catch result', result);
+        });
+
+        var tfilePormise = dbSrvc.count(fileCollection, {'hashtags._id': tag._id}).then(function(result) {
+            if (result.data > 0) {
+                totalOccurrence += result.data;
+            }
+        }).catch(function(result) {
+            console.log('tf catch result', result);
+        });
+
+        //once the promise has resolved
+        return $q.all([notebookPromise, tfilePormise]).then(function(result) {
+            //if tag occurs and that occurrence is greater than 0;
+            if (totalOccurrence && totalOccurrence > 0) {
+                //add property to tag
+                // tag.occurence = totalOccurrence;
+                //push tag to array
+                // return tag;
+                return totalOccurrence;
+                // occurringTags.push(tag);
+            }
+        });
+    }
+
+
 }
+
+
+

@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
-function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
+function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
     var simplemdeTollbar = [
         {
             name: "italic",
@@ -65,40 +65,25 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
         }
     ];
 
-    /**
-     * This is a little mini api that we can call dynamically.
-     * @type {{image: save.image, normal: save.normal, audio: save.audio}}
-     */
-    var save = {
-        image: function(currentNotebook, postContent) {
-            return saveImagePost(currentNotebook, postContent);
-        },
-        normal: function (currentNotebook, postContent) {
-            return saveNormalPost(currentNotebook);
-        },
-        audio: function(currentNotebook, postContent) {
-            return saveAudioPost(currentNotebook, postContent);
-        }
-    };
     var service = {
-        // parseTitle: parseTitle,
-        newPostDialog: newPostDialog,
-        existingPostDialog: existingPostDialog,
-        save: save
+        postOptions: postOptions,
     };
     return service;
 
-    function test(e) {
-        console.log('test', e);
-    }
-
-    function newPostDialog(ev, type, currentNotebook) {
+    /**
+     * Sets the simplemde options based on post types
+     * @param ev - target event
+     * @param notebook = the notebook that was selected
+     * @returns options for post type template and simplemde {{simplemde: {}, template: string}}
+     * TODO: should refractor these template to just use the same one?
+     */
+    function postOptions(ev, notebook) {
         var options = {
             simplemde: {},
             template: ''
         };
-        currentNotebook.postType = type;
-        switch(type) {
+
+        switch(notebook.postType) {
             case 'image':
                 options.template = 'app/notebook/postDialog/imagePost.html';
                 options.simplemde = {
@@ -106,9 +91,8 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     status: false,
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
-                    placeholder: 'image caption...',
-
+                    // forceSync: true,
+                    placeholder: 'Image caption...',
                 };
                 break;
             case 'audio':
@@ -118,143 +102,29 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse) {
                     status: false,
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
-                    placeholder: 'audio caption...'
+                    // forceSync: true,
+                    placeholder: 'Audio caption...'
                 };
                 break;
             case 'normal':
-                options.template = 'app/notebook/postDialog/newPost.html';
+                options.template = 'app/notebook/postDialog/normalPost.html';
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,
                     status: false,
                     autoDownloadFontAwesome: false,
-                    forceSync: true,
+                    // forceSync: true,
                     placeholder: 'Post description...',
                 };
                 break;
             case 'default':
                 console.log('error');
         }
-        return openPostDialog(ev, options, currentNotebook);
+        return options;
     }
 
-    /**
-     * Here we pass in the options object and send current object that is being created/modified.  I return the entire dialog object.
-     *
-     * It waits till the dialog is closed by some means then passes the data back to the notebook controller.
-     * @param ev
-     * @param options - an object that has simplemde options and template options
-     * @param currentNotebook - the data object we are modifying
-     * @returns {*} the modified data.
-     */
-    function openPostDialog(ev, options, currentNotebook) {
-        return $mdDialog.show({
-            controller: newPostCtrl,
-            controllerAs: 'newPostVm',
-            templateUrl: options.template,
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: false,
-            bindToController: true,
-            locals: {
-                simplemdeOptions: options.simplemde,
-                currentNotebook: currentNotebook
-            }
-        }).then(function(data) {
-
-            console.log('Dialog is closed. data', data);
-
-            return data;
-        }, function(data) {
-            return data;
-        });
+    function test(e) {
+        console.log('test', e);
     }
-
-    function existingPostDialog(currentNotebook) {
-        return $mdDialog.show({
-            templateUrl: 'app/notebook/postDialog/existingPost.html',
-            parent: angular.element(document.body),
-            // targetEvent: ev,
-            controller: newPostCtrl,
-            controllerAs: 'newPostVm',
-            bindToController: true,
-            clickOutsideToClose: false,
-            locals: {
-                simplemdeOptions: '',
-                currentNotebook: currentNotebook
-            }
-        }).then(function(data) {
-
-            console.log('Dialog is closed. data', data);
-
-            return data;
-        }, function(data) {
-            return data;
-        });
-    }
-
-    /**
-     * Here we create a promise object.  This enables us to 'wait' for the file system copy/write and the databse save.
-     * @param currentNotebook - this is the object we are savin in the database
-     * @param postContent - this is the content of the simplmde text are where we will parse titles, tags, mentions etc...
-     * @returns {promise.promise|jQuery.promise|promise|*|d.promise|Promise}
-     * TODO: we can turn this into one dynamic function
-     */
-    function saveNormalPost(currentNotebook) {
-        var deferred = $q.defer();
-
-        $q.when(simpleParse.parseNotebook(currentNotebook)).then(function(result) {
-
-            notebookSrvc.createNotebook(result, function(r) {
-                if (!r.success) {
-                    deferred.reject(r);
-                }
-                currentNotebook = {
-                    media: {}
-                };
-                deferred.resolve(r);
-            });
-        });
-        return deferred.promise;
-    }
-
-    function saveImagePost(currentNotebook) {
-        var deferred = $q.defer();
-
-        currentNotebook.name = currentNotebook.media.image.name;
-
-        notebookSrvc.createNotebook(currentNotebook, function(result) {
-            if (!result) {
-                deferred.reject('There was an issue')
-            }
-            currentNotebook = {
-                media: {}
-            };
-            deferred.resolve(result);
-        });
-        return deferred.promise;
-    }
-
-    function saveAudioPost(currentNotebook, postContent) {
-        var deferred = $q.defer();
-
-        currentNotebook.name = currentNotebook.media.audio.name;
-        currentNotebook.media.audio.caption = postContent;
-
-        notebookSrvc.createNotebook(currentNotebook, function(result) {
-            if (!result) {
-                deferred.reject('There was an issue')
-            }
-            currentNotebook = {
-                media: {}
-            };
-            deferred.resolve(result);
-        });
-        return deferred.promise;
-    }
-
-
-
 
 }

@@ -342,3 +342,40 @@
 .md-resize-wrapper {
 
 }
+
+.upload-selection {
+	max-height: 200px;
+	overflow: hidden;
+
+	.remove-preview {
+		color: white;
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		z-index: 82;
+
+		md-icon{
+			color: $red;
+		}
+	}
+
+	.wave-container {
+
+	}
+	.media-container {
+		position: relative;
+
+		img {
+			max-width: 100%;
+			display: block;
+		}
+	}
+}
+
+
+button.md-fab.md-mini {
+	margin: 6px 8px !important;
+	line-height: 40px !important;
+	width: 40px !important;
+	height: 40px !important;
+}

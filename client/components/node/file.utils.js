@@ -23,6 +23,37 @@ function copyAndWrite(from, to, data, callback){
         );
 }
 
+function copyWrite2(from, to) {
+
+  var pipeAction = fs.createReadStream(from)
+        .pipe(fs.createWriteStream(to));
+
+    return new Promise(function(resolve, reject){
+        pipeAction.on("close",function(){ //waits for data to be consumed
+            // pipe has ended here, so we resolve the promise
+            resolve({
+                success: true,
+                msg: 'file copied success',
+                data: {
+                    from: from,
+                    to: to,
+                    err: null
+                }});
+        }).on('error', function(err) {
+            reject({
+                success: false,
+                msg: 'File copy failed',
+                data: {
+                    from: from,
+                    to: to,
+                    err: err
+                }});
+        })
+    });
+
+}
+
+
 
 /**
  * Check if file exists
@@ -52,8 +83,24 @@ function createMediaObject(mediaObj, type) {
     return newMediaObj;
 }
 
+
+function removeItem(path) {
+
+    return new Promise(function(resolve, reject) {
+        fs.unlink(path, function(err) {
+            if (err) {
+               return reject(err);
+            }
+            resolve();
+        });
+    })
+
+}
+
 module.exports = {
     createMediaObject: createMediaObject,
     doesExist: doesExist,
     copyAndWrite : copyAndWrite,
+    copyWrite2: copyWrite2,
+    removeItem: removeItem
 };
