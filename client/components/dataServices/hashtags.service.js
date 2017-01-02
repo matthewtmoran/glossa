@@ -1,6 +1,6 @@
 'use strict';
 //node modules
-var db = require('../db/database'),
+var db = require('./db/database'),
     hashtagsCol = db.hashtags,
     fileCollection = db.transMarkdown,
     nbCollection = db.notebooks;

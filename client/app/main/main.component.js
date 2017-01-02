@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/main/main.html'
     });
 
-function MainCtrl($scope, nodeSrvc, fileSrvc) {
+function MainCtrl($scope) {
     var vm = this;
 
     vm.createNewTextFile = createNewTextFile;

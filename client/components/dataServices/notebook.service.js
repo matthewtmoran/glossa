@@ -1,6 +1,6 @@
 'use strict';
 //node modules
-var db = require('../db/database'),
+var db = require('./db/database'),
     nbCollection = db.notebooks;
 
 angular.module('glossa')

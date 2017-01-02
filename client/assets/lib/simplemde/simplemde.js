@@ -13034,7 +13034,7 @@
                 if (typeof exports == "object" && typeof module == "object") // CommonJS
                     mod(require("codemirror"));
                 else if (typeof define == "function" && define.amd) // AMD
-                    define(["./codemirror"], mod);
+                    define(["../codemirror"], mod);
                 else // Plain browser env
                     mod(CodeMirror);
             })(function (CodeMirror) {

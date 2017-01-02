@@ -1,9 +1,9 @@
-var db = require('./db/database'),
+var db = require('././database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     hashtags = db.hashtags,
-    jsonData = require('./db/data/OCM.json');
+    jsonData = require('././data/OCM.json');
 
 
 var inc = 0;

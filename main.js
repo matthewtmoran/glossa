@@ -3,9 +3,9 @@ const app = electron.app;  // Module to control application life.
 const path = require('path');
 const fs = require('fs');
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-const globalPaths = require('./globalPaths');
 const userDataPath = (app).getPath('userData');
 const userDataRoot = path.join(userDataPath, '/data');
+const client = require('electron-connect').client;
 var mainWindow = null;
 
 
@@ -18,12 +18,20 @@ var mainWindow = null;
 */
 
 
-globalPaths.static = {
-    root: userDataRoot,
-    markdown: path.join(userDataRoot, '/markdown'),
-    image: path.join(userDataRoot, '/image'),
-    audio: path.join(userDataRoot, '/audio'),
-    database: path.join(userDataRoot, '/database')
+const globalPaths = {
+    static: {
+        root: userDataRoot,
+        markdown: path.join(userDataRoot, '/markdown'),
+        image: path.join(userDataRoot, '/image'),
+        audio: path.join(userDataRoot, '/audio'),
+        database: path.join(userDataRoot, '/database')
+    },
+    relative: {
+        root: '/data',
+        markdown: '/data/markdown',
+        image: '/data/image',
+        audio: '/data/audio'
+    }
 };
 
 
@@ -58,6 +66,9 @@ app.on('ready', function () {
 
     // Open the devtools.
     mainWindow.openDevTools();
+
+    client.create(mainWindow);
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
 

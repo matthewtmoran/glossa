@@ -1,6 +1,8 @@
 'use strict';
 
-var util = require('../client/components/node/file.utils');
+var util = require('./components/node/file.utils');
+
+console.log('uitil', util);
 
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);

@@ -1,5 +1,5 @@
 'use strict';
-var util = require('../client/components/node/file.utils'),
+var util = require('./components/node/file.utils'),
     path = require('path'),
     remote = require('electron').remote,
     globalPaths = remote.getGlobal('userPaths');

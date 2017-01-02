@@ -2,7 +2,6 @@ var Datastore = require('nedb'),
     fs = require('fs'),
     path = require('path'),
     remote = require('electron').remote,
-    util = require('../client/components/node/file.utils'),
     hashtagJson = require('./data/hashtags.json');
 
 const databasePath = remote.getGlobal('userPaths').static.database;

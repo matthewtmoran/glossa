@@ -1,6 +1,6 @@
 'use strict';
 
-var db = require('../db/database'),
+var db = require('./db/database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),

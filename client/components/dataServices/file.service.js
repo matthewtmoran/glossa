@@ -1,13 +1,13 @@
 'use strict';
 // TODO: Need to come up with a better system for file paths
 //node modules
-var db = require('../db/database'),
+var db = require('./db/database'),
     fs = require('fs'),
     path = require('path'),
     _ = require('lodash'),
     fileCollection = db.transMarkdown,
     nbCollection = db.notebooks,
-    util = require('../client/components/node/file.utils'),
+    util = require('./components/node/file.utils'),
     remote = require('electron').remote,
     globalPaths = remote.getGlobal('userPaths');
 
