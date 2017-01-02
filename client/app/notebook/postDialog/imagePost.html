@@ -24,10 +24,9 @@
 					          simplemde="postVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
-			<md-divider></md-divider>
 		</md-dialog-content>
 
-		<md-dialog-actions layout="row" >
+		<md-dialog-actions layout="row" class="top-border">
 			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
 			<md-button ng-disabled="!postVm.notebook.media.image" ng-click="postVm.postDetails.button.action('Create Image Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
