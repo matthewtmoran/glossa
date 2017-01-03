@@ -23,7 +23,7 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
     activate();
 
     function activate() {
-        initialFileList(currentCorpus);
+        // initialFileList(currentCorpus);
     }
 
     /**

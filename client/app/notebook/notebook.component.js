@@ -8,9 +8,16 @@ angular.module('glossa')
         templateUrl: 'app/notebook/notebook.html'
     });
 
-function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hashtagSrvc) {
+function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hashtagSrvc, $http) {
     var nbVm = this;
     var hashtagsUsed = [];
+
+
+
+    nbVm.$onInit = function() {
+        queryNotebooks();
+        // nbVm.occurringTags = hashtagSrvc.countHashtags();
+    };
 
     nbVm.hidden = false;
     nbVm.isOpen = false;
@@ -29,23 +36,17 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
 
-    activate();
-    function activate() {
-        queryNotebooks();
-        nbVm.occurringTags = hashtagSrvc.countHashtags();
-    }
-
     /**
      * Queries all notebooks
      */
     function queryNotebooks() {
-        hashtagsUsed = [];
-        nbVm.commonTags = [];
-        notebookSrvc.query().then(function(result) {
-            nbVm.notebooks = result.data;
-        }).catch(function(err) {
-            console.log('there was an error querying notebooks', err);
-        });
+        $http.get('/api/notebook')
+            .success(function(response) {
+                nbVm.notebooks = response;
+            })
+            .error(function(response) {
+                console.log('Error with notebook query... do something', response);
+            })
     }
 
     // TODO: move to service

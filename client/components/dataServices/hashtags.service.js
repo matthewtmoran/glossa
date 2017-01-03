@@ -1,9 +1,9 @@
 'use strict';
 //node modules
-var db = require('./db/database'),
-    hashtagsCol = db.hashtags,
-    fileCollection = db.transMarkdown,
-    nbCollection = db.notebooks;
+// var db = require('./db/database'),
+//     hashtagsCol = db.hashtags,
+//     fileCollection = db.transMarkdown,
+//     nbCollection = db.notebooks;
 
 angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);

@@ -1,53 +1,39 @@
-const electron = require('electron');
-const app = electron.app;  // Module to control application life.
 const path = require('path');
 const fs = require('fs');
+const electron = require('electron');
+const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-const userDataPath = (app).getPath('userData');
-const userDataRoot = path.join(userDataPath, '/data');
 const client = require('electron-connect').client;
 var mainWindow = null;
+var config = require('./server/config/environment');
 
 
-/* create object of paths
-
- var remote = require('electron').remote;
- console.log('remote', remote);
- console.log(remote.getGlobal('userPaths'));
-
-*/
-
-
-const globalPaths = {
-    static: {
-        root: userDataRoot,
-        markdown: path.join(userDataRoot, '/markdown'),
-        image: path.join(userDataRoot, '/image'),
-        audio: path.join(userDataRoot, '/audio'),
-        database: path.join(userDataRoot, '/database')
-    },
-    relative: {
-        root: '/data',
-        markdown: '/data/markdown',
-        image: '/data/image',
-        audio: '/data/audio'
-    }
-};
+// const globalPaths = {
+//     static: {
+//         root: userDataPath,
+//         markdown: path.join(userDataRoot, '/markdown'),
+//         image: path.join(userDataRoot, '/image'),
+//         audio: path.join(userDataRoot, '/audio'),
+//         database: path.join(userDataRoot, '/database')
+//     },
+//     relative: {
+//         root: '/data',
+//         markdown: '/data/markdown',
+//         image: '/data/image',
+//         audio: '/data/audio'
+//     }
+// };
 
 
 //verify paths exist if not create it
-for (var key in globalPaths.static) {
-    if (globalPaths.static.hasOwnProperty(key)) {
-        if (!fs.existsSync(globalPaths.static[key])){
-            console.log('making directory');
-            fs.mkdirSync(globalPaths.static[key]);
-        }
-    }
-}
-
-globalPaths.static.trueRoot = userDataPath;
-global.userPaths = globalPaths;
-
+// for (var key in globalPaths.static) {
+//     if (globalPaths.static.hasOwnProperty(key)) {
+//         if (!fs.existsSync(globalPaths.static[key])){
+//             console.log('making directory');
+//             fs.mkdirSync(globalPaths.static[key]);
+//         }
+//     }
+// }
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -58,16 +44,24 @@ app.on('window-all-closed', function () {
 
 app.on('ready', function () {
 
+    app.server = require(path.join(__dirname, '/server/app'));
+
     // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 800, height: 600});
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+    });
 
     // and load the index.html of the app.
-    mainWindow.loadURL('file://' + __dirname + '/client/index.html');
+    mainWindow.loadURL('http://localhost:' + config.port);
+    // mainWindow.loadURL('file://' + __dirname + '/client/index.html');
 
     // Open the devtools.
     mainWindow.openDevTools();
 
+
     client.create(mainWindow);
+
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {

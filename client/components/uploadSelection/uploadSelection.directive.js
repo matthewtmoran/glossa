@@ -1,8 +1,8 @@
 'use strict';
-var util = require('./components/node/file.utils'),
-    path = require('path'),
-    remote = require('electron').remote,
-    globalPaths = remote.getGlobal('userPaths');
+// var util = require('./components/node/file.utils'),
+//     path = require('path'),
+//     remote = require('electron').remote,
+//     globalPaths = remote.getGlobal('userPaths');
 
 
 angular.module('glossa')

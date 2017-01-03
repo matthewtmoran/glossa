@@ -1,9 +1,9 @@
 'use strict';
-
-var fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    MDRootPath = remote.getGlobal('userPaths').static.markdown;
+//
+// var fs = require('fs'),
+//     path = require('path'),
+//     _ = require('lodash'),
+//     MDRootPath = remote.getGlobal('userPaths').static.markdown;
 
 angular.module('glossa')
     .factory('baselineSrvc', baselineSrvc);

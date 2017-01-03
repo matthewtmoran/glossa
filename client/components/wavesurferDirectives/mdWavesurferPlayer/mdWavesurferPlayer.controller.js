@@ -1,6 +1,6 @@
 'use strict';
 
-var path = require('path');
+// var path = require('path');
 
 // TODO: Need to separate the directive and controller
 angular.module('glossa')

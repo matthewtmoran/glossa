@@ -1,10 +1,10 @@
 'use strict';
 
-var db = require('./db/database'),
-    fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    corporaMenus = db.corporaMenu;
+// var db = require('./db/database'),
+//     fs = require('fs'),
+//     path = require('path'),
+//     _ = require('lodash'),
+//     corporaMenus = db.corporaMenu;
 
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
@@ -238,7 +238,7 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
     activate();
 
     function activate() {
-        addCustomItems();
+        // addCustomItems();
     }
 
     var service = {

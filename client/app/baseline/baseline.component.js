@@ -1,8 +1,8 @@
 'use strict';
 
-var path = require('path'),
-    remote = require('electron').remote,
-    globalPaths = remote.getGlobal('userPaths');
+// var path = require('path'),
+//     remote = require('electron').remote,
+//     globalPaths = remote.getGlobal('userPaths');
 
 angular.module('glossa')
     .component('baselineComponent', {

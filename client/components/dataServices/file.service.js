@@ -1,15 +1,15 @@
 'use strict';
 // TODO: Need to come up with a better system for file paths
 //node modules
-var db = require('./db/database'),
-    fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    fileCollection = db.transMarkdown,
-    nbCollection = db.notebooks,
-    util = require('./components/node/file.utils'),
-    remote = require('electron').remote,
-    globalPaths = remote.getGlobal('userPaths');
+// var db = require('./db/database'),
+//     fs = require('fs'),
+//     path = require('path'),
+//     _ = require('lodash'),
+//     fileCollection = db.transMarkdown,
+//     nbCollection = db.notebooks,
+//     util = require('./components/node/file.utils'),
+//     remote = require('electron').remote,
+//     globalPaths = remote.getGlobal('userPaths');
 
 
 angular.module('glossa')
@@ -67,9 +67,9 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      * TODO: may just want to query for text files (Actually all the files being saved in db right now are text file and this might be fine)
      */
     function queryAllFiles(currentCorpus) {
-        return dbSrvc.find(fileCollection, {corpus: currentCorpus}).then(function(docs) {
-            return docs;
-        })
+        // return dbSrvc.find(fileCollection, {corpus: currentCorpus}).then(function(docs) {
+        //     return docs;
+        // })
     }
     function getFileList() {
         return data.fileList;
@@ -149,16 +149,16 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function createAndSaveFile(file, fullFilePath) {
         //insert the file in to the fileCollection
-        return dbSrvc.insert(fileCollection, buildFileObject(file))
-            .then(function(doc) {
-                //when promise returns, push the document to the fileList
-                //when the promise resolves write the file to the file system
-                fs.createWriteStream(fullFilePath)
-                    .on('close', function() {
-                        console.log("file written to system")
-                    });
-                return doc;
-            })
+        // return dbSrvc.insert(fileCollection, buildFileObject(file))
+        //     .then(function(doc) {
+        //         when promise returns, push the document to the fileList
+        //         when the promise resolves write the file to the file system
+                // fs.createWriteStream(fullFilePath)
+                //     .on('close', function() {
+                //         console.log("file written to system")
+                //     });
+                // return doc;
+            // })
     }
     /**
      * Deletes the current text file and independently attached media
@@ -178,10 +178,10 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
                 }
             };
 
-            dbSrvc.update(nbCollection, data).then(function(result) {
-                nbCollection.persistence.compactDatafile();
-                return result;
-            })
+            // dbSrvc.update(nbCollection, data).then(function(result) {
+            //     nbCollection.persistence.compactDatafile();
+            //     return result;
+            // })
 
         } else {
             for (var key in currentFile.media) {
@@ -198,12 +198,12 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
 
         var parentFile = path.join(globalPaths.static.markdown, currentFile.name + currentFile.extension);
 
-        fs.unlink(parentFile);
+        // fs.unlink(parentFile);
 
-        return dbSrvc.remove(fileCollection, currentFile._id).then(function(doc) {
-            fileCollection.persistence.compactDatafile();
-            return doc;
-        });
+        // return dbSrvc.remove(fileCollection, currentFile._id).then(function(doc) {
+        //     fileCollection.persistence.compactDatafile();
+        //     return doc;
+        // });
     }
 
     ////////////////////////
@@ -271,32 +271,32 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function updateFileData(data) {
         console.log('fileSrvc: updateFileData');
-        data.options = {
-            returnUpdatedDocs: true
-        };
-        if (data.field === 'name') {
+        // data.options = {
+        //     returnUpdatedDocs: true
+        // };
+        // if (data.field === 'name') {
 
-            data.newObj.path = path.join(globalPaths.static.markdown, data.newObj.name + data.file.extension);
+            // data.newObj.path = path.join(globalPaths.static.markdown, data.newObj.name + data.file.extension);
 
-            console.log('data.newObj.path', data.newObj.path);
+            // console.log('data.newObj.path', data.newObj.path);
 
-            return dbSrvc.update(fileCollection, data).then(function(result) {
-                fileCollection.persistence.compactDatafile();
-
-                console.log('data.file.path', data.file.path);
-
-                renameFileToSystem(data.file.path, data.newObj.path, function() {
-                    console.log('probably dont need thie cb anymore...');
-                });
-
-                return result;
-            });
-        } else {
-            return dbSrvc.update(fileCollection, data).then(function(result) {
-                fileCollection.persistence.compactDatafile();
-                return result;
-            })
-        }
+        //     return dbSrvc.update(fileCollection, data).then(function(result) {
+        //         fileCollection.persistence.compactDatafile();
+        //
+        //         console.log('data.file.path', data.file.path);
+        //
+        //         renameFileToSystem(data.file.path, data.newObj.path, function() {
+        //             console.log('probably dont need thie cb anymore...');
+        //         });
+        //
+        //         return result;
+        //     });
+        // } else {
+        //     return dbSrvc.update(fileCollection, data).then(function(result) {
+        //         fileCollection.persistence.compactDatafile();
+        //         return result;
+        //     })
+        // }
     }
 
     //Some File System Functions
@@ -309,26 +309,26 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function renameFileToSystem(objToMod) {
         var deferred = $q.defer();
-        var oldRelPath = objToMod.path,
-            newRelPath = path.join(globalPaths.relative.markdown, objToMod.name + objToMod.extension),
-            oldStaticPath = path.join(globalPaths.static.trueRoot, objToMod.path),
-            newStaticPath = path.join(globalPaths.static.markdown, objToMod.name + objToMod.extension);
-
-        fs.rename(oldStaticPath, newStaticPath, function(err) {
-            if (err) {
-                deferred.reject({
-                    success: false,
-                    msg: 'There was an error renaming file in the filesystem',
-                    error: err
-                });
-            }
-            objToMod.path = newRelPath;
-            deferred.resolve({
-                success: true,
-                msg: 'File renamed in filesystem success',
-                data: objToMod
-            });
-        });
+        // var oldRelPath = objToMod.path,
+        //     newRelPath = path.join(globalPaths.relative.markdown, objToMod.name + objToMod.extension),
+        //     oldStaticPath = path.join(globalPaths.static.trueRoot, objToMod.path),
+        //     newStaticPath = path.join(globalPaths.static.markdown, objToMod.name + objToMod.extension);
+        //
+        // fs.rename(oldStaticPath, newStaticPath, function(err) {
+        //     if (err) {
+        //         deferred.reject({
+        //             success: false,
+        //             msg: 'There was an error renaming file in the filesystem',
+        //             error: err
+        //         });
+        //     }
+        //     objToMod.path = newRelPath;
+        //     deferred.resolve({
+        //         success: true,
+        //         msg: 'File renamed in filesystem success',
+        //         data: objToMod
+        //     });
+        // });
 
         return deferred.promise;
     }
@@ -340,214 +340,214 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
 
 
     function writeToNotebook(notebook, callback) {
-        var data = {
-            options: {
-                upsert: true,
-                returnUpdatedDocs: true
-            },
-            fileObj: {}
-        };
-        if (notebook.$$hashKey) {
-            delete notebook.$$hashKey;
-        }
-        data.fileObj = notebook;
-        return dbSrvc.updateAll(nbCollection, data).then(function(result) {
-            nbCollection.persistence.compactDatafile();
-            return callback(null, result);
-        });
+        // var data = {
+        //     options: {
+        //         upsert: true,
+        //         returnUpdatedDocs: true
+        //     },
+        //     fileObj: {}
+        // };
+        // if (notebook.$$hashKey) {
+        //     delete notebook.$$hashKey;
+        // }
+        // data.fileObj = notebook;
+        // return dbSrvc.updateAll(nbCollection, data).then(function(result) {
+        //     nbCollection.persistence.compactDatafile();
+        //     return callback(null, result);
+        // });
     }
     function writeToTransfile(currentFile, callback) {
-        var data = {
-            options: {
-                upsert: true,
-                returnUpdatedDocs: true
-            },
-            fileObj: {}
-        };
-        if (currentFile.$$hashKey) {
-            delete currentFile.$$hashKey;
-        }
-        data.fileObj = currentFile;
-        return dbSrvc.updateAll(fileCollection, data).then(function(result) {
-            fileCollection.persistence.compactDatafile();
-            return callback(null, result);
-        });
+        // var data = {
+        //     options: {
+        //         upsert: true,
+        //         returnUpdatedDocs: true
+        //     },
+        //     fileObj: {}
+        // };
+        // if (currentFile.$$hashKey) {
+        //     delete currentFile.$$hashKey;
+        // }
+        // data.fileObj = currentFile;
+        // return dbSrvc.updateAll(fileCollection, data).then(function(result) {
+        //     fileCollection.persistence.compactDatafile();
+        //     return callback(null, result);
+        // });
     }
 
     function saveIndependentAttachment(currentFile, callback) {
-        currentFile.mediaType = 'independent';
-        var maxLoops = Object.keys(currentFile.media).length;
-
-        for(var key in currentFile.media) {
-
-            if (currentFile.media.hasOwnProperty(key)) {
-
-                if (!currentFile.media[key].absolutePath) {
-                    maxLoops--;
-                    continue;
-                }
-                //closure to make current key always accessible
-                (function(key){
-                    //write to this path
-                    var writePath = path.join(globalPaths.static.markdown, key, currentFile.media[key].name);
-
-                    //call copy and write function; pass in file location, new location, notebook data, and callback
-                    util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
-                        if (err) {
-                            return console.log('There was an error copying and writing file', err);
-                        }
-
-                        //Modify loop length
-                        maxLoops--;
-
-                        //create object for database
-                        currentFile.media[key] = util.createMediaObject(currentFile.media[key], key);
-
-                        //delete absolute path
-                        delete currentFile.media[key].absolutePath;
-
-                        // if we are are done looping
-                        if (!maxLoops) {
-                            //save the notebook in the database and call callback
-
-                            var data = {
-                                options: {
-                                    upsert: true,
-                                    returnUpdatedDocs: true
-                                },
-                                fileObj: {}
-                            };
-
-                            if (currentFile.$$hashKey) {
-                                delete currentFile.$$hashKey;
-                            }
-
-                            data.fileObj = currentFile;
-
-                            return dbSrvc.updateAll(fileCollection, data).then(function(result) {
-                                return callback(null, result);
-                            });
-                        }
-                    });
-                    //    pass the key to make accessible
-                })(key);
-            }
-        }
+        // currentFile.mediaType = 'independent';
+        // var maxLoops = Object.keys(currentFile.media).length;
+        //
+        // for(var key in currentFile.media) {
+        //
+        //     if (currentFile.media.hasOwnProperty(key)) {
+        //
+        //         if (!currentFile.media[key].absolutePath) {
+        //             maxLoops--;
+        //             continue;
+        //         }
+        //         //closure to make current key always accessible
+        //         (function(key){
+        //             //write to this path
+        //             var writePath = path.join(globalPaths.static.markdown, key, currentFile.media[key].name);
+        //
+        //             //call copy and write function; pass in file location, new location, notebook data, and callback
+        //             util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
+        //                 if (err) {
+        //                     return console.log('There was an error copying and writing file', err);
+        //                 }
+        //
+        //                 //Modify loop length
+        //                 maxLoops--;
+        //
+        //                 //create object for database
+        //                 currentFile.media[key] = util.createMediaObject(currentFile.media[key], key);
+        //
+        //                 //delete absolute path
+        //                 delete currentFile.media[key].absolutePath;
+        //
+        //                 // if we are are done looping
+        //                 if (!maxLoops) {
+        //                     //save the notebook in the database and call callback
+        //
+        //                     var data = {
+        //                         options: {
+        //                             upsert: true,
+        //                             returnUpdatedDocs: true
+        //                         },
+        //                         fileObj: {}
+        //                     };
+        //
+        //                     if (currentFile.$$hashKey) {
+        //                         delete currentFile.$$hashKey;
+        //                     }
+        //
+        //                     data.fileObj = currentFile;
+        //
+        //                     return dbSrvc.updateAll(fileCollection, data).then(function(result) {
+        //                         return callback(null, result);
+        //                     });
+        //                 }
+        //             });
+        //             //    pass the key to make accessible
+        //         })(key);
+        //     }
+        // }
     }
     function saveNotebookAttachment(currentFile, notebook, callback) {
-        var updatedDocs = [];
-        updatedDocs.push(
-            writeToNotebook(notebook, function(err, result) {
-                if (err){return console.log('There was an error saving notebook', err)}
-                return result
-            })
-        );
-        updatedDocs.push(
-            writeToTransfile(currentFile, function(err, result) {
-                if (err){return console.log('There was an error saving transfile', err)}
-                return result;
-            })
-        );
-
-        Promise.all(updatedDocs).then(function(result) {
-            result.forEach(function(obj) {
-                if (obj.type === 'md') {
-                    return callback(null, obj);
-                }
-            });
-        }, function(err) {
-            console.log('err', err);
-        });
+        // var updatedDocs = [];
+        // updatedDocs.push(
+        //     writeToNotebook(notebook, function(err, result) {
+        //         if (err){return console.log('There was an error saving notebook', err)}
+        //         return result
+        //     })
+        // );
+        // updatedDocs.push(
+        //     writeToTransfile(currentFile, function(err, result) {
+        //         if (err){return console.log('There was an error saving transfile', err)}
+        //         return result;
+        //     })
+        // );
+        //
+        // Promise.all(updatedDocs).then(function(result) {
+        //     result.forEach(function(obj) {
+        //         if (obj.type === 'md') {
+        //             return callback(null, obj);
+        //         }
+        //     });
+        // }, function(err) {
+        //     console.log('err', err);
+        // });
     }
 
 
     function deleteMediaFile(attachment, type, currentFile) {
-        var writePath = path.join(globalPaths.static.markdown, type, attachment.name);
-
-        fs.unlink(writePath);
-
-        var tempData = {
-            newObj: {}
-        };
-
-        tempData.newObj.media = currentFile.media;
-
-        delete tempData.newObj.media[type];
-
-        if (!tempData.newObj.media.image && !tempData.newObj.media.audio) {
-            tempData.newObj.mediaType = '';
-        }
-
-        tempData.fileId = currentFile._id;
-        tempData.options = {
-            returnUpdatedDocs: true
-        };
-
-        return dbSrvc.update(fileCollection, tempData).then(function(result) {
-            fileCollection.persistence.compactDatafile();
-            return result;
-        });
+        // var writePath = path.join(globalPaths.static.markdown, type, attachment.name);
+        //
+        // fs.unlink(writePath);
+        //
+        // var tempData = {
+        //     newObj: {}
+        // };
+        //
+        // tempData.newObj.media = currentFile.media;
+        //
+        // delete tempData.newObj.media[type];
+        //
+        // if (!tempData.newObj.media.image && !tempData.newObj.media.audio) {
+        //     tempData.newObj.mediaType = '';
+        // }
+        //
+        // tempData.fileId = currentFile._id;
+        // tempData.options = {
+        //     returnUpdatedDocs: true
+        // };
+        //
+        // return dbSrvc.update(fileCollection, tempData).then(function(result) {
+        //     fileCollection.persistence.compactDatafile();
+        //     return result;
+        // });
     }
     function updateAttached(currentFile, attached, type) {
-
-        var tempData = {
-            newObj: {}
-        };
-        tempData.newObj.media = currentFile.media;
-
-        tempData.newObj.media[type] = {
-            name: attached.name,
-            description: '',
-            path: attached.path,
-            extension: attached.extension
-        };
-
-        tempData.fileId = currentFile._id;
-        tempData.options = {
-            returnUpdatedDocs: true
-        };
-
-        return dbSrvc.update(fileCollection, tempData).then(function(result) {
-            fileCollection.persistence.compactDatafile();
-            return result;
-        });
+        //
+        // var tempData = {
+        //     newObj: {}
+        // };
+        // tempData.newObj.media = currentFile.media;
+        //
+        // tempData.newObj.media[type] = {
+        //     name: attached.name,
+        //     description: '',
+        //     path: attached.path,
+        //     extension: attached.extension
+        // };
+        //
+        // tempData.fileId = currentFile._id;
+        // tempData.options = {
+        //     returnUpdatedDocs: true
+        // };
+        //
+        // return dbSrvc.update(fileCollection, tempData).then(function(result) {
+        //     fileCollection.persistence.compactDatafile();
+        //     return result;
+        // });
     }
 
     function attachNotebook(notebook, currentFile, callback) {
 
-        for(var key in notebook.media) {
-            if (notebook.media.hasOwnProperty(key)) {
-                currentFile.media[key] = notebook.media[key];
-                currentFile.mediaType = 'notebook';
-                currentFile.notebookId = notebook._id;
-
-                notebook.isAttached = true;
-                notebook.attachedToId = currentFile._id;
-
-            }
-        }
-        callback(null, notebook, currentFile);
+        // for(var key in notebook.media) {
+        //     if (notebook.media.hasOwnProperty(key)) {
+        //         currentFile.media[key] = notebook.media[key];
+        //         currentFile.mediaType = 'notebook';
+        //         currentFile.notebookId = notebook._id;
+        //
+        //         notebook.isAttached = true;
+        //         notebook.attachedToId = currentFile._id;
+        //
+        //     }
+        // }
+        // callback(null, notebook, currentFile);
     }
     function unattachNotebook(notebook, currentFile) {
 
-        delete notebook.isAttached;
-        delete notebook.attachedToId;
-
-        for (var key in currentFile.media) {
-            if (currentFile.media.hasOwnProperty(key)) {
-                delete currentFile.media[key];
-            }
-        }
-
-        delete currentFile.mediaType;
-        delete currentFile.notebookId;
-
-        saveNotebookAttachment(currentFile, notebook, function(err, result) {
-            if (err) {
-                return console.log('there was an error in the detaching the notebook', err);
-            }
-            return result;
-        })
+        // delete notebook.isAttached;
+        // delete notebook.attachedToId;
+        //
+        // for (var key in currentFile.media) {
+        //     if (currentFile.media.hasOwnProperty(key)) {
+        //         delete currentFile.media[key];
+        //     }
+        // }
+        //
+        // delete currentFile.mediaType;
+        // delete currentFile.notebookId;
+        //
+        // saveNotebookAttachment(currentFile, notebook, function(err, result) {
+        //     if (err) {
+        //         return console.log('there was an error in the detaching the notebook', err);
+        //     }
+        //     return result;
+        // })
 
 
     }
@@ -561,21 +561,21 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
      */
     function newUpdate(objectToUpdate, fsChange) {
         //if the field modified is the name field
-        if (fsChange === 'name') {
-            //rename in the file in the file system
-            /**
-             * Updates in the db if the filesystem write is successful
-             * @returns a promise object {success: Boolean, msg: 'message to diplay to user', (data/error): data object or error message}
-             */
-           return renameFileToSystem(objectToUpdate).then(function(result) {
-                if (!result.success) {
-                    return alert('There was an error modifying data: ' + result);
-                }
-               return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
-            })
-        } else {
-            return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
-        }
+        // if (fsChange === 'name') {
+        //     //rename in the file in the file system
+        //     /**
+        //      * Updates in the db if the filesystem write is successful
+        //      * @returns a promise object {success: Boolean, msg: 'message to diplay to user', (data/error): data object or error message}
+        //      */
+        //    return renameFileToSystem(objectToUpdate).then(function(result) {
+        //         if (!result.success) {
+        //             return alert('There was an error modifying data: ' + result);
+        //         }
+        //        return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
+        //     })
+        // } else {
+        //     return dbSrvc.basicUpdate(fileCollection, objectToUpdate);
+        // }
     }
 
 }
