@@ -26,11 +26,10 @@
 					              filetypes=".mp3, .m4a"></upload-selection>
 				</div>
 			</div>
-			<md-divider></md-divider>
 		</md-dialog-content>
 
 
-		<md-dialog-actions layout="row" >
+		<md-dialog-actions layout="row" class="top-border" >
 			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
 			<md-button ng-disabled="!postForm.$valid" ng-click="postVm.postDetails.button.action('Create Normal Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>

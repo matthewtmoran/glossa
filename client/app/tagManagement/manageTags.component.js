@@ -60,18 +60,19 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope) {
         limitSelect: true,
         pageSelect: true
     };
+
     tagVm.selected = [];
 
     tagVm.filterOptions = {
-        userTags: false,
-        systemTags: false,
-        usedTags: false,
-        unusedTags: false
+        userTags: true,
+        systemTags: true,
+        usedTags: true,
+        unusedTags: true
     };
 
     $scope.$watch('tagVm.orederOptions', function() {
         console.log('tagVm.orederOptions change');
-    })
+    });
 
 
     function showAll() {

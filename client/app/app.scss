@@ -58,9 +58,6 @@ $secondary-text: $lBlack;
 	font-feature-settings: 'liga';
 }
 
-
-
-
 @font-face {
 	font-family: "DejaVu Mono";
 	src: url(../assets/fonts/DejaVuSansMono.ttf);
@@ -143,17 +140,14 @@ md-dialog {
 	z-index: 99999 !important;
 	color: black !important;
 
-	//position: absolute;
-	//top: 0;
-
-
-	.enter-space {
+	&:before {
+		content: 'Type space to create new tag...';
+		height: 30px;
 		font-family: Roboto, "Ti", sans-serif !important;
-		font-size:1.1em;
+		font-size: 1.1em;
 		line-height: 2em;
 		display: block;
 		font-style: italic;
-		margin-bottom: 10px;
 	}
 
 	li {
@@ -162,4 +156,10 @@ md-dialog {
 		font-size:1.2em;
 		line-height: 1.8em;
 	}
+}
+
+
+.top-border {
+	//border: 1px solid red !important;
+	border-top: 1px solid rgba(0,0,0,0.12) !important;
 }

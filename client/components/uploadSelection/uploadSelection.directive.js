@@ -79,14 +79,18 @@ function uploadSelection(fileSrvc, $q) {
 
         function removePreview(event) {
             event.preventDefault();
-            util.removeItem(scope.filePath).then(function(result) {
-                scope.filePath = null;
-                scope.parentbinding = null;
-                input.val(null);
-                scope.$apply();
-            }).catch(function(err) {
-                console.log('There was an error removing file', err)
-            })
+
+            if (input.val()) {
+                util.removeItem(scope.filePath).then(function(result) {
+                    scope.filePath = null;
+                    scope.parentbinding = null;
+                    input.val(null);
+                    scope.$apply();
+                }).catch(function(err) {
+                    console.log('There was an error removing file', err)
+                })
+            }
+
         }
     }
 }
