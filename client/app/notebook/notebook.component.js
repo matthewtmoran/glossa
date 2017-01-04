@@ -12,8 +12,6 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     var nbVm = this;
     var hashtagsUsed = [];
 
-
-
     nbVm.$onInit = function() {
         queryNotebooks();
         // nbVm.occurringTags = hashtagSrvc.countHashtags();
@@ -40,13 +38,9 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
      * Queries all notebooks
      */
     function queryNotebooks() {
-        $http.get('/api/notebook')
-            .success(function(response) {
-                nbVm.notebooks = response;
-            })
-            .error(function(response) {
-                console.log('Error with notebook query... do something', response);
-            })
+        notebookSrvc.getNotebooks().then(function(data) {
+            nbVm.notebooks = data
+        })
     }
 
     // TODO: move to service
@@ -67,9 +61,8 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
             if (result && !result.dataChanged) {
                 return;
             }
-            //if there was data changed, query all notebooks again....
-            // TODO: might be able to update single post where changes were made
-            queryNotebooks();
+            var index = nbVm.notebooks.indexOf(notebook);
+            nbVm.notebooks[index] = result.data;
         }).catch(function(result) {
             console.log('catch result', result);
         });

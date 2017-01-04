@@ -4,17 +4,6 @@ angular.module('simplemde', [])
             return {
                 restrict: 'A',
                 require: 'ngModel',
-                // controller: ['$scope', function ($scope, hashtagSrvc, $q, simpleParse, fileSrvc) {
-                //
-                //     return {
-                //         get: function () {
-                //             return $scope.simplemde.instance;
-                //         },
-                //         rerenderPreview: function (val) {
-                //             return $scope.simplemde.rerenderPreview(val);
-                //         }
-                //     };
-                // }],
                 link: function (scope, element, attrs, ngModel) {
                     var options;
                     var hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
@@ -33,26 +22,23 @@ angular.module('simplemde', [])
 
                     //TODO: I don't like query every instance of simplmde
                     //Get all tags an map each one to have the required field 'text'
-                    getAllTags().then(function (result) {
+                    getAllTags().then(function (data) {
                         //Modify the tags to what codemirror's hints require
-                        hashtagList = result.data.map(function (tag) {
+                        hashtagList = data.map(function (tag) {
                             tag.displayText = tag.tag;
                             tag.text = tag.tag;
                             return tag;
                         });
+
                     }).catch(function(err) {
                         console.log('there was an error querying hashtagas', err);
                     });
-
-
 
                     ngModel.$render = render;
                     editor.on('change', changeEvent);
                     //I have to watch for this blur event to make changes.
                     // TODO:I dont like that this is called initially
                     editor.on('blur', blueEvent);
-
-
 
                     //basic rendering of data from model value
                     function render() {
@@ -111,8 +97,8 @@ angular.module('simplemde', [])
 
                     //just a gets all the tags and return promise.
                     function getAllTags() {
-                        return hashtagSrvc.query().then(function (result) {
-                            return result
+                        return hashtagSrvc.getHashtags().then(function(data) {
+                            return data
                         });
                     }
 

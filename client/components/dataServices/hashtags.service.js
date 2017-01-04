@@ -1,17 +1,12 @@
 'use strict';
-//node modules
-// var db = require('./db/database'),
-//     hashtagsCol = db.hashtags,
-//     fileCollection = db.transMarkdown,
-//     nbCollection = db.notebooks;
 
 angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);
 
 
-function hashtagSrvc(dbSrvc, $q) {
+function hashtagSrvc(dbSrvc, $q, $http) {
     var service = {
-        query: query,
+        getHashtags: getHashtags,
         termQuery: termQuery,
         update: update,
         save: save,
@@ -27,10 +22,14 @@ function hashtagSrvc(dbSrvc, $q) {
     /**
      * Queries all hashtags
      */
-    function query() {
-        return dbSrvc.find(hashtagsCol, {}).then(function(docs) {
-            return docs;
-        })
+    function getHashtags() {
+        return $http.get('/api/hashtag')
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
     }
 
     /**

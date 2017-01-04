@@ -10,13 +10,13 @@
 'use strict';
 
 var _ = require('lodash');
-var Notebook = require('./notebook.model');
+var Hashtag = require('./hashtag.model');
 var path = require('path');
 // var globalPaths = require('electron').remote.getGlobal('userPaths');
 
 // Get list of things
 exports.index = function(req, res) {
-    Notebook.find({}, function (err, notebooks) {
+    Hashtag.find({}, function (err, notebooks) {
     if(err) { return handleError(res, err); }
     return res.status(200).json(notebooks);
   });
@@ -24,39 +24,38 @@ exports.index = function(req, res) {
 
 // Get a single thing
 exports.show = function(req, res) {
-    Notebook.findOne({_id:req.params.id}, function (err, notebook) {
+    Hashtag.findById(req.params.id, function (err, thing) {
     if(err) { return handleError(res, err); }
-    if(!notebook) { return res.status(404).send('Not Found'); }
-    return res.json(notebook);
+    if(!thing) { return res.status(404).send('Not Found'); }
+    return res.json(thing);
   });
 };
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-    Notebook.insert(req.body, function(err, notebook) {
+    Hashtag.create(req.body, function(err, thing) {
     if(err) { return handleError(res, err); }
-    return res.status(201).json(notebook);
+    return res.status(201).json(thing);
   });
 };
 
 // Updates an existing thing in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
-    Notebook.findOne({_id:req.params.id}, function (err, notebook) {
+    Hashtag.findById(req.params.id, function (err, thing) {
     if (err) { return handleError(res, err); }
-    if(!notebook) { return res.status(404).send('Not Found'); }
-    var options = {returnUpdatedDocs: true};
-    var updated = _.merge(notebook, req.body);
-        Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+    if(!thing) { return res.status(404).send('Not Found'); }
+    var updated = _.merge(thing, req.body);
+    updated.save(function (err) {
       if (err) { return handleError(res, err); }
-      return res.status(200).json(updatedDoc);
+      return res.status(200).json(thing);
     });
   });
 };
 
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
-    Notebook.findById(req.params.id, function (err, thing) {
+    Hashtag.findById(req.params.id, function (err, thing) {
     if(err) { return handleError(res, err); }
     if(!thing) { return res.status(404).send('Not Found'); }
     thing.remove(function(err) {

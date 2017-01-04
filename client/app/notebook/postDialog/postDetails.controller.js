@@ -1,6 +1,5 @@
 'use strict';
 
-// var util = require('./components/node/file.utils');
 
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);
@@ -19,8 +18,8 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     postVm.save = save;
     postVm.editorOptions = simplemdeOptions;
 
-    activate();
-    function activate() {
+    init();
+    function init() {
         postVm.notebook = angular.copy(postVm.currentNotebook);
         findDetailType();
         setDynamicItems();
@@ -29,16 +28,18 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     function cancel(ev, notebook) {
         if ($scope.postForm.$dirty) {
 
-            if (notebook.media.image && !postVm.currentNotebook.media.image) {
-                util.removeItem('uploads/image/'+ notebook.media.image.name).then(function(result) {
-                    console.log('item removed', result);
-                })
-            }
-            if (notebook.media.audio && !postVm.currentNotebook.media.audio) {
-                util.removeItem('uploads/audio/'+ notebook.media.audio.name).then(function(result) {
-                    console.log('item removed', result);
-                });
-            }
+            console.log('TODO: remove preview if image/audio is not uploaded....');
+
+            // if (notebook.media.image && !postVm.currentNotebook.media.image) {
+            //     util.removeItem('uploads/image/'+ notebook.media.image.name).then(function(result) {
+            //         console.log('item removed', result);
+            //     })
+            // }
+            // if (notebook.media.audio && !postVm.currentNotebook.media.audio) {
+            //     util.removeItem('uploads/audio/'+ notebook.media.audio.name).then(function(result) {
+            //         console.log('item removed', result);
+            //     });
+            // }
         }
 
         postVm.notebook = {};
@@ -57,20 +58,20 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
             data: {}
         };
 
-        return notebookSrvc.save(postVm.notebook).then(function(result) {
+        return notebookSrvc.createNotebook(postVm.notebook).then(function(result) {
             dialogObject.data = result;
             $mdDialog.hide(dialogObject);
         });
     }
 
     function update() {
-        return notebookSrvc.update(postVm.notebook).then(function(result) {
+        return notebookSrvc.updateNotebook(postVm.notebook).then(function(data) {
             dialogObject = {
                 dataChanged: true,
                 event: 'update',
                 data: {}
             };
-            dialogObject.data = result.data;
+            dialogObject.data = data;
             $mdDialog.hide(dialogObject)
         });
     }
@@ -80,7 +81,6 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
             postVm.isNewPost = true;
         }
     }
-
     function setDynamicItems() {
         if (postVm.isNewPost) {
             postVm.postDetails = {
@@ -91,7 +91,6 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
                 }
             }
         } else {
-
             postVm.postDetails = {
                 title: postVm.currentNotebook.name + ' Details',
                 button: {

@@ -10,6 +10,7 @@ module.exports = function(app) {
 
   // Insert routes below
   app.use('/api/notebook', require('./api/notebook'));
+  app.use('/api/hashtag', require('./api/hashtag'));
   app.use('/api/transcription', require('./api/transcription'));
 
   // All undefined asset or api routes should return a 404
