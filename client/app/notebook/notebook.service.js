@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('notebookSrvc', notebookSrvc);
 
-function notebookSrvc($http, $q, simpleParse) {
+function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
 
     var service = {
         getNotebooks: getNotebooks,
@@ -74,19 +74,38 @@ function notebookSrvc($http, $q, simpleParse) {
         notebook.createdAt = Date.now();
         notebook.isAttached = false;
         notebook.attachedToId = null;
+        notebook = simpleParse.parseNotebook(notebook);
 
-       return $q.when(simpleParse.parseNotebook(notebook)).then(function(result) {
-
-           return $http.post('/api/notebook', notebook)
-               .then(function successCallback(response) {
-                   return response.data;
-               }, function errorCallback(response) {
-                   console.log('There was an error', response);
-                   return response.data;
-               });
-
+        //store promises
+        var promises = [];
+        notebook.hashtags.forEach(function(tag, index) {
+            //push this query to promises array
+            promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
+                //update the notebook model property
+                notebook.hashtags[index] = data;
+                return data;
+            }))
         });
+
+       // once all promises have resolved save notebook
+       return $q.all(promises)
+            .then(function(response) {
+                //post request to save new notebook
+                return $http.post('/api/notebook', notebook)
+                    .then(function successCallback(response) {
+                        return response.data;
+                    }, function errorCallback(response) {
+                        console.log('There was an error', response);
+                        return response.data;
+                    });
+
+            })
+            .catch(function(response) {
+                console.log('There was an error with the promises', response);
+                return response.data;
+            });
     }
+
 
     /**
      * Updates an existing notebook

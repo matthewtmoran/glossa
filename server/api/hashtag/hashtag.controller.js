@@ -24,7 +24,7 @@ exports.index = function(req, res) {
 
 // Get a single thing
 exports.show = function(req, res) {
-    Hashtag.findById(req.params.id, function (err, thing) {
+    Hashtag.findOne(req.params.id, function (err, thing) {
     if(err) { return handleError(res, err); }
     if(!thing) { return res.status(404).send('Not Found'); }
     return res.json(thing);
@@ -63,6 +63,33 @@ exports.destroy = function(req, res) {
       return res.status(204).send('No Content');
     });
   });
+};
+
+// Get a single hashtag by term
+exports.showTerm = function(req, res) {
+    var tagName = req.params.term;
+    Hashtag.findOne({"tag": tagName}, function (err, tag) {
+        if(err) { return handleError(res, err); }
+        if(!tag) {
+
+            var newTag = {
+                tag: tagName,
+                tagColor: '#4285f4',
+                realTitle: tagName,
+                canEdit: true,
+                createdAt: Date.now()
+            };
+
+            return Hashtag.insert(newTag, function(err, createdTag) {
+                if(err) { return handleError(res, err); }
+                return res.json(createdTag);
+            });
+
+            // return res.status(404).send('Not Found');
+        }
+        return res.json(tag);
+    });
+
 };
 
 function handleError(res, err) {

@@ -25,17 +25,9 @@ function simpleParse(hashtagSrvc, $q) {
             notebook.name = notebook.media.audio.name;
         }
 
-        return $q.when(findHashtags(textArea)).then(function(re) {
+        notebook.hashtags = findHashtags(textArea) || [];
+       return notebook;
 
-            notebook.hashtags = [];
-
-            re.forEach(function(d) {
-                notebook.hashtags.push(d);
-            });
-
-           return notebook;
-
-        });
     }
     //Parses the title or return first 16 characters of text
     function parseTitle(text) {
@@ -58,9 +50,7 @@ function simpleParse(hashtagSrvc, $q) {
                 return tag.trim().substr(1);
             });
         }
-
-        return getHashtagObject(newMatches);
-
+        return newMatches;
     }
 
     function getHashtagObject(tags) {

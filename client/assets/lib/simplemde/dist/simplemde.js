@@ -16668,7 +16668,10 @@
              */
             function createIcon(options, enableTooltips, shortcuts) {
                 options = options || {};
-                var el = document.createElement("a");
+                var el = document.createElement("md-button");
+                var icon = document.createElement('md-icon');
+                icon.className = 'material-icons';
+                icon.innerHTML = options.iconClass;
                 enableTooltips = (enableTooltips == undefined) ? true : enableTooltips;
 
                 if (options.title && enableTooltips) {
@@ -16680,6 +16683,7 @@
                     }
                 }
 
+                el.appendChild(icon);
                 el.tabIndex = -1;
                 el.className = options.className;
                 return el;
@@ -18309,7 +18313,10 @@
                         (function (key) {
                             var el = toolbarData[key];
                             if (stat[key]) {
-                                el.className += " active";
+                                //added this because it was adding class many times.
+                                if (el.className.indexOf('active') < 0) {
+                                    el.className += " active";
+                                }
                             } else if (key != "fullscreen" && key != "side-by-side") {
                                 el.className = el.className.replace(/\s*active\s*/g, "");
                             }

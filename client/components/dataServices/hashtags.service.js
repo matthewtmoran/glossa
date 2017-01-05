@@ -37,12 +37,14 @@ function hashtagSrvc($q, $http) {
      * @param term
      */
     function termQuery(term) {
-        var query = {
-            tag:  new RegExp('^' + term + '$', 'i')
-        };
-        return dbSrvc.find(hashtagsCol, query).then(function(result) {
-            return result;
-        })
+        return $http.get('/api/hashtag/search/' + term )
+            .then(function successCallback(response) {
+                console.log('response', response);
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
     }
 
     /**
