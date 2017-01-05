@@ -49,7 +49,6 @@
     })({
         1: [function (require, module, exports) {
             'use strict'
-            console.log('debug1');
 
             exports.toByteArray = toByteArray
             exports.fromByteArray = fromByteArray
@@ -174,7 +173,6 @@
                 /* eslint-disable no-proto */
 
                 'use strict'
-                console.log('debug mod 3');
                 var base64 = require('base64-js')
                 var ieee754 = require('ieee754')
                 var isArray = require('isarray')
@@ -1883,7 +1881,6 @@
             }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
         }, {"base64-js": 1, "ieee754": 15, "isarray": 16}],
         4: [function (require, module, exports) {
-            console.log('debug mod 4');
 // Use strict mode (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)
             "use strict";
 
@@ -2018,7 +2015,6 @@
             })(function (CodeMirror) {
                 "use strict";
 
-                console.log('debug mod 5')
 
                 CodeMirror.defineOption("fullScreen", false, function (cm, val, old) {
                     if (old == CodeMirror.Init) old = false;
@@ -2066,7 +2062,6 @@
                 else // Plain browser env
                     mod(CodeMirror);
             })(function (CodeMirror) {
-                console.log('debug mod 6');
                 CodeMirror.defineOption("placeholder", "", function (cm, val, old) {
                     var prev = old && old != CodeMirror.Init;
                     if (val && !prev) {
@@ -2125,7 +2120,6 @@
         7: [function (require, module, exports) {
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
-            console.log('debug mod 7');
             (function (mod) {
                 if (typeof exports == "object" && typeof module == "object") // CommonJS
                     mod(require("../../lib/codemirror"));
@@ -2198,7 +2192,6 @@
                     mod(CodeMirror);
             })(function (CodeMirror) {
                 "use strict";
-                console.log('debug mod 8')
                 CodeMirror.overlayMode = function (base, overlay, combine) {
                     return {
                         startState: function () {
@@ -2285,7 +2278,6 @@
                     mod(CodeMirror);
             })(function (CodeMirror) {
                 "use strict";
-                console.log('debug mod 9')
                 CodeMirror.defineOption("styleSelectedText", false, function (cm, val, old) {
                     var prev = old && old != CodeMirror.Init;
                     if (val && !prev) {
@@ -2410,7 +2402,6 @@
                     (this || window).CodeMirror = mod();
             })(function () {
                 "use strict";
-                console.log('debug mod 10');
                 // BROWSER SNIFFING
 
                 // Kludges for bugs and behavior differences that can't be feature
@@ -12100,7 +12091,6 @@
                     mod(CodeMirror);
             })(function (CodeMirror) {
                 "use strict";
-                console.log('debug11');
 
                 var urlRE = /^((?:(?:aaas?|about|acap|adiumxtra|af[ps]|aim|apt|attachment|aw|beshare|bitcoin|bolo|callto|cap|chrome(?:-extension)?|cid|coap|com-eventbrite-attendee|content|crid|cvs|data|dav|dict|dlna-(?:playcontainer|playsingle)|dns|doi|dtn|dvb|ed2k|facetime|feed|file|finger|fish|ftp|geo|gg|git|gizmoproject|go|gopher|gtalk|h323|hcp|https?|iax|icap|icon|im|imap|info|ipn|ipp|irc[6s]?|iris(?:\.beep|\.lwz|\.xpc|\.xpcs)?|itms|jar|javascript|jms|keyparc|lastfm|ldaps?|magnet|mailto|maps|market|message|mid|mms|ms-help|msnim|msrps?|mtqp|mumble|mupdate|mvn|news|nfs|nih?|nntp|notes|oid|opaquelocktoken|palm|paparazzi|platform|pop|pres|proxy|psyc|query|res(?:ource)?|rmi|rsync|rtmp|rtsp|secondlife|service|session|sftp|sgn|shttp|sieve|sips?|skype|sm[bs]|snmp|soap\.beeps?|soldat|spotify|ssh|steam|svn|tag|teamspeak|tel(?:net)?|tftp|things|thismessage|tip|tn3270|tv|udp|unreal|urn|ut2004|vemmi|ventrilo|view-source|webcal|wss?|wtai|wyciwyg|xcon(?:-userid)?|xfire|xmlrpc\.beeps?|xmpp|xri|ymsgr|z39\.50[rs]?):(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]|\([^\s()<>]*\))+(?:\([^\s()<>]*\)|[^\s`*!()\[\]{};:'".,<>?«»“”‘’]))/i
 
@@ -12226,7 +12216,6 @@
         12: [function (require, module, exports) {
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
-            console.log('debug 12');
             (function (mod) {
                 if (typeof exports == "object" && typeof module == "object") // CommonJS
                     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../meta"));
@@ -13037,7 +13026,6 @@
         13: [function (require, module, exports) {
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
-                console.log('debug 13');
             (function (mod) {
                 if (typeof exports == "object" && typeof module == "object") // CommonJS
                     mod(require("../lib/codemirror"));
@@ -13394,7 +13382,6 @@
                     mod(CodeMirror);
             })(function (CodeMirror) {
                 "use strict";
-            console.log('debug 14')
 
                 var htmlConfig = {
                     autoSelfClosers: {
@@ -13800,7 +13787,6 @@
 
         }, {"../../lib/codemirror": 10}],
         15: [function (require, module, exports) {
-            console.log('degub mod 15');
             exports.read = function (buffer, offset, isLE, mLen, nBytes) {
                 var e, m
                 var eLen = nBytes * 8 - mLen - 1
@@ -13892,7 +13878,6 @@
 
         }, {}],
         16: [function (require, module, exports) {
-            console.log('debug 16');
             var toString = {}.toString;
 
             module.exports = Array.isArray || function (arr) {
@@ -13914,7 +13899,6 @@
                     /**
                      * Block-Level Grammar
                      */
-                    console.log('debug mod 17');
                     var block = {
                         newline: /^\n+/,
                         code: /^( {4}[^\n]+\n*)+/,
@@ -15230,7 +15214,6 @@
                  * @returns {Typo} A Typo object.
                  */
 
-                console.log('debug mod 18')
                 var Typo = function (dictionary, affData, wordsData, settings) {
                     settings = settings || {};
 
@@ -15997,7 +15980,6 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
-            console.log('debug mod 19');
 
             var CodeMirror = require("codemirror");
 
@@ -16061,7 +16043,6 @@
             })(function (CodeMirror) {
                 "use strict";
 
-                console.log('debug mod 20 ***********')
                 var HINT_ELEMENT_CLASS = "CodeMirror-hint";
                 var ACTIVE_HINT_ELEMENT_CLASS = "CodeMirror-hint-active";
 
@@ -16069,7 +16050,6 @@
                 // This is the old interface, kept around for now to stay
                 // backwards-compatible.
                 CodeMirror.showHint = function (cm, getHints, options) {
-                    console.log('CodeMirror.showHint ');
                     if (!getHints) {
                         return cm.showHint(options);
                     }
@@ -16077,9 +16057,7 @@
                         getHints.async = true;
                     }
                     var newOpts = {hint: getHints};
-                    console.log('newOpts', newOpts);
                     if (options) {
-                        console.log('options are true');
                         for (var prop in options) {
                             newOpts[prop] = options[prop];
                         }
@@ -16089,7 +16067,6 @@
 
 
                 CodeMirror.defineExtension("showHint", function (options) {
-                    console.log('defineExt3ensiont');
                     options = parseOptions(this, this.getCursor("start"), options);
                     var selections = this.listSelections()
                     if (selections.length > 1) return;
@@ -16180,7 +16157,6 @@
                         if (this.tick == null) return
                         var self = this, myTick = ++this.tick
                         fetchHints(this.options.hint, this.cm, this.options, function (data) {
-                            console.log('debug1');
                             if (self.tick == myTick) self.finishUpdate(data, first)
                         })
                     },
@@ -16479,7 +16455,6 @@
                 }
 
                 function fetchHints(hint, cm, options, callback) {
-                    console.log('fetchHints');
                     if (hint.async) {
                         hint(cm, callback, options)
                     } else {
@@ -16490,7 +16465,6 @@
                 }
 
                 function resolveAutoHints(cm, pos) {
-                    console.log('resolveAutoHints')
                     var helpers = cm.getHelpers(pos, "hint"), words
                     if (helpers.length) {
                         var resolved = function (cm, callback, options) {
@@ -16529,7 +16503,6 @@
 
                 CodeMirror.registerHelper("hint", "customList", function (cm, callback, options) {
 
-                    console.log('registerHelper hint customList');
 
                     var list = cm.list;
                     var cursor = cm.getCursor();
@@ -16594,7 +16567,6 @@
         }, {"../../lib/codemirror": 10}],
         21: [function (require, module, exports) {
             /*global require,module*/
-            console.log('debug mod 20')
             "use strict";
             var CodeMirror = require("codemirror");
             require("codemirror/addon/edit/continuelist.js");

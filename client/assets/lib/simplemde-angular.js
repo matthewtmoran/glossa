@@ -13,7 +13,6 @@ angular.module('simplemde', [])
                     var mde = new SimpleMDE(options);
                     //This is the actual instance that we can use to call
                     var cm = mde.myCodeMirror;
-                    console.log('cm', cm);
                     //this is the specific instance - much more limited
                     var editor = mde.codemirror;
 
@@ -90,8 +89,6 @@ angular.module('simplemde', [])
                             instance.list = hashtagList;
                             //calls this custom function that's defined in codemirror.  Definitley need that option otherwise we will end up in an endless loop
 
-                            console.log('cm', cm);
-                            console.log('cm.hint', cm.hint);
                             cm.showHint(instance, cm.hint.customList, {
                                 "completeSingle": false,
                                 'closeOnUnfocus': false
