@@ -29,18 +29,26 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope) {
     tagVm.showData = 'alldata';
     tagVm.infiniteItems = [];
 
-    hashtagSrvc.query().then(function(result) {
-        result.data.forEach(function(tag, index) {
-            hashtagSrvc.findOccurrenceOfTag(tag).then(function(result) {
-                if (!result) {
-                    tag.occurrence = 0;
-                } else {
-                    tag.occurrence = result;
-                }
-                tagVm.infiniteItems.push(tag);
-            })
+    tagVm.$onInit = function() {
+
+        hashtagSrvc.getHashtags().then(function(data) {
+
+            tagVm.infiniteItems = data;
+
+            // data.forEach(function(tag, index) {
+            //     hashtagSrvc.findOccurrenceOfTag(tag).then(function(result) {
+            //         if (!result) {
+            //             tag.occurrence = 0;
+            //         } else {
+            //             tag.occurrence = result;
+            //         }
+            //         tagVm.infiniteItems.push(tag);
+            //     })
+            // });
         });
-    });
+
+    };
+
 
 
     tagVm.showAll = showAll;

@@ -61,8 +61,16 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
             if (result && !result.dataChanged) {
                 return;
             }
-            var index = nbVm.notebooks.indexOf(notebook);
-            nbVm.notebooks[index] = result.data;
+
+            if (result && result.event === 'update') {
+                var index = nbVm.notebooks.indexOf(notebook);
+                nbVm.notebooks[index] = result.data;
+            }
+
+            if (result && result.event === 'save') {
+                nbVm.notebooks.push(result.data);
+            }
+
         }).catch(function(result) {
             console.log('catch result', result);
         });

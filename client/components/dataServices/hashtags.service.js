@@ -4,7 +4,7 @@ angular.module('glossa')
     .factory('hashtagSrvc', hashtagSrvc);
 
 
-function hashtagSrvc(dbSrvc, $q, $http) {
+function hashtagSrvc($q, $http) {
     var service = {
         getHashtags: getHashtags,
         termQuery: termQuery,
@@ -95,7 +95,7 @@ function hashtagSrvc(dbSrvc, $q, $http) {
             });
         });
 
-       var notebookPromise = dbSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
+       var notebookPromise = notebookSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
 
             result.data.forEach(function(nb, i) {
 

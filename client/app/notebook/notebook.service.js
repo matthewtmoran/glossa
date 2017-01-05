@@ -7,7 +7,7 @@ function notebookSrvc($http, $q, simpleParse) {
 
     var service = {
         getNotebooks: getNotebooks,
-        findNoteBook: findNoteBook,
+        findNoteBook: findNotebook,
         updateNotebook: updateNotebook,
         createNotebook: createNotebook,
         findAny: findAny
@@ -34,9 +34,9 @@ function notebookSrvc($http, $q, simpleParse) {
      * Finds specific notebook
      * @param nbId
      * @returns {*}
-     * TODO: refractor to take an query as argument
+     * TODO: refracter to take query/parameters as argument
      */
-    function findNoteBook(nbId) {
+    function findNotebook(nbId) {
         // var query = {
         //     _id: nbId
         // };
@@ -48,17 +48,16 @@ function notebookSrvc($http, $q, simpleParse) {
         // })
 
         return $http.get('/api/notebook/' + nbId)
-            .success(function(response) {
+            .then(function successCallback(response) {
                 return response.data;
-            })
-            .error(function(response) {
-                console.log('There was an error ', response);
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
                 return response.data;
             });
     }
 
     function findAny(query) {
-        // return dbSrvc.find(nbCollection, query).then(function(result) {
+        // return d` bS rvc.find(nbCollection, query).then(function(result) {
         //     return result;
         // }).catch(function(err) {
         //     console.log('there was en error finding notebook', err);
