@@ -29,7 +29,6 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
             });
     }
 
-
     /**
      * Finds specific notebook
      * @param nbId
@@ -37,16 +36,6 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
      * TODO: refracter to take query/parameters as argument
      */
     function findNotebook(nbId) {
-        // var query = {
-        //     _id: nbId
-        // };
-        //
-        // return dbSrvc.find(nbCollection, query).then(function(result) {
-        //     return result;
-        // }).catch(function(err) {
-        //     console.log('there was en error finding notebook', err);
-        // })
-
         return $http.get('/api/notebook/' + nbId)
             .then(function successCallback(response) {
                 return response.data;
@@ -88,7 +77,7 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
         });
 
        // once all promises have resolved save notebook
-       return $q.all(promises)
+        return $q.all(promises)
             .then(function(response) {
                 //post request to save new notebook
                 return $http.post('/api/notebook', notebook)
@@ -106,25 +95,42 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
             });
     }
 
-
     /**
      * Updates an existing notebook
      * @param notebook
      * @returns {*}
      */
     function updateNotebook(notebook) {
+        notebook = simpleParse.parseNotebook(notebook);
+        //store promises
+        var promises = [];
 
-        return $q.when(simpleParse.parseNotebook(notebook)).then(function(result) {
-
-            return $http.put('/api/notebook/' + notebook._id, notebook)
-                .then(function successCallback(response) {
-                    return response.data;
-                }, function errorCallback(response) {
-                    console.log('There was an error', response);
-                    return response.data;
-                });
-
+        notebook.hashtags.forEach(function(tag, index) {
+            //push this query to promises array
+            promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
+                //update the notebook model property
+                notebook.hashtags[index] = data;
+                return data;
+            }))
         });
+
+        // once all promises have resolved save notebook
+        return $q.all(promises)
+            .then(function(response) {
+                //post request to save new notebook
+                return $http.put('/api/notebook/' + notebook._id, notebook)
+                    .then(function successCallback(response) {
+                        return response.data;
+                    }, function errorCallback(response) {
+                        console.log('There was an error', response);
+                        return response.data;
+                    });
+
+            })
+            .catch(function(response) {
+                console.log('There was an error with the promises', response);
+                return response.data;
+            });
     }
 }
 

@@ -39,7 +39,6 @@ function hashtagSrvc($q, $http) {
     function termQuery(term) {
         return $http.get('/api/hashtag/search/' + term )
             .then(function successCallback(response) {
-                console.log('response', response);
                 return response.data;
             }, function errorCallback(response) {
                 console.log('There was an error', response);

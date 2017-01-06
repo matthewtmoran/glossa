@@ -47,6 +47,7 @@ exports.update = function(req, res) {
     if(!notebook) { return res.status(404).send('Not Found'); }
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(notebook, req.body);
+        updated.hashtags = req.body.hashtags;
         Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) { return handleError(res, err); }
       return res.status(200).json(updatedDoc);
