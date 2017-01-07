@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('notebookSrvc', notebookSrvc);
 
-function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
+function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
 
     var service = {
         getNotebooks: getNotebooks,
@@ -79,13 +79,17 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
        // once all promises have resolved save notebook
         return $q.all(promises)
             .then(function(response) {
-                //post request to save new notebook
-                return $http.post('/api/notebook', notebook)
-                    .then(function successCallback(response) {
-                        return response.data;
-                    }, function errorCallback(response) {
-                        console.log('There was an error', response);
-                        return response.data;
+                var options = {
+                    url:'/api/notebook/',
+                    method: 'POST'
+                }
+                return uploadReq(notebook, options)
+                    .then(function successCallback(data) {
+                        console.log('successCallback data:', data);
+                        return data;
+                    }, function errorCallback(data) {
+                        console.log('There was an error', data);
+                        return data;
                     });
 
             })
@@ -117,20 +121,53 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc) {
         // once all promises have resolved save notebook
         return $q.all(promises)
             .then(function(response) {
-                //post request to save new notebook
-                return $http.put('/api/notebook/' + notebook._id, notebook)
-                    .then(function successCallback(response) {
-                        return response.data;
-                    }, function errorCallback(response) {
-                        console.log('There was an error', response);
-                        return response.data;
-                    });
-
+                var options = {
+                    url:'/api/notebook/' + notebook._id,
+                    method: 'PUT'
+                };
+                return uploadReq(notebook, options)
+                    .then(function successCallback(data) {
+                            console.log('successCallback data:', data);
+                            return data;
+                        }, function errorCallback(data) {
+                            console.log('There was an error', data);
+                            return data;
+                        });
             })
             .catch(function(response) {
                 console.log('There was an error with the promises', response);
                 return response.data;
             });
     }
+
+    function uploadReq(notebook, options) {
+        var files = [];
+        for (var key in notebook.media) {
+            if (notebook.media.hasOwnProperty(key)) {
+                if (notebook.media[key]) {
+                    files.push(notebook.media[key])
+                    delete notebook.media[key];
+                }
+            }
+        }
+
+        return Upload.upload({
+            method: options.method,
+            url: options.url,
+            data: {
+                files: files,
+                notebook: angular.toJson(notebook)
+            },
+            arrayKey: '',
+            headers: { 'Content-Type': undefined }
+        }).then(function successCallback(response) {
+            return response.data;
+
+        }, function errorCallback(response){
+            console.log('Error with upload', response);
+            return response.data;
+        });
+    }
+
 }
 

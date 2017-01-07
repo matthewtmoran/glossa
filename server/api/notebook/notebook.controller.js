@@ -12,6 +12,7 @@
 var _ = require('lodash');
 var Notebook = require('./notebook.model');
 var path = require('path');
+
 // var globalPaths = require('electron').remote.getGlobal('userPaths');
 
 // Get list of things
@@ -33,7 +34,7 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-    Notebook.insert(req.body, function(err, notebook) {
+    Notebook.insert(req.body.notebook, function(err, notebook) {
     if(err) { return handleError(res, err); }
     return res.status(201).json(notebook);
   });
@@ -46,7 +47,8 @@ exports.update = function(req, res) {
     if (err) { return handleError(res, err); }
     if(!notebook) { return res.status(404).send('Not Found'); }
     var options = {returnUpdatedDocs: true};
-    var updated = _.merge(notebook, req.body);
+    var removed = _.difference()
+    var updated = _.merge(notebook, req.body.notebook);
         updated.hashtags = req.body.hashtags;
         Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) { return handleError(res, err); }

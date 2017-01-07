@@ -39,6 +39,5 @@ function notebookCard($sce) {
         scope.open = function(event, notebook) {
             scope.openDetails(event, notebook);
         };
-
     }
 }

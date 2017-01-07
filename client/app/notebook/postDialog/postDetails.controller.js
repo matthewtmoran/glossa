@@ -4,7 +4,7 @@
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);
 
-function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
+function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $http, Upload) {
     var postVm = this;
 
     var dialogObject = {
@@ -17,7 +17,8 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     postVm.hide = hide;
     postVm.save = save;
     postVm.editorOptions = simplemdeOptions;
-
+    postVm.removeMedia = removeMedia;
+    postVm.removedMedia = [];
     init();
     function init() {
         postVm.notebook = angular.copy(postVm.currentNotebook);
@@ -65,6 +66,9 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
     }
 
     function update() {
+        if (postVm.removedMedia.length > 0) {
+            postVm.notebook.removeItem = postVm.removedMedia;
+        }
         return notebookSrvc.updateNotebook(postVm.notebook).then(function(data) {
             dialogObject = {
                 dataChanged: true,
@@ -100,4 +104,21 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc) {
             }
         }
     }
+    function removeMedia(media) {
+        if (media.createdAt) {
+            postVm.removedMedia.push(media);
+        }
+    }
+
+    $scope.$watch('postVm.notebook.media.audio', function(oldValue, newValue) {
+        if (oldValue) {
+            postVm.audioPath = oldValue.path || window.URL.createObjectURL(oldValue);
+        }
+    });
+    $scope.$watch('postVm.notebook.media.image', function(oldValue, newValue) {
+        if (oldValue) {
+            postVm.imagePath = oldValue.path || window.URL.createObjectURL(oldValue);
+        }
+    });
+
 }

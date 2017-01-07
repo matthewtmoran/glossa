@@ -3,3 +3,9 @@ node_modules
 .idea/
 client/app/*.css
 ToDo.md
+
+server/data/audio/*
+server/data/database/*
+server/data/image/*
+server/data/markdown/*
+server/data/tmp/*

@@ -8,89 +8,58 @@ function uploadSelection(fileSrvc, $q) {
     var directive = {
         restrict: 'E',
         scope: {
-            parentbinding: '=',
             buttonid: '@buttonid',
             buttonicon: '@buttonicon',
             filetypes: '@filetypes',
             tooltiptext: '@tooltiptext',
+            inputName: '@inputName',
             type: '@type',
         },
-        require:"^form",
+        require:"ngModel",
         templateUrl: 'components/uploadSelection/uploadSelection.html',
         link: apsUploadFileLink
     };
     return directive;
 
-    function apsUploadFileLink(scope, element, attrs, form) {
+    function apsUploadFileLink(scope, element, attrs, ngModel) {
 
-        if (scope.parentbinding) {
-            scope.filePath = scope.parentbinding.path;
-        }
+        // if (ngModel.$viewValue.length > 0) {
+        //     scope.filePath = ngModel.$viewValue;
+        // }
 
         var button = angular.element(element).find('.upload-button');
-        var input = angular.element(element).find('.upload-input');
+        var input = angular.element('input[name=' + scope.inputName + ']');
+        // var input = angular.element(element).find('.upload-input');
+
+        console.log('input', input);
         scope.removePreview = removePreview;
 
         if (input.length && button.length) {
-            button.click(function (e) {
-                input.click();
+            button.click(function(e) {
+                console.log('button click');
+                input.click(function() {
+                    console.log('this', this);
+                });
             });
         }
 
-        input.on('change', function (e) {
-            console.log('TODO: upload files');
-            // var file = e.target.files[0];
-            // var targetPath;
-            // //if there is no file, return
-            // if (!file) {
-            //     return;
-            // } else {
-            //     targetPath = path.join(globalPaths.static.root, scope.type, file.name);
-            //     if (util.doesExist(targetPath)) {
-            //         return alert('A file with this name already exists.  Choose another file');
-            //     }
-            // }
-            //
-            // form.$dirty = true;
-            // form.$pristine = false;
-            //
-            // var writePath = path.join(globalPaths.static.root, scope.type, file.name);
-            //
-            // util.copyWrite2(file.path, writePath).then(function(result) {
-            //     scope.filePath = path.join(globalPaths.static.root, scope.type, file.name);
-            //
-            //
-            //     scope.parentbinding = {
-            //         name: file.name,
-            //         path: path.join(globalPaths.relative.root, scope.type, file.name),
-            //         type: file.type,
-            //         extension: file.extension
-            //     };
-            //
-            //     scope.$apply();
-            //     //create object for database
-            // });
-
-
+        input.on('change', function(e) {
+            console.log('addfile');
+            var file = e.target.files[0];
+            if (file) {
+                ngModel = file;
+                scope.filePath = window.URL.createObjectURL(file);
+                console.log('scope.filePath', scope.filePath);
+                scope.$apply();
+            }
         });
 
+
+
         function removePreview(event) {
-
-            console.log('TODO: remove file preview');
-
-            // event.preventDefault();
-            //
-            // if (input.val()) {
-            //     util.removeItem(scope.filePath).then(function(result) {
-            //         scope.filePath = null;
-            //         scope.parentbinding = null;
-            //         input.val(null);
-            //         scope.$apply();
-            //     }).catch(function(err) {
-            //         console.log('There was an error removing file', err)
-            //     })
-            // }
-
+            scope.filePath = null;
+            ngModel = null;
+            input.val(null);
         }
     }
 }

@@ -6,7 +6,8 @@ angular.module('glossa', [
     'ui.router',
     'simplemde',
     'ngSanitize',
-    'md.data.table'
+    'md.data.table',
+    'ngFileUpload'
     // 'mdWavesurfer'
     ])
     .config(config)
