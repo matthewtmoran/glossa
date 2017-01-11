@@ -2,24 +2,49 @@
 	<form name="postForm" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
-				<h2>Create New Audio Post</h2>
+				<h2>{{postVm.postDetails.title}}</h2>
 			</div>
 		</md-toolbar>
 		<md-dialog-content>
 			<div class="md-dialog-content">
-				<md-input-container layout="row" layout-align="start center">
-					<upload-selection flex="50"
-				                  parentbinding="postVm.notebook.media.audio"
-					              buttonicon="volume_up"
-					              button-id="uploadAudio"
-					              type="audio"
-					              filetypes=".mp3, .m4a"></upload-selection>
-				</md-input-container>
+
+				<div layout="row">
+
+					<div flex class="upload-selection">
+						<div layout="row" layout-align="center center">
+							<md-button ngf-select
+							           name="audioUpload"
+							           class="md-icon-button"
+							           ng-model="postVm.notebook.media.audio"
+							           accept="audio/*">
+								<md-icon>volume_up</md-icon>
+							</md-button>
+						</div>
+						<div flex class="md-padding media-container" ng-if="postVm.notebook.media.audio">
+							<md-button class="md-icon-button remove-preview" ng-click="postVm.removeMedia(postVm.notebook.media.audio); postVm.notebook.media.audio = null" >
+								<md-icon>cancel</md-icon>
+							</md-button>
+							<wave-preview
+									ng-if="postVm.notebook.media.audio"
+									flex
+									url="{{postVm.audioPath}}"
+									auto-play="false"
+									player-wave-color="white"
+									player-cursor-color="#FF5252"
+									player-height="100"
+									player-progress-color="black">
+							</wave-preview>
+						</div>
+					</div>
+				</div>
+
+
+
 				<h3 class="md-padding">Audio Caption</h3>
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="audioCaption"
 					          aria-label="text area"
-					          ng-model="postVm.notebook.media.audio.caption"
+					          ng-model="postVm.notebook.description"
 					          simplemde="postVm.editorOptions"></textarea>
 				</md-input-container>
 			</div>
@@ -27,7 +52,7 @@
 		<md-dialog-actions layout="row" class="top-border">
 			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
 
-			<md-button ng-disabled="!postVm.notebook.media.audio.path" ng-click="postVm.postDetails.button.action('Create Audio Post')">Add Post</md-button>
+			<md-button ng-disabled="postForm.$invalid" ng-click="postVm.postDetails.button.action('Create Audio Post')">{{postVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 	</form>
 </md-dialog>

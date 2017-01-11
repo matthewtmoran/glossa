@@ -82,7 +82,8 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
                 var options = {
                     url:'/api/notebook/',
                     method: 'POST'
-                }
+                };
+                console.log('notebook before request', notebook);
                 return uploadReq(notebook, options)
                     .then(function successCallback(data) {
                         console.log('successCallback data:', data);
@@ -125,6 +126,7 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
                     url:'/api/notebook/' + notebook._id,
                     method: 'PUT'
                 };
+                console.log('notebook before request', notebook);
                 return uploadReq(notebook, options)
                     .then(function successCallback(data) {
                             console.log('successCallback data:', data);

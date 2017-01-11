@@ -12,20 +12,14 @@ function simpleParse(hashtagSrvc, $q) {
 
 
     function parseNotebook(notebook) {
-        var textArea;
-
         if (notebook.postType === 'normal') {
-            textArea = notebook.description;
             notebook.name = parseTitle(notebook.description);
         } else if (notebook.postType === 'image') {
-            textArea = notebook.media.image.caption || '';
-            notebook.name = notebook.media.image.name;
+            notebook.name = notebook.media.image.originalname;
         } else if (notebook.postType === 'audio') {
-            textArea = notebook.media.audio.caption || '';
-            notebook.name = notebook.media.audio.name;
+            notebook.name = notebook.media.audio.originalname;
         }
-
-        notebook.hashtags = findHashtags(textArea) || [];
+        notebook.hashtags = findHashtags(notebook.description) || [];
        return notebook;
 
     }
