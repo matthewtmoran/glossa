@@ -16,9 +16,9 @@ var path = require('path');
 
 // Get list of things
 exports.index = function(req, res) {
-    Hashtag.find({}, function (err, notebooks) {
+    Hashtag.find({}, function (err, hashtags) {
     if(err) { return handleError(res, err); }
-    return res.status(200).json(notebooks);
+    return res.status(200).json(hashtags);
   });
 };
 
@@ -68,28 +68,70 @@ exports.destroy = function(req, res) {
 // Get a single hashtag by term
 exports.showTerm = function(req, res) {
     var tagName = req.params.term;
+    var isIncrease = req.query.count;
     Hashtag.findOne({"tag": tagName}, function (err, tag) {
         if(err) { return handleError(res, err); }
         if(!tag) {
-
             var newTag = {
                 tag: tagName,
                 tagColor: '#4285f4',
                 realTitle: tagName,
                 canEdit: true,
-                createdAt: Date.now()
+                createdAt: Date.now(),
+                occurrence: 1
             };
-
             return Hashtag.insert(newTag, function(err, createdTag) {
                 if(err) { return handleError(res, err); }
                 return res.json(createdTag);
             });
-
-            // return res.status(404).send('Not Found');
         }
-        return res.json(tag);
-    });
 
+        if (isIncrease) {
+            if (!tag.occurrence) {
+                tag.occurrence = 1;
+            } else {
+                tag.occurrence++;
+            }
+        }
+
+
+        var options = {returnUpdatedDocs: true};
+        Hashtag.update({"_id": tag._id}, tag, options, function(err, updatedCount, updatedTag) {
+            if(err) { return handleError(res, err); }
+            return res.json(updatedTag);
+        })
+    });
+};
+
+exports.decreaseCount = function(req, res) {
+    if(req.body._id) { delete req.body._id; }
+    Hashtag.findOne({_id: req.params.id}, function (err, hashtag) {
+        if (err) { return handleError(res, err); }
+        if(!hashtag) { return res.status(404).send('Not Found'); }
+
+        if (!hashtag.occurrence) {
+            hashtag.occurrence = 0;
+        } else {
+            hashtag.occurrence--
+        }
+        var options = {returnUpdatedDocs: true};
+        Hashtag.update({_id: hashtag._id}, hashtag, options, function (err, updatedCount, updatedTag) {
+            if (err) { return handleError(res, err); }
+            return res.status(200).json(updatedTag);
+        });
+    });
+};
+
+exports.common = function(req, res) {
+
+    var query = {
+        occurrence: {$gt: 0}
+    };
+
+    Hashtag.find(query).sort({occurrence: 1}).limit(6).exec(function (err, hashtags) {
+        if(err) { return handleError(res, err); }
+        return res.status(200).json(hashtags);
+    });
 };
 
 function handleError(res, err) {

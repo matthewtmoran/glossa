@@ -34,6 +34,8 @@ function validateFilename(req, res, next) {
         delete notebook.removeItem;
     }
 
+    console.log('files that are attemping to be uploaded....', files);
+
     files.forEach(function(file) {
         file = MediaObject(file);
         if (file.mimetype === 'image/jpeg') {

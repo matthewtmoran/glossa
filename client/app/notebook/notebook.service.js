@@ -63,40 +63,17 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
         notebook.createdAt = Date.now();
         notebook.isAttached = false;
         notebook.attachedToId = null;
-        notebook = simpleParse.parseNotebook(notebook);
-
-        //store promises
-        var promises = [];
-        notebook.hashtags.forEach(function(tag, index) {
-            //push this query to promises array
-            promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
-                //update the notebook model property
-                notebook.hashtags[index] = data;
-                return data;
-            }))
-        });
-
-       // once all promises have resolved save notebook
-        return $q.all(promises)
-            .then(function(response) {
+        notebook.name = simpleParse.title(notebook);
+       return $q.when(simpleParse.hashtags(notebook))
+            .then(function(data) {
+                notebook.hashtags = data;
                 var options = {
-                    url:'/api/notebook/',
-                    method: 'POST'
-                };
-                console.log('notebook before request', notebook);
-                return uploadReq(notebook, options)
-                    .then(function successCallback(data) {
-                        console.log('successCallback data:', data);
-                        return data;
-                    }, function errorCallback(data) {
-                        console.log('There was an error', data);
-                        return data;
-                    });
-
-            })
-            .catch(function(response) {
-                console.log('There was an error with the promises', response);
-                return response.data;
+                     url:'/api/notebook/',
+                     method: 'POST'
+                 };
+                return uploadReq(notebook, options).then(function(data) {
+                    return data;
+                })
             });
     }
 
@@ -106,39 +83,18 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
      * @returns {*}
      */
     function updateNotebook(notebook) {
-        notebook = simpleParse.parseNotebook(notebook);
-        //store promises
-        var promises = [];
+        notebook.name = simpleParse.title(notebook);
 
-        notebook.hashtags.forEach(function(tag, index) {
-            //push this query to promises array
-            promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
-                //update the notebook model property
-                notebook.hashtags[index] = data;
-                return data;
-            }))
-        });
-
-        // once all promises have resolved save notebook
-        return $q.all(promises)
-            .then(function(response) {
+        return $q.when(simpleParse.hashtags(notebook))
+            .then(function(data) {
+                notebook.hashtags = data;
                 var options = {
                     url:'/api/notebook/' + notebook._id,
                     method: 'PUT'
                 };
-                console.log('notebook before request', notebook);
-                return uploadReq(notebook, options)
-                    .then(function successCallback(data) {
-                            console.log('successCallback data:', data);
-                            return data;
-                        }, function errorCallback(data) {
-                            console.log('There was an error', data);
-                            return data;
-                        });
-            })
-            .catch(function(response) {
-                console.log('There was an error with the promises', response);
-                return response.data;
+                return uploadReq(notebook, options).then(function(data) {
+                    return data;
+                })
             });
     }
 
@@ -170,6 +126,5 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
             return response.data;
         });
     }
-
 }
 

@@ -14,6 +14,7 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
 
     nbVm.$onInit = function() {
         queryNotebooks();
+        queryCommonTags();
         // nbVm.occurringTags = hashtagSrvc.countHashtags();
     };
 
@@ -40,6 +41,12 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     function queryNotebooks() {
         notebookSrvc.getNotebooks().then(function(data) {
             nbVm.notebooks = data
+        })
+    }
+
+    function queryCommonTags() {
+        hashtagSrvc.getCommonTags().then(function(data) {
+            nbVm.commonTags = data
         })
     }
 

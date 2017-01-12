@@ -12,5 +12,7 @@ router.put('/:id', controller.update);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 router.get('/search/:term', controller.showTerm);
+router.put('/decrease/:id', controller.decreaseCount);
+router.get('/common/:someValue', controller.common);
 
 module.exports = router;

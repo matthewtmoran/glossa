@@ -59,16 +59,18 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $htt
             data: {}
         };
 
-        return notebookSrvc.createNotebook(postVm.notebook).then(function(result) {
-            dialogObject.data = result;
-            $mdDialog.hide(dialogObject);
-        });
+        return notebookSrvc.createNotebook(postVm.notebook)
+            .then(function(result) {
+                dialogObject.data = result;
+                $mdDialog.hide(dialogObject);
+            });
     }
 
     function update() {
         if (postVm.removedMedia.length > 0) {
             postVm.notebook.removeItem = postVm.removedMedia;
         }
+
         return notebookSrvc.updateNotebook(postVm.notebook).then(function(data) {
             dialogObject = {
                 dataChanged: true,

@@ -12,8 +12,8 @@ function hashtagSrvc($q, $http) {
         save: save,
         normalizeHashtag: normalizeHashtag,
         removeHashtag: removeHashtag,
-        countHashtags: countHashtags,
-        findOccurrenceOfTag:findOccurrenceOfTag
+        decreaseTagCount: decreaseTagCount,
+        getCommonTags: getCommonTags
     };
 
     return service;
@@ -32,12 +32,22 @@ function hashtagSrvc($q, $http) {
             });
     }
 
+    function getCommonTags() {
+        return $http.get('/api/hashtag/common/1')
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
+    }
+
     /**
      * Searches by term
      * @param term
      */
     function termQuery(term) {
-        return $http.get('/api/hashtag/search/' + term )
+        return $http.get('/api/hashtag/search/' + term + '?count=true')
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {
@@ -176,69 +186,18 @@ function hashtagSrvc($q, $http) {
         });
     }
 
-    /**
-     * Counts hashtags across notebooks
-     */
-    function countHashtags() {
-        //store all occurring tags
-        var occurringTags = [];
 
-        //query all tags
-        dbSrvc.find(hashtagsCol, {}).then(function(result) {
+    function decreaseTagCount(tag) {
+        $http.put('api/hashtag/decrease/' + tag._id, tag)
+            .then(function successCallback(response) {
 
-            result.data.forEach(function(tag) {
+                // return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error - flag something to normalize data on app close or open....', response);
 
-               findOccurrenceOfTag(tag).then(function(result) {
-                   if (result) {
-                       tag.occurrence = result;
-                       occurringTags.push(tag);
-                   }
-               });
+                // return response.data;
             });
-
-        }).catch(function(result) {
-            console.log('Error finding hashtag occurrences ', result)
-        });
-        //return array of occurring tags
-        return occurringTags;
     }
-
-    function findOccurrenceOfTag(tag) {
-        //store occurrence of tag
-        var totalOccurrence = 0;
-
-        //store count promise
-        var notebookPromise = dbSrvc.count(nbCollection, {'hashtags._id': tag._id}).then(function(result) {
-            if (result.data > 0) {
-                //add occurrence to total
-                totalOccurrence += result.data;
-            }
-        }).catch(function(result) {
-            console.log('nb catch result', result);
-        });
-
-        var tfilePormise = dbSrvc.count(fileCollection, {'hashtags._id': tag._id}).then(function(result) {
-            if (result.data > 0) {
-                totalOccurrence += result.data;
-            }
-        }).catch(function(result) {
-            console.log('tf catch result', result);
-        });
-
-        //once the promise has resolved
-        return $q.all([notebookPromise, tfilePormise]).then(function(result) {
-            //if tag occurs and that occurrence is greater than 0;
-            if (totalOccurrence && totalOccurrence > 0) {
-                //add property to tag
-                // tag.occurence = totalOccurrence;
-                //push tag to array
-                // return tag;
-                return totalOccurrence;
-                // occurringTags.push(tag);
-            }
-        });
-    }
-
 
 }
 
