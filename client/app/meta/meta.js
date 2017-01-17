@@ -6,7 +6,7 @@ angular.module('glossa')
 function config($stateProvider) {
     $stateProvider
         .state('corpus.meta', {
-            url: '',
+            url: 'meta',
             template: '<meta-component ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">'
         });
 }

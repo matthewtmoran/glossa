@@ -2,9 +2,9 @@
 	<form name="fileMeta">
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>File Name</label>
-			<input ng-blur="metaVm.newUpdate('name')"
-			       ng-model="metaVm.currentFile.name"
-			       value="metaVm.currentFile.name">
+			<input ng-blur="metaVm.newUpdate('name', metaVm.currentFile)"
+			       ng-model="metaVm.currentFile.displayName"
+			       value="metaVm.currentFile.displayName">
 		</md-input-container>
 		<md-input-container class="md-block">
 			<!--<label>Description</label>-->

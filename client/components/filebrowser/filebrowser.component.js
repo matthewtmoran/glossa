@@ -12,44 +12,54 @@ angular.module('glossa')
         }
     });
 
-function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
+function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams, markdownSrvc) {
     var fbVm = this;
 
     fbVm.fileSelection = fileSelection;
-    fbVm.createNewTextFile = createNewTextFile;
+    fbVm.createMDFile = createMDFile;
     fbVm.fileList = [];
-    var currentCorpus = $stateParams.corpus;
+    var currentCorpus;
 
-    activate();
+    fbVm.$onInit = function() {
+        currentCorpus = $stateParams.corpus;
+        getFiles(currentCorpus);
+    };
 
-    function activate() {
-        // initialFileList(currentCorpus);
+    function getFiles(corpus) {
+        markdownSrvc.getFiles(corpus).then(function(data) {
+            data.forEach(function(file) {
+                fbVm.fileList.push(file)
+            });
+            fbVm.currentFile = fbVm.fileList[0];
+        })
     }
+
+
 
     /**
      * Queries for all files in db.
      * Returns a promise object
      */
-    function initialFileList(corpus) {
-        var prevLength = 37;
-        fileSrvc.queryAllFiles(corpus).then(function(docs) {
-
-            docs.data.forEach(function(doc){
-                baselineSrvc.readContent(doc, function(content) {
-                    if (content.length > prevLength) {
-                        doc.previewContent = content.substring(0, prevLength) + '...';
-                    } else {
-                        doc.previewContent = content;
-                    }
-                });
-                fbVm.fileList.push(doc);
-
-            });
-
-            //set intitial file
-            updateFileSelection(fbVm.fileList[0]);
-        });
-    }
+    // function initialFileList(corpus) {
+    //     var prevLength = 37;
+    //     fileSrvc.queryAllFiles(corpus).then(function(docs) {
+    //
+    //         docs.data.forEach(function(doc){
+    //             baselineSrvc.readContent(doc, function(content) {
+    //                 if (content.length > prevLength) {
+    //                     doc.previewContent = content.substring(0, prevLength) + '...';
+    //                 } else {
+    //                     doc.previewContent = content;
+    //                 }
+    //             });
+    //             fbVm.fileList.push(doc);
+    //
+    //         });
+    //
+    //         //set intitial file
+    //         updateFileSelection(fbVm.fileList[0]);
+    //     });
+    // }
 
     /**
      * Define the selected file
@@ -65,6 +75,7 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
      * @param file
      */
     function updateFileSelection(file) {
+        console.log('updateFileSelection');
         // fileSrvc.setCurrentFile(file);
         // fbVm.currentFile = fileSrvc.getCurrentFile();
         fbVm.currentFile = file;
@@ -73,10 +84,16 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
     /**
      * Creates a new blank texts(.md) document
      */
-    function createNewTextFile() {
-        fileSrvc.createNewTextFile().then(function(result) {
-            fbVm.fileList.push(result.data);
-            updateFileSelection(result.data);
+    function createMDFile() {
+        console.log('createMDFile');
+        var newFile = {
+            corpus: $stateParams.corpus,
+            createdBy: 'Moran'
+        };
+        markdownSrvc.createFile(newFile).then(function(data) {
+            console.log('data', data);
+            fbVm.fileList.push(data);
+            fbVm.currentFile = data;
         });
     }
 
@@ -85,7 +102,7 @@ function filebrowserComponent(fileSrvc, $scope, baselineSrvc, $stateParams) {
      * Broadcasted from main.component.js
      */
     $scope.$on('create:textFile', function() {
-        createNewTextFile();
+        createMDFile();
     });
 
     /**

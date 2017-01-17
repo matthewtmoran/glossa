@@ -18,7 +18,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse) {
+function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse, markdownSrvc) {
     var metaVm = this;
 
     metaVm.hidden = false;
@@ -40,7 +40,6 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         updateFunction: newUpdate
     };
 
-    metaVm.updateData = updateData;
     metaVm.newUpdate = newUpdate;
     metaVm.confirmDeleteDialog = confirmDeleteDialog;
     metaVm.disconnectDialog = disconnectDialog;
@@ -50,58 +49,37 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
     $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
-
     $scope.$on('update:meta-description', newUpdate('description'));
 
 
-    //I believe this is the one we use...
-    function newUpdate(field) {
-
-        $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
-
-            metaVm.currentFile.hashtags = [];
-            result.forEach(function(tag) {
-                metaVm.currentFile.hashtags.push(tag);
-            });
-
-
-            fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
-                if (!result.success) {
-                    return console.log('TODO: show user the update was unsuccessful and handle errors');
-                }
-
-                // console.log('TODO: show user the update was successful', result);
-            })
-
+    function newUpdate(field, file) {
+        console.log('newUpdate');
+        markdownSrvc.updateFile(metaVm.currentFile).then(function(data) {
+           console.log('data', data);
+           metaVm.currentFile = data;
         });
+
+
+
+        // $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
+        //
+        //     metaVm.currentFile.hashtags = [];
+        //     result.forEach(function(tag) {
+        //         metaVm.currentFile.hashtags.push(tag);
+        //     });
+        //
+        //
+        //     fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
+        //         if (!result.success) {
+        //             return console.log('TODO: show user the update was unsuccessful and handle errors');
+        //         }
+        //
+        //         // console.log('TODO: show user the update was successful', result);
+        //     })
+        //
+        // });
     }
 
-
-    //TODO: remove this?
-    /**
-     * Update the file's meta data from form
-     * @param data - object = {fileId: String, field: String}
-     */
-    function updateData(data) {
-        console.log('metaComponent: updateData', data);
-        var changeData = {
-            fileId: data.fileId,
-            options: {},
-            newObj: {},
-            field: data.field,
-            file: metaVm.currentFile
-        };
-
-        changeData['newObj'][data.field] = metaVm.currentFile[data.field];
-
-        fileSrvc.updateFileData(changeData).then(function(doc) {
-            metaVm.currentFile[data.field] = doc.data[data.field];
-
-            if (data.field === 'name') {
-                metaVm.currentFile.path = doc.data.path;
-            }
-        });
-    }
 
 
     //DIALOGS
@@ -207,18 +185,18 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
 
     //Queryies the attached notebook data
     function queryAttachedNotebook() {
-
-        if (metaVm.currentFile.mediaType === 'notebook') {
-            notebookSrvc.find(metaVm.currentFile.notebookId).then(function(result) {
-                metaVm.attachedNotebook = result.data[0];
-                if (metaVm.attachedNotebook.media.image) {
-                    metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);
-                }
-                if (metaVm.attachedNotebook.media.audio) {
-                    metaVm.audioPath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.audio.path);
-                }
-            })
-        }
+        console.log('queryAttachedNotebook');
+        // if (metaVm.currentFile.mediaType === 'notebook') {
+            // notebookSrvc.find(metaVm.currentFile.notebookId).then(function(result) {
+            //     metaVm.attachedNotebook = result.data[0];
+            //     if (metaVm.attachedNotebook.media.image) {
+            //         metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);
+            //     }
+            //     if (metaVm.attachedNotebook.media.audio) {
+            //         metaVm.audioPath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.audio.path);
+            //     }
+            // })
+        // }
 
     }
 

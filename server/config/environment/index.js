@@ -32,7 +32,8 @@ var all = {
 
     dbPath: 'server/data/database/',
     imagePath: 'server/data/image',
-    audioPath: 'server/data/audio'
+    audioPath: 'server/data/audio',
+    markdownPath: 'server/data/markdown'
 
 
 };

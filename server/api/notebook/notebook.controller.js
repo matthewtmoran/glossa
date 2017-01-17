@@ -49,7 +49,7 @@ exports.update = function(req, res) {
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(notebook, req.body.notebook);
         updated.hashtags = req.body.notebook.hashtags;
-        Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+    Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) { return handleError(res, err); }
       return res.status(200).json(updatedDoc);
     });
