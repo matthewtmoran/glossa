@@ -10,7 +10,6 @@ angular.module('simplemde', [])
                     var hashtagList = [];
                     options = $parse(attrs.simplemde)(scope) || {};
 
-                    var currentFile = $parse(attrs.fileBinding)(scope) || null;
 
                     options.element = element[0];
                     var mde = new SimpleMDE(options);
@@ -63,9 +62,9 @@ angular.module('simplemde', [])
                     //This is watched to update meta tab data
                     function blurEvent(val) {
                         //if there is an update function bound and if there is a file binding
-                        if (!!options.updateFunction && !!currentFile) {
+                        if (!!options.updateFunction) {
                             //I binded this function to options so I would have access to it here.
-                            options.updateFunction('description', currentFile);
+                            options.updateFunction('description');
                         }
                     }
 

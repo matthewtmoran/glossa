@@ -30,10 +30,15 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
     }
 
     //bound to buttons to create new md file
-    function createMDFile() {
+    function createMDFile(name) {
         var newFile = {
             corpus: $stateParams.corpus,
-            createdBy: 'Moran'
+            createdBy: 'Moran',
+            createdAt: Date.now(),
+            displayName: name || 'untitled',
+            description: '',
+            content: '',
+            media: {}
         };
         markdownSrvc.createFile(newFile).then(function(data) {
             vm.markdownFiles.push(data);

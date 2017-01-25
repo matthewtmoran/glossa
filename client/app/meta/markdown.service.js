@@ -52,10 +52,8 @@ function markdownSrvc($http, Upload) {
 
     //create new md file
     function createFile(file) {
-        console.log('createFile');
         return $http.post('/api/transcription', file)
             .then(function successCallback(response) {
-                console.log('response', response);
                 return response.data;
             }, function errorCallback(response) {
                 console.log('There was an error', response);

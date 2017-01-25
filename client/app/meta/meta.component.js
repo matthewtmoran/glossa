@@ -53,9 +53,18 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
     $scope.$watch('metaVm.currentFile', watchCurrentFile);
 
     //update transcription file
-    function update(field, file) {
-        markdownSrvc.updateFile(file).then(function(data) {
+    //Cant pass in file here right now.  simplemde binding is 'static'.. need to find a way to make the binding dynamic or just reference metaVm.currentFile
+    function update(field) {
+
+        markdownSrvc.updateFile(metaVm.currentFile).then(function(data) {
+
             metaVm.currentFile = data;
+
+            metaVm.markdownFiles.forEach(function(file, index) {
+                if (file._id === data._id) {
+                    metaVm.markdownFiles[index] = data;
+                }
+            })
         });
     }
 

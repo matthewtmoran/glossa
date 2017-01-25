@@ -41,7 +41,7 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-    Transcription.insert(req.mdFile, function(err, file) {
+    Transcription.insert(req.body, function(err, file) {
         if(err) { return handleError(res, err); }
         return res.status(201).json(file);
     });
