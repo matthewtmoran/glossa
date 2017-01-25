@@ -9,6 +9,9 @@ angular.module('simplemde', [])
                     var hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
                     var hashtagList = [];
                     options = $parse(attrs.simplemde)(scope) || {};
+
+                    var currentFile = $parse(attrs.fileBinding)(scope) || null;
+
                     options.element = element[0];
                     var mde = new SimpleMDE(options);
                     //This is the actual instance that we can use to call
@@ -38,7 +41,7 @@ angular.module('simplemde', [])
                     editor.on('change', changeEvent);
                     //I have to watch for this blur event to make changes.
                     // TODO:I dont like that this is called initially
-                    editor.on('blur', blueEvent);
+                    editor.on('blur', blurEvent);
 
                     //basic rendering of data from model value
                     function render() {
@@ -58,10 +61,11 @@ angular.module('simplemde', [])
                     }
 
                     //This is watched to update meta tab data
-                    function blueEvent() {
-                        if (!!options.updateFunction) {
+                    function blurEvent(val) {
+                        //if there is an update function bound and if there is a file binding
+                        if (!!options.updateFunction && !!currentFile) {
                             //I binded this function to options so I would have access to it here.
-                            options.updateFunction();
+                            options.updateFunction('description', currentFile);
                         }
                     }
 

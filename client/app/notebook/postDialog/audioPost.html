@@ -2,32 +2,34 @@
 	<form name="postForm" ng-cloak>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
-				<h2>{{postVm.postDetails.title}}</h2>
+				<h2>{{dialogVm.postDetails.title}}</h2>
 			</div>
 		</md-toolbar>
+
 		<md-dialog-content>
 			<div class="md-dialog-content">
-
 				<div layout="row">
-
 					<div flex class="upload-selection">
 						<div layout="row" layout-align="center center">
 							<md-button ngf-select
 							           name="audioUpload"
+							           required
 							           class="md-icon-button"
-							           ng-model="postVm.notebook.media.audio"
+							           ng-model="dialogVm.notebook.media.audio"
 							           accept="audio/*">
 								<md-icon>volume_up</md-icon>
 							</md-button>
 						</div>
-						<div flex class="md-padding media-container" ng-if="postVm.notebook.media.audio">
-							<md-button class="md-icon-button remove-preview" ng-click="postVm.removeMedia(postVm.notebook.media.audio); postVm.notebook.media.audio = null" >
+						<div flex
+						     class="md-padding media-container"
+						     ng-if="dialogVm.notebook.media.audio">
+							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.media.audio); dialogVm.notebook.media.audio = null" >
 								<md-icon>cancel</md-icon>
 							</md-button>
 							<wave-preview
-									ng-if="postVm.notebook.media.audio"
+									ng-if="dialogVm.notebook.media.audio"
 									flex
-									url="{{postVm.audioPath}}"
+									url="{{dialogVm.audioPath}}"
 									auto-play="false"
 									player-wave-color="white"
 									player-cursor-color="#FF5252"
@@ -38,21 +40,20 @@
 					</div>
 				</div>
 
-
-
-				<h3 class="md-padding">Audio Caption</h3>
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="audioCaption"
 					          aria-label="text area"
-					          ng-model="postVm.notebook.description"
-					          simplemde="postVm.editorOptions"></textarea>
+					          class="simplemde-textarea"
+					          ng-model="dialogVm.notebook.description"
+					          simplemde="dialogVm.editorOptions">
+					</textarea>
 				</md-input-container>
 			</div>
 		</md-dialog-content>
 		<md-dialog-actions layout="row" class="top-border">
-			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
+			<md-button ng-click="dialogVm.cancel($event, dialogVm.notebook)">Cancel</md-button>
 
-			<md-button ng-disabled="postForm.$invalid" ng-click="postVm.postDetails.button.action('Create Audio Post')">{{postVm.postDetails.button.text}}</md-button>
+			<md-button ng-disabled="postForm.$invalid" ng-click="dialogVm.postDetails.button.action('Create Audio Post')">{{dialogVm.postDetails.button.text}}</md-button>
 		</md-dialog-actions>
 	</form>
 </md-dialog>

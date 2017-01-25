@@ -10,6 +10,7 @@ function simpleParse(hashtagSrvc, $q) {
     };
     return service;
 
+    //get title
     function title(notebook) {
         if (notebook.postType === 'normal') {
             notebook.name = extractTitle(notebook.description);
@@ -20,31 +21,13 @@ function simpleParse(hashtagSrvc, $q) {
         }
         return notebook.name;
     }
-    //Parses the title or return first 16 characters of text
-    function extractTitle(text) {
-       var heading = /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/;
 
-       if (heading.test(text)) {
-           return text.match(heading)[0];
-       } else {
-           return text.slice(0, 16);
-       }
-    }
-
-    function extractHashtagText(text) {
-        var hashtags = [];
-        var hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
-        if (hashReg.test(text)) {
-            hashtags = text.match(hashReg).map(function (tag) {
-                return tag.trim().substr(1);
-            });
-            return hashtags
-        }
-    }
-
+    //get hashtags
     function hashtags(notebook) {
+        //gets the hashtags existing in text
         var tagsInText = extractHashtagText(notebook.description) || [];
         var removedTags = [];
+        //if no hashtags exist..
         if (!notebook.hashtags) {
             notebook.hashtags = [];
         }
@@ -58,14 +41,15 @@ function simpleParse(hashtagSrvc, $q) {
                 //remove from hashtags array
                 notebook.hashtags.splice(index, 1);
             }
+            //splice tags in text if it already exists....
             tagsInText.splice(tagsInText.indexOf(tag.tag), 1)
         });
 
+        // removedTags.forEach(function(tag) {
+        //     hashtagSrvc.decreaseTagCount(tag);
+        // });
 
-        removedTags.forEach(function(tag) {
-            hashtagSrvc.decreaseTagCount(tag);
-        });
-
+        //the rest of the tags here should be tags new to this notebook...
         return queryForNewTags(tagsInText).then(function(data) {
             data.forEach(function(tag) {
                 notebook.hashtags.push(tag);
@@ -74,18 +58,48 @@ function simpleParse(hashtagSrvc, $q) {
         });
     }
 
-    function queryForNewTags(newtags) {
+
+    ///////////
+    //helpers//
+    ///////////
+
+
+    //new tags is an array of tags new to this notebook;
+    function queryForNewTags(tagsInText) {
         var promises = [];
-        newtags.forEach(function(tag, index) {
+        tagsInText.forEach(function(tag, index) {
             //push this query to promises array
             promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
                 //update the notebook model property
-                newtags[index] = data;
+                tagsInText[index] = data;
                 return data;
             }))
         });
         return $q.all(promises).then(function(data) {
             return data;
         });
+    }
+
+    //Parses the title or return first 16 characters of text
+    function extractTitle(text) {
+        var heading = /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/;
+
+        if (heading.test(text)) {
+            return text.match(heading)[0];
+        } else {
+            return text.slice(0, 16);
+        }
+    }
+
+    //gets all hashtags in text
+    function extractHashtagText(text) {
+        var hashtags = [];
+        var hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
+        if (hashReg.test(text)) {
+            hashtags = text.match(hashReg).map(function (tag) {
+                return tag.trim().substr(1);
+            });
+            return hashtags
+        }
     }
 }

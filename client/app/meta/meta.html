@@ -2,36 +2,35 @@
 	<form name="fileMeta">
 		<md-input-container class="md-block" flex-gt-sm="">
 			<label>File Name</label>
-			<input ng-blur="metaVm.newUpdate('name', metaVm.currentFile)"
+			<input ng-blur="metaVm.update('name', metaVm.currentFile)"
 			       ng-model="metaVm.currentFile.displayName"
 			       value="metaVm.currentFile.displayName">
 		</md-input-container>
 		<md-input-container class="md-block">
-			<!--<label>Description</label>-->
-
 			<textarea aria-label="textarea"
 			          simplemde="metaVm.editorOptions"
-			          update-function="metaVm.newUpdate('description')"
+			          update-function="metaVm.update('description', metaVm.currentFile)"
+			          file-binding="metaVm.currentFile"
 			          ng-model="metaVm.currentFile.description"
 			          ng-trim="false"
 			          autocomplete="off"
 			          id="meta-description"
-			          rows="5"></textarea>
-
+			          rows="5">
+			</textarea>
 		</md-input-container>
 	</form>
 	<div layout="row" layout-align="space-between center">
-		<md-button ng-click="metaVm.confirmDeleteDialog($event)" class="md-warn">Delete Text</md-button>
-		<md-button ng-disabled="metaVm.currentFile.media.image && metaVm.currentFile.media.audio" ng-click="metaVm.newAttachDialog($event)">Attach</md-button>
+		<md-button ng-click="metaVm.deleteMarkdownFile($event, metaVm.currentFile)" class="md-warn">Delete Text</md-button>
+		<md-button ng-disabled="metaVm.currentFile.attachment.notebookId" ng-click="metaVm.addAttachment($event)">Attach</md-button>
 	</div>
 	<div layout="column" class="attached-media">
 		<h3>Associated Media</h3>
 		<md-content layout="row">
 			<!--Independent Media-->
 			<md-card flex="50"
-					class="mdl-shadow--2dp attachment-card"
-					ng-repeat="(type, attachment) in metaVm.currentFile.media"
-					ng-if="attachment != null && type != 'type' && metaVm.currentFile.mediaType !== 'notebook'">
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-repeat="(type, attachment) in metaVm.currentFile.media"
+			         ng-if="metaVm.currentFile.media.image || metaVm.currentFile.media.audio">
 
 				<md-card-content class="media-content">
 					<md-card-title ng-if="type !== 'image'" class="media-title" layout-align="center space-between">
@@ -42,15 +41,14 @@
 					</md-card-title>
 
 					<div ng-if="type === 'image'" class="media-image">
-						<img ng-src="{{metaVm.imagePath}}" alt="">
+						<img ng-src="{{metaVm.currentFile.media.image.path}}" alt="">
 					</div>
 
 					<div ng-if="type === 'audio'">
 						<wave-preview
 								flex
-								url="{{metaVm.audioPath}}"
+								url="{{metaVm.currentFile.media.audio.path}}"
 								auto-play="false"
-								back-img="{{metaVm.imagePath}}"
 								player-wave-color="white"
 								player-height="150"
 								player-progress-color="black">
@@ -63,35 +61,16 @@
 				<md-divider></md-divider>
 
 				<md-card-actions layout="row" layout-align="start center">
-					<md-button ng-click="metaVm.disconnectDialog($event, attachment, type)">Delete</md-button>
+					<md-button ng-click="metaVm.removeMedia($event, attachment, type)">Delete</md-button>
 				</md-card-actions>
 
-			</md-card><!--Independent Media-->
+			</md-card><!--Independent Media End-->
 			<!--Notebook Attachment-->
-			<md-card flex="50"
-			         class="mdl-shadow--2dp attachment-card"
-			         ng-if="metaVm.currentFile.mediaType === 'notebook'">
-
-				<md-card-content class="media-content">
-					<div ng-if="metaVm.attachedNotebook.media.image" class="media-image">
-						<img ng-src="{{metaVm.imagePath}}" alt="">
-					</div>
-					<div class="media-description">
-						<span class="md-headline">{{metaVm.attachedNotebook.name}}</span>
-						<p>{{metaVm.attachedNotebook.description}}</p>
-					</div>
-				</md-card-content>
-
-				<md-divider></md-divider>
-
-				<md-card-actions layout="row" layout-align="start center">
-					<md-button ng-click="metaVm.disconnectDialog($event, metaVm.attachedNotebook)">Disconnect</md-button>
-					<span flex></span>
-					<md-button ng-click="metaVm.openNBDialog($event, metaVm.attachedNotebook)" class="md-icon-button">
-						<md-icon>open_in_new</md-icon>
-					</md-button>
-				</md-card-actions>
-			</md-card><!--Notebook Media-->
+			<notebook-card flex="50"
+			               ng-if="metaVm.notebookAttachment"
+			               notebook="metaVm.notebookAttachment"
+			               disconnect-notebook="metaVm.disconnectNotebook(notebook)"
+			               view-details="metaVm.viewDetails($event, metaVm.notebookAttachment)"></notebook-card>
 		</md-content>
 	</div>
 	<md-divider></md-divider>

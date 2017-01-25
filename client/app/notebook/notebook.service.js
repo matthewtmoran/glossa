@@ -3,14 +3,13 @@
 angular.module('glossa')
     .factory('notebookSrvc', notebookSrvc);
 
-function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
+function notebookSrvc($http, $q, simpleParse, Upload) {
 
     var service = {
         getNotebooks: getNotebooks,
-        findNoteBook: findNotebook,
-        updateNotebook: updateNotebook,
+        findNotebook: findNotebook,
         createNotebook: createNotebook,
-        findAny: findAny
+        updateNotebook: updateNotebook,
     };
 
     return service;
@@ -33,7 +32,6 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
      * Finds specific notebook
      * @param nbId
      * @returns {*}
-     * TODO: refracter to take query/parameters as argument
      */
     function findNotebook(nbId) {
         return $http.get('/api/notebook/' + nbId)
@@ -43,14 +41,6 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
                 console.log('There was an error', response);
                 return response.data;
             });
-    }
-
-    function findAny(query) {
-        // return d` bS rvc.find(nbCollection, query).then(function(result) {
-        //     return result;
-        // }).catch(function(err) {
-        //     console.log('there was en error finding notebook', err);
-        // })
     }
 
     /**
@@ -83,8 +73,10 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
      * @returns {*}
      */
     function updateNotebook(notebook) {
+        //parse name of notebook in case it was changed...
         notebook.name = simpleParse.title(notebook);
 
+        //parse hashtags in description
         return $q.when(simpleParse.hashtags(notebook))
             .then(function(data) {
                 notebook.hashtags = data;
@@ -98,13 +90,20 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
             });
     }
 
-    function uploadReq(notebook, options) {
+
+    //////////
+    //helper//
+    //////////
+
+
+    //ng-upload request
+    function uploadReq(dataObj, options) {
         var files = [];
-        for (var key in notebook.media) {
-            if (notebook.media.hasOwnProperty(key)) {
-                if (notebook.media[key]) {
-                    files.push(notebook.media[key])
-                    delete notebook.media[key];
+        for (var key in dataObj.media) {
+            if (dataObj.media.hasOwnProperty(key)) {
+                if (dataObj.media[key]) {
+                    files.push(dataObj.media[key])
+                    delete dataObj.media[key];
                 }
             }
         }
@@ -114,7 +113,7 @@ function notebookSrvc($http, $q, simpleParse, hashtagSrvc, Upload) {
             url: options.url,
             data: {
                 files: files,
-                notebook: angular.toJson(notebook)
+                dataObj: angular.toJson(dataObj)
             },
             arrayKey: '',
             headers: { 'Content-Type': undefined }

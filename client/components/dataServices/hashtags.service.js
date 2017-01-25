@@ -47,7 +47,7 @@ function hashtagSrvc($q, $http) {
      * @param term
      */
     function termQuery(term) {
-        return $http.get('/api/hashtag/search/' + term + '?count=true')
+        return $http.get('/api/hashtag/search/' + term)
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {

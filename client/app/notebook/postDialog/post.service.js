@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
-function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
+function postSrvc() {
     var simplemdeTollbar = [
         {
             name: "italic",
@@ -80,7 +80,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
     function postOptions(ev, notebook) {
         var options = {
             simplemde: {},
-            template: ''
+            template: '',
         };
 
         switch(notebook.postType) {
@@ -107,7 +107,7 @@ function postSrvc($mdDialog, notebookSrvc, $q, simpleParse, dialogSrvc) {
                 };
                 break;
             case 'normal':
-                options.template = 'app/notebook/postDialog/normalPost.html';
+                options.template = 'app/notebook/notebookDetails/notebook-details.html';
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,

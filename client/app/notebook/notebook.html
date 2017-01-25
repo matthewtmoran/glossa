@@ -24,35 +24,32 @@
 
 	<md-content flex="75" class="notebook-list" layout-padding >
 		<md-grid-list
-				md-cols="1" md-cols-lt-md="1" md-cols-md="2" md-cols-lg="2" md-cols-gt-lg="3"
-				md-row-height="500"
-				md-gutter="16px" md-gutter-gt-sm="24px">
-
+			md-cols="1" md-cols-lt-md="1" md-cols-md="2" md-cols-lg="2" md-cols-gt-lg="3"
+			md-row-height="500"
+			md-gutter="16px" md-gutter-gt-sm="24px">
 			<md-grid-tile
-					class="grid-tile mdl-shadow--2dp"
-					ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
-					md-colspan="1">
+				class="grid-tile mdl-shadow--2dp"
+				ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
+				md-colspan="1">
 
-				<notebook-card notebook="notebook" open-details="nbVm.openNBDialog($event, notebook)" flex layout-fill></notebook-card>
+				<notebook-card notebook="notebook" view-details="nbVm.viewDetails(event, notebook)" flex layout-fill></notebook-card>
 
 			</md-grid-tile>
 		</md-grid-list>
 	</md-content>
-
-	<md-fab-speed-dial ng-hide="nbVm.hidden"
-	                   md-direction="up"
-	                   md-open="metaVm.isOpen"
-	                   class="md-scale md-fab-bottom-right "
-	                   ng-class="{ 'md-hover-full': nbVm.hover }"
-	                   ng-mouseenter="nbVm.isOpen = true"
-	                   ng-mouseleave="nbVm.isOpen = false">
-
+	<md-fab-speed-dial
+		ng-hide="nbVm.hidden"
+        md-direction="up"
+        md-open="metaVm.isOpen"
+        class="md-scale md-fab-bottom-right "
+        ng-class="{ 'md-hover-full': nbVm.hover }"
+        ng-mouseenter="nbVm.isOpen = true"
+        ng-mouseleave="nbVm.isOpen = false">
 		<md-fab-trigger>
 			<md-button aria-label="menu" class="md-fab md-grey-fab">
 				<md-icon aria-label="menu">add</md-icon>
 			</md-button>
 		</md-fab-trigger>
-
 		<md-fab-actions>
 			<md-button ng-repeat="item in nbVm.items" class="md-fab md-raised md-mini" ng-click="nbVm.newPost($event, item.type)">
 				<md-icon>{{item.icon}}</md-icon>

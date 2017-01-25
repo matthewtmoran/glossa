@@ -1,51 +1,53 @@
 <md-dialog class="post-dialog" flex="50">
 	<form name="postForm" ng-cloak>
+		
 		<md-toolbar>
 			<div class="md-toolbar-tools">
-				<h2>{{postVm.postDetails.title}}</h2>
+				<h2>{{dialogVm.postDetails.title}}</h2>
 			</div>
 		</md-toolbar>
+		
 		<md-dialog-content>
 			<div class="md-dialog-content">
 				<div layout="row">
-
 					<div flex class="upload-selection">
 						<div layout="row" layout-align="center center">
 							<md-button ngf-select
 							           name="imageUpload"
 							           required
 							           class="md-icon-button"
-							           ng-model="postVm.notebook.media.image"
+							           ng-model="dialogVm.notebook.media.image"
 							           accept="image/*">
-								<!--ngf-max-size="5MB"-->
-								<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
 								<md-icon>camera_alt</md-icon>
 							</md-button>
 						</div>
-						<div flex class="md-padding media-container" ng-if="postVm.notebook.media.image" >
-							<md-button class="md-icon-button remove-preview" ng-click="postVm.removeMedia(postVm.notebook.media.image); postVm.notebook.media.image = null" >
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.media.image" >
+							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.media.image); dialogVm.notebook.media.image = null" >
 								<md-icon>cancel</md-icon>
 							</md-button>
-							<img ng-show="postVm.notebook.media.image" ngf-src="postVm.imagePath" class="thumb">
+							<img ng-show="dialogVm.notebook.media.image" ngf-src="dialogVm.imagePath" class="thumb">
 						</div>
 					</div>
 				</div>
 
-				<h3 class="md-padding">Image Caption</h3>
 				<md-input-container class="simplemde-wrapper">
 					<textarea id="imageCaption"
 					          aria-label="text area"
-					          ng-model="postVm.notebook.description"
-					          simplemde="postVm.editorOptions"></textarea>
+					          class="simplemde-textarea"
+					          ng-model="dialogVm.notebook.description"
+					          simplemde="dialogVm.editorOptions">
+					</textarea>
 				</md-input-container>
 			</div>
-
 		</md-dialog-content>
 
 		<md-dialog-actions layout="row" class="top-border">
-			<md-button ng-click="postVm.cancel($event, postVm.notebook)">Cancel</md-button>
-			<md-button ng-disabled="postForm.$invalid" ng-click="postVm.postDetails.button.action('Create Image Post')">{{postVm.postDetails.button.text}}</md-button>
+			<md-button ng-click="dialogVm.cancel($event)">Cancel</md-button>
+			<md-button ng-disabled="postForm.$invalid"
+			           ng-click="dialogVm.postDetails.button.action('Create Image Post')">
+				{{dialogVm.postDetails.button.text}}
+			</md-button>
 		</md-dialog-actions>
+		
 	</form>
-
 </md-dialog>

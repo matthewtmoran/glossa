@@ -4,7 +4,7 @@
 angular.module('glossa')
     .controller('postDetailsCtrl', postDetailsCtrl);
 
-function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $http, Upload) {
+function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $http, Upload, viewOnly, $sce) {
     var postVm = this;
 
     var dialogObject = {
@@ -13,12 +13,15 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $htt
         data: null
     };
     postVm.isNewPost = false;
+    postVm.editorOptions = simplemdeOptions;
+    postVm.removedMedia = [];
     postVm.cancel = cancel;
     postVm.hide = hide;
     postVm.save = save;
-    postVm.editorOptions = simplemdeOptions;
     postVm.removeMedia = removeMedia;
-    postVm.removedMedia = [];
+    postVm.viewOnly = viewOnly;
+    postVm.previewText;
+
     init();
     function init() {
         postVm.notebook = angular.copy(postVm.currentNotebook);
@@ -44,7 +47,6 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $htt
         }
 
         postVm.notebook = {};
-
         $mdDialog.cancel(dialogObject);
     }
 
@@ -70,8 +72,10 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $htt
         if (postVm.removedMedia.length > 0) {
             postVm.notebook.removeItem = postVm.removedMedia;
         }
-
         return notebookSrvc.updateNotebook(postVm.notebook).then(function(data) {
+
+            console.log('data from update notebook: ', data);
+
             dialogObject = {
                 dataChanged: true,
                 event: 'update',
@@ -88,6 +92,9 @@ function postDetailsCtrl($mdDialog, simplemdeOptions, $scope, notebookSrvc, $htt
         }
     }
     function setDynamicItems() {
+        if (postVm.viewOnly) {
+           postVm.previewText = $sce.trustAsHtml(SimpleMDE.markdown(postVm.notebook.description));
+        }
         if (postVm.isNewPost) {
             postVm.postDetails = {
                 title: 'Create New Post',

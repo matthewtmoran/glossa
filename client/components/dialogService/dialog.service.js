@@ -6,18 +6,19 @@ angular.module('glossa')
 function dialogSrvc($mdDialog) {
     var service = {
         hide: hide,
-        manageTags: manageTags,
-        attachToNotebook: attachToNotebook,
         cancel: cancel,
+        manageTags: manageTags,
+        mediaAttachment: mediaAttachment,
         settingsFull: settingsFull,
         corpusDialog: corpusDialog,
         confirmDialog: confirmDialog,
-        openPostDialog: openPostDialog
+        notebookDetails: notebookDetails,
+        viewDetails: viewDetails
     };
     return service;
 
-    function hide() {
-        $mdDialog.hide();
+    function hide(data) {
+        $mdDialog.hide(data);
     }
 
     function cancel(data) {
@@ -38,11 +39,12 @@ function dialogSrvc($mdDialog) {
             return data;
         });
     }
-    function attachToNotebook(ev, currentFile) {
+
+    function mediaAttachment(ev, currentFile) {
        return $mdDialog.show({
-            controller: attachfileCtrl,
+            controller: attachmentCtrl,
             controllerAs: 'atVm',
-            templateUrl: 'app/meta/modal/attachfile.html',
+            templateUrl: 'app/meta/attachment/attachment.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: false,
@@ -50,9 +52,9 @@ function dialogSrvc($mdDialog) {
             locals: {
                 currentFile: currentFile
             }
-        }).then(function(data) {
+        }).then(function truthyAction(data) {
             return data;
-        }, function(data) {
+        }, function falsyAction(data) {
             return data;
         });
     }
@@ -69,11 +71,9 @@ function dialogSrvc($mdDialog) {
             fullscreen: true
 
         }).then(function(data) {
-            console.log('close on save?', data);
         }).catch(function(data) {
             console.log('close on cancel or hide?', data);
         });
-
     }
 
     function corpusDialog() {
@@ -86,18 +86,13 @@ function dialogSrvc($mdDialog) {
             bindToController: true,
             clickOutsideToClose: false,
         }).then(function(data) {
-
-            console.log('corpusDialog is closed. data', data);
-
             return data;
         }).catch(function(data) {
-            console.log('corpusDialog is closed. data', data);
             return data;
         });
     }
 
     function confirmDialog(options) {
-
         var confirm = $mdDialog.confirm()
             .title(options.title || 'Are you sure you want to do this?' )
             .textContent(options.textContent || 'This will change things....')
@@ -105,20 +100,19 @@ function dialogSrvc($mdDialog) {
             .ok(options.okBtn || 'Yes')
             .cancel(options.cancelBtn || 'Cancel');
 
-        return $mdDialog.show(confirm).then(function(data) {
-            console.log('Yes selection', data);
-            return data;
-        }).catch(function(data) {
-            console.log('Cancel selection', data);
-            return data;
-        });
-
+        return $mdDialog.show(confirm)
+            .then(function(data) {
+                return data || true;
+            })
+            .catch(function(data) {
+                return data || false;
+            });
     }
 
-    function openPostDialog(ev, options, currentNotebook) {
+    function notebookDetails(ev, options, notebook) {
         return $mdDialog.show({
-            controller: postDetailsCtrl,
-            controllerAs: 'postVm',
+            controller: notebookDetailsCtrl,
+            controllerAs: 'dialogVm',
             templateUrl: options.template,
             parent: angular.element(document.body),
             targetEvent: ev,
@@ -126,17 +120,36 @@ function dialogSrvc($mdDialog) {
             bindToController: true,
             locals: {
                 simplemdeOptions: options.simplemde,
-                currentNotebook: currentNotebook
+                notebook: notebook
             }
         }).then(function(data) {
 
-            console.log('Dialog is saved. data', data);
-
             return data;
         }).catch(function(data) {
-            console.log('Dialog is canceled', data);
             return data;
         });
     }
+
+    function viewDetails(ev, options, notebook) {
+        return $mdDialog.show({
+            controller: notebookDetailsCtrl,
+            controllerAs: 'dialogVm',
+            templateUrl: 'app/notebook/notebookDetails/view-notebook-details.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: false,
+            bindToController: true,
+            locals: {
+                simplemdeOptions: options.simplemde,
+                notebook: notebook
+            }
+        }).then(function(data) {
+
+            return data;
+        }).catch(function(data) {
+            return data;
+        });
+    }
+
 
 }

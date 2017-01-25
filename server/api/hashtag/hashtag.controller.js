@@ -68,10 +68,11 @@ exports.destroy = function(req, res) {
 // Get a single hashtag by term
 exports.showTerm = function(req, res) {
     var tagName = req.params.term;
-    var isIncrease = req.query.count;
     Hashtag.findOne({"tag": tagName}, function (err, tag) {
         if(err) { return handleError(res, err); }
+        //if there is no tag, create a new one...
         if(!tag) {
+
             var newTag = {
                 tag: tagName,
                 tagColor: '#4285f4',
@@ -85,16 +86,6 @@ exports.showTerm = function(req, res) {
                 return res.json(createdTag);
             });
         }
-
-        if (isIncrease) {
-            if (!tag.occurrence) {
-                tag.occurrence = 1;
-            } else {
-                tag.occurrence++;
-            }
-        }
-
-
         var options = {returnUpdatedDocs: true};
         Hashtag.update({"_id": tag._id}, tag, options, function(err, updatedCount, updatedTag) {
             if(err) { return handleError(res, err); }

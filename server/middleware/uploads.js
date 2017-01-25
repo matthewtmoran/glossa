@@ -19,19 +19,21 @@ var upload = multer({ storage: storage });
 var type = upload.array('files');
 
 function validateFilename(req, res, next) {
+    console.log("req.files", req.files);
+    console.log("req.body", req.body);
     if (!req.files) {
         next();
     }
 
-    var notebook = JSON.parse(req.body.notebook);
+    var dataObj = JSON.parse(req.body.dataObj);
     var files = req.files;
     var promises = [];
 
-    if (notebook.removeItem) {
-        notebook.removeItem.forEach(function(media) {
+    if (dataObj.removeItem) {
+        dataObj.removeItem.forEach(function(media) {
             removeMedia(media);
         });
-        delete notebook.removeItem;
+        delete dataObj.removeItem;
     }
 
     console.log('files that are attemping to be uploaded....', files);
@@ -42,7 +44,7 @@ function validateFilename(req, res, next) {
             var imagePromise = copyAndWrite(file.path, path.join(config.imagePath, file.filename))
                 .then(function(response) {
                     file.path = path.join('image',file.filename);
-                    notebook.media.image = file;
+                    dataObj.media.image = file;
                     return file;
                 });
             promises.push(imagePromise);
@@ -51,7 +53,7 @@ function validateFilename(req, res, next) {
             var audioPromise = copyAndWrite(file.path, path.join(config.audioPath, file.filename))
                 .then(function(response) {
                     file.path = path.join('audio', file.filename);
-                    notebook.media.audio = file;
+                    dataObj.media.audio = file;
                     return file;
                 });
             promises.push(audioPromise);
@@ -61,7 +63,7 @@ function validateFilename(req, res, next) {
     });
 
     q.all(promises).then(function(response) {
-        req.body.notebook = notebook;
+        req.body.dataObj = dataObj;
         next()
     });
 }

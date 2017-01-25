@@ -5,6 +5,7 @@
   "main": "main.js",
   "productName": "glossa",
   "dependencies": {
+    "angular-ui-router": "^1.0.0-alpha.1",
     "body-parser": "~1.5.0",
     "codemirror": "^5.22.0",
     "compression": "~1.0.1",

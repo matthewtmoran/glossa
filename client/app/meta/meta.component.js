@@ -11,21 +11,20 @@ angular.module('glossa')
         templateUrl: 'app/meta/meta.html',
         transclude: true,
         bindings: {
-            currentFile: '='
+            currentFile: '=',
+            notebookAttachment: '=',
+            markdownFiles: '='
         },
         require: {
-            parent: '^^viewerEditorComponent'
+            corpus: '^^corpusComponent'
         }
     });
 
-function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hashtagSrvc, postSrvc, dialogSrvc, simpleParse, markdownSrvc) {
+function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdownSrvc) {
     var metaVm = this;
 
-    metaVm.hidden = false;
+
     metaVm.isOpen = false;
-    metaVm.hover = false;
-    metaVm.attachedMedia = [];
-    metaVm.attachedNotebook = {};
     metaVm.items = [
         { name: "Attach Audio", icon: "volume_up", direction: "bottom", accept: '.mp3, .m4a', type: 'audio' },
         { name: "Attach Image", icon: "add_a_photo", direction: "top", accept: '.jpg, .png, .svg', type: 'image' }
@@ -37,169 +36,138 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
         autoDownloadFontAwesome: false,
         forceSync: true,
         placeholder: 'Description...',
-        updateFunction: newUpdate
-    };
+        updateFunction: update
+    }; //main description editor option
+    metaVm.cardOptions = {
+        disAction: disconnectNotebook
+    }; //notebook cared options (disconnect button)
 
-    metaVm.newUpdate = newUpdate;
-    metaVm.confirmDeleteDialog = confirmDeleteDialog;
-    metaVm.disconnectDialog = disconnectDialog;
-    metaVm.editAttachedFile = editAttachedFile;
-    metaVm.openNBDialog = openNBDialog;
-    metaVm.newAttachDialog = newAttachDialog;
+    metaVm.update = update;
+    metaVm.disconnectNotebook = disconnectNotebook;
+    metaVm.addAttachment = addAttachment;
+    metaVm.deleteMarkdownFile = deleteMarkdownFile;
+    metaVm.removeMedia = removeMedia;
+    metaVm.viewDetails = viewDetails;
 
     $scope.$watch('metaVm.isOpen', isOpenWatch);
-    $scope.$watch('metaVm.currentFile', queryAttachedNotebook);
-    $scope.$on('update:meta-description', newUpdate('description'));
+    $scope.$watch('metaVm.currentFile', watchCurrentFile);
 
-
-    function newUpdate(field, file) {
-        console.log('newUpdate');
-        markdownSrvc.updateFile(metaVm.currentFile).then(function(data) {
-           console.log('data', data);
-           metaVm.currentFile = data;
+    //update transcription file
+    function update(field, file) {
+        markdownSrvc.updateFile(file).then(function(data) {
+            metaVm.currentFile = data;
         });
-
-
-
-        // $q.when(simpleParse.findHashtags(metaVm.currentFile.description)).then(function(result) {
-        //
-        //     metaVm.currentFile.hashtags = [];
-        //     result.forEach(function(tag) {
-        //         metaVm.currentFile.hashtags.push(tag);
-        //     });
-        //
-        //
-        //     fileSrvc.newUpdate(metaVm.currentFile, field).then(function(result) {
-        //         if (!result.success) {
-        //             return console.log('TODO: show user the update was unsuccessful and handle errors');
-        //         }
-        //
-        //         // console.log('TODO: show user the update was successful', result);
-        //     })
-        //
-        // });
     }
 
-
-
-    //DIALOGS
+    //disconnects notebook from file
+    function disconnectNotebook(notebook) {
+        var options = {
+            title: 'Are you sure you want to disconnect this notebook?',
+            textContent: 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.'
+        };
+        dialogSrvc.confirmDialog(options).then(function(result) {
+            console.log('result', result);
+            if (!result) {
+                return;
+            }
+            delete metaVm.currentFile.attachment;
+            markdownSrvc.updateFile(metaVm.currentFile)
+                .then(function(data) {
+                    metaVm.currentFile = data;
+                });
+        })
+    }
 
     /**
      * This function opens the attach dialog.
      * @param ev - this is the event object
      * The result will be returned whether an item is attached or not.
      */
-    function newAttachDialog(ev) {
-        dialogSrvc.attachToNotebook(ev, metaVm.currentFile).then(function(result) {
+    function addAttachment(ev) {
+        dialogSrvc.mediaAttachment(ev, metaVm.currentFile).then(function(result) {
             metaVm.currentFile = result;
+            metaVm.markdownFiles.forEach(function(file, index) {
+                if (file._id === result._id) {
+                    metaVm.markdownFiles[index] = result;
+                }
+            })
         });
     }
 
-    function confirmDeleteDialog(ev) {
-        // Appending dialog to document.body to cover sidenav in docs app
-        var confirm = $mdDialog.confirm()
-            .title('Are you sure you want to delete this text file?')
-            .textContent('By clicking yes, you confirm to delete all independently attached media files associated with this file?')
-            .ariaLabel('Delete Text')
-            .targetEvent(ev)
-            .ok('Yes, Delete')
-            .cancel('No, cancel');
+    //delete the markdown file
+    function deleteMarkdownFile(ev, file) {
+        var options = {
+            title: 'Are you sure you want to delete this markdown file?',
+            textContent: 'By clicking yes, you confirm to delete all independently attached media files associated with this file?',
+            okBtn: 'Yes, Delete',
+            cancelBtn: 'No, cancel'
+        };
 
-        $mdDialog.show(confirm).then(function() {
-            fileSrvc.deleteTextFile(metaVm.currentFile).then(function() {
+        dialogSrvc.confirmDialog(options)
+            .then(function okayCallback(response) {
+                if (!response) {
+                    return console.log('confirm cancel response', response);
+                }
+                return markdownSrvc.removeFile(file).then(function(data) {
+                    metaVm.corpus.deletMDFile(file);
+                    return data;
+                })
 
-                $scope.$emit('remove:textFile', metaVm.currentFile);
-
-            })
-        }, function() {
-            console.log("don't delete file")
-        });
+            });
     };
 
-    function disconnectDialog(ev, attachment, type) {
-        var title,
-            textContent;
-        if (type) {
-            title = 'Are you sure you want to disconnect this media attachment?';
-            textContent = 'By clicking yes you will remove this media attachment from the application';
-        } else {
-            title = 'Are you sure you want to disconnect this notebook?';
-            textContent = 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.';
-        }
-
-        var confirm = $mdDialog.confirm()
-            .title(title)
-            .textContent(textContent)
-            .ariaLabel('Disconnect attachment')
-            .targetEvent(ev)
-            .ok('Yes, Disconnect')
-            .cancel('No, cancel');
-
-        $mdDialog.show(confirm).then(function() {
-            if (type) {
-              return fileSrvc.deleteMediaFile(attachment, type, metaVm.currentFile).then(function(result) {
-                  metaVm.currentFile = result.data;
-               })
-            }
-            return fileSrvc.unattachNotebook(attachment, metaVm.currentFile);
-        }, function() {
-            console.log('cancel disconnect');
-        });
-    }
-
-    function openNBDialog(ev, notebook) {
-        var postOptions = postSrvc.postOptions(ev, notebook);
-
-        dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
-            if (result && !result.dataChanged) {
+    //remove independent media
+    function removeMedia(ev, media, type) {
+        var options = {
+            title: 'Are you sure you want to disconnect this media attachment?',
+            textContent: 'By clicking yes you will remove this media attachment from the application',
+        };
+        dialogSrvc.confirmDialog(options).then(function(result) {
+            if (!result) {
                 return;
             }
-            queryAttachedNotebook();
-        }).catch(function(result) {
-            console.log('error', result);
-        });
+            delete metaVm.currentFile.media[type];
+            markdownSrvc.updateFile(metaVm.currentFile)
+                .then(function(data) {
+                    //reset currentFile
+                    metaVm.currentFile = data;
+                    //reset file in list
+                    metaVm.markdownFiles.forEach(function(file, index) {
+                        if (file._id === data._id) {
+                            metaVm.markdownFiles[index] = data;
+                        }
+                    })
+
+                });
+        })
     }
 
-    function editAttachedFile(ev, attachment, type) {
-        $mdDialog.show({
-            controller: editAttached,
-            controllerAs: 'edVm',
-            templateUrl: 'app/meta/editAttachedDialog/editAttached.html',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true,
-            bindToController: true,
-            locals: {
-                currentFile: metaVm.currentFile,
-                attachment: attachment,
-                attachedType: type
-            }
-        })
-            .then(function(answer) {
-                $scope.status = 'You said the information was "' + answer + '".';
-            }, function() {
-                $scope.status = 'You cancelled the dialog.';
-            });
+    //view notebook details... should be view only
+    function viewDetails(ev, notebook) {
+        var postOptions = postSrvc.postOptions(ev, notebook);
+        dialogSrvc.viewDetails(ev, postOptions, notebook);
     }
+
+
+    ///////////
+    //Helpers//
+    ///////////
 
 
     //Queryies the attached notebook data
-    function queryAttachedNotebook() {
-        console.log('queryAttachedNotebook');
-        // if (metaVm.currentFile.mediaType === 'notebook') {
-            // notebookSrvc.find(metaVm.currentFile.notebookId).then(function(result) {
-            //     metaVm.attachedNotebook = result.data[0];
-            //     if (metaVm.attachedNotebook.media.image) {
-            //         metaVm.imagePath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.image.path);
-            //     }
-            //     if (metaVm.attachedNotebook.media.audio) {
-            //         metaVm.audioPath = path.join(globalPaths.static.trueRoot, metaVm.attachedNotebook.media.audio.path);
-            //     }
-            // })
-        // }
-
+    function queryAttachedNotebook(nbId) {
+        notebookSrvc.findNotebook(nbId).then(function(data) {
+           metaVm.attachedNotebook = data;
+        });
     }
 
+
+    ////////////
+    //watchers//
+    ////////////
+
+
+    //has to do with drawer...
     function isOpenWatch(isOpen) {
         if (isOpen) {
             $timeout(function() {
@@ -209,5 +177,13 @@ function metaCtrl($scope, fileSrvc, $mdDialog, notebookSrvc, $q, $timeout, hasht
             $scope.tooltipVisible = metaVm.isOpen;
         }
     }
+
+    //watch current file for update to notebook attachment
+    function watchCurrentFile(currentFile, oldFile) {
+        if(currentFile && currentFile.notebookId) {
+            queryAttachedNotebook(currentFile.notebookId);
+        }
+    }
+
 
 }

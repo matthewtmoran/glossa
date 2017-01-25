@@ -6,13 +6,18 @@ angular.module('glossa')
 function config($stateProvider) {
     $stateProvider
         .state('corpus', {
-            url: '/',
+            url: '/corpus',
             redirectTo:'corpus.meta',
-            // abstract:true,
-            template: '<corpus-component flex layout="column">',
+            // abstract: true,
+            template: '<corpus-component markdown-files="$resolve.markdownFiles" flex layout="column">',
             params: {
                 user: {},
                 corpus: 'default'
+            },
+            resolve: {
+                markdownFiles: function(markdownSrvc, $stateParams) {
+                    return markdownSrvc.getFiles($stateParams.corpus);
+                }
             }
         });
 }

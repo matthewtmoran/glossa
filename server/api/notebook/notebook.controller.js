@@ -18,56 +18,61 @@ var path = require('path');
 // Get list of things
 exports.index = function(req, res) {
     Notebook.find({}, function (err, notebooks) {
-    if(err) { return handleError(res, err); }
-    return res.status(200).json(notebooks);
-  });
+        if(err) { return handleError(res, err); }
+        return res.status(200).json(notebooks);
+    });
 };
 
 // Get a single thing
 exports.show = function(req, res) {
+    console.log('showing notebook', req.params.id);
+
     Notebook.findOne({_id:req.params.id}, function (err, notebook) {
-    if(err) { return handleError(res, err); }
-    if(!notebook) { return res.status(404).send('Not Found'); }
-    return res.json(notebook);
-  });
+        if(err) { return handleError(res, err); }
+        if(!notebook) { return res.status(404).send('Not Found'); }
+        return res.json(notebook);
+    });
 };
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-    Notebook.insert(req.body.notebook, function(err, notebook) {
-    if(err) { return handleError(res, err); }
-    return res.status(201).json(notebook);
-  });
+    Notebook.insert(req.body.dataObj, function(err, notebook) {
+        if(err) { return handleError(res, err); }
+        return res.status(201).json(notebook);
+    });
 };
 
-// Updates an existing thing in the DB.
+// Updates an existing notebook in the DB.
+//becuase this could potentially have uploaded files, the body object is, dataObj instead of notebook...
 exports.update = function(req, res) {
-  if(req.body._id) { delete req.body._id; }
+    if(req.body._id) { delete req.body._id; }
     Notebook.findOne({_id:req.params.id}, function (err, notebook) {
-    if (err) { return handleError(res, err); }
-    if(!notebook) { return res.status(404).send('Not Found'); }
-    var options = {returnUpdatedDocs: true};
-    var updated = _.merge(notebook, req.body.notebook);
-        updated.hashtags = req.body.notebook.hashtags;
-    Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
-      if (err) { return handleError(res, err); }
-      return res.status(200).json(updatedDoc);
+        if (err) { return handleError(res, err); }
+        if(!notebook) { return res.status(404).send('Not Found'); }
+        var options = {returnUpdatedDocs: true};
+        var updated = _.merge(notebook, req.body.dataObj);
+        // hashtags will either be array of tags or an empty array
+        updated.hashtags = req.body.dataObj.hashtags || [];
+        Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+            if (err) { return handleError(res, err); }
+            Notebook.persistence.stopAutocompaction(); // concat db
+            return res.status(200).json(updatedDoc);
+        });
     });
-  });
 };
 
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
     Notebook.findById(req.params.id, function (err, thing) {
-    if(err) { return handleError(res, err); }
-    if(!thing) { return res.status(404).send('Not Found'); }
-    thing.remove(function(err) {
-      if(err) { return handleError(res, err); }
-      return res.status(204).send('No Content');
+        if(err) { return handleError(res, err); }
+        if(!thing) { return res.status(404).send('Not Found'); }
+        thing.remove(function(err) {
+            if(err) { return handleError(res, err); }
+            return res.status(204).send('No Content');
+        });
     });
-  });
 };
 
 function handleError(res, err) {
-  return res.status(500).send(err);
+    return res.status(500).send(err);
 }

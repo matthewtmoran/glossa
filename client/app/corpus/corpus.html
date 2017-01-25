@@ -3,34 +3,52 @@
 		layout="row"
 		search-text="navVm.searchText">
 </navbar-component>
-<md-content layout="row" flex>
+
+<md-content layout="row" flex class="corpus-content">
 
 	<md-button id="uploadButton"
 	           class="md-button md-fab md-grey-fab md-fab-bottom-left"
-	           ng-click="vm.createNewTextFile()"
+	           ng-click="vm.createMDFile()"
 	           aria-label="attach_file">
 		<md-icon class="material-icons">add</md-icon>
 	</md-button>
+	<md-sidenav
+			md-component-id="left2"
+			md-is-locked-open="true"
+			class="md-whiteframe-4dp"
+			layout-column>
+		<md-content layout-fill role="navigation">
 
-	<!--
-	I didn't want to have to put the sidenav outside of the actual component 'filebrowser' but I was having so many issues with the styling
+			<md-button ng-click="vm.createMDFile()" ng-cloak ng-if="!vm.filteredFiles.length">Create New File</md-button>
 
-	-->
+			<md-list>
+				<md-list-item ng-class="{active: vm.currentFile._id === file._id}" ng-repeat="file in vm.filteredFiles = (vm.markdownFiles | filter: vm.searchText)" class="md-2-line" ng-click="vm.fileSelection(file)">
+					<a>
+						<md-item-content md-ink-ripple layout="row" layout-align="start center">
+							<div class="md-list-item-text" layout="column">
+								<h3>{{file.displayName}}</h3>
+								<p>{{file.previewContent}}</p>
+							</div>
+						</md-item-content>
+					</a>
+				</md-list-item>
+			</md-list>
+		</md-content>
+	</md-sidenav>
 
-		<md-sidenav
-				md-component-id="left2"
-				md-is-locked-open="true"
-				class="md-whiteframe-4dp"
-				layout-column>
-			<!--filebrowser-->
-			<filebrowser-component
-					search-text="navVm.searchText"
-					current-file="fbVm.currentFile">
-			</filebrowser-component>
-		</md-sidenav>
+	<md-content layout="column" flex>
+		<md-tabs md-dynamic-height="" md-border-bottom=""  md-selected="selectedIndex" md-stretch-tabs="always" >
+			<md-tab label="Meta"></md-tab>
+			<md-tab label="Baseline"></md-tab>
+			<md-tab label="Analyze"></md-tab>
+			<md-tab label="Text Chart"></md-tab>
+			<md-tab label="Preview"></md-tab>
+		</md-tabs>
 
-	<!--viewer-editor-->
-	<viewer-editor-component current-file="fbVm.currentFile" layout="column" flex></viewer-editor-component>
+		<!-- child state -->
+		<md-content layout="column" id="tab-body" ui-view flex ></md-content>
+
+	</md-content>
 </md-content>
 <!--drawer-->
 <drawer-directive></drawer-directive>

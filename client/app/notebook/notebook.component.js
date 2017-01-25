@@ -14,7 +14,7 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
 
     nbVm.$onInit = function() {
         queryNotebooks();
-        queryCommonTags();
+        // queryCommonTags();
         // nbVm.occurringTags = hashtagSrvc.countHashtags();
     };
 
@@ -29,7 +29,7 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     nbVm.notebooks = [];
     nbVm.commonTags = [];
 
-    nbVm.openNBDialog = openNBDialog;
+    nbVm.viewDetails = viewDetails;
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
 
@@ -50,30 +50,29 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
         })
     }
 
-    // TODO: move to service
-    // TODO: refractor to store use data within tag document vs creating every time
-    //find the common tags accross notebooks
     /**
      * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebook to the array
      * @param ev - the event
      * @param notebook object - postType should be defined everytime
      */
-    function openNBDialog(ev, notebook) {
+    function viewDetails(ev, notebook) {
         //get options depending on post type
         var postOptions = postSrvc.postOptions(ev, notebook);
 
         //open post dialog
-        dialogSrvc.openPostDialog(ev, postOptions, notebook).then(function(result) {
+        dialogSrvc.notebookDetails(ev, postOptions, notebook).then(function(result) {
             //if there was no data changed just return
             if (result && !result.dataChanged) {
                 return;
             }
 
+            //update the specific notebook in the view
             if (result && result.event === 'update') {
                 var index = nbVm.notebooks.indexOf(notebook);
                 nbVm.notebooks[index] = result.data;
             }
 
+            //add the new notebook to the view
             if (result && result.event === 'save') {
                 nbVm.notebooks.push(result.data);
             }
@@ -111,6 +110,6 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
             media: {},
             postType: type
         };
-        openNBDialog(event, notebook)
+        viewDetails(event, notebook)
     }
 }

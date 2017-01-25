@@ -6,8 +6,10 @@ angular.module('glossa')
 function config($stateProvider) {
     $stateProvider
         .state('corpus.baseline', {
-            url: 'baseline',
-            template: '<baseline-component layout="column" flex ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">',
+            url: '/baseline',
+            template: '<baseline-component>',
+            parent: 'corpus'
+            // template: '<baseline-component layout="column" flex ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">',
 
             // templateUrl: 'app/baseline/baseline.html',
             // controller: 'baselineCrtl',

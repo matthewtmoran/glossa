@@ -115,10 +115,9 @@ md-backdrop.md-sidenav-backdrop {
 /* inject:scss */
 @import 'baseline/baseline';
 @import 'corpus/corpus';
-@import 'main/main';
 @import 'mentions/mentions';
+@import 'meta/attachment/attachment';
 @import 'meta/meta';
-@import 'meta/modal/attachfile';
 @import 'notebook/notebook';
 @import 'tagManagement/manageTags';
 @import '../assets/lib/simplemde/simplemde';
@@ -162,4 +161,9 @@ md-dialog {
 .top-border {
 	//border: 1px solid red !important;
 	border-top: 1px solid rgba(0,0,0,0.12) !important;
+}
+
+#uploadButton {
+	z-index: 61 !important;
+	left: 215px !important;
 }
