@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('attachmentCtrl', attachmentCtrl);
 
-function attachmentCtrl($mdDialog, currentFile, markdownSrvc, notebookSrvc, $scope, $q) {
+function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $scope, $q) {
     var atVm = this;
 
     //make copy to make changes on... so we can restore changes on cancel
@@ -48,7 +48,7 @@ function attachmentCtrl($mdDialog, currentFile, markdownSrvc, notebookSrvc, $sco
         }
 
         markdownSrvc.updateFile(atVm.currentFileEditable).then(function(data) {
-            $mdDialog.hide(data);
+            dialogSrvc.hide(data);
         });
     }
 

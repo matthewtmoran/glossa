@@ -100,12 +100,11 @@ function copyAndWrite(from, to){
 
 function removeMedia(media) {
     var mediaPath;
-    if (media.mimetype === 'image/jpeg' ) {
+    if (media.mimetype.indexOf('image')> -1) {
         mediaPath = path.join(config.imagePath, media.filename);
     } else if (media.mimetype.indexOf('audio') > -1) {
         mediaPath = path.join(config.audioPath, media.filename);
     }
-
     fs.unlink(mediaPath);
 }
 

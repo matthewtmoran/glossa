@@ -135,7 +135,9 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
             if (!result) {
                 return;
             }
-            delete metaVm.currentFile.media[type];
+            metaVm.currentFile.removeItem = []; //create this temp property to send to server
+            metaVm.currentFile.removeItem.push(metaVm.currentFile.media[type]);
+            delete metaVm.currentFile.media[type]; //delete this property...
             markdownSrvc.updateFile(metaVm.currentFile)
                 .then(function(data) {
                     //reset currentFile

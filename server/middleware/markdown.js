@@ -29,6 +29,20 @@ module.exports = {
         });
     },
 
+    removeMedia: function(req, res, next) {
+        if (!req.body.removeMedia) {
+            next();
+        }
+
+        req.body.removeMedia.forEach(function(media) {
+            fs.unlink(req.body.media[media].path);
+        });
+        next();
+
+
+
+    }
+
 
 };
 
