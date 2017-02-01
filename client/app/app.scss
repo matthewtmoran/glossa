@@ -122,7 +122,6 @@ md-backdrop.md-sidenav-backdrop {
 @import 'tagManagement/manageTags';
 @import '../assets/lib/simplemde/simplemde';
 @import '../components/drawer/drawer';
-@import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
 @import '../components/settings/settings';
 @import '../components/wavesurferDirectives/mdWavesurferPlayer';
@@ -166,4 +165,28 @@ md-dialog {
 #uploadButton {
 	z-index: 61 !important;
 	left: 215px !important;
+}
+
+md-sidenav {
+	md-list {
+		md-list-item {
+			.md-button {
+				width: 100%;
+				margin-left: 0 !important;
+				margin-right: 0 !important;
+
+				md-icon {
+					padding-top: 5px;
+					padding-bottom: 5px;
+				}
+
+			}
+
+			&:hover {
+				cursor: pointer;
+				background: lightgrey;
+				transition: .3s;
+			}
+		}
+	}
 }

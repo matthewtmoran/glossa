@@ -78,10 +78,10 @@ function dialogSrvc($mdDialog) {
 
     function corpusDialog() {
         $mdDialog.show({
-            templateUrl: 'components/drawer/dialogs/corpusDialog.html',
+            templateUrl: 'components/drawer/corpus-management/manage-corpus.html',
             parent: angular.element(document.body),
             // targetEvent: ev,
-            controller: corpusDialogCtrl,
+            controller: manageCorpusCtrl,
             controllerAs: 'dialogVm',
             bindToController: true,
             clickOutsideToClose: false,

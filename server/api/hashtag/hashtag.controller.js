@@ -12,6 +12,7 @@
 var _ = require('lodash');
 var Hashtag = require('./hashtag.model');
 var path = require('path');
+var Notebook = require('../notebook/notebook.model');
 // var globalPaths = require('electron').remote.getGlobal('userPaths');
 
 // Get list of things
@@ -115,14 +116,54 @@ exports.decreaseCount = function(req, res) {
 
 exports.common = function(req, res) {
 
+    // Hashtag.find({}, function (err, hashtags) {
+    //     if(err) { return handleError(res, err); }
+    //
+    //     hashtags.forEach(function(tag) {
+    //
+    //     });
+    //
+    //
+    //     return res.status(200).json(hashtags);
+    // });
+
+    // var query = {
+    //     occurrence: {$gt: 0}
+    // };
+    //
+    // Hashtag.find(query).sort({occurrence: 1}).limit(6).exec(function (err, hashtags) {
+    //     if(err) { return handleError(res, err); }
+    //     return res.status(200).json(hashtags);
+    // });
+
+    var allTags = [];
+
     var query = {
-        occurrence: {$gt: 0}
+       "hashtags": {$gt:0}
     };
 
-    Hashtag.find(query).sort({occurrence: 1}).limit(6).exec(function (err, hashtags) {
+    Notebook.find(query, function(err, notebooks) {
         if(err) { return handleError(res, err); }
-        return res.status(200).json(hashtags);
-    });
+        notebooks.forEach(function(notebook) {
+            notebook.hashtags.forEach(function(tag) {
+                allTags.push(tag);
+            })
+        })
+
+         var result = _(allTags)
+            .groupBy('_id')
+            .map(function(item, itemId) {
+
+                var obj = {};
+                obj[itemId] = _.countBy(item, 'answer')
+                return obj
+            }).value();
+
+        console.log(JSON.stringify(result, null, 2));
+
+    })
+
+
 };
 
 function handleError(res, err) {

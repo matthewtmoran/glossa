@@ -9,7 +9,7 @@
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
+function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
 
     var section = [
         {
@@ -238,7 +238,7 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
     activate();
 
     function activate() {
-        // addCustomItems();
+        addCustomItems();
     }
 
     var service = {
@@ -257,10 +257,10 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
 
     function toggleSelectSection(section) {
         service.openedSection = (service.openedSection === section ? null : section);
-    };
+    }
     function isSectionSelected(section) {
         return service.openedSection === section;
-    };
+    }
     function toggleSettingsSection(section) {
         service.openSetting = (service.openSetting === section ? null : section);
     }
@@ -272,12 +272,10 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
     function addCustomItems() {
         section.forEach(function(sec) {
             if (sec.name === 'Corpora') {
-                return queryCorporaMenus().then(function(result) {
-                    if (!result.success) {
-                        return console.log(result);
-                    }
-                    result.data.forEach(function(item) {
-                        sec.pages.push(item);
+
+                manageCorpusSrvc.getCorporia().then(function(data) {
+                    data.forEach(function(corpus) {
+                        sec.pages.push(corpus);
                     });
                 });
             }
@@ -291,13 +289,6 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                 return sec.pages.push(corpus);
             }
         });
-    }
-
-    //queries all corporas
-    function queryCorporaMenus() {
-        return dbSrvc.find(corporaMenus, {}).then(function(docs) {
-            return docs;
-        })
     }
 
 

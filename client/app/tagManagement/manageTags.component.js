@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/tagManagement/manageTags.html'
     });
 
-function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope) {
+function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope, dialogSrvc) {
     var tagVm = this;
     var changesMade = false;
 

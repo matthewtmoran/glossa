@@ -9,7 +9,7 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
         getNotebooks: getNotebooks,
         findNotebook: findNotebook,
         createNotebook: createNotebook,
-        updateNotebook: updateNotebook,
+        updateNotebook: updateNotebook
     };
 
     return service;
