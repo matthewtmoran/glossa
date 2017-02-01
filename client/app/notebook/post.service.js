@@ -1,5 +1,5 @@
 'use strict';
-
+//TODO: move to notebook service
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
@@ -85,7 +85,7 @@ function postSrvc() {
 
         switch(notebook.postType) {
             case 'image':
-                options.template = 'app/notebook/postDialog/imagePost.html';
+                options.template = 'app/notebook/notebookDetails/edit-image-details.html';
                 options.simplemde = {
                     toolbar: false,
                     status: false,
@@ -96,7 +96,7 @@ function postSrvc() {
                 };
                 break;
             case 'audio':
-                options.template = 'app/notebook/postDialog/audioPost.html';
+                options.template = 'app/notebook/notebookDetails/edit-audio-details.html';
                 options.simplemde = {
                     toolbar: false,
                     status: false,
@@ -107,7 +107,7 @@ function postSrvc() {
                 };
                 break;
             case 'normal':
-                options.template = 'app/notebook/notebookDetails/notebook-details.html';
+                options.template = 'app/notebook/notebookDetails/edit-notebook-details.html';
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,

@@ -1,9 +1,5 @@
 'use strict';
 
-// var path = require('path'),
-//     remote = require('electron').remote,
-//     globalPaths = remote.getGlobal('userPaths');
-
 angular.module('glossa')
     .component('baselineComponent', {
         controller: baselineCtrl,
@@ -11,10 +7,12 @@ angular.module('glossa')
         templateUrl: 'app/baseline/baseline.html',
         transclude: true,
         bindings: {
-            currentFile: '='
+            currentFile: '=',
+            notebookAttachment: '=',
+            markdownFiles: '='
         },
         require: {
-            parent: '^^viewerEditorComponent'
+            parent: '^^corpusComponent'
         }
     });
 

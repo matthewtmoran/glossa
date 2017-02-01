@@ -1,9 +1,5 @@
 'use strict';
 
-// var remote = require('electron').remote,
-//     path = require('path'),
-//     globalPaths = remote.getGlobal('userPaths');
-
 angular.module('glossa')
     .component('metaComponent', {
         controller: metaCtrl,

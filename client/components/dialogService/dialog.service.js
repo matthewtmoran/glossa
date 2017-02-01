@@ -134,7 +134,7 @@ function dialogSrvc($mdDialog) {
         return $mdDialog.show({
             controller: notebookDetailsCtrl,
             controllerAs: 'dialogVm',
-            templateUrl: 'app/notebook/notebookDetails/view-notebook-details.html',
+            templateUrl: 'app/notebook/notebookDetails/view-edit-notebook-details.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: false,

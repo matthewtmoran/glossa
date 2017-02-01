@@ -25,8 +25,6 @@ exports.index = function(req, res) {
 
 // Get a single thing
 exports.show = function(req, res) {
-    console.log('showing notebook', req.params.id);
-
     Notebook.findOne({_id:req.params.id}, function (err, notebook) {
         if(err) { return handleError(res, err); }
         if(!notebook) { return res.status(404).send('Not Found'); }

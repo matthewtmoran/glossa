@@ -8,7 +8,6 @@ function manageCorpusCtrl(dialogSrvc, manageCorpusSrvc, drawerMenu) {
 
     dialogVm.corpus = {};
 
-
     dialogVm.newCorpus = {
         params: {
             corpus: ''

@@ -7,12 +7,7 @@ function config($stateProvider) {
     $stateProvider
         .state('corpus.baseline', {
             url: '/baseline',
-            template: '<baseline-component>',
+            template: '<baseline-component markdown-files="vm.markdownFiles" current-file="vm.currentFile" notebook-attachment="vm.notebookAttachment">',
             parent: 'corpus'
-            // template: '<baseline-component layout="column" flex ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">',
-
-            // templateUrl: 'app/baseline/baseline.html',
-            // controller: 'baselineCrtl',
-            // controllerAs: 'baselineVm'
         });
 }
