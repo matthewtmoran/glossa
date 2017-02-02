@@ -8,6 +8,7 @@
 
 var express = require('express');
 var config = require('./config/environment');
+var path = require('path');
 
 // Populate DB with sample data
 if(config.seedDB) { require('./config/seed'); }
@@ -17,6 +18,10 @@ var app = express();
 var server = require('http').createServer(app);
 require('./config/express')(app);
 require('./routes')(app);
+
+var images = path.join(__dirname,'data/image');
+console.log('images Path:', images);
+
 
 // Start server
 server.listen(config.port, config.ip, function () {

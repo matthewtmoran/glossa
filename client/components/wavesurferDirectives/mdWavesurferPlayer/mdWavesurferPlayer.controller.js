@@ -5,7 +5,7 @@
 // TODO: Need to separate the directive and controller
 angular.module('glossa')
     .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
-    .directive('backImg', function(){
+    .directive('backImg', function($timeout){
         return function(scope, element, attrs){
             //element where background image should be attached to
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
@@ -15,11 +15,13 @@ angular.module('glossa')
                 var pathFix = value.replace(/\\/g, "\\\\");
 
                 if (value) {
+
                     waveEl.css({
-                        'background-image': 'url(' + pathFix + ')',
+                        'background-image': 'url(http://localhost:9000/' + pathFix + ')',
                         'background-size' : 'cover',
                         'background-position' : 'center center'
                     });
+
                 }
 
             });

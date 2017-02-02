@@ -7,7 +7,7 @@ function config($stateProvider) {
     $stateProvider
         .state('corpus.baseline', {
             url: '/baseline',
-            template: '<baseline-component markdown-files="vm.markdownFiles" current-file="vm.currentFile" notebook-attachment="vm.notebookAttachment">',
+            template: '<baseline-component flex layout="column" markdown-files="vm.markdownFiles" current-file="vm.currentFile" notebook-attachment="vm.notebookAttachment">',
             parent: 'corpus'
         });
 }

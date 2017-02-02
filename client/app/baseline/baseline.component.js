@@ -16,18 +16,55 @@ angular.module('glossa')
         }
     });
 
-function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc) {
+function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc) {
     var blVm = this;
 
     blVm.textContent = '';
 
+    blVm.codemirrorLoaded = codemirrorLoaded;
 
-    activate();
 
-    function activate() {
-        getAudioImagePath();
-        getTextContent(blVm.currentFile);
+    function codemirrorLoaded(_editor) {
+        console.log('_editor', _editor);
+
+        _editor.setOption('lineNumbers', true)
+
+
+
     }
+
+    blVm.$onInit = init;
+
+    function init() {
+
+        // getMediaData(blVm.currentFile)
+
+
+    }
+
+    $scope.$watch('blVm.currentFile', function(newValue) {
+        blVm.audioPath = '';
+        blVm.imagePath = '';
+        getMediaData(newValue)
+    });
+
+    function getMediaData(file) {
+        if (file.attachment) {
+            notebookSrvc.findNotebook(file.attachment.notebookId).then(function(notebook) {
+                blVm.audioPath = notebook.media.audio.path ||'';
+                blVm.imagePath = notebook.media.image.path ||'';
+            });
+            return;
+        }
+        if (blVm.currentFile.media.audio) {
+            blVm.audioPath = blVm.currentFile.media.audio.path || null;
+        }
+
+        if (blVm.currentFile.media.image) {
+            blVm.imagePath = blVm.currentFile.media.image.path || null;
+        }
+    }
+
 
     function getTextContent(file) {
         baselineSrvc.readContent(file, function(result) {
