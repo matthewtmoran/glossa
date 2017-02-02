@@ -232,7 +232,13 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                 }
             ],
             orderNum: 10
-        }
+        },
+        {
+            name: 'Help',
+            type: 'link',
+            state:'help',
+            orderNum: 11
+        },
     ];
 
     activate();
