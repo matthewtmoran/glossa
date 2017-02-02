@@ -13,7 +13,7 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
 
     var section = [
         {
-            name: 'Test Heading',
+            name: 'Project',
             type: 'heading',
             orderNum: 0
         },
