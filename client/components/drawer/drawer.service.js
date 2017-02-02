@@ -18,6 +18,31 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
             orderNum: 0
         },
         {
+            name: 'Notebooks',
+            type: 'toggle',
+            pages: [
+                {
+                    name: 'My Notebook',
+                    type: 'link',
+                    state: 'notebook',
+                    icon: 'fa fa-group'
+                },
+                {
+                    name: '@matthewtmoran',
+                    state: 'munchies.bananachips',
+                    type: 'link',
+                    icon: 'fa fa-map-marker'
+                },
+                {
+                    name: '@justin_rees',
+                    state: 'munchies.donuts',
+                    type: 'link',
+                    icon: 'fa fa-map-marker'
+                }
+            ],
+            orderNum: 2
+        },
+        {
             name: 'Corpora',
             type: 'toggle',
             pages: [
@@ -80,7 +105,7 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                     type: ''
                 }
             ],
-            orderNum: 1
+            orderNum: 3
         },
         {
             name: 'Lexicon',
@@ -113,7 +138,7 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                     type: ''
                 }
             ],
-            orderNum: 2
+            orderNum: 4
         },
         {
             name: 'Grammar',
@@ -138,37 +163,12 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                     icon: 'fa fa-plus'
                 }
             ],
-            orderNum: 3
-        },
-        {
-            name: 'Notebooks',
-            type: 'toggle',
-            pages: [
-                {
-                    name: 'My Notebook',
-                    type: 'link',
-                    state: 'notebook',
-                    icon: 'fa fa-group'
-                },
-                {
-                    name: '@matthewtmoran',
-                    state: 'munchies.bananachips',
-                    type: 'link',
-                    icon: 'fa fa-map-marker'
-                },
-                {
-                    name: '@justin_rees',
-                    state: 'munchies.donuts',
-                    type: 'link',
-                    icon: 'fa fa-map-marker'
-                }
-            ],
-            orderNum: 4
+            orderNum: 5
         },
         {
             name: 'Help',
             type: 'heading',
-            orderNum: 5
+            orderNum: 6
         },
         {
             name: 'Glossa Basics',
@@ -193,23 +193,23 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                     icon: 'fa fa-map-marker'
                 }
             ],
-            orderNum: 6
+            orderNum: 7
 
         },
         {
             name: 'Grammatical Helps',
             type: 'toggle',
-            orderNum: 7
+            orderNum: 8
         },
         {
             name: 'Phonology Helps',
             type: 'toggle',
-            orderNum: 8
+            orderNum: 9
         },
         {
             name: 'Dev',
             type: 'heading',
-            orderNum: 9
+            orderNum: 10
         },
         {
             name: 'Sandbox States',
@@ -231,13 +231,13 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
                     state: 'main.meta'
                 }
             ],
-            orderNum: 10
+            orderNum: 11
         },
         {
             name: 'Help',
             type: 'link',
             state:'help',
-            orderNum: 11
+            orderNum: 12
         },
     ];
 
