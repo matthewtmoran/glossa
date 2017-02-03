@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('glossa')
-    .component('notebookComponent', {
+    .component('notebooksComponent', {
         controller: notebookCtrl,
         controllerAs: 'nbVm',
         transclude: true,
-        templateUrl: 'app/notebook/notebook.html'
+        templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
 function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hashtagSrvc, $http) {
@@ -51,7 +51,7 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     }
 
     /**
-     * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebook to the array
+     * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebooks to the array
      * @param ev - the event
      * @param notebook object - postType should be defined everytime
      */
@@ -66,13 +66,13 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
                 return;
             }
 
-            //update the specific notebook in the view
+            //update the specific notebooks in the view
             if (result && result.event === 'update') {
                 var index = nbVm.notebooks.indexOf(notebook);
                 nbVm.notebooks[index] = result.data;
             }
 
-            //add the new notebook to the view
+            //add the new notebooks to the view
             if (result && result.event === 'save') {
                 nbVm.notebooks.push(result.data);
             }
@@ -103,11 +103,10 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     /**
      * Called when someone click the mini-fab button
      * @param event - the target event
-     * @param type - the type of notebook selected to create (picture, audio, normal)
+     * @param type - the type of notebooks selected to create (picture, audio, normal)
      */
     function newPost(event, type) {
         var notebook = {
-            media: {},
             postType: type
         };
         viewDetails(event, notebook)

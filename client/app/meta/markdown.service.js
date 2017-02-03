@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('markdownSrvc', markdownSrvc);
 
-function markdownSrvc($http, Upload) {
+function markdownSrvc($http, Upload, $stateParams) {
 
     var service = {
         getFiles: getFiles,
@@ -51,7 +51,18 @@ function markdownSrvc($http, Upload) {
     }
 
     //create new md file
-    function createFile(file) {
+    function createFile(name) {
+
+        var file = {
+            displayName: name || 'untitled',
+            description: '',
+            content: '',
+            corpus: $stateParams.corpus,
+            createdAt: Date.now(),
+            createdBy: 'Moran',
+            projectId: 1
+        };
+
         return $http.post('/api/transcription', file)
             .then(function successCallback(response) {
                 return response.data;
@@ -61,13 +72,11 @@ function markdownSrvc($http, Upload) {
             });
     }
 
-    //attach notebook to object and return
+    //attach notebooks to object and return
     function attachNotebook(file, notebook) {
-        if (!file.attachment) {
-            file.attachment = {};
-        }
-        file.attachment.notebookId = notebook._id;
-        file.attachment.type = 'notebook';
+
+        file.notebookId = notebook._id;
+
         return {file: file, notebook: notebook};
     }
 
@@ -80,14 +89,23 @@ function markdownSrvc($http, Upload) {
     //ng-upload request
     function uploadReq(dataObj, options) {
         var files = [];
-        for (var key in dataObj.media) {
-            if (dataObj.media.hasOwnProperty(key)) {
-                if (dataObj.media[key]) {
-                    files.push(dataObj.media[key]);
-                    // delete dataObj.media[key];
-                }
-            }
+
+        if (dataObj.image) {
+            files.push(dataObj.image);
         }
+
+        if (dataObj.audio) {
+            files.push(dataObj.audio);
+        }
+        //
+        // for (var key in dataObj.media) {
+        //     if (dataObj.media.hasOwnProperty(key)) {
+        //         if (dataObj.media[key]) {
+        //             files.push(dataObj.media[key]);
+        //             // delete dataObj.media[key];
+        //         }
+        //     }
+        // }
 
         return Upload.upload({
             method: options.method,

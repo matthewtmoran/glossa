@@ -19,8 +19,8 @@ var upload = multer({ storage: storage });
 var type = upload.array('files');
 
 function validateFilename(req, res, next) {
-    console.log("req.files", req.files);
-    console.log("req.body", req.body);
+    console.log("req.files:  ", req.files);
+    console.log("req.body:  ", req.body);
     if (!req.files) {
         next();
     }
@@ -44,7 +44,7 @@ function validateFilename(req, res, next) {
             var imagePromise = copyAndWrite(file.path, path.join(config.imagePath, file.filename))
                 .then(function(response) {
                     file.path = path.join('image',file.filename);
-                    dataObj.media.image = file;
+                    dataObj.image = file;
                     return file;
                 });
             promises.push(imagePromise);
@@ -53,7 +53,7 @@ function validateFilename(req, res, next) {
             var audioPromise = copyAndWrite(file.path, path.join(config.audioPath, file.filename))
                 .then(function(response) {
                     file.path = path.join('audio', file.filename);
-                    dataObj.media.audio = file;
+                    dataObj.audio = file;
                     return file;
                 });
             promises.push(audioPromise);

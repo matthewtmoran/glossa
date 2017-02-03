@@ -114,11 +114,12 @@ md-backdrop.md-sidenav-backdrop {
 
 /* inject:scss */
 @import 'baseline/baseline';
-@import 'corpus/corpus';
+@import 'corpus/corpus.component';
+@import 'help/help.component';
 @import 'mentions/mentions';
 @import 'meta/attachment/attachment';
-@import 'meta/meta';
-@import 'notebook/notebook';
+@import 'meta/meta.component';
+@import 'notebooks/notebooks.component';
 @import 'tagManagement/manageTags';
 @import '../assets/lib/simplemde/simplemde';
 @import '../components/drawer/drawer';

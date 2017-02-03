@@ -4,7 +4,7 @@ angular.module('glossa')
     .component('metaComponent', {
         controller: metaCtrl,
         controllerAs: 'metaVm',
-        templateUrl: 'app/meta/meta.html',
+        templateUrl: 'app/meta/meta.component.html',
         transclude: true,
         bindings: {
             currentFile: '=',
@@ -36,7 +36,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
     }; //main description editor option
     metaVm.cardOptions = {
         disAction: disconnectNotebook
-    }; //notebook cared options (disconnect button)
+    }; //notebooks cared options (disconnect button)
 
     metaVm.update = update;
     metaVm.disconnectNotebook = disconnectNotebook;
@@ -54,9 +54,9 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
 
         markdownSrvc.updateFile(metaVm.currentFile).then(function(data) {
 
-            metaVm.currentFile = data;
+            metaVm.currentFile = data; //set the current file as the response
 
-            metaVm.markdownFiles.forEach(function(file, index) {
+            metaVm.markdownFiles.forEach(function(file, index) { //update the appropriate file in the file list
                 if (file._id === data._id) {
                     metaVm.markdownFiles[index] = data;
                 }
@@ -64,18 +64,17 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
         });
     }
 
-    //disconnects notebook from file
+    //disconnects notebooks from file
     function disconnectNotebook(notebook) {
         var options = {
-            title: 'Are you sure you want to disconnect this notebook?',
+            title: 'Are you sure you want to disconnect this notebooks?',
             textContent: 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.'
         };
         dialogSrvc.confirmDialog(options).then(function(result) {
-            console.log('result', result);
             if (!result) {
                 return;
             }
-            delete metaVm.currentFile.attachment;
+            delete metaVm.currentFile.notebookId;
             markdownSrvc.updateFile(metaVm.currentFile)
                 .then(function(data) {
                     metaVm.currentFile = data;
@@ -132,8 +131,8 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
                 return;
             }
             metaVm.currentFile.removeItem = []; //create this temp property to send to server
-            metaVm.currentFile.removeItem.push(metaVm.currentFile.media[type]);
-            delete metaVm.currentFile.media[type]; //delete this property...
+            metaVm.currentFile.removeItem.push(metaVm.currentFile[type]);
+            delete metaVm.currentFile[type]; //delete this property...
             markdownSrvc.updateFile(metaVm.currentFile)
                 .then(function(data) {
                     //reset currentFile
@@ -149,7 +148,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
         })
     }
 
-    //view notebook details... should be view only
+    //view notebooks details... should be view only
     function viewDetails(ev, notebook) {
         var postOptions = postSrvc.postOptions(ev, notebook);
         dialogSrvc.viewDetails(ev, postOptions, notebook);
@@ -161,7 +160,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
     ///////////
 
 
-    //Queryies the attached notebook data
+    //Queryies the attached notebooks data
     function queryAttachedNotebook(nbId) {
         notebookSrvc.findNotebook(nbId).then(function(data) {
            metaVm.attachedNotebook = data;
@@ -185,7 +184,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
         }
     }
 
-    //watch current file for update to notebook attachment
+    //watch current file for update to notebooks attachment
     function watchCurrentFile(currentFile, oldFile) {
         if(currentFile && currentFile.notebookId) {
             queryAttachedNotebook(currentFile.notebookId);

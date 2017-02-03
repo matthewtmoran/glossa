@@ -1,5 +1,5 @@
 'use strict';
-//directive that displays a preview of notebook data
+//directive that displays a preview of notebooks data
 
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
@@ -7,7 +7,7 @@ angular.module('glossa')
 function notebookCard($sce, $state) {
     var directive = {
         restrict: 'E',
-        templateUrl: 'app/notebook/cards/notebook-card.html',
+        templateUrl: 'app/notebooks/notebook-card/notebook-card.directive.html',
         scope: {
             notebook: '=',
             viewDetails: '&',
@@ -21,7 +21,7 @@ function notebookCard($sce, $state) {
 
         scope.isCorpus = false;
 
-        //A rendered preview of the notebook descriptions markdown
+        //A rendered preview of the notebooks descriptions markdown
         scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
 
         scope.disconnect = disconnect;

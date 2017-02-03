@@ -15,9 +15,9 @@ function simpleParse(hashtagSrvc, $q) {
         if (notebook.postType === 'normal') {
             notebook.name = extractTitle(notebook.description);
         } else if (notebook.postType === 'image') {
-            notebook.name = notebook.media.image.originalname;
+            notebook.name = notebook.image.originalname;
         } else if (notebook.postType === 'audio') {
-            notebook.name = notebook.media.audio.originalname;
+            notebook.name = notebook.audio.originalname;
         }
         return notebook.name;
     }
@@ -49,7 +49,7 @@ function simpleParse(hashtagSrvc, $q) {
         //     hashtagSrvc.decreaseTagCount(tag);
         // });
 
-        //the rest of the tags here should be tags new to this notebook...
+        //the rest of the tags here should be tags new to this notebooks...
         return queryForNewTags(tagsInText).then(function(data) {
             data.forEach(function(tag) {
                 notebook.hashtags.push(tag);
@@ -64,13 +64,13 @@ function simpleParse(hashtagSrvc, $q) {
     ///////////
 
 
-    //new tags is an array of tags new to this notebook;
+    //new tags is an array of tags new to this notebooks;
     function queryForNewTags(tagsInText) {
         var promises = [];
         tagsInText.forEach(function(tag, index) {
             //push this query to promises array
             promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
-                //update the notebook model property
+                //update the notebooks model property
                 tagsInText[index] = data;
                 return data;
             }))

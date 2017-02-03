@@ -148,7 +148,7 @@ function mentionsCtrl($q, $timeout, hashtagSrvc, $scope) {
     }
 
     function selectHashtag(item) {
-        //This is were we will add the tag data to the current notebook/textfile
+        //This is were we will add the tag data to the current notebooks/textfile
 
 
 

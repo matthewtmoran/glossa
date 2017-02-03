@@ -22,9 +22,9 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
     atVm.showNotebookPreview = showNotebookPreview;
 
     //keeps the audio path up to date depeneidng if it is a file or object with path
-    $scope.$watch('atVm.currentFileEditable.media.audio', audioWatcher);
+    $scope.$watch('atVm.currentFileEditable.audio', audioWatcher);
     //keeps the image path up to date depeneidng if it is a file or object with path
-    $scope.$watch('atVm.currentFileEditable.media.image', imageWatcher);
+    $scope.$watch('atVm.currentFileEditable.image', imageWatcher);
 
 
     init();
@@ -41,10 +41,12 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
     function hide() {
         dialogSrvc.hide('hide');
     }
+    
     function save() {
-        //if a notebook is selected attach to currentFileEditable
-        if(atVm.notebookPreview) {
-            attachNotebook(atVm.notebookPreview)
+        //if a notebooks is selected attach to currentFileEditable
+        
+        if(atVm.notebookSelected) {
+            attachNotebook(atVm.notebookSelected)
         }
 
         markdownSrvc.updateFile(atVm.currentFileEditable).then(function(data) {
@@ -52,7 +54,7 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
         });
     }
 
-    //attaches notebook to file
+    //attaches notebooks to file
     function attachNotebook(notebook, currentFile) {
         //this just attaches data to the file object... I promisefy it here.
         $q.when(markdownSrvc.attachNotebook(atVm.currentFileEditable, notebook))
@@ -61,9 +63,10 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
             });
     }
 
-    //called when notebook is selected
+    //called when notebooks is selected
     function showNotebookPreview(notebook) {
-        atVm.notebookPreview = notebook;
+        console.log('showNotebookPreview');
+        atVm.notebookSelected = notebook;
     }
 
 

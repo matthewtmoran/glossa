@@ -15,19 +15,19 @@
 							           name="audioUpload"
 							           required
 							           class="md-icon-button"
-							           ng-model="dialogVm.notebook.media.audio"
+							           ng-model="dialogVm.notebook.audio"
 							           accept="audio/*">
 								<md-icon>volume_up</md-icon>
 							</md-button>
 						</div>
 						<div flex
 						     class="md-padding media-container"
-						     ng-if="dialogVm.notebook.media.audio">
-							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.media.audio); dialogVm.notebook.media.audio = null" >
+						     ng-if="dialogVm.notebook.audio">
+							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.audio); dialogVm.notebook.audio = null" >
 								<md-icon>cancel</md-icon>
 							</md-button>
 							<wave-preview
-									ng-if="dialogVm.notebook.media.audio"
+									ng-if="dialogVm.notebook.audio"
 									flex
 									url="{{dialogVm.audioPath}}"
 									auto-play="false"

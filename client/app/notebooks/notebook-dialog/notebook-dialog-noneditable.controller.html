@@ -19,15 +19,15 @@
 
 				<div layout="row">
 					<div flex class="upload-selection">
-						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.media.image" >
-							<img ng-show="dialogVm.notebook.media.image" ngf-src="dialogVm.imagePath" class="thumb">
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.image" >
+							<img ng-show="dialogVm.notebook.image" ngf-src="dialogVm.imagePath" class="thumb">
 						</div>
 					</div>
 
 					<div flex class="upload-selection">
-						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.media.audio">
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.audio">
 							<wave-preview
-									ng-if="dialogVm.notebook.media.audio"
+									ng-if="dialogVm.notebook.audio"
 									flex
 									url="{{dialogVm.audioPath}}"
 									auto-play="false"

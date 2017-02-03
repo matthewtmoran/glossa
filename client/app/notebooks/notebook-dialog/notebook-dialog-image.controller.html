@@ -16,16 +16,16 @@
 							           name="imageUpload"
 							           required
 							           class="md-icon-button"
-							           ng-model="dialogVm.notebook.media.image"
+							           ng-model="dialogVm.notebook.image"
 							           accept="image/*">
 								<md-icon>camera_alt</md-icon>
 							</md-button>
 						</div>
-						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.media.image" >
-							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.media.image); dialogVm.notebook.media.image = null" >
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.image" >
+							<md-button class="md-icon-button remove-preview" ng-click="dialogVm.removeMedia(dialogVm.notebook.image); dialogVm.notebook.image = null" >
 								<md-icon>cancel</md-icon>
 							</md-button>
-							<img ng-show="dialogVm.notebook.media.image" ngf-src="dialogVm.imagePath" class="thumb">
+							<img ng-show="dialogVm.notebook.image" ngf-src="dialogVm.imagePath" class="thumb">
 						</div>
 					</div>
 				</div>

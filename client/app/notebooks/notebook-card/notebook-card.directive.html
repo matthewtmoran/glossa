@@ -2,19 +2,19 @@
 	<md-card-header class="card-title" flex="12">
 		<md-card-header-text class="title-text ">
 			<span>Will display userName and Avatar?</span>
-			<!--<span class="md-headline">{{notebook.name}}</span>-->
+			<!--<span class="md-headline">{{notebooks.name}}</span>-->
 		</md-card-header-text>
 		<md-divider></md-divider>
 	</md-card-header>
 
 	<md-card-content class="card-content" flex>
-		<div ng-if="notebook.media.image" class="md-media-lg card-image">
-			<img ng-src="{{notebook.media.image.path}}" class="md-card-image" alt="">
+		<div ng-if="notebook.image" class="md-media-lg card-image">
+			<img ng-src="{{notebook.image.path}}" class="md-card-image" alt="">
 		</div>
 		<div class="wave-container" ng-if="notebook.postType === 'audio'">
 			<wave-preview
 					flex
-					url="{{notebook.media.audio.path}}"
+					url="{{notebook.audio.path}}"
 					auto-play="false"
 					player-wave-color="white"
 					player-cursor-color="#FF5252"
@@ -32,6 +32,8 @@
 	<md-card-actions flex=10 layout="row" layout-align="end bottom">
 		<md-button ng-if="isCorpus" ng-click="disconnect({notebook: notebook})">Disconnect</md-button>
 		<md-button ng-click="openDetails({event: $event}, notebook)">View Details</md-button>
-		<!--<md-button ng-click="notebookDialog($event, notebook.postType, notebook)">Edit Post</md-button>-->
+		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
 	</md-card-actions>
+
+	<pre>{{notebook | json}}</pre>
 </md-card>

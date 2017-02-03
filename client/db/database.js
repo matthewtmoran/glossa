@@ -69,7 +69,7 @@
 //             description,
 //        },
 //     }
-//     mediaType: String(notebook,
+//     mediaType: String(notebooks,
 //     notebookId: String || null,
 // }
 //

@@ -19,7 +19,7 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
      * Queries all the notebooks and returns results
      */
     function getNotebooks() {
-        return $http.get('/api/notebook')
+        return $http.get('/api/notebooks')
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {
@@ -29,12 +29,12 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
     }
 
     /**
-     * Finds specific notebook
+     * Finds specific notebooks
      * @param nbId
      * @returns {*}
      */
     function findNotebook(nbId) {
-        return $http.get('/api/notebook/' + nbId)
+        return $http.get('/api/notebooks/' + nbId)
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {
@@ -44,21 +44,24 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
     }
 
     /**
-     * Saves a new notebook
+     * Saves a new notebooks
      * @param notebook
      * @returns {*}
      */
     function createNotebook(notebook) {
-        notebook.createdBy = 'Moran';
-        notebook.createdAt = Date.now();
-        notebook.isAttached = false;
-        notebook.attachedToId = null;
+
+        console.log('notebooks parameter in createNotebook ', notebook);
+
         notebook.name = simpleParse.title(notebook);
+        notebook.createdAt = Date.now();
+        notebook.createdBy = 111;
+        notebook.projectId = 1;
+
        return $q.when(simpleParse.hashtags(notebook))
             .then(function(data) {
                 notebook.hashtags = data;
                 var options = {
-                     url:'/api/notebook/',
+                     url:'/api/notebooks/',
                      method: 'POST'
                  };
                 return uploadReq(notebook, options).then(function(data) {
@@ -68,12 +71,12 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
     }
 
     /**
-     * Updates an existing notebook
+     * Updates an existing notebooks
      * @param notebook
      * @returns {*}
      */
     function updateNotebook(notebook) {
-        //parse name of notebook in case it was changed...
+        //parse name of notebooks in case it was changed...
         notebook.name = simpleParse.title(notebook);
 
         //parse hashtags in description
@@ -81,7 +84,7 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
             .then(function(data) {
                 notebook.hashtags = data;
                 var options = {
-                    url:'/api/notebook/' + notebook._id,
+                    url:'/api/notebooks/' + notebook._id,
                     method: 'PUT'
                 };
                 return uploadReq(notebook, options).then(function(data) {
@@ -99,14 +102,26 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
     //ng-upload request
     function uploadReq(dataObj, options) {
         var files = [];
-        for (var key in dataObj.media) {
-            if (dataObj.media.hasOwnProperty(key)) {
-                if (dataObj.media[key]) {
-                    files.push(dataObj.media[key])
-                    delete dataObj.media[key];
-                }
-            }
+
+
+
+        // for (var key in dataObj.media) {
+        //     if (dataObj.media.hasOwnProperty(key)) {
+        //         if (dataObj.media[key]) {
+        //             files.push(dataObj.media[key])
+        //             delete dataObj.media[key];
+        //         }
+        //     }
+        // }
+
+        if (dataObj.image) {
+            files.push(dataObj.image);
         }
+
+        if (dataObj.audio) {
+            files.push(dataObj.audio);
+        }
+
 
         return Upload.upload({
             method: options.method,

@@ -5,7 +5,7 @@ angular.module('glossa')
         controller: corpusCtrl,
         controllerAs: 'vm',
         transclude: true,
-        templateUrl: 'app/corpus/corpus.html',
+        templateUrl: 'app/corpus/corpus.component.html',
         bindings: { markdownFiles: '=' } //defined in route resolve
     });
 
@@ -21,7 +21,7 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
     //water for tab click events
     $scope.$watch('selectedIndex', selectedIndexWatch);
     //watch for file attachment and update object to be bound
-    $scope.$watch('vm.currentFile.attachment', attachmentWatcher);
+    $scope.$watch('vm.currentFile.notebookId', attachmentWatcher);
 
 
     //runs on component initialization
@@ -31,16 +31,8 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
 
     //bound to buttons to create new md file
     function createMDFile(name) {
-        var newFile = {
-            corpus: $stateParams.corpus,
-            createdBy: 'Moran',
-            createdAt: Date.now(),
-            displayName: name || 'untitled',
-            description: '',
-            content: '',
-            media: {}
-        };
-        markdownSrvc.createFile(newFile).then(function(data) {
+
+        markdownSrvc.createFile(name).then(function(data) {
             vm.markdownFiles.push(data);
             vm.currentFile = data;
         });
@@ -84,7 +76,7 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
     //watch for file attachment and update object to be bound
     function attachmentWatcher(newValue, oldValue) {
         if (newValue) {
-            notebookSrvc.findNotebook(newValue.notebookId)
+            notebookSrvc.findNotebook(newValue)
                 .then(function(data) {
                     vm.notebookAttachment = data;
                 })

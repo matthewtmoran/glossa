@@ -1,5 +1,5 @@
 'use strict';
-//notebook details controller should display details of notebook and should be able to be editable/noneditable
+//notebooks details controller should display details of notebooks and should be able to be editable/noneditable
 //I would like to use a component but angular material does not currently support components with dialogs
 
 angular.module('glossa')
@@ -40,6 +40,9 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
     }
 
     function save() {
+
+        console.log('dialogVm.notebook', dialogVm.notebook);
+
         dialogObject = {
             dataChanged: true,
             event: 'save',
@@ -79,7 +82,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
     //function to set at least some dynamic features... TODO: should be moved to service....
     function setDynamicItems() {
         // if (dialogVm.viewOnly) {
-        //     dialogVm.previewText = $sce.trustAsHtml(SimpleMDE.markdown(dialogVm.notebook.description));
+        //     dialogVm.previewText = $sce.trustAsHtml(SimpleMDE.markdown(dialogVm.notebooks.description));
         // }
         if (dialogVm.isNewPost) {
             dialogVm.postDetails = {
@@ -111,9 +114,9 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
             //replace the media if it was removed then details were canceled.
             dialogVm.removedMedia.forEach(function(media) {
                 if (media.mimetype.indexOf('audio') > -1) { //check if mimetype is an audio type...
-                    dialogVm.notebook.media.audio = media;
+                    dialogVm.notebook.audio = media;
                 } else {
-                    dialogVm.notebook.media.image = media;
+                    dialogVm.notebook.image = media;
                 }
             })
         }
@@ -124,12 +127,12 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
     }
 
     //keep watch on this just in case a file is uploaded or if file is already in server...
-    $scope.$watch('dialogVm.notebook.media.audio', function(oldValue, newValue) {
+    $scope.$watch('dialogVm.notebook.audio', function(oldValue, newValue) {
         if (oldValue) {
             dialogVm.audioPath = oldValue.path || window.URL.createObjectURL(oldValue);
         }
     });
-    $scope.$watch('dialogVm.notebook.media.image', function(oldValue, newValue) {
+    $scope.$watch('dialogVm.notebook.image', function(oldValue, newValue) {
         if (oldValue) {
             dialogVm.imagePath = oldValue.path || window.URL.createObjectURL(oldValue);
         }

@@ -44,7 +44,7 @@ function dialogSrvc($mdDialog) {
        return $mdDialog.show({
             controller: attachmentCtrl,
             controllerAs: 'atVm',
-            templateUrl: 'app/meta/attachment/attachment.html',
+            templateUrl: 'app/meta/attachment/attachment.controller.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: false,
@@ -78,7 +78,7 @@ function dialogSrvc($mdDialog) {
 
     function corpusDialog() {
         $mdDialog.show({
-            templateUrl: 'components/drawer/corpus-management/manage-corpus.html',
+            templateUrl: 'components/drawer/corpus-management/manage-corpus.component.html',
             parent: angular.element(document.body),
             // targetEvent: ev,
             controller: manageCorpusCtrl,
@@ -134,7 +134,7 @@ function dialogSrvc($mdDialog) {
         return $mdDialog.show({
             controller: notebookDetailsCtrl,
             controllerAs: 'dialogVm',
-            templateUrl: 'app/notebook/notebookDetails/view-edit-notebook-details.html',
+            templateUrl: 'app/notebooks/notebook-dialog/notebook-dialog-noneditable.controller.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose: false,

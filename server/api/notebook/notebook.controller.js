@@ -40,8 +40,8 @@ exports.create = function(req, res) {
     });
 };
 
-// Updates an existing notebook in the DB.
-//becuase this could potentially have uploaded files, the body object is, dataObj instead of notebook...
+// Updates an existing notebooks in the DB.
+//becuase this could potentially have uploaded files, the body object is, dataObj instead of notebooks...
 exports.update = function(req, res) {
     if(req.body._id) { delete req.body._id; }
     Notebook.findOne({_id:req.params.id}, function (err, notebook) {

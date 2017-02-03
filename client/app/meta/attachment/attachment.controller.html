@@ -3,19 +3,19 @@
 		<md-dialog-content>
 			<div class="md-dialog-content">
 				<div class="new-files md-padding">
-					<h2 ng-if="!atVm.notebookPreview._id" class="dialog-section-title">Add New Media</h2>
-					<h2 ng-if="atVm.notebookPreview._id" class="dialog-section-title">Attached Notebook Media</h2>
+					<h2 ng-if="!atVm.notebookSelected._id" class="dialog-section-title">Add New Media</h2>
+					<h2 ng-if="atVm.notebookSelected._id" class="dialog-section-title">Attached Notebook Media</h2>
 
-					<!--this shows on notebook selection-->
-					<div ng-if="atVm.notebookPreview" layout="row" flex layout-align="center center">
+					<!--this shows on notebooks selection-->
+					<div ng-if="atVm.notebookSelected" layout="row" flex layout-align="center center">
 						<div flex="50" class="md-padding">
-							<img ng-if="atVm.notebookPreview.media.image" ngf-src="atVm.notebookPreview.media.image.path" class="thumb">
+							<img ng-if="atVm.notebookSelected.image" ngf-src="atVm.notebookSelected.image.path" class="thumb">
 						</div>
 						<div flex="50" class="md-padding">
 							<wave-preview
-									ng-if="atVm.notebookPreview.media.audio"
+									ng-if="atVm.notebookSelected.audio"
 									flex
-									url="{{atVm.notebookPreview.media.audio.path}}"
+									url="{{atVm.notebookSelected.audio.path}}"
 									auto-play="false"
 									player-wave-color="white"
 									player-cursor-color="#FF5252"
@@ -25,14 +25,14 @@
 						</div>
 					</div>
 
-					<!--this shows if notebook is not selected-->
-					<div ng-if="!atVm.notebookPreview" class="upload-buttons" layout="row" layout-align="space-between center">
+					<!--this shows if notebooks is not selected-->
+					<div ng-if="!atVm.notebookSelected" class="upload-buttons" layout="row" layout-align="space-between center">
 						<div flex class="upload-selection">
 							<div layout="row" layout-align="center center">
 								<md-button ngf-select
 								           name="imageUpload"
 								           class="md-icon-button"
-								           ng-model="atVm.currentFileEditable.media.image"
+								           ng-model="atVm.currentFileEditable.image"
 								           accept="image/*">
 									<!--ngf-max-size="5MB"-->
 									<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
@@ -40,31 +40,31 @@
 								</md-button>
 							</div>
 
-							<div flex class="md-padding media-container" ng-if="atVm.currentFileEditable.media.image" >
-								<md-button ng-if="atVm.currentFileEditable.mediaType !== 'notebook'" class="md-icon-button remove-preview" ng-click="atVm.removeMedia(atVm.currentFileEditable.media.image); atVm.currentFileEditable.media.image = null" >
+							<div flex class="md-padding media-container" ng-if="atVm.currentFileEditable.image" >
+								<md-button ng-if="atVm.currentFileEditable.mediaType !== 'notebook'" class="md-icon-button remove-preview" ng-click="atVm.removeMedia(atVm.currentFileEditable.image); atVm.currentFileEditable.image = null" >
 									<md-icon>cancel</md-icon>
 								</md-button>
-								<img ng-show="atVm.currentFileEditable.media.image" ngf-src="atVm.imagePath" class="thumb">
+								<img ng-show="atVm.currentFileEditable.image" ngf-src="atVm.imagePath" class="thumb">
 							</div>
 
-						</div> <!--this shows if notebook is not selected-->
+						</div> <!--this shows if notebooks is not selected-->
 
 						<div flex class="upload-selection">
 							<div layout="row" layout-align="center center">
 								<md-button ngf-select
 								           name="audioUpload"
 								           class="md-icon-button"
-								           ng-model="atVm.currentFileEditable.media.audio"
+								           ng-model="atVm.currentFileEditable.audio"
 								           accept="audio/*">
 									<md-icon>volume_up</md-icon>
 								</md-button>
 							</div>
-							<div flex class="md-padding media-container" ng-if="atVm.currentFileEditable.media.audio">
-								<md-button ng-if="atVm.currentFileEditable.mediaType !== 'notebook'" class="md-icon-button remove-preview" ng-click="atVm.removeMedia(atVm.currentFileEditable.media.audio); atVm.currentFileEditable.media.audio = null" >
+							<div flex class="md-padding media-container" ng-if="atVm.currentFileEditable.audio">
+								<md-button ng-if="atVm.currentFileEditable.mediaType !== 'notebook'" class="md-icon-button remove-preview" ng-click="atVm.removeMedia(atVm.currentFileEditable.audio); atVm.currentFileEditable.audio = null" >
 									<md-icon>cancel</md-icon>
 								</md-button>
 								<wave-preview
-										ng-if="atVm.currentFileEditable.media.audio"
+										ng-if="atVm.currentFileEditable.audio"
 										flex
 										url="{{atVm.audioPath}}"
 										auto-play="false"
@@ -82,7 +82,7 @@
 				<md-divider ng-if="atVm.currentFileEditable.notebookId || atVm.currentFileEditable.mediaType === 'notebook' || !atVm.currentFileEditable.mediaType"></md-divider>
 
 				<!--list of notebooks-->
-				<div ng-hide="atVm.currentFileEditable.media.image || atVm.currentFileEditable.media.audio" class="notebook">
+				<div ng-hide="atVm.currentFileEditable.image || atVm.currentFileEditable.audio" class="notebook">
 
 					<h2 class="dialog-section-title md-padding">Attach from notebook</h2>
 					<md-input-container md-no-float class="md-block" >
@@ -108,7 +108,7 @@
 
 								<div class="md-list-item-image sm-padding" flex="15">
 									<div class="image-wrapper">
-										<img ng-if="notebook.media.image" ng-src="{{notebook.media.image.path}}" alt="">
+										<img ng-if="notebook.image" ng-src="{{notebook.image.path}}" alt="">
 									</div>
 								</div>
 
@@ -117,8 +117,8 @@
 									<p>{{notebook.description}}</p>
 								</div>
 								<div class="md-list-item-audio sm-padding" flex="30" layout="column" layout-align="center center">
-									<md-button ng-if="notebook.media.audio" class="md-icon-button">
-										<!--ng-click="atVm.playPauseAudio(notebook); $event.stopPropagation()"-->
+									<md-button ng-if="notebook.audio" class="md-icon-button">
+										<!--ng-click="atVm.playPauseAudio(notebooks); $event.stopPropagation()"-->
 										<md-icon class="material-icons">volume_up</md-icon>
 									</md-button>
 								</div>

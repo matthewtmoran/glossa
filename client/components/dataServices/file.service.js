@@ -347,10 +347,10 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         //     },
         //     fileObj: {}
         // };
-        // if (notebook.$$hashKey) {
-        //     delete notebook.$$hashKey;
+        // if (notebooks.$$hashKey) {
+        //     delete notebooks.$$hashKey;
         // }
-        // data.fileObj = notebook;
+        // data.fileObj = notebooks;
         // return dbSrvc.updateAll(nbCollection, data).then(function(result) {
         //     nbCollection.persistence.compactDatafile();
         //     return callback(null, result);
@@ -391,7 +391,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         //             //write to this path
         //             var writePath = path.join(globalPaths.static.markdown, key, currentFile.media[key].name);
         //
-        //             //call copy and write function; pass in file location, new location, notebook data, and callback
+        //             //call copy and write function; pass in file location, new location, notebooks data, and callback
         //             util.copyAndWrite(currentFile.media[key].absolutePath, writePath, currentFile, function(err, to) {
         //                 if (err) {
         //                     return console.log('There was an error copying and writing file', err);
@@ -408,7 +408,7 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         //
         //                 // if we are are done looping
         //                 if (!maxLoops) {
-        //                     //save the notebook in the database and call callback
+        //                     //save the notebooks in the database and call callback
         //
         //                     var data = {
         //                         options: {
@@ -437,8 +437,8 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
     function saveNotebookAttachment(currentFile, notebook, callback) {
         // var updatedDocs = [];
         // updatedDocs.push(
-        //     writeToNotebook(notebook, function(err, result) {
-        //         if (err){return console.log('There was an error saving notebook', err)}
+        //     writeToNotebook(notebooks, function(err, result) {
+        //         if (err){return console.log('There was an error saving notebooks', err)}
         //         return result
         //     })
         // );
@@ -515,23 +515,23 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
 
     function attachNotebook(notebook, currentFile, callback) {
 
-        // for(var key in notebook.media) {
-        //     if (notebook.media.hasOwnProperty(key)) {
-        //         currentFile.media[key] = notebook.media[key];
-        //         currentFile.mediaType = 'notebook';
-        //         currentFile.notebookId = notebook._id;
+        // for(var key in notebooks.media) {
+        //     if (notebooks.media.hasOwnProperty(key)) {
+        //         currentFile.media[key] = notebooks.media[key];
+        //         currentFile.mediaType = 'notebooks';
+        //         currentFile.notebookId = notebooks._id;
         //
-        //         notebook.isAttached = true;
-        //         notebook.attachedToId = currentFile._id;
+        //         notebooks.isAttached = true;
+        //         notebooks.attachedToId = currentFile._id;
         //
         //     }
         // }
-        // callback(null, notebook, currentFile);
+        // callback(null, notebooks, currentFile);
     }
     function unattachNotebook(notebook, currentFile) {
 
-        // delete notebook.isAttached;
-        // delete notebook.attachedToId;
+        // delete notebooks.isAttached;
+        // delete notebooks.attachedToId;
         //
         // for (var key in currentFile.media) {
         //     if (currentFile.media.hasOwnProperty(key)) {
@@ -542,9 +542,9 @@ function fileSrvc(dbSrvc, $stateParams, $q) {
         // delete currentFile.mediaType;
         // delete currentFile.notebookId;
         //
-        // saveNotebookAttachment(currentFile, notebook, function(err, result) {
+        // saveNotebookAttachment(currentFile, notebooks, function(err, result) {
         //     if (err) {
-        //         return console.log('there was an error in the detaching the notebook', err);
+        //         return console.log('there was an error in the detaching the notebooks', err);
         //     }
         //     return result;
         // })

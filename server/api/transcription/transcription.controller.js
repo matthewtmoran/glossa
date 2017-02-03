@@ -41,6 +41,9 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
+    console.log('req.body:  ', req.body);
+
+
     Transcription.insert(req.body, function(err, file) {
         if(err) { return handleError(res, err); }
         return res.status(201).json(file);
@@ -57,16 +60,16 @@ exports.update = function(req, res) {
         var updated = _.merge(file, req.body.dataObj);
 
 
-        if (!req.body.dataObj.attachment) {
-            delete updated.attachment
+        if (!req.body.dataObj.notebookId) {
+            delete updated.notebookId
         }
 
-        if (!req.body.dataObj.media.image) {
-            delete updated.media.image;
+        if (!req.body.dataObj.image) {
+            delete updated.image;
         }
 
-        if (!req.body.dataObj.media.audio) {
-            delete updated.media.audio;
+        if (!req.body.dataObj.audio) {
+            delete updated.audio;
         }
 
         Transcription.update({_id:req.params.id}, updated, options, function (err, updatedNum, updatedDoc) {

@@ -10,7 +10,7 @@ var express = require('express');
 module.exports = function(app) {
 
   // Insert routes below
-  app.use('/api/notebook', require('./api/notebook'));
+  app.use('/api/notebooks', require('./api/notebook'));
   app.use('/api/hashtag', require('./api/hashtag'));
   app.use('/api/transcription', require('./api/transcription'));
   app.use('/api/corporia', require('./api/corpus'));

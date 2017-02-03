@@ -6,7 +6,7 @@ angular.module('glossa')
 function config($stateProvider) {
     $stateProvider
         .state('notebook', {
-            url: '/notebook',
-            template: '<notebook-component flex layout="column">'
+            url: '/notebooks',
+            template: '<notebooks-component flex layout="column">'
         });
 }

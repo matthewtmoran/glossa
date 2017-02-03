@@ -1,5 +1,5 @@
 'use strict';
-//TODO: move to notebook service
+//TODO: move to notebooks service
 angular.module('glossa')
     .factory('postSrvc', postSrvc);
 
@@ -73,7 +73,7 @@ function postSrvc() {
     /**
      * Sets the simplemde options based on post types
      * @param ev - target event
-     * @param notebook = the notebook that was selected
+     * @param notebook = the notebooks that was selected
      * @returns options for post type template and simplemde {{simplemde: {}, template: string}}
      * TODO: should refractor these template to just use the same one?
      */
@@ -85,7 +85,7 @@ function postSrvc() {
 
         switch(notebook.postType) {
             case 'image':
-                options.template = 'app/notebook/notebookDetails/edit-image-details.html';
+                options.template = 'app/notebooks/notebook-dialog/notebook-dialog-image.controller.html';
                 options.simplemde = {
                     toolbar: false,
                     status: false,
@@ -96,7 +96,7 @@ function postSrvc() {
                 };
                 break;
             case 'audio':
-                options.template = 'app/notebook/notebookDetails/edit-audio-details.html';
+                options.template = 'app/notebooks/notebook-dialog/notebook-dialog-audio.controller.html';
                 options.simplemde = {
                     toolbar: false,
                     status: false,
@@ -107,7 +107,7 @@ function postSrvc() {
                 };
                 break;
             case 'normal':
-                options.template = 'app/notebook/notebookDetails/edit-notebook-details.html';
+                options.template = 'app/notebooks/notebook-dialog/notebook-dialog.controller.html';
                 options.simplemde = {
                     toolbar: simplemdeTollbar,
                     spellChecker: false,
