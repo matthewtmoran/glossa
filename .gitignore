@@ -4,8 +4,8 @@ node_modules
 client/app/*.css
 ToDo.md
 
-server/data/audio/*
-server/data/database/*
-server/data/image/*
-server/data/markdown/*
-server/data/tmp/*
+# server/data/audio/*
+# server/data/database/*
+# server/data/image/*
+# server/data/markdown/*
+# server/data/tmp/*
