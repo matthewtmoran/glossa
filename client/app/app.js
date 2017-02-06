@@ -13,7 +13,12 @@ angular.module('glossa', [
     ])
     .config(config)
     .run(function($rootScope, $state, $injector) {
-        $rootScope.$on('$stateChangeStart',function (event, toState, toParams) {
+        $rootScope.$on('$stateChangeStart',function (event, toState, toParams, fromState, fromParams) {
+
+
+
+            // $rootScope.previousState = fromState;
+            // $rootScope.previousStateParams = fromParams;
             var redirect = toState.redirectTo;
             if (redirect) {
                 if (angular.isString(redirect)) {
@@ -100,4 +105,6 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
 
     $mdIconProvider
         .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
+
+
 };

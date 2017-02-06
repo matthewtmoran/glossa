@@ -20,7 +20,7 @@
 
 <body ng-app="glossa" layout="column" ng-cloak>
 
-	<div ui-view flex layout="column"></div>
+	<div ui-view flex class="main" layout="column"></div>
 
 
 	<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
@@ -110,6 +110,12 @@
 
 	<script src="app/help/help.component.js"></script>
 	<script src="app/help/help.js"></script>
+	<script src="app/settings/settings.component.js"></script>
+	<script src="app/settings/settings.js"></script>
+	<script src="app/settings/project-settings/project-settings.component.js"></script>
+	<script src="app/settings/project-settings/project-settings.js"></script>
+	<script src="app/settings/about/about.component.js"></script>
+	<script src="app/settings/about/about.js"></script>
 
 	<script type="text/javascript" src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
 </body>

@@ -120,6 +120,8 @@ md-backdrop.md-sidenav-backdrop {
 @import 'meta/attachment/attachment';
 @import 'meta/meta.component';
 @import 'notebooks/notebooks.component';
+@import 'settings/project-settings/project-settings.component';
+@import 'settings/settings.component';
 @import 'tagManagement/manageTags';
 @import '../assets/lib/simplemde/simplemde';
 @import '../components/drawer/drawer';
@@ -192,7 +194,18 @@ md-sidenav {
 	}
 }
 
-.waveSurferWave {
-	//background-image: url('../server/data/image/Adam-1485389529712.jpg');
-	//background-image: url('http://localhost:9000/image/Adam-1485389529712.jpg');
+
+/* start 'enter' transition on main view */
+.main.ng-enter {
+	/* transition on enter for .5s */
+	transition: .5s;
+
+	/* start with opacity 0 (invisible) */
+	opacity: 0;
+}
+
+/* end 'enter' transition on main view */
+.main.ng-enter-active {
+	/* end with opacity 1 (fade in) */
+	opacity: 1;
 }

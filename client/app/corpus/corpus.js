@@ -17,6 +17,14 @@ function config($stateProvider) {
             resolve: {
                 markdownFiles: function(markdownSrvc, $stateParams) {
                     return markdownSrvc.getFiles($stateParams.corpus);
+                },
+                PreviousState: function ($state) {
+                    var currentStateData = {
+                        Name: $state.current.name,
+                        Params: $state.params,
+                        URL: $state.href($state.current.name, $state.params)
+                    };
+                    return currentStateData;
                 }
             }
         });
