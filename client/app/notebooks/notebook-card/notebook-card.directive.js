@@ -11,7 +11,8 @@ function notebookCard($sce, $state) {
         scope: {
             notebook: '=',
             viewDetails: '&',
-            disconnectNotebook: '&'
+            disconnectNotebook: '&',
+            uniqueUsers: '='
         },
         link: notebookCardLink
     };
@@ -20,6 +21,8 @@ function notebookCard($sce, $state) {
     function notebookCardLink(scope, element, attrs) {
 
         scope.isCorpus = false;
+
+        scope.notebookCreator = scope.uniqueUsers[scope.notebook.createdBy];
 
         //A rendered preview of the notebooks descriptions markdown
         scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));

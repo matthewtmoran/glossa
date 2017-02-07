@@ -53,14 +53,16 @@ function markdownSrvc($http, Upload, $stateParams) {
     //create new md file
     function createFile(name) {
 
+        var session = JSON.parse(localStorage.getItem('session'));
+
         var file = {
             displayName: name || 'untitled',
             description: '',
             content: '',
             corpus: $stateParams.corpus,
             createdAt: Date.now(),
-            createdBy: 'Moran',
-            projectId: 1
+            createdBy: session.userId,
+            projectId: session.projectId
         };
 
         return $http.post('/api/transcription', file)

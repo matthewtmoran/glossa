@@ -32,7 +32,7 @@
 				ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
 				md-colspan="1">
 
-				<notebook-card notebook="notebook" view-details="nbVm.viewDetails(event, notebook)" flex layout-fill></notebook-card>
+				<notebook-card unique-users="nbVm.uniqueUsers" notebook="notebook" view-details="nbVm.viewDetails(event, notebook)" flex layout-fill></notebook-card>
 
 			</md-grid-tile>
 		</md-grid-list>

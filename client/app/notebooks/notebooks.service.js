@@ -50,12 +50,12 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
      */
     function createNotebook(notebook) {
 
-        console.log('notebooks parameter in createNotebook ', notebook);
+        var session = JSON.parse(localStorage.getItem('session'));
 
         notebook.name = simpleParse.title(notebook);
         notebook.createdAt = Date.now();
-        notebook.createdBy = 111;
-        notebook.projectId = 1;
+        notebook.createdBy = session.userId;
+        notebook.projectId = session.projectId;
 
        return $q.when(simpleParse.hashtags(notebook))
             .then(function(data) {
@@ -64,8 +64,9 @@ function notebookSrvc($http, $q, simpleParse, Upload) {
                      url:'/api/notebooks/',
                      method: 'POST'
                  };
+
                 return uploadReq(notebook, options).then(function(data) {
-                    return data;
+                        return data
                 })
             });
     }

@@ -26,7 +26,7 @@ Session.find({}, function(err, sessions) {
 
 function buildProject() {
     User.count({}, function(err, count) {
-        if (err) {return console.log('There was an error laoding project.....')}
+        if (err) {return console.log('There was an error loading project.....')}
         //if no users exist it mean this is the first time the application has run... Maybe we run more checks here to be extra careful.
         if (count < 1) {
 
