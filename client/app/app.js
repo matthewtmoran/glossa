@@ -12,13 +12,35 @@ angular.module('glossa', [
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector) {
-        $rootScope.$on('$stateChangeStart',function (event, toState, toParams, fromState, fromParams) {
+    .run(function($rootScope, $state, $injector, AppService) {
+
+        //gets the current session from the server
+        AppService.getSession().then(function(data){
+            //go to the session state
+            localStorage.setItem('session', JSON.stringify(data));
+            $state.go(data.currentState, data.currentStateParams);
+        });
+
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+            //set the current session from local storage
+            var session = JSON.parse(localStorage.getItem('session'));
+
+            //update the current state and params
+            if (session) {
+                session.currentState = toState.name;
+                session.currentStateParams = toParams;
+
+                //update session data on server end
+                AppService.updateSession(session).then(function(data) {
+                    // after reponse update local storage
+                    session = data;
+                    localStorage.setItem('session', JSON.stringify(data));
+                });
+            }
 
 
 
-            // $rootScope.previousState = fromState;
-            // $rootScope.previousStateParams = fromParams;
+            //This keeps the state from redirecting away from the child state when that same child state is clicked.
             var redirect = toState.redirectTo;
             if (redirect) {
                 if (angular.isString(redirect)) {
@@ -40,7 +62,7 @@ angular.module('glossa', [
                 }
             }
         })
-})
+});
 
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
@@ -92,11 +114,9 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
         .accentPalette('customAccent');
 
 
-
-    // $urlRouterProvider
-    //     .otherwise('/corpus/:corpus:default');
-
     $urlRouterProvider.otherwise(function($injector, $location){
+
+
         var state = $injector.get('$state');
         // state.go("corpus", $location.corpus());
         state.go("corpus");
@@ -106,5 +126,4 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
     $mdIconProvider
         .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
 
-
-};
+}
