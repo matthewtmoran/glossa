@@ -36,26 +36,15 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
     nbVm.uniqueUsers = {};
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
+    $scope.$watch('nbVm.uniqueUsers', function(newValue) {
+        console.log('there was a change', newValue);
+    });
 
     /**
      * Queries all notebooks
      */
     function queryNotebooks() {
-
-        nbVm.uniqueUsers = {};
         notebookSrvc.getNotebooks().then(function(data) {
-
-            data.forEach(function(nb) {
-                if (!nbVm.uniqueUsers[nb.createdBy]) {
-
-
-                     UserService.getUser(nb.createdBy).then(function(data) {
-                         nbVm.uniqueUsers[nb.createdBy] = data;
-                     })
-
-                }
-            });
-
             nbVm.notebooks = data
         })
     }

@@ -4,7 +4,7 @@
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
 
-function notebookCard($sce, $state) {
+function notebookCard($sce, $state, UserService) {
     var directive = {
         restrict: 'E',
         templateUrl: 'app/notebooks/notebook-card/notebook-card.directive.html',
@@ -22,7 +22,21 @@ function notebookCard($sce, $state) {
 
         scope.isCorpus = false;
 
-        scope.notebookCreator = scope.uniqueUsers[scope.notebook.createdBy];
+        if ($state.current.name.indexOf('corpus') > -1) {
+            scope.isCorpus = true;
+        }
+
+        if ($state.current.name === 'notebook') {
+            if (scope.uniqueUsers[scope.notebook.createdBy]) {
+                scope.notebookCreator = scope.uniqueUsers[scope.notebook.createdBy];
+            } else if (!scope.uniqueUsers[scope.notebook.createdBy]) {
+                UserService.getUser(scope.notebook.createdBy).then(function(data) {
+                    scope.uniqueUsers[scope.notebook.createdBy] = data;
+                    scope.notebookCreator = data;
+                });
+            }
+        }
+
 
         //A rendered preview of the notebooks descriptions markdown
         scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
@@ -31,9 +45,7 @@ function notebookCard($sce, $state) {
         scope.openDetails = openDetails;
 
         //if state is corups... use veiw only template
-        if ($state.current.name.indexOf('corpus') > -1) {
-            scope.isCorpus = true;
-        }
+
 
 
         function disconnect(notebook) {
