@@ -21,7 +21,7 @@
 	</form>
 	<div layout="row" layout-align="space-between center">
 		<md-button ng-click="metaVm.deleteMarkdownFile($event, metaVm.currentFile)" class="md-warn">Delete Text</md-button>
-		<md-button ng-disabled="metaVm.currentFile.attachment.notebookId" ng-click="metaVm.addAttachment($event)">Attach</md-button>
+		<md-button ng-disabled="metaVm.currentFile.notebookId || (metaVm.currentFile.image && metaVm.currentFile.audio)" ng-click="metaVm.addAttachment($event)">Attach</md-button>
 	</div>
 	<div layout="column" class="attached-media">
 		<h3>Associated Media</h3>

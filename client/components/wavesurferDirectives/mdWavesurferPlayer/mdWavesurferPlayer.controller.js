@@ -39,11 +39,13 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
 
 
     $scope.$on('get:timeStamp', function() {
-        console.log('get time stamp listener');
-        var time = control.surfer.getCurrentTime();
+        var timeStamp = control.surfer.getCurrentTime();
+        $scope.$emit('send:timeStamp', timeStamp);
+    });
 
-
-        $scope.$emit('send:timeStamp', time);
+    $scope.$on('set:timeStamp', function(event, seconds) {
+       // seekTo does not take seconds but a fraction of a second in context of the entire audio duration.
+       control.surfer.seekTo(seconds / control.surfer.getDuration());
     });
 
     control.toggleMute = toggleMute;

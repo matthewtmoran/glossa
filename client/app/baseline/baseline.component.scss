@@ -22,11 +22,16 @@
 	padding: 3px 0 0 3px;
 }
 
-.cm-url {
-	background: red;
+.cm-timestamp {
+	background: $lGrey;
+	color: white !important;
+	transition: .3s;
+	padding-left: 3px;
+	padding-right: 3px;
+	border-radius: 6px;
 
 	&:hover {
 		cursor: pointer;
-		background: blue;
+		background: $red;
 	}
 }

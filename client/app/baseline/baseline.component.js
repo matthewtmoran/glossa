@@ -28,7 +28,6 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
     blVm.$onInit = init;
     blVm.codemirrorLoaded = codemirrorLoaded;
     blVm.update = update;
-    blVm.getTimeStamp = getTimeStamp;
 
     $scope.$watch('blVm.currentFile', function(newValue) {
         blVm.audioPath = '';
@@ -44,14 +43,50 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
 
     }
 
+    function getMediaData(file) {
+        if (file.notebookId) {
+            notebookSrvc.findNotebook(file.notebookId).then(function(notebook) {
+                blVm.audioPath = notebook.audio.path ||'';
+                blVm.imagePath = notebook.image.path ||'';
+            });
+            return;
+        }
+        if (blVm.currentFile.audio) {
+            blVm.audioPath = blVm.currentFile.audio.path || null;
+        }
+
+        if (blVm.currentFile.image) {
+            blVm.imagePath = blVm.currentFile.image.path || null;
+        }
+    }
+
+    function update() {
+        baselineSrvc.updateContent(blVm.currentFile, blVm.textContent);
+    }
+
+
+    function getTextContent(file) {
+        baselineSrvc.readContent(file, function(result) {
+            blVm.textContent = result;
+            $scope.$apply();
+        });
+    }
+
+    function getAudioImagePath() {
+        if (blVm.currentFile.audio) {
+            blVm.audioPath = path.join(globalPaths.static.trueRoot, blVm.currentFile.audio.path)
+        }
+        if (blVm.currentFile.image) {
+            blVm.imagePath = path.join(globalPaths.static.trueRoot, blVm.currentFile.image.path)
+        }
+    }
+
+
     var _doc;
 
 
     function codemirrorLoaded(_editor) {
-        console.log('_editor', _editor);
         _doc = _editor.getDoc();
-
-
 
         _editor.setOption('lineNumbers', true);
 
@@ -63,110 +98,70 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
             // console.log('keypress');
         });
 
-        hyperlinkOverlay(_editor);
+        timestampOverlay(_editor);
 
-        function hoverWidgetOnOverlay(cm, overlayClass, widget) {
+        function hoverWidgetOnOverlay(cm, overlayClass) {
 
-            cm.addWidget({line:0, ch:0}, widget, true);
-            widget.style.position = 'fixed';
-            widget.style.zIndex=100000;
-            widget.style.top=widget.style.left='-1000px'; // hide it
-            widget.dataset.token=null;
+            // cm.getWrapperElement().addEventListener('mousehover', function(e) {
+            //     var onToken = e.target.classList.contains("cm-"+overlayClass);
+            //     if (onToken) {
+            //         e.target.
+            //     }
+            //
+            // }
 
-            cm.getWrapperElement().addEventListener('mousemove', function(e) {
-                var onToken = e.target.classList.contains("cm-"+overlayClass),
-                    onWidget = (e.target === widget || widget.contains(e.target));
+            cm.getWrapperElement().addEventListener('mousedown', function(e) {
+                var onToken = e.target.classList.contains("cm-"+overlayClass);
+                var tokenText = e.target.innerText;
+                var time_rx = /([0-9][0-9]):([0-9][0-9]):([0-9][0-9])\.([0-9])/g;
+                if (onToken) {
 
-                if (onToken && e.target.innerText !== widget.dataset.token) { // entered token, show widget
-                    var rect = e.target.getBoundingClientRect();
-                    widget.style.left=rect.left+'px';
-                    widget.style.top=rect.bottom+'px';
-                    //let charCoords=cm.charCoords(cm.coordsChar({ left: e.pageX, top:e.pageY }));
-                    //widget.style.left=(e.pageX-5)+'px';
-                    //widget.style.top=(cm.charCoords(cm.coordsChar({ left: e.pageX, top:e.pageY })).bottom-1)+'px';
+                    var dateUnformatted = tokenText.match(time_rx);
 
-                    widget.dataset.token=e.target.innerText;
-                    if (typeof widget.onShown==='function') widget.onShown();
+                    var dateFormatted = convertToSeconds(dateUnformatted[0]);
 
-                } else if ((e.target===widget || widget.contains(e.target))) { // entered widget, call widget.onEntered
-                    if (widget.dataset.entered==='true' && typeof widget.onEntered==='function')  widget.onEntered();
-                    widget.dataset.entered='true';
+                    $scope.$broadcast('set:timeStamp', dateFormatted);
 
-                } else if (!onToken && widget.style.left!=='-1000px') { // we stepped outside
-                    widget.style.top=widget.style.left='-1000px'; // hide it
-                    delete widget.dataset.token;
-                    widget.dataset.entered='false';
-                    if (typeof widget.onHidden==='function') widget.onHidden();
                 }
-
-                return true;
             });
         }
 
-        function hyperlinkOverlay(cm) {
+        function timestampOverlay(cm) {
             if (!cm) return;
 
             var rx_word = "\" "; // Define what separates a word
-            var endTag = ">";
-            // var rx_word = "-->\" "; // Define what separates a word
-
 
             function isTimeStamp(s) {
-                console.log('s', s);
                var comment =  /<!--.*?-->/;
                 if (!comment.test(s)) {
-                    console.log('returning false');
                     return false;
                 } else if (comment.test(s)) {
-                    console.log('returning true');
                     return true;
                 }
             }
 
-
             cm.addOverlay({
                     token: function(stream) {
-                        console.log('stream:', stream);
                         var ch = stream.peek();
-                        console.log('ch:', ch);
                         var word = "";
-
-                        // console.log('rx_word', rx_word);
-                        // console.log('ch', ch);
-                        // console.log('rx_word.includes(ch)', rx_word.includes(ch));
 
                         if (rx_word.includes(ch) || ch==='\uE000' || ch==='\uE001') {
                             stream.next();
                             return null;
                         }
 
-                        // if (endTag.includes(ch)) {
-                        //     stream.next();
-                        //     return null
-                        // }
-
                         while ((ch = stream.peek()) && !rx_word.includes(ch)) {
                             word += ch;
                             stream.next();
                         }
 
-                        console.log('word:', word);
-
-                        if (isTimeStamp(word)) return "url"; // CSS class: cm-url
+                        if (isTimeStamp(word)) return "timestamp"; // CSS class: cm-timestamp
                     }},
-                { opaque : true }  // opaque will remove any spelling overlay etc
+                    { opaque : true }  // opaque will remove any spelling overlay etc
             );
 
-            var widget = document.createElement('button');
-            widget.innerHTML = '&rarr;';
-            widget.onclick = function(e) {
-                if (!widget.dataset.token) return;
-                var link=widget.dataset.token;
-                if (!(new RegExp('^(?:(?:https?|ftp):\/\/)', 'i')).test(link)) link="http:\/\/"+link;
-                window.open(link, '_blank');
-                return true;
-            };
-            hoverWidgetOnOverlay(cm, 'url', widget);
+
+            hoverWidgetOnOverlay(cm, 'timestamp');
         }
 
 
@@ -199,61 +194,31 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
         }
     }
 
-    $scope.$on('send:timeStamp', function(event, data) {
-        console.log('send:timestamp listener', data);
+    $scope.$on('send:timeStamp', function(event, seconds) {
+        console.log('send:timestamp listener', seconds);
 
-        var string = " <!--" + formatTime(data) + "--> ";
+        var string = " <!--" + clockFormat(seconds, 1) + "--> ";
 
-        _doc.replaceSelection(  string, 'end');
+        _doc.replaceSelection(string, 'end');
 
     });
 
-    function getMediaData(file) {
-        if (file.attachment) {
-            notebookSrvc.findNotebook(file.attachment.notebookId).then(function(notebook) {
-                blVm.audioPath = notebook.audio.path ||'';
-                blVm.imagePath = notebook.image.path ||'';
-            });
-            return;
-        }
-        if (blVm.currentFile.audio) {
-            blVm.audioPath = blVm.currentFile.audio.path || null;
-        }
 
-        if (blVm.currentFile.image) {
-            blVm.imagePath = blVm.currentFile.image.path || null;
-        }
+    function convertToSeconds(time) {
+
+
+        var a = time.split(':'); // split it at the colons
+
+// minutes are worth 60 seconds. Hours are worth 60 minutes.
+        var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+        return seconds;
     }
 
 
-    function getTimeStamp() {
-        console.log('get time stamp');
-    }
-
-
-    function getTextContent(file) {
-        baselineSrvc.readContent(file, function(result) {
-            blVm.textContent = result;
-            $scope.$apply();
-        });
-    }
-
-    function getAudioImagePath() {
-        if (blVm.currentFile.audio) {
-            blVm.audioPath = path.join(globalPaths.static.trueRoot, blVm.currentFile.audio.path)
-        }
-        if (blVm.currentFile.image) {
-            blVm.imagePath = path.join(globalPaths.static.trueRoot, blVm.currentFile.image.path)
-        }
-    }
-
-
-
-    function update() {
-        baselineSrvc.updateContent(blVm.currentFile, blVm.textContent);
-    }
 
    function formatTime (time) {
+        console.log('time***', time);
+
         var sec_num = parseInt(time, 10); // don't forget the second param
         var hours   = Math.floor(sec_num / 3600);
         var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
@@ -263,6 +228,65 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
         if (minutes < 10) {minutes = "0"+minutes;}
         if (seconds < 10) {seconds = "0"+seconds;}
         return hours+':'+minutes+':'+seconds;
+    }
+
+    //takes seconds and then decimals....
+    function clockFormat(seconds, decimals) {
+        var hours,
+            minutes,
+            secs,
+            result;
+
+        hours = parseInt(seconds / 3600, 10) % 24;
+        minutes = parseInt(seconds / 60, 10) % 60;
+        secs = seconds % 60;
+        secs = secs.toFixed(decimals);
+
+        result = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (secs < 10 ? "0" + secs : secs);
+
+        return result;
+    }
+
+    function cueFormatters(format) {
+
+        function clockFormat(seconds, decimals) {
+            var hours,
+                minutes,
+                secs,
+                result;
+
+            hours = parseInt(seconds / 3600, 10) % 24;
+            minutes = parseInt(seconds / 60, 10) % 60;
+            secs = seconds % 60;
+            secs = secs.toFixed(decimals);
+
+            result = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (secs < 10 ? "0" + secs : secs);
+
+            return result;
+        }
+
+        var formats = {
+            "seconds": function (seconds) {
+                return seconds.toFixed(0);
+            },
+            "thousandths": function (seconds) {
+                return seconds.toFixed(3);
+            },
+            "hh:mm:ss": function (seconds) {
+                return clockFormat(seconds, 0);
+            },
+            "hh:mm:ss.u": function (seconds) {
+                return clockFormat(seconds, 1);
+            },
+            "hh:mm:ss.uu": function (seconds) {
+                return clockFormat(seconds, 2);
+            },
+            "hh:mm:ss.uuu": function (seconds) {
+                return clockFormat(seconds, 3);
+            }
+        };
+
+        return formats[format];
     }
 }
 
