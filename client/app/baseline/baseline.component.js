@@ -98,10 +98,10 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
             // console.log('keypress');
         });
 
+
         timestampOverlay(_editor);
 
         function hoverWidgetOnOverlay(cm, overlayClass) {
-
             // cm.getWrapperElement().addEventListener('mousehover', function(e) {
             //     var onToken = e.target.classList.contains("cm-"+overlayClass);
             //     if (onToken) {
@@ -110,15 +110,27 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
             //
             // }
 
+
             cm.getWrapperElement().addEventListener('mousedown', function(e) {
                 var onToken = e.target.classList.contains("cm-"+overlayClass);
                 var tokenText = e.target.innerText;
+
                 var time_rx = /([0-9][0-9]):([0-9][0-9]):([0-9][0-9])\.([0-9])/g;
+
+
+                // cm.getRange(word.anchor, word.head);
+
                 if (onToken) {
 
                     var dateUnformatted = tokenText.match(time_rx);
 
                     var dateFormatted = convertToSeconds(dateUnformatted[0]);
+
+
+
+                    // cm.execCommand('goLineDown');
+                    // _doc.goLineDown();
+
 
                     $scope.$broadcast('set:timeStamp', dateFormatted);
 
