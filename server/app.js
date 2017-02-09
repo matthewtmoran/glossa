@@ -14,8 +14,6 @@ var path = require('path');
 // Populate DB with sample data
 if(config.seedDB) { require('./config/seed'); }
 
-require('./config/init');
-
 
 
 
@@ -24,12 +22,14 @@ var app = express();
 var server = require('http').createServer(app);
 require('./config/express')(app);
 require('./routes')(app);
+require('./config/init');
 
-var images = path.join(__dirname,'data/image');
+// var images = path.join(__dirname,'data/image');
 
 
 // Start server
 server.listen(config.port, config.ip, function () {
+    console.log('Listening on Port.');
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 });
 

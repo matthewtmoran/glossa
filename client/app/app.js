@@ -13,30 +13,41 @@ angular.module('glossa', [
     ])
     .config(config)
     .run(function($rootScope, $state, $injector, AppService) {
-
+        console.log('App Run time:', Date.now());
         //gets the current session from the server
         AppService.getSession().then(function(data){
+
             //go to the session state
-            localStorage.setItem('session', JSON.stringify(data));
+            // localStorage.setItem('session', JSON.stringify(data));
+
             $state.go(data.currentState, data.currentStateParams);
         });
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             //set the current session from local storage
-            var session = JSON.parse(localStorage.getItem('session'));
+            // var session = JSON.parse(localStorage.getItem('session'));
+
+            var session;
+
+            AppService.getSession().then(function(data){
+
+                if (data) {
+
+
+                    data.currentState = toState.name;
+                    data.currentStateParams = toParams;
+
+                    //update session data on server end
+                    AppService.updateSession(data).then(function(data) {
+                        session = data;
+                    });
+                }
+
+            });
+
 
             //update the current state and params
-            if (session) {
-                session.currentState = toState.name;
-                session.currentStateParams = toParams;
 
-                //update session data on server end
-                AppService.updateSession(session).then(function(data) {
-                    // after reponse update local storage
-                    session = data;
-                    localStorage.setItem('session', JSON.stringify(data));
-                });
-            }
 
 
 
@@ -66,6 +77,7 @@ angular.module('glossa', [
 
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
+    console.log('Main Config time:', Date.now());
     var customAccent = {
         '50': '#b80000',
         '100': '#d10000',

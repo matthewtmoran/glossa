@@ -16,8 +16,7 @@ var path = require('path');
 var config = require('./environment');
 
 var electron = require('electron'),
-    electronApp = electron.app,  // Module to control application life.
-    userDataPath = (electronApp).getPath('userData');
+    electronApp = electron.app;  // Module to control application life.
 
 module.exports = function(app) {
   var env = app.get('env');
