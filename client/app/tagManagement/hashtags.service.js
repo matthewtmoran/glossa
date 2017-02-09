@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('glossa')
-    .factory('hashtagSrvc', hashtagSrvc);
+    .factory('HashtagService', HashtagService);
 
 
-function hashtagSrvc($q, $http) {
+function HashtagService($q, $http) {
     var service = {
         getHashtags: getHashtags,
         termQuery: termQuery,
@@ -106,7 +106,7 @@ function hashtagSrvc($q, $http) {
             });
         });
 
-       var notebookPromise = notebookSrvc.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
+       var notebookPromise = NotebookService.find(nbCollection, {"hashtags._id": tag._id}).then(function(result) {
 
             result.data.forEach(function(nb, i) {
 

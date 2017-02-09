@@ -3,6 +3,7 @@ node_modules
 .idea/
 client/app/*.css
 ToDo.md
+client/app/audioSandbox/*
 
 # server/data/audio/*
 # server/data/database/*

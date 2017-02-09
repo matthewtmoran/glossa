@@ -16,7 +16,7 @@ angular.module('glossa')
         }
     });
 
-function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdownSrvc) {
+function metaCtrl($scope, NotebookService, $timeout, dialogSrvc, CorpusService) {
     var metaVm = this;
 
 
@@ -52,7 +52,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
     //Cant pass in file here right now.  simplemde binding is 'static'.. need to find a way to make the binding dynamic or just reference metaVm.currentFile
     function update(field) {
 
-        markdownSrvc.updateFile(metaVm.currentFile).then(function(data) {
+        CorpusService.updateFile(metaVm.currentFile).then(function(data) {
 
             metaVm.currentFile = data; //set the current file as the response
 
@@ -75,7 +75,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
                 return;
             }
             delete metaVm.currentFile.notebookId;
-            markdownSrvc.updateFile(metaVm.currentFile)
+            CorpusService.updateFile(metaVm.currentFile)
                 .then(function(data) {
                     metaVm.currentFile = data;
                 });
@@ -112,7 +112,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
                 if (!response) {
                     return console.log('confirm cancel response', response);
                 }
-                return markdownSrvc.removeFile(file).then(function(data) {
+                return CorpusService.removeFile(file).then(function(data) {
                     metaVm.corpus.deletMDFile(file);
                     return data;
                 })
@@ -133,7 +133,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
             metaVm.currentFile.removeItem = []; //create this temp property to send to server
             metaVm.currentFile.removeItem.push(metaVm.currentFile[type]);
             delete metaVm.currentFile[type]; //delete this property...
-            markdownSrvc.updateFile(metaVm.currentFile)
+            CorpusService.updateFile(metaVm.currentFile)
                 .then(function(data) {
                     //reset currentFile
                     metaVm.currentFile = data;
@@ -150,7 +150,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
 
     //view notebooks details... should be view only
     function viewDetails(ev, notebook) {
-        var postOptions = postSrvc.postOptions(ev, notebook);
+        var postOptions = NotebookService.postOptions(ev, notebook);
         dialogSrvc.viewDetails(ev, postOptions, notebook);
     }
 
@@ -162,7 +162,7 @@ function metaCtrl($scope, notebookSrvc, $timeout, postSrvc, dialogSrvc, markdown
 
     //Queryies the attached notebooks data
     function queryAttachedNotebook(nbId) {
-        notebookSrvc.findNotebook(nbId).then(function(data) {
+        NotebookService.findNotebook(nbId).then(function(data) {
            metaVm.attachedNotebook = data;
         });
     }

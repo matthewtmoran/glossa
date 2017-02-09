@@ -5,7 +5,7 @@
 angular.module('glossa')
     .controller('notebookDetailsCtrl', notebookDetailsCtrl);
 
-function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc, $sce, notebook) {
+function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookService, $sce, notebook) {
     var dialogVm = this;
 
     //An object to be returned when dialog closes
@@ -49,7 +49,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
             data: {}
         };
 
-        return notebookSrvc.createNotebook(dialogVm.notebook)
+        return NotebookService.createNotebook(dialogVm.notebook)
             .then(function(result) {
                 dialogObject.data = result;
                 dialogSrvc.hide(dialogObject);
@@ -62,7 +62,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, notebookSrvc,
             dialogVm.notebook.removeItem = dialogVm.removedMedia;
         }
 
-        return notebookSrvc.updateNotebook(dialogVm.notebook).then(function(data) {
+        return NotebookService.updateNotebook(dialogVm.notebook).then(function(data) {
             dialogObject = {
                 dataChanged: true,
                 event: 'update',

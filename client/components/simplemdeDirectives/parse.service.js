@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('simpleParse', simpleParse);
 
-function simpleParse(hashtagSrvc, $q) {
+function simpleParse(HashtagService, $q) {
     var service = {
         title: title,
         hashtags: hashtags
@@ -46,7 +46,7 @@ function simpleParse(hashtagSrvc, $q) {
         });
 
         // removedTags.forEach(function(tag) {
-        //     hashtagSrvc.decreaseTagCount(tag);
+        //     HashtagService.decreaseTagCount(tag);
         // });
 
         //the rest of the tags here should be tags new to this notebooks...
@@ -69,7 +69,7 @@ function simpleParse(hashtagSrvc, $q) {
         var promises = [];
         tagsInText.forEach(function(tag, index) {
             //push this query to promises array
-            promises.push(hashtagSrvc.termQuery(tag).then(function(data) {
+            promises.push(HashtagService.termQuery(tag).then(function(data) {
                 //update the notebooks model property
                 tagsInText[index] = data;
                 return data;

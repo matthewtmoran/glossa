@@ -12,13 +12,13 @@ module.exports = {
 
 
 Session.find({}, function(err, sessions) {
-    console.log('Checking for Sessions time:', Date.now());
+    // console.log('Checking for Sessions time:', Date.now());
     if (err) {return console.log('There was an error laoding session.')};
     if (sessions.length < 1) {
         console.log('No Session exists; build new project');
         return buildProject();
     }
-    console.log('Session exists');
+    // console.log('Session exists');
     return sessions[0];
 });
 
@@ -26,13 +26,13 @@ Session.find({}, function(err, sessions) {
 //count users if none exists create a new one and save results somewhere
 
 function buildProject() {
-    console.log('buildProject Called')
+    // console.log('buildProject Called')
     User.count({}, function(err, count) {
         if (err) {return console.log('There was an error loading project.....')}
         //if no users exist it mean this is the first time the application has run... Maybe we run more checks here to be extra careful.
         if (count < 1) {
 
-            console.log('No users exist.');
+            // console.log('No users exist.');
 
             //create new user object
             var newUser = {
@@ -44,7 +44,7 @@ function buildProject() {
             User.insert(newUser, function(err, createdUser) {
                 if (err) {return console.log('there was an error')}
 
-                console.log('User created.');
+                // console.log('User created.');
 
                 //creeate new project object
                 var newProject = {
@@ -57,7 +57,7 @@ function buildProject() {
                 Project.insert(newProject, function(err, createdProject) {
                     if (err) {return console.log('there was an error')}
 
-                    console.log('Project Created.');
+                    // console.log('Project Created.');
                     //create new session object
                     var session = {
                         start: Date.now(),
@@ -71,7 +71,7 @@ function buildProject() {
                     //insert session object into db
                     Session.insert(session, function(err, createdSession) {
                         if (err) {return console.log('there was an error')}
-                        console.log('Session created (_id) ', createdSession._id);
+                        // console.log('Session created (_id) ', createdSession._id);
 
                         return createdSession;
 

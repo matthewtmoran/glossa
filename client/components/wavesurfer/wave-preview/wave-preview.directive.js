@@ -1,12 +1,12 @@
 'use strict';
 angular.module('glossa')
-    .directive('wavePreview', wavePreview);
+    .directive('wavePreview', WavePreview);
 
-function wavePreview() {
+function WavePreview() {
 
     return {
         restrict: 'E',
-        templateUrl: 'components/wavesurferDirectives/wavePreview/wavePreview.html',
+        templateUrl: 'components/wavesurfer/wave-preview/wave-preview.html',
         scope: {
             src: '@url',
             title: '@',
@@ -15,7 +15,7 @@ function wavePreview() {
             autoPlay: '=',
             properties: '='
         },
-        controller: 'mdWavesurferPlayerController',
+        controller: 'wavesurferPlayerController',
         controllerAs: 'control',
         bindToController: true
     };

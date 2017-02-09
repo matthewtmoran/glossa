@@ -1,5 +1,5 @@
 'use strict';
-//directive that displays a preview of notebooks data
+//directive that displays a wave-preview of notebooks data
 
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
@@ -38,7 +38,7 @@ function notebookCard($sce, $state, UserService) {
         }
 
 
-        //A rendered preview of the notebooks descriptions markdown
+        //A rendered wave-preview of the notebooks descriptions markdown
         scope.previewText = $sce.trustAsHtml(SimpleMDE.markdown(scope.notebook.description));
 
         scope.disconnect = disconnect;

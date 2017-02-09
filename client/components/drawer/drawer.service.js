@@ -9,7 +9,7 @@
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
+function drawerMenu(manageCorpusSrvc, dialogSrvc) {
 
     var section = [
         {
@@ -349,11 +349,11 @@ function drawerMenu(dbSrvc, manageCorpusSrvc, dialogSrvc) {
         corpus.settings = settings;
 
 
-       return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
-            return docs.data;
-        }).catch(function(err) {
-           console.log('there was an error saving corpus', err);
-           return err;
-       })
+       // return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
+       //      return docs.data;
+       //  }).catch(function(err) {
+       //     console.log('there was an error saving corpus', err);
+       //     return err;
+       // })
     }
 }

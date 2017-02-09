@@ -25,7 +25,6 @@ function manageCorpusSrvc($http) {
     function getCorporia() {
         return $http.get('/api/corporia')
             .then(function successCallback(response) {
-                console.log('response.data', response.data);
                 return response.data;
             }, function errorCallback(response) {
                 console.log('There was an error', response);

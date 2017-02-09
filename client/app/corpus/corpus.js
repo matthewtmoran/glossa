@@ -15,8 +15,8 @@ function config($stateProvider) {
                 corpus: 'default'
             },
             resolve: {
-                markdownFiles: function(markdownSrvc, $stateParams) {
-                    return markdownSrvc.getFiles($stateParams.corpus);
+                markdownFiles: function(CorpusService, $stateParams) {
+                    return CorpusService.getFiles($stateParams.corpus);
                 },
                 PreviousState: function ($state) {
                     var currentStateData = {

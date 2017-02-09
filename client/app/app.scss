@@ -116,21 +116,18 @@ md-backdrop.md-sidenav-backdrop {
 @import 'baseline/baseline.component';
 @import 'corpus/corpus.component';
 @import 'help/help.component';
-@import 'mentions/mentions';
 @import 'meta/attachment/attachment';
 @import 'meta/meta.component';
 @import 'notebooks/notebooks.component';
 @import 'settings/about/about.component';
 @import 'settings/project-settings/project-settings.component';
 @import 'settings/settings.component';
-@import 'tagManagement/manageTags';
+@import 'tagManagement/hashtags.component';
 @import '../assets/lib/simplemde/simplemde';
 @import '../components/drawer/drawer';
 @import '../components/navbar/navbar';
-@import '../components/settings/settings';
-@import '../components/wavesurferDirectives/mdWavesurferPlayer';
-@import '../components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer';
-@import '../components/wavesurferDirectives/wavePreview/wavePreview';
+@import '../components/wavesurfer/wave-preview/wave-preview';
+@import '../components/wavesurfer/wavesurfer-player/wavesurfer-player';
 /* endinject */
 
 

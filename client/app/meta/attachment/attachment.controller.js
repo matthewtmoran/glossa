@@ -3,7 +3,7 @@
 angular.module('glossa')
     .controller('attachmentCtrl', attachmentCtrl);
 
-function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $scope, $q) {
+function attachmentCtrl(dialogSrvc, currentFile, CorpusService, NotebookService, $scope, $q) {
     var atVm = this;
 
     //make copy to make changes on... so we can restore changes on cancel
@@ -30,7 +30,7 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
     init();
     //psuedo inti function
     function init() {
-        notebookSrvc.getNotebooks().then(function(data) {
+        NotebookService.getNotebooks().then(function(data) {
             atVm.notebooks = data;
         })
     }
@@ -49,7 +49,7 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
             attachNotebook(atVm.notebookSelected)
         }
 
-        markdownSrvc.updateFile(atVm.currentFileEditable).then(function(data) {
+        CorpusService.updateFile(atVm.currentFileEditable).then(function(data) {
             dialogSrvc.hide(data);
         });
     }
@@ -57,7 +57,7 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
     //attaches notebooks to file
     function attachNotebook(notebook, currentFile) {
         //this just attaches data to the file object... I promisefy it here.
-        $q.when(markdownSrvc.attachNotebook(atVm.currentFileEditable, notebook))
+        $q.when(CorpusService.attachNotebook(atVm.currentFileEditable, notebook))
             .then(function(response) {
                 atVm.currentFileEditable = response.file;
             });
@@ -78,14 +78,15 @@ function attachmentCtrl(dialogSrvc, currentFile, markdownSrvc, notebookSrvc, $sc
     //keeps the audio path up to date depeneidng if it is a file or object with path
     function audioWatcher(newValue) {
         if (newValue) {
-            atVm.audioPath = newValue.path || window.URL.createObjectURL(newValue);
+            atVm.audioPath = window.URL.createObjectURL(newValue) || newValue.path;
         }
     }
 
     //keeps the image path up to date depeneidng if it is a file or object with path
     function imageWatcher(newValue) {
+        console.log('newValue', newValue);
         if (newValue) {
-            atVm.imagePath = newValue.path || window.URL.createObjectURL(newValue);
+            atVm.imagePath = window.URL.createObjectURL(newValue) || newValue.path;
         }
     }
 

@@ -17262,7 +17262,7 @@
 
 
             /**
-             * Toggle side by side preview
+             * Toggle side by side wave-preview
              */
             function toggleSideBySide(editor) {
                 var cm = editor.codemirror;
@@ -17277,20 +17277,20 @@
                     toolbarButton.className = toolbarButton.className.replace(/\s*active\s*/g, "");
                     wrapper.className = wrapper.className.replace(/\s*CodeMirror-sided\s*/g, " ");
                 } else {
-                    // When the preview button is clicked for the first time,
+                    // When the wave-preview button is clicked for the first time,
                     // give some time for the transition from editor.css to fire and the view to slide from right to left,
                     // instead of just appearing.
                     setTimeout(function () {
                         if (!cm.getOption("fullScreen"))
                             toggleFullScreen(editor);
-                        preview.className += " editor-preview-active-side";
+                        preview.className += " editor-wave-preview-active-side";
                     }, 1);
                     toolbarButton.className += " active";
                     wrapper.className += " CodeMirror-sided";
                     useSideBySideListener = true;
                 }
 
-                // Hide normal preview if active
+                // Hide normal wave-preview if active
                 var previewNormal = wrapper.lastChild;
                 if (/editor-preview-active/.test(previewNormal.className)) {
                     previewNormal.className = previewNormal.className.replace(
@@ -17333,7 +17333,7 @@
                 var preview = wrapper.lastChild;
                 if (!preview || !/editor-preview/.test(preview.className)) {
                     preview = document.createElement("div");
-                    preview.className = "editor-preview";
+                    preview.className = "editor-wave-preview";
                     wrapper.appendChild(preview);
                 }
                 if (/editor-preview-active/.test(preview.className)) {
@@ -17345,15 +17345,15 @@
                         toolbar_div.className = toolbar_div.className.replace(/\s*disabled-for-preview*/g, "");
                     }
                 } else {
-                    // When the preview button is clicked for the first time,
+                    // When the wave-preview button is clicked for the first time,
                     // give some time for the transition from editor.css to fire and the view to slide from right to left,
                     // instead of just appearing.
                     setTimeout(function () {
-                        preview.className += " editor-preview-active";
+                        preview.className += " editor-wave-preview-active";
                     }, 1);
                     if (toolbar) {
                         toolbar.className += " active";
-                        toolbar_div.className += " disabled-for-preview";
+                        toolbar_div.className += " disabled-for-wave-preview";
                     }
                 }
                 preview.innerHTML = editor.options.previewRender(editor.value(), preview);
@@ -17910,7 +17910,7 @@
                 }
 
 
-                // Add default preview rendering function
+                // Add default wave-preview rendering function
                 if (!options.previewRender) {
                     options.previewRender = function (plainText) {
                         // Note: "this" refers to the options object
@@ -18193,11 +18193,11 @@
 
                 if (!preview || !/editor-preview-side/.test(preview.className)) {
                     preview = document.createElement("div");
-                    preview.className = "editor-preview-side";
+                    preview.className = "editor-wave-preview-side";
                     wrapper.parentNode.insertBefore(preview, wrapper.nextSibling);
                 }
 
-                // Syncs scroll  editor -> preview
+                // Syncs scroll  editor -> wave-preview
                 var cScroll = false;
                 var pScroll = false;
                 cm.on("scroll", function (v) {
@@ -18212,7 +18212,7 @@
                     preview.scrollTop = move;
                 });
 
-                // Syncs scroll  preview -> editor
+                // Syncs scroll  wave-preview -> editor
                 preview.onscroll = function () {
                     if (pScroll) {
                         pScroll = false;

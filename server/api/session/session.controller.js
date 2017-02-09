@@ -17,14 +17,14 @@ var path = require('path');
 
 // Get list of things
 exports.index = function(req, res) {
-    console.log('Session Requested.');
+    // console.log('Session Requested.');
     Session.findOne({}, function (err, session) {
         if(err) {
             console.log('There was an error finding session.')
             return handleError(res, err);
 
         }
-        console.log('Session found (_id)', session._id);
+        // console.log('Session found (_id)', session._id);
 
         return res.status(200).json(session);
     });

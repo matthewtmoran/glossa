@@ -4,7 +4,7 @@
 
 // TODO: Need to separate the directive and controller
 angular.module('glossa')
-    .controller('mdWavesurferPlayerController', mdWavesurferPlayerController)
+    .controller('wavesurferPlayerController', WavesurferPlayerController)
     .directive('backImg', function($timeout){
         return function(scope, element, attrs){
             //element where background image should be attached to
@@ -29,7 +29,7 @@ angular.module('glossa')
 });
 
 
-function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming) {
+function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming) {
     var control = this,
         timeInterval;
 

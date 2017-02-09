@@ -1,12 +1,12 @@
 'use strict';
 angular.module('glossa')
-    .directive('mdWavesurferPlayer', mdWavesurferPlayer);
+    .directive('wavesurferPlayer', WavesurferPlayer);
 
-function mdWavesurferPlayer() {
+function WavesurferPlayer() {
 
     return {
         restrict: 'E',
-        templateUrl: 'components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer.html',
+        templateUrl: 'components/wavesurfer/wavesurfer-player/wavesurfer-player.html',
         scope: {
             src: '@url',
             title: '@',
@@ -16,7 +16,7 @@ function mdWavesurferPlayer() {
             properties: '=',
         },
         transclude: true,
-        controller: 'mdWavesurferPlayerController',
+        controller: 'wavesurferPlayerController',
         controllerAs: 'control',
         bindToController: true
     };

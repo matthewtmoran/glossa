@@ -8,14 +8,14 @@ angular.module('glossa')
         templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
-function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hashtagSrvc, UserService) {
+function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService) {
     var nbVm = this;
     var hashtagsUsed = [];
 
     nbVm.$onInit = function() {
         queryNotebooks();
         // queryCommonTags();
-        // nbVm.occurringTags = hashtagSrvc.countHashtags();
+        // nbVm.occurringTags = HashtagService.countHashtags();
     };
 
     nbVm.hidden = false;
@@ -44,13 +44,13 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
      * Queries all notebooks
      */
     function queryNotebooks() {
-        notebookSrvc.getNotebooks().then(function(data) {
+        NotebookService.getNotebooks().then(function(data) {
             nbVm.notebooks = data
         })
     }
 
     function queryCommonTags() {
-        hashtagSrvc.getCommonTags().then(function(data) {
+        HashtagService.getCommonTags().then(function(data) {
             nbVm.commonTags = data
         })
     }
@@ -62,7 +62,7 @@ function notebookCtrl(notebookSrvc, $scope, $timeout, postSrvc, dialogSrvc, hash
      */
     function viewDetails(ev, notebook) {
         //get options depending on post type
-        var postOptions = postSrvc.postOptions(ev, notebook);
+        var postOptions = NotebookService.postOptions(ev, notebook);
 
         //open post dialog
         dialogSrvc.notebookDetails(ev, postOptions, notebook).then(function(result) {

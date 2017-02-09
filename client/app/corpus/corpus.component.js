@@ -10,7 +10,7 @@ angular.module('glossa')
     });
 
 
-function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
+function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookService) {
     var vm = this;
 
     vm.$onInit = onInit;
@@ -32,7 +32,7 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
     //bound to buttons to create new md file
     function createMDFile(name) {
 
-        markdownSrvc.createFile(name).then(function(data) {
+        CorpusService.createFile(name).then(function(data) {
             vm.markdownFiles.push(data);
             vm.currentFile = data;
         });
@@ -76,7 +76,7 @@ function corpusCtrl($scope, $state,  $stateParams, markdownSrvc, notebookSrvc) {
     //watch for file attachment and update object to be bound
     function attachmentWatcher(newValue, oldValue) {
         if (newValue) {
-            notebookSrvc.findNotebook(newValue)
+            NotebookService.findNotebook(newValue)
                 .then(function(data) {
                     vm.notebookAttachment = data;
                 })

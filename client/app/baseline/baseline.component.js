@@ -17,7 +17,7 @@ angular.module('glossa')
     });
 // On enter
 //
-function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $timeout) {
+function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
     var blVm = this;
 
     var isDoubleClick = false;
@@ -45,7 +45,7 @@ function baselineCtrl($scope, fileSrvc, $mdDialog, baselineSrvc, notebookSrvc, $
 
     function getMediaData(file) {
         if (file.notebookId) {
-            notebookSrvc.findNotebook(file.notebookId).then(function(notebook) {
+            NotebookService.findNotebook(file.notebookId).then(function(notebook) {
                 blVm.audioPath = notebook.audio.path ||'';
                 blVm.imagePath = notebook.image.path ||'';
             });

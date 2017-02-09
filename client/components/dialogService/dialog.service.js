@@ -29,7 +29,7 @@ function dialogSrvc($mdDialog) {
         return $mdDialog.show({
             controller: manageTagsCtrl,
             controllerAs: 'tagVm',
-            templateUrl: 'app/tagManagement/manageDialog.html',
+            templateUrl: 'app/tagManagement/hashtags.dialog.html',
             parent: angular.element(document.body),
             clickOutsideToClose: false,
             // bindToController: true,

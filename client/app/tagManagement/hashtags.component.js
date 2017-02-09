@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('glossa')
-    .component('manageTagsComponent', {
-        controller: manageTagsCtrl,
+    .component('hashtagsComponent', {
+        controller: HashtagsComponent,
         controllerAs: 'tagVm',
         transclude: true,
-        templateUrl: 'app/tagManagement/manageTags.html'
+        templateUrl: 'app/tagManagement/hashtags.component.html'
     });
 
-function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope, dialogSrvc) {
+function HashtagsComponent(HashtagService, $mdEditDialog, $scope, dialogSrvc) {
     var tagVm = this;
     var changesMade = false;
 
@@ -31,12 +31,12 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope, dialogSrvc) {
 
     tagVm.$onInit = function() {
 
-        hashtagSrvc.getHashtags().then(function(data) {
+        HashtagService.getHashtags().then(function(data) {
 
             tagVm.infiniteItems = data;
 
             // data.forEach(function(tag, index) {
-            //     hashtagSrvc.findOccurrenceOfTag(tag).then(function(result) {
+            //     HashtagService.findOccurrenceOfTag(tag).then(function(result) {
             //         if (!result) {
             //             tag.occurrence = 0;
             //         } else {
@@ -137,8 +137,8 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope, dialogSrvc) {
     }
 
     function updateTag(item) {
-        hashtagSrvc.update(item).then(function(result) {
-            hashtagSrvc.normalizeHashtag(result.data).then(function(result) {
+        HashtagService.update(item).then(function(result) {
+            HashtagService.normalizeHashtag(result.data).then(function(result) {
                 changesMade = true;
 
             }).catch(function(err) {
@@ -153,7 +153,7 @@ function manageTagsCtrl(hashtagSrvc, $mdEditDialog, $scope, dialogSrvc) {
         event.stopPropagation();
         var r = confirm("Are you sure you want to remove this tag from the application?");
         if (r == true) {
-            hashtagSrvc.removeHashtag(item).then(function(result) {
+            HashtagService.removeHashtag(item).then(function(result) {
                 var index = tagVm.infiniteItems.indexOf(item);
                 tagVm.infiniteItems.splice(index, 1);
                 changesMade = true;

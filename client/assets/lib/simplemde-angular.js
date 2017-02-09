@@ -1,6 +1,6 @@
 angular.module('simplemde', [])
     .directive('simplemde', [
-        '$parse', '$timeout', 'simpleParse', '$q', 'hashtagSrvc', 'simpleSrvc', function ($parse, $timeout, simpleParse, $q, hashtagSrvc, simpleSrvc) {
+        '$parse', '$timeout', 'simpleParse', '$q', 'HashtagService', 'simpleSrvc', function ($parse, $timeout, simpleParse, $q, HashtagService, simpleSrvc) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
@@ -9,7 +9,6 @@ angular.module('simplemde', [])
                     var hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
                     var hashtagList = [];
                     options = $parse(attrs.simplemde)(scope) || {};
-
 
                     options.element = element[0];
                     var mde = new SimpleMDE(options);
@@ -101,14 +100,14 @@ angular.module('simplemde', [])
 
                     //just a gets all the tags and return promise.
                     function getAllTags() {
-                        return hashtagSrvc.getHashtags().then(function(data) {
+                        return HashtagService.getHashtags().then(function(data) {
                             return data
                         });
                     }
 
-                    //I'm not sure we will use preview at all
+                    //I'm not sure we will use wave-preview at all
                     function rerenderPreview(val) {
-                        console.log("rendering preview");
+                        console.log("rendering wave-preview");
                     }
 
                     scope.simplemde = {

@@ -13,7 +13,7 @@ angular.module('glossa', [
     ])
     .config(config)
     .run(function($rootScope, $state, $injector, AppService) {
-        console.log('App Run time:', Date.now());
+        // console.log('App Run time:', Date.now());
         //gets the current session from the server
         AppService.getSession().then(function(data){
 
@@ -32,11 +32,8 @@ angular.module('glossa', [
             AppService.getSession().then(function(data){
 
                 if (data) {
-
-
                     data.currentState = toState.name;
                     data.currentStateParams = toParams;
-
                     //update session data on server end
                     AppService.updateSession(data).then(function(data) {
                         session = data;
@@ -77,7 +74,7 @@ angular.module('glossa', [
 
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
-    console.log('Main Config time:', Date.now());
+    // console.log('Main Config time:', Date.now());
     var customAccent = {
         '50': '#b80000',
         '100': '#d10000',
