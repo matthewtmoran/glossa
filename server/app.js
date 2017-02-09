@@ -16,33 +16,8 @@ if(config.seedDB) { require('./config/seed'); }
 
 require('./config/init');
 
-// init.findUser()
-//     .then(function success(response) {
-//         console.log('findUser success response', response);
-//     }, function failure(response) {
-//         console.log('findUser response failure', response);
-//
-//         init.createUser().then(function success(response) {
-//             console.log('createUser success response', response);
-//         }, function failure(response) {
-//             console.log('createUser failure response', response);
-//         })
-//
-//     }
-// );
-//
-// init.findProject()
-//     .then(function success(response) {
-//         console.log('findProject success response', response);
-//     }, function failure(response) {
-//         console.log('findProject response failure', response);
-//
-//         init.createProject().then(function success(response) {
-//             console.log('findProject success response', response);
-//         }, function failure(response) {
-//             console.log('findProject failure response', response);
-//         })
-// });
+
+
 
 // Setup server
 var app = express();

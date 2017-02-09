@@ -37,9 +37,19 @@ function mdWavesurferPlayerController($element, $scope, $attrs, $interval, $mdTh
     control.isReady = false;
     control.surfer = null;
 
+
+    $scope.$on('get:timeStamp', function() {
+        console.log('get time stamp listener');
+        var time = control.surfer.getCurrentTime();
+
+
+        $scope.$emit('send:timeStamp', time);
+    });
+
     control.toggleMute = toggleMute;
 
     function toggleMute() {
+        console.log('toggleMute');
         if (control.surfer) {
             control.surfer.toggleMute();
             control.isMute = !control.isMute;

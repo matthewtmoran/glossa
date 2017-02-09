@@ -21,3 +21,12 @@
 	max-width: 100%;
 	padding: 3px 0 0 3px;
 }
+
+.cm-url {
+	background: red;
+
+	&:hover {
+		cursor: pointer;
+		background: blue;
+	}
+}

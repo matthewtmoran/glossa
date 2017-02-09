@@ -113,7 +113,7 @@ md-backdrop.md-sidenav-backdrop {
 }
 
 /* inject:scss */
-@import 'baseline/baseline';
+@import 'baseline/baseline.component';
 @import 'corpus/corpus.component';
 @import 'help/help.component';
 @import 'mentions/mentions';

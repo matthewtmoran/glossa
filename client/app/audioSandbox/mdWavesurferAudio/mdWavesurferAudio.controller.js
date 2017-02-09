@@ -44,6 +44,7 @@ function mdWavesurferAudioController(attributes, $element) {
     }
 
     var getPlayer = function(){
+        console.log('getPlayer');
         return $element.find('md-wavesurfer-player').controller('mdWavesurferPlayer');
     };
 

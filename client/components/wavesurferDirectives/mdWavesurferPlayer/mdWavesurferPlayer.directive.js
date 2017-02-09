@@ -13,8 +13,9 @@ function mdWavesurferPlayer() {
             extraButtons: '=',
             toolbarClass: '@',
             autoPlay: '=',
-            properties: '='
+            properties: '=',
         },
+        transclude: true,
         controller: 'mdWavesurferPlayerController',
         controllerAs: 'control',
         bindToController: true
