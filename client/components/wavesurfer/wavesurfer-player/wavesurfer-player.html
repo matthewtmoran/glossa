@@ -1,40 +1,12 @@
 <div layout="column" class="audioPlayerWrapper">
-
-	<!--
-	Looks like the wave surfer file list
-
-	-->
-
-	<!--toolbar listing file name and duration-->
-	<!--<md-toolbar class="md-toolbar-sm {{control.themeClass}} {{control.toolbarClass}} " style="color: #333333; background:-->
-    <!--none;">-->
-		<!--<div class="md-toolbar-tools" layout="row">-->
-			<!--<div flex="initial" layout-align="center start">-->
-				<!--{{control.currentTime }}-->
-				<!--&lt;!&ndash;{{control.currentTime | mdWavesurferTimeFormat}}&ndash;&gt;-->
-			<!--</div>-->
-			<!--<div flex="grow" class="text-center">-->
-				<!--{{control.title}}-->
-			<!--</div>-->
-			<!--<div flex="initial" layout-align="center end" class="text-right">-->
-				<!--{{control.surfer.getDuration() }}-->
-				<!--&lt;!&ndash;{{control.surfer.getDuration() | mdWavesurferTimeFormat}}&ndash;&gt;-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</md-toolbar>-->
-
-
 	<!--the wave graphic-->
 	<md-content flex class="wave-content-wrapper">
 		<div class="waveSurferWave"></div>
 	</md-content>
 
 	<!--wave player toolbar-->
-	<md-fab-toolbar class="md-player-controls transparent md-fab-bottom-right">
-		<!--<md-toolbar class="{{control.themeClass}} {{control.toolbarClass}} md-player-controls">-->
-
+	<md-toolbar class="md-player-controls transparent md-fab-bottom-right">
 		<div layout="row" class="md-toolbar-tools">
-
 			<div flex layout="row" layout-align="end center">
 				<md-button class="md-button md-fab md-mini"
 				           ng-click="control.surfer.skipBackward()" type="button"
@@ -42,9 +14,7 @@
 					<md-tooltip>
 						Rewind
 					</md-tooltip>
-
 					<md-icon class="material-icons">fast_rewind</md-icon>
-					<!--<md-icon md-font-icon="zmdi zmdi-fast-rewind"></md-icon>-->
 				</md-button>
 
 				<md-button class="md-button md-fab md-mini"
@@ -56,8 +26,6 @@
 					</md-tooltip>
 					<md-icon ng-show="control.surfer.isPlaying()" class="material-icons">pause</md-icon>
 					<md-icon ng-show="!control.surfer.isPlaying()"  class="material-icons">play_arrow</md-icon>
-					<!--<md-icon ng-show="control.surfer.isPlaying()" md-font-icon="zmdi zmdi-pause"></md-icon>-->
-					<!--<md-icon ng-show="!control.surfer.isPlaying()" md-font-icon="zmdi zmdi-play"></md-icon>-->
 				</md-button>
 
 				<md-button class="md-button md-fab md-mini"
@@ -85,10 +53,5 @@
 				</md-button>
 			</div>
 		</div>
-	</md-fab-toolbar>
-
-	<!--<md-divider md-inset></md-divider>-->
-
-	<!--Controls for the player @@@Matt-->
-
+	</md-toolbar>
 </div>
