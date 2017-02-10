@@ -65,7 +65,6 @@ function attachmentCtrl(dialogSrvc, currentFile, CorpusService, NotebookService,
 
     //called when notebooks is selected
     function showNotebookPreview(notebook) {
-        console.log('showNotebookPreview');
         atVm.notebookSelected = notebook;
     }
 
@@ -74,11 +73,15 @@ function attachmentCtrl(dialogSrvc, currentFile, CorpusService, NotebookService,
     //Watchers//
     ////////////
 
-
-    //keeps the audio path up to date depeneidng if it is a file or object with path
+    //TODO: find a better way to differentiate between files and a regular js object
+    //keeps the audio path up to date depending if it is a file or object with path
     function audioWatcher(newValue) {
         if (newValue) {
-            atVm.audioPath = window.URL.createObjectURL(newValue) || newValue.path;
+            if (newValue.originalname) {
+                atVm.audioPath = newValue.path
+            } else {
+                atVm.audioPath = window.URL.createObjectURL(newValue)
+            }
         }
     }
 
@@ -86,7 +89,11 @@ function attachmentCtrl(dialogSrvc, currentFile, CorpusService, NotebookService,
     function imageWatcher(newValue) {
         console.log('newValue', newValue);
         if (newValue) {
-            atVm.imagePath = window.URL.createObjectURL(newValue) || newValue.path;
+            if (newValue.originalname) {
+                atVm.imagePath = newValue.path;
+            } else {
+                atVm.imagePath = window.URL.createObjectURL(newValue);
+            }
         }
     }
 

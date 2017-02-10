@@ -22,7 +22,7 @@ var app = express();
 var server = require('http').createServer(app);
 require('./config/express')(app);
 require('./routes')(app);
-require('./config/init');
+require('./config/init').checkForSession();
 
 // var images = path.join(__dirname,'data/image');
 

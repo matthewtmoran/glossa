@@ -1,9 +1,11 @@
+'use strict';
+
 angular.module('glossa')
-    .component('aboutComponent', {
+    .component('aboutSettingsComponent', {
         controller: About,
         controllerAs: 'vm',
         transclude: true,
-        templateUrl: 'app/settings/about/about.component.html'
+        templateUrl: 'app/settings/about/about-settings.component.html'
     });
 
 function About() {

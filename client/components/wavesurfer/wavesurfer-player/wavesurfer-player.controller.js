@@ -29,37 +29,63 @@ angular.module('glossa')
 });
 
 
-function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming) {
+function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming, SettingsService) {
     var control = this,
         timeInterval;
 
-    control.themeClass = "md-" + $mdTheming.defaultTheme() + "-theme";
+    control.themeClass = "md-" + $mdTheming.defaultTheme() + "-theme"; //not sure what this affects
     control.isReady = false;
     control.surfer = null;
 
+    control.defaultSettings = { //not sure we need if db is populated.....
+        skipForward: 2,
+        skipBack: 2,
+        waveColor: 'black'
+    };
 
-    $scope.$on('get:timeStamp', function() {
-        var timeStamp = control.surfer.getCurrentTime();
-        $scope.$emit('send:timeStamp', timeStamp);
+    SettingsService.getSettings().then(function(data) {
+        control.mediaSettings = data.media;
+        initWaveSurfer();
     });
 
-    $scope.$on('set:timeStamp', function(event, seconds) {
-       // seekTo does not take seconds but a fraction of a second in context of the entire audio duration.
-       control.surfer.seekTo(seconds / control.surfer.getDuration());
-    });
 
     control.toggleMute = toggleMute;
+    //pause
+    control.pause = pause;
 
-    function toggleMute() {
-        console.log('toggleMute');
-        if (control.surfer) {
-            control.surfer.toggleMute();
-            control.isMute = !control.isMute;
+    $scope.$on('get:timeStamp', getTimeStamp);
+    $scope.$on('set:timeStamp', setTimestamp);
+    //re-init wavesurfer
+    $scope.$watch('control.src', resetWaveSurfer);
+
+    $scope.$watch(function () {
+        var div = $element[0].querySelector('.audioPlayerWrapper');
+        return div ? div.offsetWidth : 0;
+    }, function (width) {
+        if (width < 1) {
+            //hidden
+            control.pause();
         }
-    }
+    });
+
+    $element.on('$destroy', function () {
+        if (control.surfer) {
+            control.surfer.destroy();
+        }
+        stopInterval();
+    });
+
+
+    var startInterval = function () {
+        timeInterval = $interval(function () {
+            control.currentTime = control.isReady ? control.surfer.getCurrentTime() : 0;
+        }, 1000);
+    }, stopInterval = function () {
+        $interval.cancel(timeInterval);
+    };
 
     //initiate the wavesurfer
-    var initWaveSurfer = function () {
+    function initWaveSurfer() {
         control.isReady = false;
         control.currentTime = 0;
         if (!control.surfer) {
@@ -67,8 +93,9 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
             var options = {
                 container: $element[0].querySelector('.waveSurferWave')
             }, defaults = {
+                skipLength: control.mediaSettings.skipLength,
                 scrollParent: false,
-                waveColor: 'violet',
+                waveColor: control.mediaSettings.waveColor,
                 progressColor: 'purple',
                 height: '200'
             };
@@ -99,60 +126,57 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
                 $scope.$apply();
             });
 
-            //pause event
-            control.surfer.on('pause', function () {
-                stopInterval();
-            });
-
-            //end of sound
-            control.surfer.on('finish', function () {
-                stopInterval();
-            });
-
-            //play event
-            control.surfer.on('play', function () {
-                startInterval();
-            });
 
         }
 
+        //play event listener
+        control.surfer.on('play', play);
+        //end of sound event listener
+        control.surfer.on('finish', finish);
 
         control.title = control.title || control.src.split('/').pop();
         control.surfer.load(control.src);
 
-    };
+    }
 
-    var startInterval = function () {
-        timeInterval = $interval(function () {
-            control.currentTime = control.isReady ? control.surfer.getCurrentTime() : 0;
-        }, 1000);
-    }, stopInterval = function () {
-        $interval.cancel(timeInterval);
-    };
+    function pause() {
+        if (control.surfer) {
+            stopInterval();
+        }
+    }
 
+    function finish() {
+        if (control.surfer) {
+            stopInterval();
+        }
+    }
 
-    initWaveSurfer();
+    function play() {
+        if (control.surfer) {
+            startInterval();
+        }
+    }
 
-    $scope.$watch('control.src', function (src1, src2) {
+    function toggleMute() {
+        console.log('toggleMute');
+        if (control.surfer) {
+            control.surfer.toggleMute();
+            control.isMute = !control.isMute;
+        }
+    }
+
+    function resetWaveSurfer(src1, src2){
         if (src1 != src2) {
             initWaveSurfer();
         }
-    });
+    }
 
-    $element.on('$destroy', function () {
-        if (control.surfer) {
-            control.surfer.destroy();
-        }
-        stopInterval();
-    });
+    function getTimeStamp() {
+        var timeStamp = control.surfer.getCurrentTime();
+        $scope.$emit('send:timeStamp', timeStamp);
+    }
 
-    $scope.$watch(function () {
-        var div = $element[0].querySelector('.audioPlayerWrapper');
-        return div ? div.offsetWidth : 0;
-    }, function (width) {
-        if (width < 1) {
-            //hidden
-            control.surfer.pause();
-        }
-    });
+    function setTimestamp(event, seconds) {
+        control.surfer.seekTo(seconds / control.surfer.getDuration());
+    }
 }

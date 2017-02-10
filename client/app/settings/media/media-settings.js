@@ -5,9 +5,9 @@ angular.module('glossa')
 
 function config($stateProvider) {
     $stateProvider
-        .state('settings.about', {
-            url: '/about',
-            template: '<about-settings-component flex layout="column">',
+        .state('settings.media', {
+            url: '/media',
+            template: '<media-settings-component settings="vm.settings" flex layout="column">',
             parent: 'settings'
         });
 }

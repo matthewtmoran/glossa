@@ -27,44 +27,67 @@
 		<h3>Associated Media</h3>
 		<md-content layout="row">
 			<!--Independent Media-->
+
+			<!--image-->
 			<md-card flex="50"
 			         class="mdl-shadow--2dp attachment-card"
-			         ng-repeat="(type, attachment) in metaVm.currentFile.media"
-			         ng-if="metaVm.currentFile.media.image || metaVm.currentFile.media.audio">
-
+					 ng-if="metaVm.currentFile.image">
 				<md-card-content class="media-content">
-					<md-card-title ng-if="type !== 'image'" class="media-title" layout-align="center space-between">
+					<md-card-title class="media-title" layout-align="center space-between">
 						<md-card-title-text>
-							<span class="md-headline">{{attachment.name}}</span>
+							<span class="md-headline">{{metaVm.currentFile.image.name}}</span>
 							<span class="md-subhead">Independent Media File</span>
 						</md-card-title-text>
 					</md-card-title>
-
-					<div ng-if="type === 'image'" class="media-image">
-						<img ng-src="{{metaVm.currentFile.media.image.path}}" alt="">
+					<div class="media-image">
+						<img ng-src="{{metaVm.currentFile.image.path}}" alt="">
 					</div>
+				</md-card-content>
 
-					<div ng-if="type === 'audio'">
+				<span flex></span>
+
+				<md-divider></md-divider>
+
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="metaVm.removeMedia($event, metaVm.currentFile.image, 'image')">Delete</md-button>
+				</md-card-actions>
+
+			</md-card>
+
+			<!--audio-->
+			<md-card flex="50"
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-if="metaVm.currentFile.audio">
+				<md-card-content class="media-content">
+					<md-card-title class="media-title" layout-align="center space-between">
+						<md-card-title-text>
+							<span class="md-headline">{{metaVm.currentFile.audio.name}}</span>
+							<span class="md-subhead">Independent Media File</span>
+						</md-card-title-text>
+					</md-card-title>
+					<div>
 						<wave-preview
 								flex
-								url="{{metaVm.currentFile.media.audio.path}}"
+								url="{{metaVm.currentFile.audio.path}}"
 								auto-play="false"
 								player-wave-color="white"
 								player-height="150"
 								player-progress-color="black">
 						</wave-preview>
 					</div>
-
 				</md-card-content>
+
 				<span flex></span>
 
 				<md-divider></md-divider>
 
 				<md-card-actions layout="row" layout-align="start center">
-					<md-button ng-click="metaVm.removeMedia($event, attachment, type)">Delete</md-button>
+					<md-button ng-click="metaVm.removeMedia($event, metaVm.currentFile.audio, 'audio')">Delete</md-button>
 				</md-card-actions>
 
-			</md-card><!--Independent Media End-->
+			</md-card>
+
+
 			<!--Notebook Attachment-->
 			<notebook-card flex="50"
 			               ng-if="metaVm.notebookAttachment"
@@ -75,7 +98,7 @@
 	</div>
 	<md-divider></md-divider>
 
-	<pre>
-		{{metaVm.currentFile | json}}
-	</pre>
+	<!--<pre>-->
+		<!--{{metaVm.currentFile | json}}-->
+	<!--</pre>-->
 </div>

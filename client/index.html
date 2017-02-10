@@ -22,7 +22,6 @@
 
 	<div ui-view flex class="main" layout="column"></div>
 
-
 	<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
@@ -96,8 +95,11 @@
 	<script src="app/settings/settings.js"></script>
 	<script src="app/settings/project-settings/project-settings.component.js"></script>
 	<script src="app/settings/project-settings/project-settings.js"></script>
-	<script src="app/settings/about/about.component.js"></script>
+	<script src="app/settings/about/about-settings.component.js"></script>
 	<script src="app/settings/about/about.js"></script>
+	<script src="app/settings/media/media-settings.js"></script>
+	<script src="app/settings/media/media-settings.component.js"></script>
+	<script src="app/settings/settings.service.js"></script>
 	<script src="app/app.service.js"></script>
 	<script src="components/user/user.service.js"></script>
 

@@ -13,7 +13,7 @@ function WavesurferPlayer() {
             extraButtons: '=',
             toolbarClass: '@',
             autoPlay: '=',
-            properties: '=',
+            properties: '='
         },
         transclude: true,
         controller: 'wavesurferPlayerController',

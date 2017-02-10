@@ -16,6 +16,7 @@ angular.module('glossa', [
         // console.log('App Run time:', Date.now());
         //gets the current session from the server
         AppService.getSession().then(function(data){
+            console.log('getSession result', data);
 
             //go to the session state
             // localStorage.setItem('session', JSON.stringify(data));

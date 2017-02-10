@@ -131,7 +131,7 @@ function metaCtrl($scope, NotebookService, $timeout, dialogSrvc, CorpusService) 
                 return;
             }
             metaVm.currentFile.removeItem = []; //create this temp property to send to server
-            metaVm.currentFile.removeItem.push(metaVm.currentFile[type]);
+            metaVm.currentFile.removeItem.push(media);
             delete metaVm.currentFile[type]; //delete this property...
             CorpusService.updateFile(metaVm.currentFile)
                 .then(function(data) {

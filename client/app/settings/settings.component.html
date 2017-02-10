@@ -2,7 +2,7 @@
 
 	<md-toolbar class="light-toolbar">
 		<div class="md-toolbar-tools">
-			<h2>Your preferences for Glossa</h2>
+			<h2>Your preferences for Glossa <md-icon>keyboard_arrow_right</md-icon> {{vm.selectedTab.label}}</h2>
 		</div>
 		<md-button class="close-button md-icon-button" ng-click="vm.back()">
 			<md-icon>close</md-icon>
@@ -13,11 +13,8 @@
 
 	<md-content layout="column" flex>
 		<md-tabs md-dynamic-height="" md-border-bottom=""  md-selected="selectedIndex" md-stretch-tabs="always" >
-			<md-tab label="Project Settings"></md-tab>
-			<md-tab label="About"></md-tab>
-			<md-tab label="Hashtags"></md-tab>
+			<md-tab ng-repeat="tab in vm.tabs" label="{{tab.label}}"></md-tab>
 		</md-tabs>
-
 		<!-- child state -->
 		<md-content layout="column" id="tab-body" ui-view flex ></md-content>
 
