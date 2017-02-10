@@ -87,7 +87,6 @@ function attachmentCtrl(dialogSrvc, currentFile, CorpusService, NotebookService,
 
     //keeps the image path up to date depeneidng if it is a file or object with path
     function imageWatcher(newValue) {
-        console.log('newValue', newValue);
         if (newValue) {
             if (newValue.originalname) {
                 atVm.imagePath = newValue.path;

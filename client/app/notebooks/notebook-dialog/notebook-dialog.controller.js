@@ -127,14 +127,22 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
     }
 
     //keep watch on this just in case a file is uploaded or if file is already in server...
-    $scope.$watch('dialogVm.notebook.audio', function(oldValue, newValue) {
-        if (oldValue) {
-            dialogVm.audioPath = oldValue.path || window.URL.createObjectURL(oldValue);
+    $scope.$watch('dialogVm.notebook.audio', function(newValue, oldValue) {
+        if (newValue) {
+            if (newValue.originalname) {
+                dialogVm.audioPath = newValue.path;
+            } else {
+                dialogVm.audioPath = window.URL.createObjectURL(newValue);
+            }
         }
     });
-    $scope.$watch('dialogVm.notebook.image', function(oldValue, newValue) {
-        if (oldValue) {
-            dialogVm.imagePath = oldValue.path || window.URL.createObjectURL(oldValue);
+    $scope.$watch('dialogVm.notebook.image', function(newValue, oldValue) {
+        if (newValue) {
+            if (newValue.originalname) {
+                dialogVm.imagePath = newValue.path
+            } else {
+                dialogVm.imagePath = window.URL.createObjectURL(newValue);
+            }
         }
     });
 

@@ -1,7 +1,7 @@
 <md-card class="notebook-card" flex layout-fill layout="column">
 	<md-card-header ng-if="!isCorpus" class="card-title" flex="12">
 		<md-card-header-text class="title-text ">
-			<span>{{notebookCreator.name}}</span>
+			<span>{{notebook.createdBy.name}}</span>
 			<!--<span class="md-headline">{{notebooks.name}}</span>-->
 		</md-card-header-text>
 		<md-divider></md-divider>
@@ -35,5 +35,5 @@
 		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
 	</md-card-actions>
 
-	<pre>{{notebook | json}}</pre>
+	<!--<pre>{{notebook | json}}</pre>-->
 </md-card>

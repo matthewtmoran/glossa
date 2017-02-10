@@ -32,7 +32,9 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
     $scope.$watch('blVm.currentFile', function(newValue) {
         blVm.audioPath = '';
         blVm.imagePath = '';
-        getMediaData(newValue)
+        if (newValue) {
+            getMediaData(newValue)
+        }
     });
 
 

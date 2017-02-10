@@ -26,16 +26,16 @@ function notebookCard($sce, $state, UserService) {
             scope.isCorpus = true;
         }
 
-        if ($state.current.name === 'notebook') {
-            if (scope.uniqueUsers[scope.notebook.createdBy]) {
-                scope.notebookCreator = scope.uniqueUsers[scope.notebook.createdBy];
-            } else if (!scope.uniqueUsers[scope.notebook.createdBy]) {
-                UserService.getUser(scope.notebook.createdBy).then(function(data) {
-                    scope.uniqueUsers[scope.notebook.createdBy] = data;
-                    scope.notebookCreator = data;
-                });
-            }
-        }
+        // if ($state.current.name === 'notebook') {
+        //     if (scope.uniqueUsers[scope.notebook.createdBy]) {
+        //         scope.notebookCreator = scope.uniqueUsers[scope.notebook.createdBy];
+        //     } else if (!scope.uniqueUsers[scope.notebook.createdBy]) {
+        //         UserService.getUser(scope.notebook.createdBy).then(function(data) {
+        //             scope.uniqueUsers[scope.notebook.createdBy] = data;
+        //             scope.notebookCreator = data;
+        //         });
+        //     }
+        // }
 
 
         //A rendered wave-preview of the notebooks descriptions markdown
