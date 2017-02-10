@@ -11,7 +11,7 @@ angular.module('glossa')
 function About() {
     var vm = this;
 
-    $onInit = function() {
+    vm.$onInit = function() {
         console.log('About init');
     };
 }

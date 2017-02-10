@@ -1,15 +1,9 @@
 'use strict';
 
-// var db = require('./db/database'),
-//     fs = require('fs'),
-//     path = require('path'),
-//     _ = require('lodash'),
-//     corporaMenus = db.corporaMenu;
-
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu(manageCorpusSrvc, dialogSrvc) {
+function drawerMenu(manageCorpusSrvc, dialogSrvc, SettingsService) {
 
     var section = [
         {
@@ -244,6 +238,10 @@ function drawerMenu(manageCorpusSrvc, dialogSrvc) {
     activate();
 
     function activate() {
+        //get project info to set name
+        SettingsService.getProject().then(function(data) {
+            section[0].name = data.name;
+        });
         addCustomItems();
     }
 
@@ -255,7 +253,8 @@ function drawerMenu(manageCorpusSrvc, dialogSrvc) {
         isSectionSettingsSelected: isSectionSettingsSelected,
         createCorpus: createCorpus,
         addCreatedCorpus: addCreatedCorpus,
-        deleteCorpus: deleteCorpus
+        deleteCorpus: deleteCorpus,
+        updateProjectName: updateProjectName
 };
 
     return service;
@@ -356,4 +355,10 @@ function drawerMenu(manageCorpusSrvc, dialogSrvc) {
        //     return err;
        // })
     }
+
+    //called after project is updated in settings
+    function updateProjectName(name) {
+        section[0].name = name
+    }
+
 }

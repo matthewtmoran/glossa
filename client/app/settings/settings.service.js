@@ -6,7 +6,9 @@ angular.module('glossa')
 function SettingsService($http) {
     var service = {
         getSettings: getSettings,
-        saveSettings: saveSettings
+        saveSettings: saveSettings,
+        getProject: getProject,
+        updateProject: updateProject
     };
     return service;
 
@@ -31,6 +33,25 @@ function SettingsService($http) {
             });
     }
 
+    function getProject() {
+        return $http.get('/api/project/')
+            .then(function successCallback(response) {
+                return response.data[0];
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
+    }
+
+    function updateProject(project) {
+        return $http.put('/api/project/' + project._id, project)
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
+    }
 
 
 

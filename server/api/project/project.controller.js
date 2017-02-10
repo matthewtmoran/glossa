@@ -49,7 +49,7 @@ exports.update = function(req, res) {
         if (err) { return handleError(res, err); }
         if(!project) { return res.status(404).send('Not Found'); }
         var options = {returnUpdatedDocs: true};
-        var updated = _.merge(project, req.body.dataObj);
+        var updated = _.merge(project, req.body);
         Project.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
             Project.persistence.stopAutocompaction(); // concat db

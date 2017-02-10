@@ -1,18 +1,17 @@
-<form name="project-settings" class="md-padding">
+<form name="projectSettings" ng-submit="vm.updateProject(vm.project)" class="md-padding">
 
-	<md-input-container class="md-block" flex="50">
+	<md-input-container class="md-block" flex="25">
 		<label>Project Name</label>
-		<input ng-model="psVm.project.name" type="text" required>
+		<input ng-model="vm.project.name" type="text">
 	</md-input-container>
 
 	<md-input-container class="md-block">
 		<label>Project Description</label>
-		<textarea ng-model="psVm.project.description"></textarea>
+		<textarea ng-model="vm.project.description"></textarea>
 	</md-input-container>
 
 	<!--<md-divider></md-divider>-->
 
-	<md-button class=" md-raised">Save Changes</md-button>
-
+	<md-button type="submit" class="md-raised">Save Changes</md-button>
 
 </form>
