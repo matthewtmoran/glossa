@@ -4,6 +4,7 @@
 
 .waveSurferWave {//container of wave surfer
 	background-size: cover;
+	min-height: 200px;
 
 	wave {
 		overflow: hidden !important;
