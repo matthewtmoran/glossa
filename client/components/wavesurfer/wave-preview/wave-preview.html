@@ -1,6 +1,8 @@
 <div layout="column" class="audioPlayerWrapper">
 	<md-content flex class="wave-content-wrapper">
-		<div class="waveSurferWave"></div>
+		<div class="waveSurferWave">
+			<md-progress-linear ng-if="control.loading" class="md-warn" md-mode="determinate" value="{{control.wavesurferProgress}}"></md-progress-linear>
+		</div>
 	</md-content>
 	<md-toolbar class="md-player-controls transparent md-fab-bottom-right">
 		<div layout="row" class="md-toolbar-tools">
