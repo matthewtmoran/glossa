@@ -3,37 +3,10 @@ const fs = require('fs');
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-const client = require('electron-connect').client;
 var mainWindow = null;
 var config = require('./server/config/environment');
 
 
-// const globalPaths = {
-//     static: {
-//         root: userDataPath,
-//         markdown: path.join(userDataRoot, '/markdown'),
-//         image: path.join(userDataRoot, '/image'),
-//         audio: path.join(userDataRoot, '/audio'),
-//         database: path.join(userDataRoot, '/database')
-//     },
-//     relative: {
-//         root: '/data',
-//         markdown: '/data/markdown',
-//         image: '/data/image',
-//         audio: '/data/audio'
-//     }
-// };
-
-
-//verify paths exist if not create it
-// for (var key in globalPaths.static) {
-//     if (globalPaths.static.hasOwnProperty(key)) {
-//         if (!fs.existsSync(globalPaths.static[key])){
-//             console.log('making directory');
-//             fs.mkdirSync(globalPaths.static[key]);
-//         }
-//     }
-// }
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -58,9 +31,6 @@ app.on('ready', function () {
 
     // Open the devtools.
     mainWindow.openDevTools();
-
-
-    client.create(mainWindow);
 
 
     // Emitted when the window is closed.
