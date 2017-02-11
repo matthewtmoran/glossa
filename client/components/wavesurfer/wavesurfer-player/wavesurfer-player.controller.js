@@ -49,10 +49,28 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
         initWaveSurfer();
     });
 
+    var speed = [
+        {
+            value: 1,
+            label: '1.0x'
+        },
+        {
+            value: 0.75,
+            label: '0.75x'
+        },
+        {
+            value: 0.5,
+            label: '0.5x'
+        }
+    ];
+
+
 
     control.toggleMute = toggleMute;
     //pause
     control.pause = pause;
+    control.adjustPlaySpeed = adjustPlaySpeed;
+    control.playbackSpeed = speed[0];
 
     $scope.$on('get:timeStamp', getTimeStamp);
     $scope.$on('set:timeStamp', setTimestamp);
@@ -137,6 +155,15 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
 
         control.title = control.title || control.src.split('/').pop();
         control.surfer.load(control.src);
+
+    }
+
+    var index = 1;
+    function adjustPlaySpeed() {
+        control.playbackSpeed = speed[index];
+        index = (index+1)%(speed.length);
+
+        control.surfer.setPlaybackRate(control.playbackSpeed.value);
 
     }
 
