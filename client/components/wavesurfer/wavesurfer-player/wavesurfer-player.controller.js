@@ -33,6 +33,7 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
     var control = this,
         timeInterval;
 
+    control.loading = true;
     control.themeClass = "md-" + $mdTheming.defaultTheme() + "-theme"; //not sure what this affects
     control.isReady = false;
     control.surfer = null;
@@ -100,7 +101,24 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
                 height: '200'
             };
 
+            options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);
             control.playerProperties = {};
+            control.surfer.init(options);
+
+            control.surfer.on('loading', function(progress) {
+                control.wavesurferProgress = progress;
+                $scope.$apply();
+            });
+
+            control.surfer.on('ready', function () {
+                control.loading = false;
+                control.isReady = true;
+                if (control.autoPlay) {
+                    control.surfer.play();
+                }
+                $scope.$apply();
+            });
+
             var nKey;
             for (var attr in $attrs) {
                 if (attr.match(/^player/)) {
@@ -110,23 +128,6 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
                     control.playerProperties[nKey] = $attrs[attr];
                 }
             }
-
-            options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);
-
-            control.surfer.init(options);
-
-            control.surfer.on('ready', function () {
-                control.isReady = true;
-                if (control.autoPlay) {
-                    control.surfer.play();
-                }
-
-                // angular.element('.waveSurferWave').css('background-image', 'url(' + control.image + ')');
-
-                $scope.$apply();
-            });
-
-
         }
 
         //play event listener

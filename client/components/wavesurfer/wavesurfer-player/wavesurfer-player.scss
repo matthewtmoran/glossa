@@ -2,12 +2,16 @@
 	background-color: transparent !important;
 }
 
-.waveSurferWave {
-	//background-image: url('C:\xampp\htdocs\development\_moranmedia\glossa\uploads\Adam.jpg');
+.waveSurferWave {//container of wave surfer
 	background-size: cover;
 
 	wave {
 		overflow: hidden !important;
+	}
+
+	md-progress-linear {
+		margin-top: 97px;
+		position: absolute;
 	}
 }
 
@@ -20,3 +24,5 @@
 	}
 
 }
+
+
