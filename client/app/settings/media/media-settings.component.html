@@ -1,0 +1,25 @@
+<md-content id="media-settings" class="md-padding">
+	<form name="mediaSettings" ng-submit="vm.saveMediaSettings(vm.settings)">
+		<div layout="row">
+			<md-input-container class="md-block " flex="20">
+				<label>Wave Color</label>
+				<md-select class="select-input" ng-model="vm.settings.media.waveColor" aria-label="select color">
+					<md-optgroup label="Wave Color">
+						<md-option ng-value="color.value" ng-repeat="color in vm.waveColorOptions">{{color.name}}</md-option>
+					</md-optgroup>
+				</md-select>
+			</md-input-container>
+		</div>
+
+		<div layout="row">
+			<md-input-container class="md-block" flex="20">
+				<label>Skip Length (in seconds)</label>
+				<input ng-model="vm.settings.media.skipLength" min="1" max="99" type="number">
+			</md-input-container>
+		</div>
+		<div>
+			<md-button type="submit" class="md-raised">Save Changes</md-button>
+			<md-button ng-click="vm.restoreDefaults()" class="md-raised">Restore Defaults</md-button>
+		</div>
+	</form>
+</md-content>

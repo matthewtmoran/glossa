@@ -1,0 +1,37 @@
+#baseline {
+	.CodeMirror{
+		width: 100%;
+		height: auto;
+		//min-height: 100%;
+	}
+}
+
+
+.ace_editor {
+	//height: 200px;
+	height: 100%;
+	width: 100%;
+	//height: -webkit-calc(100% - 116px);
+	//width: 100%;
+}
+
+
+#ace-wrapper {
+	max-height: 100%;
+	max-width: 100%;
+	padding: 3px 0 0 3px;
+}
+
+.cm-timestamp {
+	background: $lGrey;
+	color: white !important;
+	transition: .3s;
+	padding-left: 3px;
+	padding-right: 3px;
+	border-radius: 6px;
+
+	&:hover {
+		cursor: pointer;
+		background: $red;
+	}
+}

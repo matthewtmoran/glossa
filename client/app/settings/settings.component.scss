@@ -1,0 +1,22 @@
+
+.settings-component {
+	input, textarea {
+		color: #333 !important;
+	}
+}
+
+.light-toolbar {
+	background: transparent !important;
+	color: #333;
+
+	h2, md-icon  {
+		color: #333 !important;
+	}
+
+	.close-button  {
+		position: absolute;
+		right: 12px;
+		top: 12px;
+	}
+
+}

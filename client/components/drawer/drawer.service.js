@@ -1,21 +1,40 @@
 'use strict';
 
-var db = require('./db/database'),
-    fs = require('fs'),
-    path = require('path'),
-    _ = require('lodash'),
-    corporaMenus = db.corporaMenu;
-
 angular.module('glossa')
     .factory('drawerMenu', drawerMenu);
 
-function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
+function drawerMenu(manageCorpusSrvc, dialogSrvc, SettingsService) {
 
     var section = [
         {
-            name: 'Test Heading',
+            name: 'Project',
             type: 'heading',
             orderNum: 0
+        },
+        {
+            name: 'Notebooks',
+            type: 'toggle',
+            pages: [
+                {
+                    name: 'My Notebook',
+                    type: 'link',
+                    state: 'notebook',
+                    icon: 'fa fa-group'
+                },
+                {
+                    name: '@matthewtmoran',
+                    state: 'munchies.bananachips',
+                    type: 'link',
+                    icon: 'fa fa-map-marker'
+                },
+                {
+                    name: '@justin_rees',
+                    state: 'munchies.donuts',
+                    type: 'link',
+                    icon: 'fa fa-map-marker'
+                }
+            ],
+            orderNum: 2
         },
         {
             name: 'Corpora',
@@ -80,7 +99,7 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                     type: ''
                 }
             ],
-            orderNum: 1
+            orderNum: 3
         },
         {
             name: 'Lexicon',
@@ -113,7 +132,7 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                     type: ''
                 }
             ],
-            orderNum: 2
+            orderNum: 4
         },
         {
             name: 'Grammar',
@@ -138,37 +157,12 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                     icon: 'fa fa-plus'
                 }
             ],
-            orderNum: 3
-        },
-        {
-            name: 'Notebooks',
-            type: 'toggle',
-            pages: [
-                {
-                    name: 'My Notebook',
-                    type: 'link',
-                    state: 'notebook',
-                    icon: 'fa fa-group'
-                },
-                {
-                    name: '@matthewtmoran',
-                    state: 'munchies.bananachips',
-                    type: 'link',
-                    icon: 'fa fa-map-marker'
-                },
-                {
-                    name: '@justin_rees',
-                    state: 'munchies.donuts',
-                    type: 'link',
-                    icon: 'fa fa-map-marker'
-                }
-            ],
-            orderNum: 4
+            orderNum: 5
         },
         {
             name: 'Help',
             type: 'heading',
-            orderNum: 5
+            orderNum: 6
         },
         {
             name: 'Glossa Basics',
@@ -193,23 +187,23 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                     icon: 'fa fa-map-marker'
                 }
             ],
-            orderNum: 6
+            orderNum: 7
 
         },
         {
             name: 'Grammatical Helps',
             type: 'toggle',
-            orderNum: 7
+            orderNum: 8
         },
         {
             name: 'Phonology Helps',
             type: 'toggle',
-            orderNum: 8
+            orderNum: 9
         },
         {
             name: 'Dev',
             type: 'heading',
-            orderNum: 9
+            orderNum: 10
         },
         {
             name: 'Sandbox States',
@@ -231,13 +225,23 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                     state: 'main.meta'
                 }
             ],
-            orderNum: 10
-        }
+            orderNum: 11
+        },
+        {
+            name: 'Help',
+            type: 'link',
+            state:'help',
+            orderNum: 12
+        },
     ];
 
     activate();
 
     function activate() {
+        //get project info to set name
+        SettingsService.getProject().then(function(data) {
+            section[0].name = data.name;
+        });
         addCustomItems();
     }
 
@@ -249,7 +253,8 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
         isSectionSettingsSelected: isSectionSettingsSelected,
         createCorpus: createCorpus,
         addCreatedCorpus: addCreatedCorpus,
-        deleteCorpus: deleteCorpus
+        deleteCorpus: deleteCorpus,
+        updateProjectName: updateProjectName
 };
 
     return service;
@@ -257,10 +262,10 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
 
     function toggleSelectSection(section) {
         service.openedSection = (service.openedSection === section ? null : section);
-    };
+    }
     function isSectionSelected(section) {
         return service.openedSection === section;
-    };
+    }
     function toggleSettingsSection(section) {
         service.openSetting = (service.openSetting === section ? null : section);
     }
@@ -272,12 +277,10 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
     function addCustomItems() {
         section.forEach(function(sec) {
             if (sec.name === 'Corpora') {
-                return queryCorporaMenus().then(function(result) {
-                    if (!result.success) {
-                        return console.log(result);
-                    }
-                    result.data.forEach(function(item) {
-                        sec.pages.push(item);
+
+                manageCorpusSrvc.getCorporia().then(function(data) {
+                    data.forEach(function(corpus) {
+                        sec.pages.push(corpus);
                     });
                 });
             }
@@ -291,13 +294,6 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
                 return sec.pages.push(corpus);
             }
         });
-    }
-
-    //queries all corporas
-    function queryCorporaMenus() {
-        return dbSrvc.find(corporaMenus, {}).then(function(docs) {
-            return docs;
-        })
     }
 
 
@@ -352,11 +348,17 @@ function drawerMenu(dbSrvc, $mdDialog, dialogSrvc) {
         corpus.settings = settings;
 
 
-       return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
-            return docs.data;
-        }).catch(function(err) {
-           console.log('there was an error saving corpus', err);
-           return err;
-       })
+       // return dbSrvc.insert(corporaMenus, corpus).then(function(docs) {
+       //      return docs.data;
+       //  }).catch(function(err) {
+       //     console.log('there was an error saving corpus', err);
+       //     return err;
+       // })
     }
+
+    //called after project is updated in settings
+    function updateProjectName(name) {
+        section[0].name = name
+    }
+
 }

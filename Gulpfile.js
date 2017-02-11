@@ -29,7 +29,6 @@ var paths = {
             "./client/components/**/*.js",
             "./client/db/**/*.js",
             "!./client/**/*.utils.js",
-            "!./client/**/database.js",
             "!./client/assets/**/*.min.js",
         ]
     }
@@ -42,6 +41,9 @@ gulp.task('default', function() {
 
 // This runs electron
 gulp.task('run', function () {
+
+    // Set default node environment to development
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
     electron.start();
 
@@ -122,28 +124,22 @@ gulp.task('styles', function() {
         .pipe(gulp.dest(clientPath + '/app'));
 });
 
-
-
 gulp.task('index', function() {
     var cssSources = gulp.src([clientPath + '/app/*.css'], {read: false});
-    var appSources = gulp.src(paths.client.jsScripts).pipe(plugins.angularFilesort());
-    var bowerSources = gulp.src(mainBowerFiles(), { base: 'client/bower_components' }, {read: false});
+    // var appSources = gulp.src(paths.client.jsScripts).pipe(plugins.angularFilesort());
+    // var bowerSources = gulp.src(mainBowerFiles(), { base: 'client/bower_components' }, {read: false});
 
     return gulp.src(paths.client.mainView)
         .pipe(plugins.inject(cssSources, { ignorePath: clientPath, addRootSlash: false}))
-        .pipe(plugins.inject(appSources, { ignorePath: clientPath, addRootSlash: false}))
-        .pipe(plugins.inject(bowerSources, { ignorePath: clientPath, addRootSlash: false, starttag: '<!-- bower:{{ext}} -->'}))
+        // .pipe(plugins.inject(appSources, { ignorePath: clientPath, addRootSlash: false}))
+        // .pipe(plugins.inject(bowerSources, { ignorePath: clientPath, addRootSlash: false, starttag: '<!-- bower:{{ext}} -->'}))
         .pipe(gulp.dest(clientPath));
 });
 
-
-
 gulp.task('watch', function() {
     gulp.watch(paths.client.styles, ['styles', electron.reload] );
-    gulp.watch(paths.client.jsScripts, electron.reload);
+    // gulp.watch(paths.client.jsScripts, electron.reload);
 });
-
-
 
 gulp.task('serve', function (cb) {
     runSequence(

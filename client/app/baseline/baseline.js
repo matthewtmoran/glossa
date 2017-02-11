@@ -6,11 +6,18 @@ angular.module('glossa')
 function config($stateProvider) {
     $stateProvider
         .state('corpus.baseline', {
-            template: '<baseline-component layout="column" flex ng-if="veVm.bindingsAreStabilized" current-file="veVm.currentFile">'
-
-            // url: '/meta',
-            // templateUrl: 'app/baseline/baseline.html',
-            // controller: 'baselineCrtl',
-            // controllerAs: 'baselineVm'
+            url: '/baseline',
+            template: '<baseline-component flex layout="column" markdown-files="vm.markdownFiles" current-file="vm.currentFile" notebooks-attachment="vm.notebookAttachment">',
+            parent: 'corpus',
+            resolve: {
+                PreviousState: function ($state) {
+                    var currentStateData = {
+                        Name: $state.current.name,
+                        Params: $state.params,
+                        URL: $state.href($state.current.name, $state.params)
+                    };
+                    return currentStateData;
+                }
+            }
         });
 }

@@ -20,94 +20,85 @@
 
 <body ng-app="glossa" layout="column" ng-cloak>
 
-	<div ui-view flex layout="column"></div>
-
+	<div ui-view flex class="main" layout="column"></div>
 
 	<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
 	<!-- bower:js -->
 	<script src="bower_components/jquery/dist/jquery.js"></script>
-	<script src="bower_components/codemirror/lib/codemirror.js"></script>
+
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-animate/angular-animate.js"></script>
 	<script src="bower_components/angular-aria/angular-aria.js"></script>
 	<script src="bower_components/angular-messages/angular-messages.js"></script>
+	<!--<script src="assets/lib/angular-ui-router.js"></script>-->
 	<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 	<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
 	<script src="bower_components/angular-material/angular-material.js"></script>
 	<script src="bower_components/angular-material-data-table/dist/md-data-table.js"></script>
+	<script src="bower_components/ng-file-upload/ng-file-upload-all.min.js"></script>
 	<!-- endinject -->
 
 	<!-- inject:js -->
 	<script src="app/app.js"></script>
-	<script src="db/db.service.js"></script>
-	<script src="components/wavesurferDirectives/wavePreview/wavePreview.directive.js"></script>
-	<script src="components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer.directive.js"></script>
-	<script src="components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer.controller.js"></script>
-	<script src="components/tabbar/tabcontent/meta.controller.js"></script>
 	<script src="components/drawer/menutoggle/menuToggle.driective.js"></script>
 	<script src="components/drawer/menuSettings/settingsToggle.directive.js"></script>
 	<script src="components/drawer/menuLink/menuLink.directive.js"></script>
-	<script src="components/drawer/dialogs/corpusDialog.controller.js"></script>
-	<script src="components/wavesurferDirectives/waveform.js"></script>
-	<script src="components/wavesurferDirectives/waveform.controller.js"></script>
-	<script src="components/waveform/waveform.service.js"></script>
-	<script src="components/uploadSelection/uploadSelection.directive.js"></script>
-	<script src="components/viewerEditor/viewerEditor.component.js"></script>
-	<script src="components/uploadbutton/uploadbtn.directive.js"></script>
-	<script src="components/tabbar/tabbar.directive.js"></script>
 	<script src="components/simplemdeDirectives/simple.service.js"></script>
 	<script src="components/simplemdeDirectives/parse.service.js"></script>
-	<script src="components/simplemdeDirectives/converticons.directive.js"></script>
-	<script src="components/settings/settings.service.js"></script>
-	<script src="components/settings/settings.controller.js"></script>
-	<script src="components/node/node.service.js"></script>
 	<script src="components/navbar/navbar.component.js"></script>
 	<script src="components/filters/nospace.js"></script>
 	<script src="components/filters/humanize.js"></script>
-	<script src="components/filebrowser/filebrowser.component.js"></script>
 	<script src="components/drawer/drawer.service.js"></script>
 	<script src="components/drawer/drawer.directive.js"></script>
 	<script src="components/drawer/drawer.controller.js"></script>
 	<script src="components/dialogService/dialog.service.js"></script>
-	<script src="components/dataServices/notebook.service.js"></script>
-	<script src="components/dataServices/hashtags.service.js"></script>
-	<script src="components/dataServices/file.service.js"></script>
-	<script src="components/dataServices/baseline.service.js"></script>
-	<script src="assets/lib/simplemde/simplemde.js"></script>
+	<script src="components/wavesurfer/wavesurfer-player/wavesurfer-player.directive.js"></script>
+	<script src="components/wavesurfer/wave-preview/wave-preview.directive.js"></script>
+	<script src="components/wavesurfer/wavesurfer-player/wavesurfer-player.controller.js"></script>
+	<script src="app/notebooks/notebooks.service.js"></script>
+	<script src="app/tagManagement/hashtags.service.js"></script>
+	<script src="app/baseline/baseline.service.js"></script>
+	<script src="components/drawer/corpus-management/manage-corpus.service.js"></script>
+	<script src="components/drawer/corpus-management/manage-corpus.controller.js"></script>
+	<script src="app/corpus/corpus.service.js"></script>
 	<script src="assets/lib/wavesurfer.js"></script>
-	<script src="assets/lib/simplemde-angular.js"></script>
-	<script src="assets/lib/codemirror.js"></script>
-	<script src="assets/lib/simplemde/codemirror/tablist.js"></script>
-	<script src="app/notebook/postDialog/postDetails.controller.js"></script>
-	<script src="app/notebook/postDialog/post.service.js"></script>
-	<script src="app/meta/modal/attachfile.controller.js"></script>
-	<script src="app/notebook/cards/notebookcard.directive.js"></script>
-	<script src="app/audioSandbox/mdWavesurferAudio/mdWavesurferAudio.directive.js"></script>
-	<script src="app/audioSandbox/mdWavesurferAudio/mdWavesurferAudio.controller.js"></script>
-	<script src="app/tagManagement/manageTags.js"></script>
-	<script src="app/tagManagement/manageTags.filter.js"></script>
-	<script src="app/tagManagement/manageTags.component.js"></script>
-	<script src="app/tagManagement/manageDialog.controller.js"></script>
-	<script src="app/notebook/notebook.js"></script>
-	<script src="app/notebook/notebook.component.js"></script>
+
+	<script src="app/meta/attachment/attachment.controller.js"></script>
+	<script src="app/notebooks/notebook-dialog/notebook-dialog.controller.js"></script>
+	<script src="app/notebooks/notebook-card/notebook-card.directive.js"></script>
+	<script src="app/tagManagement/hashtags.js"></script>
+	<script src="app/tagManagement/hashtags.filter.js"></script>
+	<script src="app/tagManagement/hashtags.component.js"></script>
 	<script src="app/meta/meta.js"></script>
 	<script src="app/meta/meta.component.js"></script>
-	<script src="app/mentions/mentions.js"></script>
-	<script src="app/mentions/mentions.controller.js"></script>
-	<script src="app/corpus/corpus.js"></script>
-	<script src="app/corpus/corpus.component.js"></script>
-	<script src="app/main/main.js"></script>
-	<script src="app/main/main.component.js"></script>
+	<script src="app/notebooks/notebooks.js"></script>
+	<script src="app/notebooks/notebooks.component.js"></script>
 	<script src="app/corpus/corpus.js"></script>
 	<script src="app/corpus/corpus.component.js"></script>
 	<script src="app/baseline/baseline.js"></script>
-	<script src="app/baseline/baseline.controller.js"></script>
 	<script src="app/baseline/baseline.component.js"></script>
-	<script src="app/audioSandbox/wavesurfer.directive.js"></script>
-	<script src="app/audioSandbox/waveform.controller.js"></script>
 	<!-- endinject -->
 
+	<script src="assets/lib/codemirror/lib/codemirror.js"></script>
+	<script src="assets/lib/simplemde/dist/simplemde.js"></script>
+	<script src="assets/lib/simplemde-angular.js"></script>
+
+	<script src="app/help/help.component.js"></script>
+	<script src="app/help/help.js"></script>
+	<script src="app/settings/settings.component.js"></script>
+	<script src="app/settings/settings.js"></script>
+	<script src="app/settings/project-settings/project-settings.component.js"></script>
+	<script src="app/settings/project-settings/project-settings.js"></script>
+	<script src="app/settings/about/about-settings.component.js"></script>
+	<script src="app/settings/about/about.js"></script>
+	<script src="app/settings/media/media-settings.js"></script>
+	<script src="app/settings/media/media-settings.component.js"></script>
+	<script src="app/settings/settings.service.js"></script>
+	<script src="app/app.service.js"></script>
+	<script src="components/user/user.service.js"></script>
+
+	<script type="text/javascript" src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
 </body>
 </html>

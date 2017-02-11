@@ -3,87 +3,103 @@
 angular.module('glossa')
     .factory('simpleParse', simpleParse);
 
-function simpleParse(hashtagSrvc, $q) {
+function simpleParse(HashtagService, $q) {
     var service = {
-        parseNotebook: parseNotebook,
-        findHashtags: findHashtags
+        title: title,
+        hashtags: hashtags
     };
     return service;
 
-
-    function parseNotebook(notebook) {
-        var textArea;
-
+    //get title
+    function title(notebook) {
         if (notebook.postType === 'normal') {
-            textArea = notebook.description;
-            notebook.name = parseTitle(notebook.description);
+            notebook.name = extractTitle(notebook.description);
         } else if (notebook.postType === 'image') {
-            textArea = notebook.media.image.caption || '';
-            notebook.name = notebook.media.image.name;
+            notebook.name = notebook.image.originalname;
         } else if (notebook.postType === 'audio') {
-            textArea = notebook.media.audio.caption || '';
-            notebook.name = notebook.media.audio.name;
+            notebook.name = notebook.audio.originalname;
+        }
+        return notebook.name;
+    }
+
+    //get hashtags
+    function hashtags(notebook) {
+        //gets the hashtags existing in text
+        var tagsInText = extractHashtagText(notebook.description) || [];
+        var removedTags = [];
+        //if no hashtags exist..
+        if (!notebook.hashtags) {
+            notebook.hashtags = [];
         }
 
-        return $q.when(findHashtags(textArea)).then(function(re) {
+        //verify old tags exist in text still...
+        notebook.hashtags.forEach(function(tag, index) {
 
-            notebook.hashtags = [];
+            if (tagsInText.indexOf(tag.tag) < 0) {
+                //add to removed tags
+                removedTags.push(tag);
+                //remove from hashtags array
+                notebook.hashtags.splice(index, 1);
+            }
+            //splice tags in text if it already exists....
+            tagsInText.splice(tagsInText.indexOf(tag.tag), 1)
+        });
 
-            re.forEach(function(d) {
-                notebook.hashtags.push(d);
+        // removedTags.forEach(function(tag) {
+        //     HashtagService.decreaseTagCount(tag);
+        // });
+
+        //the rest of the tags here should be tags new to this notebooks...
+        return queryForNewTags(tagsInText).then(function(data) {
+            data.forEach(function(tag) {
+                notebook.hashtags.push(tag);
             });
-
-           return notebook;
-
+            return notebook.hashtags;
         });
     }
-    //Parses the title or return first 16 characters of text
-    function parseTitle(text) {
-       var heading = /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/;
 
-       if (heading.test(text)) {
-           return text.match(heading)[0];
-       } else {
-           return text.slice(0, 16);
-       }
-    }
 
-    function findHashtags(text) {
-        var matches = [];
-        var newMatches = [];
-        var hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
-        if (hashReg.test(text)) {
-            matches = text.match(hashReg);
-            newMatches = matches.map(function(tag) {
-                return tag.trim().substr(1);
-            });
-        }
+    ///////////
+    //helpers//
+    ///////////
 
-        return getHashtagObject(newMatches);
 
-    }
-
-    function getHashtagObject(tags) {
+    //new tags is an array of tags new to this notebooks;
+    function queryForNewTags(tagsInText) {
         var promises = [];
-
-        //for each tag
-        tags.forEach(function(tag) {
-            //query db for tag
-            promises.push(hashtagSrvc.termQuery(tag).then(function(result) {
-                //if the tag returns but is undefined it does not exist
-                if (!result.data.length) {
-                    return hashtagSrvc.save(tag);
-                } else {
-                    //otherwise, there is a result that is defined so just push it to the array
-                    return $q.when(result.data[0]);
-                  // return result;
-                }
+        tagsInText.forEach(function(tag, index) {
+            //push this query to promises array
+            promises.push(HashtagService.termQuery(tag).then(function(data) {
+                //update the notebooks model property
+                tagsInText[index] = data;
+                return data;
             }))
         });
-
-       return $q.all(promises).then(function(result) {
-            return result;
+        return $q.all(promises).then(function(data) {
+            return data;
         });
     }
 
+    //Parses the title or return first 16 characters of text
+    function extractTitle(text) {
+        var heading = /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/;
+
+        if (heading.test(text)) {
+            return text.match(heading)[0];
+        } else {
+            return text.slice(0, 16);
+        }
+    }
+
+    //gets all hashtags in text
+    function extractHashtagText(text) {
+        var hashtags = [];
+        var hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
+        if (hashReg.test(text)) {
+            hashtags = text.match(hashReg).map(function (tag) {
+                return tag.trim().substr(1);
+            });
+            return hashtags
+        }
+    }
 }

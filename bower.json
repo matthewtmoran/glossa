@@ -10,7 +10,9 @@
     "jquery": "^3.1.0",
     "codemirror": "^5.19.0",
     "angular-sanitize": "^1.5.9",
-    "angular-material-data-table": "^0.10.10"
+    "angular-material-data-table": "^0.10.10",
+    "ng-file-upload": "^12.2.13",
+    "angular-ui-codemirror": "^0.3.0"
   },
   "overrides": {
     "angular": {
@@ -18,5 +20,10 @@
         "jquery": "3.1.1"
       }
     }
+  },
+  "devDependencies": {
+    "codemirror": "^5.21.0",
+    "simplemde": "^1.11.2",
+    "simplemde-angular": "^0.0.3"
   }
 }

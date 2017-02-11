@@ -113,24 +113,48 @@ md-backdrop.md-sidenav-backdrop {
 }
 
 /* inject:scss */
-@import 'baseline/baseline';
-@import 'corpus/corpus';
-@import 'main/main';
-@import 'mentions/mentions';
-@import 'meta/meta';
-@import 'meta/modal/attachfile';
-@import 'notebook/notebook';
-@import 'tagManagement/manageTags';
+@import 'baseline/baseline.component';
+@import 'corpus/corpus.component';
+@import 'help/help.component';
+@import 'meta/attachment/attachment';
+@import 'meta/meta.component';
+@import 'notebooks/notebooks.component';
+@import 'settings/about/about-settings.component';
+@import 'settings/media/media-settings.component';
+@import 'settings/project-settings/project-settings.component';
+@import 'settings/settings.component';
+@import 'tagManagement/hashtags.component';
 @import '../assets/lib/simplemde/simplemde';
 @import '../components/drawer/drawer';
-@import '../components/filebrowser/filebrowser';
 @import '../components/navbar/navbar';
-@import '../components/settings/settings';
-@import '../components/wavesurferDirectives/mdWavesurferPlayer';
-@import '../components/wavesurferDirectives/mdWavesurferPlayer/mdWavesurferPlayer';
-@import '../components/wavesurferDirectives/wavePreview/wavePreview';
+@import '../components/wavesurfer/wave-preview/wave-preview';
+@import '../components/wavesurfer/wavesurfer-player/wavesurfer-player';
 /* endinject */
+main-loader{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
 
+	position: fixed;
+	z-index: 10000;
+	background-color: #fff;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+
+	opacity: 1;
+	transition: opacity 0.3s ease-in-out;
+
+	h1 {
+		color: black;
+	}
+}
+
+main-loader._splash_fade_out{
+	opacity: 0;
+}
 
 md-dialog {
 	border-top: 1px solid rgba(0,0,0,0.12) !important;
@@ -162,4 +186,49 @@ md-dialog {
 .top-border {
 	//border: 1px solid red !important;
 	border-top: 1px solid rgba(0,0,0,0.12) !important;
+}
+
+#uploadButton {
+	z-index: 61 !important;
+	left: 215px !important;
+}
+
+md-sidenav {
+	md-list {
+		md-list-item {
+			.md-button {
+				width: 100%;
+				margin-left: 0 !important;
+				margin-right: 0 !important;
+
+				md-icon {
+					padding-top: 5px;
+					padding-bottom: 5px;
+				}
+
+			}
+
+			&:hover {
+				cursor: pointer;
+				background: lightgrey;
+				transition: .3s;
+			}
+		}
+	}
+}
+
+
+/* start 'enter' transition on main view */
+.main.ng-enter {
+	/* transition on enter for .5s */
+	transition: .5s;
+
+	/* start with opacity 0 (invisible) */
+	opacity: 0;
+}
+
+/* end 'enter' transition on main view */
+.main.ng-enter-active {
+	/* end with opacity 1 (fade in) */
+	opacity: 1;
 }

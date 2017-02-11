@@ -1,0 +1,50 @@
+<md-dialog class="post-dialog" flex="50">
+	<div ng-cloak>
+
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{dialogVm.postDetails.title}}</h2>
+			</div>
+		</md-toolbar>
+
+		<md-dialog-content>
+			<div class="md-dialog-content" >
+				<md-input-container class="simplemde-wrapper" >
+
+					<div>
+						{{dialogVm.notebook.description}}
+					</div>
+
+				</md-input-container>
+
+				<div layout="row">
+					<div flex class="upload-selection">
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.image" >
+							<img ng-show="dialogVm.notebook.image" ngf-src="dialogVm.imagePath" class="thumb">
+						</div>
+					</div>
+
+					<div flex class="upload-selection">
+						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.audio">
+							<wave-preview
+									ng-if="dialogVm.notebook.audio"
+									flex
+									url="{{dialogVm.audioPath}}"
+									auto-play="false"
+									player-wave-color="white"
+									player-cursor-color="#FF5252"
+									player-height="100"
+									player-progress-color="black">
+							</wave-preview>
+						</div>
+					</div>
+				</div>
+			</div>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" class="top-border" >
+			<md-button ng-click="dialogVm.closeDetails()">Close</md-button>
+		</md-dialog-actions>
+
+	</div>
+</md-dialog>

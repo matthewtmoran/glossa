@@ -6,12 +6,50 @@ angular.module('glossa', [
     'ui.router',
     'simplemde',
     'ngSanitize',
-    'md.data.table'
+    'md.data.table',
+    'ngFileUpload',
+    'ui.codemirror'
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector) {
-        $rootScope.$on('$stateChangeStart',function (event, toState, toParams) {
+    .run(function($rootScope, $state, $injector, AppService) {
+        // console.log('App Run time:', Date.now());
+        //gets the current session from the server
+        AppService.getSession().then(function(data){
+            console.log('getSession result', data);
+
+            //go to the session state
+            // localStorage.setItem('session', JSON.stringify(data));
+
+            $state.go(data.currentState, data.currentStateParams);
+        });
+
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+            //set the current session from local storage
+            // var session = JSON.parse(localStorage.getItem('session'));
+
+            var session;
+
+            AppService.getSession().then(function(data){
+
+                if (data) {
+                    data.currentState = toState.name;
+                    data.currentStateParams = toParams;
+                    //update session data on server end
+                    AppService.updateSession(data).then(function(data) {
+                        session = data;
+                    });
+                }
+
+            });
+
+
+            //update the current state and params
+
+
+
+
+            //This keeps the state from redirecting away from the child state when that same child state is clicked.
             var redirect = toState.redirectTo;
             if (redirect) {
                 if (angular.isString(redirect)) {
@@ -33,10 +71,11 @@ angular.module('glossa', [
                 }
             }
         })
-})
+});
 
 
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
+    // console.log('Main Config time:', Date.now());
     var customAccent = {
         '50': '#b80000',
         '100': '#d10000',
@@ -85,11 +124,9 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
         .accentPalette('customAccent');
 
 
-
-    // $urlRouterProvider
-    //     .otherwise('/corpus/:corpus:default');
-
     $urlRouterProvider.otherwise(function($injector, $location){
+
+
         var state = $injector.get('$state');
         // state.go("corpus", $location.corpus());
         state.go("corpus");
@@ -98,4 +135,5 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
 
     $mdIconProvider
         .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
-};
+
+}
