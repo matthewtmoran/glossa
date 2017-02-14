@@ -27,11 +27,11 @@
     "multer": "^1.2.1",
     "nedb": "^1.8.0",
     "q": "^1.4.1",
-    "serve-favicon": "~2.0.1",
-    "simple-peer": "^6.2.1",
-    "wrtc": "0.0.61"
+    "serve-favicon": "~2.0.1"
   },
   "devDependencies": {
+    "simple-peer": "^6.2.1",
+    "wrtc": "0.0.61",
     "electron": "^1.4.13",
     "electron-packager": "^8.4.0",
     "gulp-angular-filesort": "^1.1.1",

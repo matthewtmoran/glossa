@@ -6,8 +6,9 @@ var gulp = require('gulp'),
     // electron = require('electron-prebuilt'),
     _ = require('lodash'),
     runSequence = require('run-sequence'),
-    plugins = gulpLoadPlugins();
-    electron = require('electron-connect').server.create();
+    plugins = gulpLoadPlugins(),
+    run = require('gulp-run');
+    // electron = require('electron-connect').server.create();
 
 var clientPath = 'client';
 var serverPath = 'server';
@@ -43,9 +44,10 @@ gulp.task('default', function() {
 gulp.task('run', function () {
 
     // Set default node environment to development
-    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-    electron.start();
+
+    // electron.start();
+    return run('electron .').exec();
 
     // childProcess.spawn(electron, ['./'], { stdio: 'inherit' });
 });
@@ -137,7 +139,7 @@ gulp.task('index', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch(paths.client.styles, ['styles', electron.reload] );
+    gulp.watch(paths.client.styles, ['styles'] );
     // gulp.watch(paths.client.jsScripts, electron.reload);
 });
 

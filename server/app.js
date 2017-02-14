@@ -4,14 +4,12 @@
 
 'use strict';
 
-// process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
 var express = require('express');
 var config = require('./config/environment');
 var path = require('path');
 // var init = require('./config/init');
 
-var bonjour = require('bonjour')()
+// var bonjour = require('bonjour')()
 
 // Populate DB with sample data
 if(config.seedDB) { require('./config/seed'); }
