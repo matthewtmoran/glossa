@@ -4,12 +4,12 @@
 
 'use strict';
 
-// process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
 var express = require('express');
 var config = require('./config/environment');
 var path = require('path');
 // var init = require('./config/init');
+
+// var bonjour = require('bonjour')()
 
 // Populate DB with sample data
 if(config.seedDB) { require('./config/seed'); }
@@ -29,8 +29,13 @@ require('./config/init').checkForSession();
 
 // Start server
 server.listen(config.port, config.ip, function () {
+    // bonjour.publish({ name: 'Glossa App', type: 'http', port: config.port });
     console.log('Listening on Port.');
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+
+    // bonjour.find({ type: 'http' }, function (service) {
+    //     console.log('Found an HTTP server:', service)
+    // })
 });
 
 exports = module.exports = app;
