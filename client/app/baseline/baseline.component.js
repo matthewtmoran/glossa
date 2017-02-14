@@ -17,17 +17,16 @@ angular.module('glossa')
     });
 // On enter
 //
-function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
+function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout, CorpusService) {
     var blVm = this;
 
     var isDoubleClick = false;
     var singleClick;
-
-    blVm.textContent = '';
+    var _doc; //the codemirror editor to expose
 
     blVm.$onInit = init;
     blVm.codemirrorLoaded = codemirrorLoaded;
-    blVm.update = update;
+    blVm.saveContent = saveContent;
 
     $scope.$watch('blVm.currentFile', function(newValue) {
         blVm.audioPath = '';
@@ -35,6 +34,15 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
         if (newValue) {
             getMediaData(newValue)
         }
+    });
+
+    $scope.$on('send:timeStamp', function(event, seconds) {
+        console.log('send:timestamp listener', seconds);
+
+        var string = " <!--" + clockFormat(seconds, 1) + "--> ";
+
+        _doc.replaceSelection(string, 'end');
+
     });
 
 
@@ -62,29 +70,11 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
         }
     }
 
-    function update() {
-        baselineSrvc.updateContent(blVm.currentFile, blVm.textContent);
+    function saveContent(currentFile) {
+        CorpusService.updateFile(currentFile).then(function(data) {
+            console.log('The result of the save...', data);
+        })
     }
-
-
-    function getTextContent(file) {
-        baselineSrvc.readContent(file, function(result) {
-            blVm.textContent = result;
-            $scope.$apply();
-        });
-    }
-
-    function getAudioImagePath() {
-        if (blVm.currentFile.audio) {
-            blVm.audioPath = path.join(globalPaths.static.trueRoot, blVm.currentFile.audio.path)
-        }
-        if (blVm.currentFile.image) {
-            blVm.imagePath = path.join(globalPaths.static.trueRoot, blVm.currentFile.image.path)
-        }
-    }
-
-
-    var _doc;
 
 
     function codemirrorLoaded(_editor) {
@@ -181,8 +171,6 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
 
     }
 
-
-
     function enterEvent(cm) {
         var doc = cm.getDoc();
         if(!isDoubleClick) {
@@ -208,16 +196,6 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
         }
     }
 
-    $scope.$on('send:timeStamp', function(event, seconds) {
-        console.log('send:timestamp listener', seconds);
-
-        var string = " <!--" + clockFormat(seconds, 1) + "--> ";
-
-        _doc.replaceSelection(string, 'end');
-
-    });
-
-
     function convertToSeconds(time) {
 
 
@@ -226,22 +204,6 @@ function baselineCtrl($scope, baselineSrvc, NotebookService, $timeout) {
 // minutes are worth 60 seconds. Hours are worth 60 minutes.
         var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
         return seconds;
-    }
-
-
-
-   function formatTime (time) {
-        console.log('time***', time);
-
-        var sec_num = parseInt(time, 10); // don't forget the second param
-        var hours   = Math.floor(sec_num / 3600);
-        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-        var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-        if (hours   < 10) {hours   = "0"+hours;}
-        if (minutes < 10) {minutes = "0"+minutes;}
-        if (seconds < 10) {seconds = "0"+seconds;}
-        return hours+':'+minutes+':'+seconds;
     }
 
     //takes seconds and then decimals....
