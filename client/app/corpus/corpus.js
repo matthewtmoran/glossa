@@ -9,7 +9,7 @@ function config($stateProvider) {
             url: '/corpus',
             redirectTo:'corpus.meta',
             // abstract: true,
-            template: '<corpus-component markdown-files="$resolve.markdownFiles" flex layout="column">',
+            template: '<corpus-component ng-cloak markdown-files="$resolve.markdownFiles" flex layout="column">',
             params: {
                 user: {},
                 corpus: 'default'

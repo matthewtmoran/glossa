@@ -1,6 +1,54 @@
-'use strict';
+// 'use strict';
+// var initInjector = angular.injector(['ng']);
+// var $http = initInjector.get('$http');
+// var ready = new Promise(function(resolve, reject){
+//
+//
+// });
+// var settings = fetch('/mySettingsUrl');
+
+// Promise.all([ ready, settings ]).then(() => {
+//     angular.bootstrap(document, app.name);
+// });
+
+angular.module('config', []);
+window.onload = function(){
+    // get injector object
+    var initInjector = angular.injector(['ng']);
+    // extract necessary angular services
+    var $http = initInjector.get('$http');
+    var $timeout = initInjector.get('$timeout');
+    var $animate = initInjector.get('$animate');
+    // do operations before bootstrap
+    // get user sign in status
+    $http({
+        url : 'http://localhost:9000/api/session',
+        method : 'GET'
+    }).then(function successCallback(res){
+            console.log('response from server.... ', res);
+            angular.module('config').constant('__session', res.data);
+        },
+        // not signed in {statusCode : 403} // Forbidden
+        function failureCallback(res){
+            console.log('Failed to get user settings...');
+
+            angular.module('config').constant('__session', res.data);
+
+        }).then(function(){
+        console.log('Bootstrapping angular....');
+        // start bootstrapping
+        angular.bootstrap(document, ['glossa']);
+        // add `_splash_fade_out` class to splash screen
+        // when resolved after animation complete, remove element from DOM
+        $animate.addClass(angular.element('.splash-screen'), '_splash_fade_out')
+            .then(function(){
+                angular.element('.splash-screen').remove();
+            });
+    });
+};
 
 angular.module('glossa', [
+    'config',
     'ngAnimate',
     'ngMaterial',
     'ui.router',
@@ -9,45 +57,19 @@ angular.module('glossa', [
     'md.data.table',
     'ngFileUpload',
     'ui.codemirror'
+    // 'socket.io'
+    // 'btford.socket-io'
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector, AppService) {
-        // console.log('App Run time:', Date.now());
-        //gets the current session from the server
-        AppService.getSession().then(function(data){
-            console.log('getSession result', data);
+    .run(function($rootScope, $state, $injector, AppService, __session) {
 
-            //go to the session state
-            // localStorage.setItem('session', JSON.stringify(data));
-
-            $state.go(data.currentState, data.currentStateParams);
-        });
+        $state.go(__session.currentState, __session.currentStateParams);
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-            //set the current session from local storage
-            // var session = JSON.parse(localStorage.getItem('session'));
-
-            var session;
-
-            AppService.getSession().then(function(data){
-
-                if (data) {
-                    data.currentState = toState.name;
-                    data.currentStateParams = toParams;
-                    //update session data on server end
-                    AppService.updateSession(data).then(function(data) {
-                        session = data;
-                    });
-                }
-
-            });
-
-
-            //update the current state and params
-
-
-
+            __session.currentState = toState.name;
+            __session.currentStateParams = toParams;
+            AppService.updateSession(__session);
 
             //This keeps the state from redirecting away from the child state when that same child state is clicked.
             var redirect = toState.redirectTo;
@@ -73,9 +95,14 @@ angular.module('glossa', [
         })
 });
 
+//$socketProvider...custom socket library implementation
+function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider ) {
 
-function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider) {
-    // console.log('Main Config time:', Date.now());
+    //set initial socket connection ... custom socket library implementation
+    // $socketProvider.setConnectionUrl('http://localhost:9000');
+
+
+    //material theme stuff...
     var customAccent = {
         '50': '#b80000',
         '100': '#d10000',
@@ -96,7 +123,6 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
     $mdThemingProvider
         .definePalette('customAccent',
             customAccent);
-
     $mdThemingProvider.definePalette('glossaPalette', {
         '50': 'ffebee',
         '100': 'ffcdd2',
@@ -118,22 +144,21 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
             '200', '300', '400', 'A100'],
         'contrastLightColors': undefined    // could also specify this if default was 'dark'
     });
-
     $mdThemingProvider.theme('default')
         .primaryPalette('glossaPalette')
         .accentPalette('customAccent');
+    $mdIconProvider
+        .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
+
 
 
     $urlRouterProvider.otherwise(function($injector, $location){
-
-
         var state = $injector.get('$state');
-        // state.go("corpus", $location.corpus());
         state.go("corpus");
-        return $location.path();
     });
 
-    $mdIconProvider
-        .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
+
+
+
 
 }
