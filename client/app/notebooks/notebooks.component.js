@@ -8,12 +8,14 @@ angular.module('glossa')
         templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
-function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService) {
+function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, socketFactory) {
     var nbVm = this;
     var hashtagsUsed = [];
 
     nbVm.$onInit = function() {
         queryNotebooks();
+        // socketFactory.init();
+        AppService.initListeners();
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };

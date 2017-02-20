@@ -2,9 +2,56 @@
 'use strict';
 
 angular.module('glossa')
-  .factory('socket', function(socketFactory) {
+    .factory('socketFactory', socketFactory);
 
-    return socketFactory();
+function socketFactory($rootScope, $window, __session) {
+
+    var socket;
+    var service = {
+        on: on,
+        emit: emit,
+        init: init
+    };
+
+
+    return service;
+
+    function init() {
+        var ioRoom = $window.location.origin;
+        console.log('ioRoom', ioRoom);
+        // var ioRoom = $window.location.origin + '/' + $window.localStorage.code;
+        $window.socket = io(ioRoom);
+        console.log('$window.socket', $window.socket);
+    }
+
+    function on(eventName, callback) {
+        console.log('on event, eventName', eventName);
+        $window.socket.on(eventName, function() {
+            var args = arguments;
+            console.log("args", args);
+            $rootScope.$apply(function() {
+                callback.apply($window.socket, args);
+            });
+        });
+    }
+
+    function emit(eventName, data, callback) {
+        console.log('emit in socket service');
+        $window.socket.emit(eventName, data, function() {
+            var args = arguments;
+            $rootScope.$apply(function() {
+                if (callback) {
+                    callback.apply($window.socket, args);
+                }
+            });
+        });
+    }
+}
+
+// angular.module('glossa')
+//   .factory('socket', function(socketFactory) {
+
+    // return socketFactory();
 
     // // socket.io now auto-configures its connection when we ommit a connection url
     // var ioSocket = io('', {
@@ -73,4 +120,4 @@ angular.module('glossa')
     //     socket.removeAllListeners(modelName + ':remove');
     //   }
     // };
-  });
+  // });

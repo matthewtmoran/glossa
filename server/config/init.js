@@ -31,17 +31,21 @@ var defaultSettings = {
     //if user does not exist create new project
 
 function checkForSession() {
-    Session.find({}, function(err, sessions) {
-        if (err) {
-            return console.log('There was an error loading session.', err);
-        }
-        if (sessions.length < 1) {
-            console.log('No Session exists; check for user');
-            return validateAll();
-        }
-        console.log('Session exists');
-        return sessions[0];
-    });
+
+    return new Promise(function(resolve, reject) {
+        Session.find({}, function(err, sessions) {
+            if (err) {
+                console.log('There was an error loading session.', err);
+                reject(err);
+            }
+            if (sessions.length < 1) {
+                console.log('No Session exists; check for user');
+                resolve(validateAll());
+            }
+            resolve(sessions[0]);
+        });
+    })
+
 }
 
 
@@ -50,9 +54,10 @@ function validateAll() {
         .then(function(userData) {
            return projectCheck(userData)
                .then(function(projectData) {
-                   return createDefaultSession(userData, projectData)
+
+                   return createDefaultSettings(userData, projectData)
                        .then(function(sessionData) {
-                          return createDefaultSettings();
+                          return createDefaultSession(userData, projectData);
                     })
                });
         })
@@ -148,7 +153,7 @@ function createDefaultSession(user, project) {
     defaultSession.currentStateParams = {user: user._id, corpus:'default'};
 
     return new Promise(function (resolve, reject) {
-       Session.insert(defaultSession, function(err, createdSession) {
+       return Session.insert(defaultSession, function(err, createdSession) {
             if (err) {
                 console.log('Error Creating Session', err);
                 reject(err);
