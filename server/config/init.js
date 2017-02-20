@@ -55,7 +55,6 @@ function validateAll() {
         .then(function(userData) {
            return projectCheck(userData)
                .then(function(projectData) {
-
                    return createDefaultSettings(userData, projectData)
                        .then(function(sessionData) {
                           return createDefaultSession(userData, projectData);
@@ -65,7 +64,15 @@ function validateAll() {
 }
 
 function getGlossaUser() {
-    return userCheck();
+    return new Promise(function(resolve, reject) {
+        User.find({}, function(err, user) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(user);
+            }
+        })
+    })
 }
 
 
@@ -171,10 +178,13 @@ function createDefaultSession(user, project) {
 }
 
 function createDefaultSettings() {
-    Settings.insert(defaultSettings, function(err, createdSettings) {
-        if (err) {
-            return console.log('Error Creating Session', err);
-        }
-        console.log('Settings Created', createdSettings._id);
+    return new Promise(function (resolve, reject) {
+        Settings.insert(defaultSettings, function (err, createdSettings) {
+            if (err) {
+                console.log('Error Creating Session', err);
+                reject(err);
+            }
+            resolve(createdSettings);
+        });
     });
 }
