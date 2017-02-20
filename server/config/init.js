@@ -5,7 +5,8 @@ var Settings = require('../api/settings/settings.model');
 var currentUser;
 
 module.exports = {
-    checkForSession: checkForSession
+    checkForSession: checkForSession,
+    getGlossaUser: getGlossaUser
 };
 
 var defaultUser = {
@@ -62,6 +63,12 @@ function validateAll() {
                });
         })
 }
+
+function getGlossaUser() {
+    return userCheck();
+}
+
+
 
 function userCheck() {
     return new Promise(function(resolve, reject) {

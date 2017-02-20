@@ -2,7 +2,13 @@ var externalSockets = {};
 var allSockets = {};
 
 
-module.exports = function(io) {
+module.exports = function(io, ioClient, glossaUser, service) {
+
+    if (service) {
+        console.log('This appears to be an external connection');
+        // ioClient.connect()
+    }
+
     io.sockets.on('connection', function (socket) {
         console.log('****New Socket Connected:', socket.id);
 

@@ -131,7 +131,9 @@ function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookServic
 
     //runs on component initialization
     function onInit() {
+        console.log('onInit');
         if (!$window.socket) {
+        console.log('no $window.socket');
             socketFactory.init()
             AppService.initListeners();
         }
