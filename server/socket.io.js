@@ -1,40 +1,90 @@
+var path = require('path');
 var externalSockets = {};
 var allSockets = {};
-
 
 module.exports = function(io, ioClient, glossaUser, service) {
 
     if (service) {
-        console.log('This appears to be an external connection');
-        // ioClient.connect()
+        console.log('...This appears to be an external connection broadcasting on port: ' + service.port);
+
+
+        for (var key in allSockets) {
+            if (allSockets.hasOwnProperty(key)) {
+                if (allSockets[key].userid === service.txt.userid || allSockets[key].userid === glossaUser.userId ) {
+                   return console.log('External socket is already established IGNORE')
+                } else {
+                    console.log('...external socket not found proceed with connection');
+                }
+            }
+        }
+
+        var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
+        var externalSocket = ioClient.connect(externalPath);
+
+        externalSocket.on('connect', function() {
+
+            console.log('... external socket connected');
+
+            externalSocket.emit('thisTest');
+
+        });
+
+        externalSocket.on('connection', function() {
+            console.log('connection event');
+        })
+
+
+
+
+
     }
 
-    io.sockets.on('connection', function (socket) {
-        console.log('****New Socket Connected:', socket.id);
 
-        console.log('*{{Adding to allSockets object.}}');
-        allSockets[socket.id] = socket.id;
-        console.log('allSockets:', allSockets);
+
+    io.sockets.on('connection', function (socket) {
+        console.log('***New Socket Connected:', Date.now());
+
+        console.log('...add to allSocket object');
+        allSockets[socket.id] = {
+            socketId: socket.id,
+            userId: glossaUser._id
+            // serverId: service.id || null
+        };
 
         //emit to socket to get the type either client or external
         //external connection should be any user that has an approved connection
-        console.log('*{{emit event to ' + socket.id + ' requesting socket type}}');
-        socket.emit('requestSocketType');
-        socket.on('returnSocketType', function(data) {
-            console.log('*{{returnSocketType Heard.  Socket type is \'' + data.type + '\'. Join specific room. }}');
-            console.log('Heard returningSocketType on server', data);
-            socket.room = data.type;
+        console.log('... emitting to socket.id:' + socket.id);
+        socket.emit('request:SocketType', {socketId: socket.id});
+        socket.on('return:SocketType', function(data) {
 
-            if (socket.room === 'client') {
-                socket.join(socket.room);
+            console.log('...socket type is ' + data.type);
+
+            if (data.type === 'client') {
+                console.log('...notify local user server is connected');
+                io.to(socket.id).emit('notify:server-connection')
             }
 
+            socket.room = data.type;
+
+            // if (socket.room === 'client') {
+            //     console.log('...joining ' + data.type + ' room.');
+            //     socket.join(socket.room);
+            // }
+
             if (data.type === 'external') {
+                console.log('...joining ' + data.type + ' room.');
                 socket.join('external');
             }
 
-            console.log('*{{Emit to all in'+ socket.room +' room that socket is connected}}');
-            io.sockets.in(socket.room).emit('notify:client-server-connection')
+
+
+
+            // console.log('...Emit to all in '+ socket.room +' room that socket: '+ socket.id +' is connected');
+
+            // var room = io.sockets.adapter.rooms[socket.room];
+            // console.log('...socket in room ' + socket.room+ ' = ' + room.length);
+
+            // io.sockets.in(socket.room).emit('notify:server-connection')
 
         });
 

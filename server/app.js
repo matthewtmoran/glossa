@@ -22,26 +22,50 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var ioClient = require('socket.io-client');
+var socketUtilities = require('./socket.io');
 
 require('./config/express')(app);
 require('./routes')(app);
 
-require('./config/init').checkForSession().then(function(data) {
+var mySession = require('./config/init').checkForSession();
+var glossaUser = require('./config/init').getGlossaUser();
 
-    var glossaUser = require('./config/init').getGlossaUser();
-    var glossaSession = data;
+Promise.all([mySession, glossaUser]).then(function(results) {
+
 
     server.listen(config.port, config.ip, function () {
         console.log('Listening on Port.');
         console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     });
 
-    bonjour.find({type: 'http'}, function(service) {
-        console.log('Found an HTTP server:', service.name);
+    var browser = bonjour.find({type: 'http'});
+
+    bonjour.publish({
+        name:'glossaApp-' + results[0].userId,
+        type: 'http',
+        port: config.port,
+        txt: {
+            userid: results[0].userId
+        }
+    });
+
+
+    browser.on('up', function(service) {
+        console.log('...Found published http service', service.name);
         if (service.name.indexOf('glossaApp') > -1) {
-            console.log('This is a glossa application on the network...');
+            console.log('...This is a glossa application');
             //for some reason camel case was not working on service.txt.userId
-            if (service.txt.userid != glossaSession.userId) {
+            if (service.txt.userid != results[0].userId) {
+
+
+                console.log('...external service found');
+                console.log('... verify in connected user list');
+
+
+
+                //check user object to see if it is in connected users list.
+                //if it is not in connected users list...
+                //
 
 
 
@@ -57,55 +81,54 @@ require('./config/init').checkForSession().then(function(data) {
 
 
 
-            //    here we connect to an external socket
-                console.log('CONNECT TO EXTERNAL SOCKET');
+                //    here we connect to an external socket
+
                 // TODO: need to figure out how to manage the connection so events are not permitted twice.
-/*
+                /*
 
-               events need to broadcast to connected users when:
-               a connection is established
-               a connection is 'requested'
-               a connection is 'accepted'
-               update to notebook
-               update to transfile
-               user is not longer available
-
-
-               On initial open
-               when connection is established
-               Look for changes since last time user was connected....
+                 events need to broadcast to connected users when:
+                 a connection is established
+                 a connection is 'requested'
+                 a connection is 'accepted'
+                 update to notebook
+                 update to transfile
+                 user is not longer available
 
 
+                 On initial open
+                 when connection is established
+                 Look for changes since last time user was connected....
 
-               NOTES: maybe we manually scan so we cna keep track of which user upon a connection is the 'host' user
- *
- */
+
+
+                 NOTES: maybe we manually scan so we cna keep track of which user upon a connection is the 'host' user
+                 *
+                 */
 
 
             }
-            if (service.txt.userid === glossaSession.userId) {
-                console.log('This is my own service so dont connect to it');
+
+            if (!service.published && service.txt.userid === results[0].userId) {
+                console.log('...if service is not published and its my local service');
+                 socketUtilities(io, ioClient, results[1][0]);
+            }
+
+            if (service.published && service.txt.userid == results[0].userId) {
+                console.log('... service is published and it is local its a local service so IGNORE');
             }
         }
     });
 
-    bonjour.publish({
-        name:'glossaApp-' + glossaSession.userId,
-        type: 'http',
-        port: config.port,
-        txt: {
-            userid: glossaSession.userId
-        }
-    });
 
 
-    require('./socket.io')(io, ioClient);
+
 
 
 });
 
-function handleSockeConnection(io, ioClient, glossaUser) {
-    require('./socket.io')(io, ioClient, glossaUser);
+
+function handleSockeConnection(io, ioClient, glossaUser, service) {
+    socketUtilities(io, ioClient, glossaUser, service);
 }
 
 function createExternalSocketConnection(localUser, callback) {

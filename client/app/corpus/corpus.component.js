@@ -10,7 +10,7 @@ angular.module('glossa')
     });
 
 //$socket ...custom socket library implementation...
-function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookService, $mdToast, socketFactory, AppService, $window) {
+function corpusCtrl($scope, $state,  Notification, CorpusService, NotebookService, $mdToast, socketFactory, AppService, $window) {
     var vm = this;
 
     // socketFactory.init();
@@ -131,10 +131,8 @@ function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookServic
 
     //runs on component initialization
     function onInit() {
-        console.log('onInit');
         if (!$window.socket) {
-        console.log('no $window.socket');
-            socketFactory.init()
+            socketFactory.init();
             AppService.initListeners();
         }
 
@@ -196,5 +194,16 @@ function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookServic
             vm.notebookAttachment = null;
         }
     }
+
+    // function showToast() {
+    //     var msg = vm.message;
+    //     if (!msg) {
+    //         msg = 'Toast number ' + ++vm.number;
+    //     }
+    //     Notification.show({
+    //         message: msg,
+    //         hideDelay: vm.delay
+    //     });
+    // }
 
 }

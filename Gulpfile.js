@@ -173,7 +173,7 @@ gulp.task('serve', function (cb) {
         ],[
             'server',
             'run',
-            'electron',
+            // 'electron',
             'watch'
         ],
         cb

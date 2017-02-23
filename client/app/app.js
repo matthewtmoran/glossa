@@ -25,7 +25,6 @@ window.onload = function(){
         url : 'http://localhost:9000/api/session',
         method : 'GET'
     }).then(function successCallback(res){
-            console.log('Request Initial AppData response.... ', res.data);
             angular.module('config').constant('__session', res.data);
         },
         // not signed in {statusCode : 403} // Forbidden

@@ -1,7 +1,7 @@
 angular.module('glossa')
     .factory('AppService', AppService);
 
-function AppService($http, socketFactory, $rootScope, $mdToast) {
+function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     var service = {
         getSession: getSession,
         updateSession: updateSession,
@@ -38,50 +38,65 @@ function AppService($http, socketFactory, $rootScope, $mdToast) {
 
     function initListeners() {
 
-        console.log('initListeners triggered');
-
         socketFactory.on('joined', function(data) {
             console.log("Heard 'joined' in appFactory.data:", data);
             service.data = data;
             // $rootScope.$broadcast('joined');
 
-            var pinTo = getToastPosition();
-            var toast = $mdToast.simple()
-                .textContent('Socket Heard: joined from corpus.component' + data.socketId)
-                .action('Okay')
-                .highlightAction(true)
-                .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
-                .position(pinTo);
+            var msg = 'Socket Heard: joined from corpus.component' + data.socketId;
+            var delay = 8;
 
-            $mdToast.show(toast).then(function(response) {
-                if ( response == 'ok' ) {
-                    alert('You clicked the \'Okay\' action.');
-                }
+            Notification.show({
+                message: msg,
+                hideDelay: delay
             });
+
+            // var pinTo = getToastPosition();
+            // var toast = $mdToast.simple()
+            //     .textContent('Socket Heard: joined from corpus.component' + data.socketId)
+            //     .action('Okay')
+            //     .highlightAction(true)
+            //     .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
+            //     .position(pinTo);
+            //
+            // $mdToast.show(toast).then(function(response) {
+            //     if ( response == 'ok' ) {
+            //         alert('You clicked the \'Okay\' action.');
+            //     }
+            // });
         });
 
-        socketFactory.on('requestSocketType', function(data) {
-            console.log("Heard 'requestSocketType' in appFactory.data:", data);
+        socketFactory.on('request:SocketType', function(data) {
+            console.log("Heard 'request:SocketType' in appService.data:", data);
+
+            var msg = 'server requesting socket type... ';
+            var delay = 5000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
             var socketData = {
-                type: 'client'
+                type: 'client',
+                socketId: data.socketId
             };
 
-            socketFactory.emit('returnSocketType', socketData);
+            socketFactory.emit('return:SocketType', socketData);
 
         });
 
-        socketFactory.on('notify:client-server-connection', function(data) {
-            console.log("Heard 'notify:client-server-connection' in appFactory.data:", data);
+        socketFactory.on('notify:server-connection', function(data) {
+            console.log("Heard 'notify:server-connection' in appFactory.data:", data);
 
+            var msg = 'connected to local server';
+            var delay = 5000;
 
-            var pinTo = getToastPosition();
-            var toast = $mdToast.simple()
-                .textContent('Connection with server complete')
-                .action('Okay')
-                .highlightAction(true)
-                .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
-                .position(pinTo);
-            $mdToast.show(toast);
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
 
             // $rootScope.$broadcast('local:server-connection');
 

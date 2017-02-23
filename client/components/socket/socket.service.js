@@ -18,17 +18,13 @@ function socketFactory($rootScope, $window, __session) {
 
     function init() {
         var ioRoom = $window.location.origin;
-        console.log('ioRoom', ioRoom);
         // var ioRoom = $window.location.origin + '/' + $window.localStorage.code;
         $window.socket = io(ioRoom);
-        console.log('$window.socket', $window.socket);
     }
 
     function on(eventName, callback) {
-        console.log('on event, eventName', eventName);
         $window.socket.on(eventName, function() {
             var args = arguments;
-            console.log("args", args);
             $rootScope.$apply(function() {
                 callback.apply($window.socket, args);
             });
@@ -36,7 +32,6 @@ function socketFactory($rootScope, $window, __session) {
     }
 
     function emit(eventName, data, callback) {
-        console.log('emit in socket service');
         $window.socket.emit(eventName, data, function() {
             var args = arguments;
             $rootScope.$apply(function() {
