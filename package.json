@@ -30,6 +30,7 @@
     "nedb": "^1.8.0",
     "socket.io": "^1.7.2",
     "q": "^1.4.1",
+    "bonjour": "^3.5.0",
     "serve-favicon": "~2.0.1"
   },
   "devDependencies": {

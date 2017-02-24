@@ -1,8 +1,12 @@
 var path = require('path');
 var externalSockets = {};
 var allSockets = {};
+var bonjourInit = require('./bonjour');
 
 module.exports = function(io, ioClient, glossaUser, service) {
+    if (!service) {
+        console.log('...establish local socket connection');
+    }
 
     if (service) {
         console.log('...This appears to be an external connection broadcasting on port: ' + service.port);
@@ -32,17 +36,27 @@ module.exports = function(io, ioClient, glossaUser, service) {
         externalSocket.on('connection', function() {
             console.log('connection event');
         })
-
-
-
-
-
     }
+
+    // ioClient.on('request:SocketType', function(data) {
+    //     console.log('.**********************..server side request:SocketType', data)
+    // });
 
 
 
     io.sockets.on('connection', function (socket) {
-        console.log('***New Socket Connected:', Date.now());
+        console.log('***new Socket Connected:', Date.now());
+
+        // for (var key in allSockets) {
+        //     if (allSockets.hasOwnProperty(key)) {
+        //         if (allSockets[key].userid === service.txt.userid || allSockets[key].userid === glossaUser.userId ) {
+        //             return console.log('External socket is already established IGNORE')
+        //         } else {
+        //             console.log('...external socket not found proceed with connection');
+        //         }
+        //     }
+        // }
+
 
         console.log('...add to allSocket object');
         allSockets[socket.id] = {
@@ -51,16 +65,22 @@ module.exports = function(io, ioClient, glossaUser, service) {
             // serverId: service.id || null
         };
 
+
         //emit to socket to get the type either client or external
         //external connection should be any user that has an approved connection
         console.log('... emitting to socket.id:' + socket.id);
         socket.emit('request:SocketType', {socketId: socket.id});
+
+        socket.on('request:SocketType', function(data) {
+            console.log('.**********************..server side request:SocketType', data)
+        });
+
         socket.on('return:SocketType', function(data) {
-
-            console.log('...socket type is ' + data.type);
-
             if (data.type === 'client') {
                 console.log('...notify local user server is connected');
+
+                console.log('this is where we want to publish our service???');
+                bonjourInit(glossaUser);
                 io.to(socket.id).emit('notify:server-connection')
             }
 
