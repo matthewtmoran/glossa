@@ -26,6 +26,9 @@ window.onload = function(){
         method : 'GET'
     }).then(function successCallback(res){
             angular.module('config').constant('__session', res.data);
+
+
+
         },
         // not signed in {statusCode : 403} // Forbidden
         function failureCallback(res){
@@ -61,9 +64,15 @@ angular.module('glossa', [
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector, AppService, __session) {
+    .run(function($rootScope, $state, $injector, AppService, __session, socketFactory, $window) {
 
         $state.go(__session.currentState, __session.currentStateParams);
+
+        if (!$window.socket) {
+            socketFactory.init();
+            AppService.initListeners();
+        }
+
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             __session.currentState = toState.name;

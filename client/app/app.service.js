@@ -5,7 +5,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     var service = {
         getSession: getSession,
         updateSession: updateSession,
-        initListeners: initListeners
+        initListeners: initListeners,
+        getUserList: getUserList
     };
 
     // initListeners();
@@ -33,6 +34,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
                 console.log('There was an error', response);
                 return response.data;
             });
+    }
+
+    function getUserList() {
+        socketFactory.emit('get:networkUsers')
     }
 
 
@@ -70,7 +75,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             console.log("Heard 'request:SocketType' in appService.data:", data);
 
             var msg = 'server requesting socket type... ';
-            var delay = 5000;
+            var delay = 3000;
 
             Notification.show({
                 message: msg,
@@ -78,7 +83,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             });
 
             var socketData = {
-                type: 'client',
+                type: 'local-client',
                 socketId: data.socketId
             };
 
@@ -90,7 +95,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             console.log("Heard 'notify:server-connection' in appFactory.data:", data);
 
             var msg = 'connected to local server';
-            var delay = 5000;
+            var delay = 3000;
 
             Notification.show({
                 message: msg,
@@ -101,6 +106,36 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             // $rootScope.$broadcast('local:server-connection');
 
         });
+
+        socketFactory.on('local-client:send:userData', function(data) {
+            console.log('this is external client user data', data);
+
+            var msg = (data.name || data._id) + ' is now connected!';
+            var delay = 3000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
+            $rootScope.$broadcast('update:networkUsers', data);
+
+
+        });
+
+
+        socketFactory.on('local-client:send:externalUserList', function(data) {
+            console.log('local-client:send:externalUserList', data);
+            $rootScope.$broadcast('update:networkUsers', data)
+        });
+
+        socketFactory.on('userDisconnected', function(data) {
+            $rootScope.$broadcast('update:networkUsers:disconnect', data)
+        });
+
+
+
+
 
         // socketFactory.on('newParticipant', function(userObj) {
         //     console.log("Heard 'newParticipant' in appFactory:", userObj);
@@ -148,7 +183,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
 
             last = angular.extend({},current);
         }
-       var getToastPosition = function() {
+        var getToastPosition = function() {
             sanitizePosition();
 
             return Object.keys(toastPosition)

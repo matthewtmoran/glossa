@@ -131,10 +131,10 @@ function corpusCtrl($scope, $state,  Notification, CorpusService, NotebookServic
 
     //runs on component initialization
     function onInit() {
-        if (!$window.socket) {
-            socketFactory.init();
-            AppService.initListeners();
-        }
+        // if (!$window.socket) {
+        //     socketFactory.init();
+        //     AppService.initListeners();
+        // }
 
         vm.currentFile = vm.markdownFiles[0];
     }
