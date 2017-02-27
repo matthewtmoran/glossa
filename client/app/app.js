@@ -22,7 +22,7 @@ window.onload = function(){
     // do operations before bootstrap
     // get user sign in status
     $http({
-        url : 'http://localhost:9090/api/session',
+        url : 'http://localhost:9000/api/session',
         method : 'GET'
     }).then(function successCallback(res){
             angular.module('config').constant('__session', res.data);
