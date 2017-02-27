@@ -78,7 +78,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             });
 
             var socketData = {
-                type: 'client',
+                type: 'local-client',
                 socketId: data.socketId
             };
 
@@ -99,6 +99,19 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
 
 
             // $rootScope.$broadcast('local:server-connection');
+
+        });
+
+        socketFactory.on('local-client:send:userData', function(data) {
+            console.log('this is external client user data', data);
+
+            var msg = (data.name || data._id) + ' is now connected!';
+            var delay = 5000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
 
         });
 
@@ -148,7 +161,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
 
             last = angular.extend({},current);
         }
-       var getToastPosition = function() {
+        var getToastPosition = function() {
             sanitizePosition();
 
             return Object.keys(toastPosition)

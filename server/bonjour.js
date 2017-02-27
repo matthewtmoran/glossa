@@ -1,7 +1,9 @@
 var config = require('./config/environment');
 var bonjour = require('bonjour')();
 
-module.exports = function(glossaUser, session) {
+var externalSockets = {};
+
+module.exports = function(glossaUser, io, ioClient, allSockets) {
     console.log('...bonjour module');
     var browser = bonjour.find({type: 'http'});
 
@@ -22,9 +24,12 @@ module.exports = function(glossaUser, session) {
             //for some reason camel case was not working on service.txt.userId
             if (service.txt.userid != glossaUser.userId) {
 
-                console.log('...external service found');
-                console.log('... verify in connected user list');
+                console.log('... external service found');
+                // console.log('... verify in connected user list');
 
+
+
+                initExternalSocket(service, io, ioClient);
 
 
 
@@ -81,13 +86,42 @@ module.exports = function(glossaUser, session) {
             //      socketUtilities(io, ioClient, results[1][0]);
             // }
 
-            if (service.published && service.txt.userid == glossaUser.userId) {
+
+            if (service.txt.userid == glossaUser.userId) {
                 console.log('... service is published and it is local its a local service so IGNORE');
             }
         }
     });
 
+    function initExternalSocket(service, io, ioClient) {
+        console.log('initExternalSocket');
+        for (var key in externalSockets) {
+            if (externalSockets.hasOwnProperty(key)) {
+                if (externalSockets[key].userid === service.txt.userid || externalSockets[key].userid === glossaUser.userId ) {
+                    return console.log('External socket is already established IGNORE')
+                } else {
+                    console.log('...external socket not found proceed with connection');
+                }
+            }
+        }
+
+        var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
+        var externalSocket = ioClient.connect(externalPath);
+
+        // externalSocket.socketType = 'external';
+        //
+        externalSocket.on('connect', function() {
 
 
+            console.log('... external socket connected as a client');
 
-}
+
+            externalSocket.emit('thisTest');
+
+        });
+        //
+        // externalSocket.on('connection', function() {
+        //     console.log('connection event');
+        // })
+    }
+};

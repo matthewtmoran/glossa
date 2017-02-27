@@ -17,7 +17,7 @@ angular.module('glossa')
                 if (value) {
 
                     waveEl.css({
-                        'background-image': 'url(http://localhost:9000/' + pathFix + ')',
+                        'background-image': 'url(http://localhost:9090/' + pathFix + ')',
                         'background-size' : 'cover',
                         'background-position' : 'center center'
                     });

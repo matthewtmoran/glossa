@@ -1,51 +1,59 @@
 var path = require('path');
 var externalSockets = {};
 var allSockets = {};
-var bonjourInit = require('./bonjour');
+var globalSockets = {
+    client: {},
+    external: {}
+};
+
+// var bonjourInit = require('./bonjour');
 
 module.exports = function(io, ioClient, glossaUser, service) {
     if (!service) {
         console.log('...establish local socket connection');
     }
 
-    if (service) {
-        console.log('...This appears to be an external connection broadcasting on port: ' + service.port);
-
-
-        for (var key in allSockets) {
-            if (allSockets.hasOwnProperty(key)) {
-                if (allSockets[key].userid === service.txt.userid || allSockets[key].userid === glossaUser.userId ) {
-                   return console.log('External socket is already established IGNORE')
-                } else {
-                    console.log('...external socket not found proceed with connection');
-                }
-            }
-        }
-
-        var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-        var externalSocket = ioClient.connect(externalPath);
-
-        externalSocket.on('connect', function() {
-
-            console.log('... external socket connected');
-
-            externalSocket.emit('thisTest');
-
-        });
-
-        externalSocket.on('connection', function() {
-            console.log('connection event');
-        })
-    }
+    // if (service) {
+    //     console.log('...This appears to be an external connection broadcasting on port: ' + service.port);
+    //
+    //
+    //     for (var key in allSockets) {
+    //         if (allSockets.hasOwnProperty(key)) {
+    //             if (allSockets[key].userid === service.txt.userid || allSockets[key].userid === glossaUser.userId ) {
+    //                return console.log('External socket is already established IGNORE')
+    //             } else {
+    //                 console.log('...external socket not found proceed with connection');
+    //             }
+    //         }
+    //     }
+    //
+    //     var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
+    //     var externalSocket = ioClient.connect(externalPath);
+    //
+    //     externalSocket.on('connect', function() {
+    //
+    //         console.log('... external socket connected');
+    //
+    //         externalSocket.emit('thisTest');
+    //
+    //     });
+    //
+    //     externalSocket.on('connection', function() {
+    //         console.log('connection event');
+    //     })
+    // }
 
     // ioClient.on('request:SocketType', function(data) {
     //     console.log('.**********************..server side request:SocketType', data)
     // });
 
 
-
     io.sockets.on('connection', function (socket) {
         console.log('***new Socket Connected:', Date.now());
+
+        if (socket.socketType === 'external') {
+            console.log("Whoa.... This is an external socket!!!");
+        }
 
         // for (var key in allSockets) {
         //     if (allSockets.hasOwnProperty(key)) {
@@ -58,17 +66,17 @@ module.exports = function(io, ioClient, glossaUser, service) {
         // }
 
 
-        console.log('...add to allSocket object');
-        allSockets[socket.id] = {
-            socketId: socket.id,
-            userId: glossaUser._id
-            // serverId: service.id || null
-        };
+        // console.log('...add to allSocket object');
+        // allSockets[socket.id] = {
+        //     socketId: socket.id,
+        //     userId: glossaUser._id
+        // serverId: service.id || null
+        // };
 
 
         //emit to socket to get the type either client or external
         //external connection should be any user that has an approved connection
-        console.log('... emitting to socket.id:' + socket.id);
+        console.log('...requesting socket type to socket.id:' + socket.id);
         socket.emit('request:SocketType', {socketId: socket.id});
 
         socket.on('request:SocketType', function(data) {
@@ -76,15 +84,23 @@ module.exports = function(io, ioClient, glossaUser, service) {
         });
 
         socket.on('return:SocketType', function(data) {
-            if (data.type === 'client') {
-                console.log('...notify local user server is connected');
+            console.log('...return:SocketType heard');
 
-                console.log('this is where we want to publish our service???');
-                bonjourInit(glossaUser);
-                io.to(socket.id).emit('notify:server-connection')
-            }
+            globalSockets[data.type][socket.id] = data;
+            console.log('... emitting to socket - notify:server-connection');
+            io.to(socket.id).emit('notify:server-connection');
 
-            socket.room = data.type;
+            // if (data.type === 'client') {
+            //     console.log('...notify local user server is connected');
+            //
+            //
+            //
+            //     console.log('this is where we want to publish our service???');
+            bonjourInit(glossaUser, io, ioClient, allSockets);
+            //     io.to(socket.id).emit('notify:server-connection')
+            // }
+            //
+            // socket.room = data.type;
 
             // if (socket.room === 'client') {
             //     console.log('...joining ' + data.type + ' room.');
@@ -121,6 +137,10 @@ module.exports = function(io, ioClient, glossaUser, service) {
         socket.on('echo-ack', function (data, callback) {
             console.log('echo-ack listener');
             callback(data);
+        });
+
+        socket.on('thisTest', function(data) {
+            console.log('Heard thisText on server from client', data);
         });
 
 
