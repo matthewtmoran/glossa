@@ -134,9 +134,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
         });
 
 
-
-
-
         // socketFactory.on('newParticipant', function(userObj) {
         //     console.log("Heard 'newParticipant' in appFactory:", userObj);
         //     services.data.users.push(userObj);
