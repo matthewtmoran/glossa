@@ -37,7 +37,6 @@ Promise.all([
 ])
     .then(function(results) {
 
-
         var mySession = results[0];
         var glossaUser = results[1][0];
 
@@ -49,6 +48,7 @@ Promise.all([
 
             require('./socket-bonjour')(glossaUser, mySession, io);
 
+            //just a change to push
             // socketUtilities(io, ioClient, glossaUser);
         });
 
