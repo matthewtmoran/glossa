@@ -10,7 +10,7 @@ angular.module('glossa')
     });
 
 //$socket ...custom socket library implementation...
-function corpusCtrl($scope, $state,  Notification, CorpusService, NotebookService, $mdToast, socketFactory, AppService, $window) {
+function corpusCtrl($scope, $state,  CorpusService, NotebookService, $mdToast, AppService, $window) {
     var vm = this;
 
     // socketFactory.init();

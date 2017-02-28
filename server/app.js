@@ -20,7 +20,11 @@ if(config.seedDB) { require('./config/seed'); }
 // Setup server
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+// var io = require('socket.io')(server);
+var spacebro = require('spacebro');
+console.log('spacebro', spacebro);
+var spacebroClient = require('spacebro-client');
+var bonjour = require('bonjour')();
 // var io = require('socket.io')(server);
 // var ioClient = require('socket.io-client');
 // var socketUtilities = require('./socket.io');
@@ -47,12 +51,59 @@ Promise.all([
             console.log('Listening on Port.');
             console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 
-            require('./socket-bonjour')(glossaUser, mySession, io);
+
+            spacebro.init({
+                "server": {
+                    "serviceName": "glossa",
+                        "port": 8888
+                }
+            });
+
+            var options = {
+                clientName: glossaUser._id,
+                channelName: 'external-client',
+                multiService: true
+            };
+
+            spacebroClient.connect(options);
+
+            // var browser = bonjour.find({type: 'http'});
+            // browser.on('up', function(service) {
+            //     console.log('service found', service);
+            // });
+
+
+
+
+
+            // spacebroClient.connect('127.0.0.1', 8888, {
+            //     clientName: 'local-client',
+            //     channelName: 'local-channel',
+            //     verbose: true
+            // });
+
+            // spacebroClient.on('hello', function (data) {
+            //     console.log('received hello', data)
+            // });
+            //
+            // setTimeout(function() { spacebroClient.emit('hello', 'world') }, 3000);
+            // setTimeout(function() { spacebroClient.emit('hello', {world: 'hello'}) }, 5000);
+            // setTimeout(function() { spacebroClient.off('hello') }, 6000);
+            // setTimeout(function() { spacebroClient.emit('hello') }, 7000);
+            //
+            // spacebroClient.on('new-member', function(data){
+            //     console.log(data.member + ' has joined.');
+            // });
+
+
+            // require('./socket-bonjour')(glossaUser, mySession, io);
 
             // socketUtilities(io, ioClient, glossaUser);
         });
 
     });
+
+
 
 
 exports = module.exports = app;
