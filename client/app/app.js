@@ -64,12 +64,12 @@ angular.module('glossa', [
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector, AppService, __session, $window, spacebroFactory) {
+    .run(function($rootScope, $state, $injector, AppService, __session, socketFactory, $window) {
 
         $state.go(__session.currentState, __session.currentStateParams);
 
-        if ($window.spacebroClient) {
-            spacebroFactory.init();
+        if (!$window.socket) {
+            socketFactory.init();
             AppService.initListeners();
         }
 
