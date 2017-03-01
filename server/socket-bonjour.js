@@ -33,7 +33,7 @@ module.exports = function(glossaUser, localSession, io) {
                 var externalSocket = ioClient.connect(externalPath);
 
                 externalSocket.on('connect', function() {
-                    console.log('connected as client to external socket server');
+                    console.log('connected to socket server as a client');
 
                     externalSocket.on('request:SocketType', function(data) {
 
@@ -79,49 +79,44 @@ module.exports = function(glossaUser, localSession, io) {
             if (data.type === 'local-client') {
                 console.log('...local client connected');
 
-                connectLocalClient(socketArray, socket, io, ioClient, glossaUser);
+                connectLocalClient(socketArray, socket, ioClient, glossaUser);
 
-
-                // if (!socketArray.length) {
-                //     socketArray.push({localClient:{socketId: socket.id, userName: glossaUser.name, userId: glossaUser._id}});
-                // } else {
-                //     for (var j = 0; j < socketArray.length; j++) {
-                //         if (socketArray[j].localClient.socketId === socket.id) {
-                //             socketArray[j] = {localClient:{socketId: socket.id, userName: glossaUser.name, userId: glossaUser._id}};
-                //             break;
-                //         }
-                //     }
-                // }
 
             } else if (data.type === 'external-client') {
-                console.log('...an external client connected');
 
-                console.log('external-client data', data);
+                connectExternalClient(socketArray, socket, ioClient, glossaUser)
 
-                var exists = false;
-                for (var j = 0; j < externalClients.length; j++) {
-                    if (externalClients[j].userid === data.userid) {
-                        exists = true;
-                        externalClients[j] = data;
-                    }
-                }
-
-                if (!exists) {
-                    externalClients.push({
-                        userName: data.userName,
-                        userid: data.userid,
-                        type: 'external-client',
-                        socketId: data.socketId
-                    })
-                }
-
-                io.to(localClient.socketId).emit('local-client:send:externalUserList', externalClients);
-
-                console.log('...external client list updated', externalClients);
-
-                console.log('...update local client with list of online users');
             }
         });
+
+        function connectExternalClient(socketArray, socket, ioClient, glossaUser) {
+            console.log('...an external client connected');
+
+            console.log('external-client data', data);
+
+            var exists = false;
+            for (var j = 0; j < externalClients.length; j++) {
+                if (externalClients[j].userid === data.userid) {
+                    exists = true;
+                    externalClients[j] = data;
+                }
+            }
+
+            if (!exists) {
+                externalClients.push({
+                    userName: data.userName,
+                    userid: data.userid,
+                    type: 'external-client',
+                    socketId: data.socketId
+                })
+            }
+
+            io.to(localClient.socketId).emit('local-client:send:externalUserList', externalClients);
+
+            console.log('...external client list updated', externalClients);
+
+            console.log('...update local client with list of online users');
+        }
 
 
         socket.on('request:userData', function(data) {
@@ -166,7 +161,7 @@ module.exports = function(glossaUser, localSession, io) {
     });
 
 
-    function connectLocalClient(socketArray, socket, io, ioClient, glossaUser) {
+    function connectLocalClient(socketArray, socket, ioClient, glossaUser) {
 
 
 

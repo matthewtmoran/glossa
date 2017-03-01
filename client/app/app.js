@@ -19,13 +19,15 @@ window.onload = function(){
     var $http = initInjector.get('$http');
     var $timeout = initInjector.get('$timeout');
     var $animate = initInjector.get('$animate');
+    var rootUrl = 'http://localhost:9000/';
     // do operations before bootstrap
     // get user sign in status
     $http({
-        url : 'http://localhost:9000/api/session',
+        url : rootUrl + 'api/session',
         method : 'GET'
     }).then(function successCallback(res){
             angular.module('config').constant('__session', res.data);
+            angular.module('config').constant('__rootUrl', rootUrl);
 
 
 
@@ -107,8 +109,6 @@ angular.module('glossa', [
 function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingProvider ) {
 
     //set initial socket connection ... custom socket library implementation
-    // $socketProvider.setConnectionUrl('http://localhost:9000');
-
 
     //material theme stuff...
     var customAccent = {
