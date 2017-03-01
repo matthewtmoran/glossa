@@ -24,12 +24,6 @@ module.exports = function(glossaUser, localSession, io) {
         socket.emit('request:SocketType', {socketId: socket.id});
 
 
-        //listener for the updated user list
-        socket.on('update:userlist', function() {
-            //emit to local client the updated user list
-            socket.to(localClient.socketId).emit('local-client:send:externalUserList',externalClients);
-        });
-
         //socktype listener
         socket.on('return:SocketType', function(clientData) {
             console.log('...socket type returned:', clientData.type);
@@ -49,7 +43,11 @@ module.exports = function(glossaUser, localSession, io) {
             }
         });
 
-
+        //listener for the updated user list
+        socket.on('update:userlist', function() {
+            //emit to local client the updated user list
+            socket.to(localClient.socketId).emit('local-client:send:externalUserList',externalClients);
+        });
 
 
         //listener for userData request
@@ -66,8 +64,8 @@ module.exports = function(glossaUser, localSession, io) {
 
         socket.on('disconnect', function() {
             console.log('%% disconnect listener %%');
-
             console.log('socket.id', socket.id);
+
 
             externalClients = externalClients.filter(function(s) {
                return s.socketId != socket.id;
@@ -76,11 +74,44 @@ module.exports = function(glossaUser, localSession, io) {
             io.to(localClient.socketId).emit('local-client:send:externalUserList', externalClients);
 
         });
+
+        socket.on('local-client:updates', function(data) {
+            console.log('%% local-client:updates %%');
+
+            console.log('...broadcast to all external clients that a user has made updates');
+
+            io.broadcast.to('externalClientsRoom').emit('external-clients:updates', {updates: 'there were some updated made', userId: glossaUser._id});
+
+        });
+
+        socket.on('local-client:buttonTest', function(data) {
+            console.log('%% local-client:buttonTest %%');
+
+            console.log('...broadcast to all external clients that a user has pressed a button');
+
+            io.sockets.in('externalClientsRoom').emit('external-clients:buttonPressed', {updates: 'there were some updated made', userId: glossaUser._id});
+
+        });
+
+
+        socket.on('external-client:getUpdates', function(data) {
+            console.log('%% external-client:getUpdates %%');
+            console.log('...external client is requesting updates');
+
+            //query the db for updates since last time requesting user has synced with hosting user.
+
+        });
+
+        socket.on('notify:buttonPressed', function(data) {
+            console.log('%% notify:buttonPressed %%');
+            io.to(localClient.socketId).emit('local-client:send:buttonPressed', data);
+        })
+
     });
 
 
 
-
+    //Triggered when a client connects to this socket
     function connectExternalClient(socket, ioClient, glossaUser, externalClient) {
         console.log('...an external client connected');
 
@@ -99,12 +130,20 @@ module.exports = function(glossaUser, localSession, io) {
         }
 
         if (!exists) {
-            externalClients.push({
+
+            var externalClientData = {
                 userName: externalClient.userName,
                 userid: externalClient.userid,
                 type: 'external-client',
                 socketId: externalClient.socketId
-            })
+            };
+
+            externalClients.push(externalClientData);
+
+            externalClient.join('externalClientsRoom');
+
+
+
         }
 
         //emit ot the local client, the updated list of external clients
@@ -179,15 +218,15 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('...service is up', service.name);
 
             if (service.name === 'glossaApp-' + glossaUser._id) {
-                console.log('...local service found');
+                console.log('...local service found IGNORE');
             } else if (service.name !== 'glossaApp-' + glossaUser._id) {
-                console.log('...connecting to that external service as an external-client');
+                console.log('...connecting to external service as an external-client');
                 //    connect to external service as a client
                 var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
                 var nodeClientSocket = ioClient.connect(externalPath);
 
                 nodeClientSocket.on('connect', function() {
-                    console.log('connected to external socket server as a client');
+                    console.log('...connected to external socket server as a client');
 
                     nodeClientSocket.on('request:SocketType', function(data) {
                         console.log('%% request:SocketType %%');
@@ -204,13 +243,21 @@ module.exports = function(glossaUser, localSession, io) {
                         nodeClientSocket.emit('return:SocketType', socketData);
                     });
 
-                    //When outside application disconnects this listener is triggerd
+                    //When outside application disconnects this listener is triggered
                     nodeClientSocket.on('notify:userDisconnected', function(data) {
                         console.log('%% notify:userDisconnected %%');
 
                         console.log('... outside application disconnected');
 
                         nodeClientSocket.emit('update:userlist', data);
+                    });
+
+
+                    nodeClientSocket.on('external-clients:buttonPressed', function(data) {
+                        console.log('%% external-clients:buttonPressed %%');
+
+                        nodeClientSocket.emit('notify:buttonPressed', data);
+
                     })
 
                 })

@@ -8,12 +8,18 @@ angular.module('glossa')
         templateUrl: 'app/settings/network-users/network-users-settings.component.html'
     });
 
-function NetworkSettings(SettingsService, $scope, AppService) {
+function NetworkSettings(SettingsService, $scope, AppService, socketFactory) {
     var vm = this;
 
     vm.$onInit = init;
 
     vm.networkUsers = [];
+
+    vm.testEvent = testEvent;
+
+    function testEvent() {
+        socketFactory.emit('local-client:buttonTest', {myData: 'just some data'});
+    }
 
     function init() {
         AppService.getUserList();
