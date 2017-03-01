@@ -12,6 +12,7 @@ angular.module('glossa')
             attrs.$observe('backImg', function(value) {
 
                 //fix for windows paths... I'm not sure how this will effect mac/linux
+                // TODO: find univeral way to fix path vs regex....
                 var pathFix = value.replace(/\\/g, "\\\\");
 
                 if (value) {

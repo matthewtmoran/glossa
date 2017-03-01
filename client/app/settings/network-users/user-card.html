@@ -1,0 +1,19 @@
+<md-card>
+	<md-card-title layout="column" layout-align="center center">
+
+		<div class="user-card-items" flex layout="row" layout-align="space-between center">
+
+			<div>
+				<md-button class="md-fab" ng-style="{'background-color': user.color }">
+					<span class="letter">{{user.userName[0]}}</span>
+				</md-button>
+				<span>{{user.userName}}</span>
+			</div>
+
+			<md-switch ng-model="user.isSharing" aria-label="Switch 1">
+				Sharing: <span>{{user.isSharing ? 'On' : 'Off'}}</span>
+			</md-switch>
+
+		</div>
+	</md-card-title>
+</md-card>
