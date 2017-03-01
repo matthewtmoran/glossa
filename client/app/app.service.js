@@ -133,7 +133,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             $rootScope.$broadcast('update:networkUsers:disconnect', data)
         });
 
-        socketFactory.on('local-client:send:buttonPressed', function(data) {
+        socketFactory.on('external-client:notify:buttonPressed', function(data) {
             var msg = 'Button has been pressed by user ' + data.userId;
             var delay = 3000;
 

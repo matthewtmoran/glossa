@@ -116,6 +116,7 @@ module.exports = function(glossaUser, localSession, io) {
         console.log('...an external client connected');
 
         console.log('external-client data', externalClient);
+        socket.instance = 'Server1';
 
         //check if this external client exists in the list of clients
         // if it does exist, update it.
@@ -139,10 +140,7 @@ module.exports = function(glossaUser, localSession, io) {
             };
 
             externalClients.push(externalClientData);
-
-            externalClient.join('externalClientsRoom');
-
-
+            socket.join('externalClientsRoom');
 
         }
 
@@ -253,10 +251,19 @@ module.exports = function(glossaUser, localSession, io) {
                     });
 
 
+                    nodeClientSocket.on('disconnect', function() {
+                        console.log('client disconnect');
+                        nodeClientSocket.disconnect(true);
+                    });
+
+
+
                     nodeClientSocket.on('external-clients:buttonPressed', function(data) {
                         console.log('%% external-clients:buttonPressed %%');
 
-                        nodeClientSocket.emit('notify:buttonPressed', data);
+
+                        io.to(localClient.socketId).emit('external-client:notify:buttonPressed', data);
+                        // nodeClientSocket.emit('notify:buttonPressed', data);
 
                     })
 
