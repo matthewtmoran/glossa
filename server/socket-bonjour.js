@@ -9,7 +9,8 @@ module.exports = function(glossaUser, localSession, io) {
     var externalClients = [];
     var isLocalClientConnected = false;
     var browser;
-
+    var myLocalService;
+    // initBonjour();
 
 
 
@@ -63,9 +64,13 @@ module.exports = function(glossaUser, localSession, io) {
         });
 
         socket.on('disconnect', function() {
-            console.log('%% disconnect listener %%');
-            console.log('socket.id', socket.id);
+            console.log('%% main socket process disconnect listener %%');
 
+            //if the local-client disconnects....
+            if (localClient.socketId === socket.id) {
+                //un-publish our service
+                myLocalService.stop();
+            }
 
             externalClients = externalClients.filter(function(s) {
                return s.socketId != socket.id;
@@ -92,7 +97,6 @@ module.exports = function(glossaUser, localSession, io) {
             io.sockets.in('externalClientsRoom').emit('external-clients:buttonPressed', {updates: 'there were some updated made', userId: glossaUser._id});
 
         });
-
 
         socket.on('external-client:getUpdates', function(data) {
             console.log('%% external-client:getUpdates %%');
@@ -165,10 +169,10 @@ module.exports = function(glossaUser, localSession, io) {
 
         // var onlineServices = browser.services;
 
-        if (!browser || !browser.services || !browser.services.length) {
+        if (!browser || !browser.services.length) {
             console.log('no service published');
 
-            bonjour.publish({
+            myLocalService = bonjour.publish({
                 name:'glossaApp-' + glossaUser._id,
                     type: 'http',
                     port: config.port,
@@ -191,7 +195,7 @@ module.exports = function(glossaUser, localSession, io) {
 
             //if local service is not published publish service
             if (!localServicePublished) {
-                bonjour.publish({
+                myLocalService = bonjour.publish({
                     name:'glossaApp-' + glossaUser._id,
                     type: 'http',
                     port: config.port,
@@ -212,6 +216,8 @@ module.exports = function(glossaUser, localSession, io) {
         browser = bonjour.find({type: 'http'});
 
         browser.on('up', function(service) {
+            console.log('***** browser listener *****');
+            console.log('browser.services.length', browser.services.length);
 
             console.log('...service is up', service.name);
 
@@ -252,14 +258,18 @@ module.exports = function(glossaUser, localSession, io) {
 
 
                     nodeClientSocket.on('disconnect', function() {
-                        console.log('client disconnect');
+                        console.log('external-client disconnect listener');
+
+                        //disconnect socket.... this occurrs when the server this socket is connected to closes.
                         nodeClientSocket.disconnect(true);
+
                     });
 
 
 
                     nodeClientSocket.on('external-clients:buttonPressed', function(data) {
-                        console.log('%% external-clients:buttonPressed %%');
+                        console.log('%% external-clients:buttonPressed listener %%');
+                        console.log('nodeClientSocket.id', nodeClientSocket.id);
 
 
                         io.to(localClient.socketId).emit('external-client:notify:buttonPressed', data);
