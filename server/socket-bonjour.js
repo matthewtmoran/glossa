@@ -1,20 +1,17 @@
 var config = require('./config/environment');
 var bonjour = require('bonjour')();
 var ioClient = require('socket.io-client');
+
 module.exports = function(glossaUser, localSession, io) {
 
-    var socketArray = [];
-    var externalSockets = [];
     var localClient = {};
     var externalClients = [];
-    var isLocalClientConnected = false;
     var browser;
-    var myLocalService;
-    // initBonjour();
+    var myLocalService = {};
 
-
-
-    // console.log('Bonjour browser', browser);
+    var bonjourSocketApi = {
+        stopService: stopService
+    };
 
 
     io.sockets.on('connection', function(socket) {
@@ -67,11 +64,10 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('%% main socket process disconnect listener %%');
 
             //if the local-client disconnects....
-            if (localClient.socketId === socket.id) {
-                //un-publish our service
-                myLocalService.stop();
-            }
-
+            // if (localClient.socketId === socket.id) {
+            //     //un-publish our service
+            //     myLocalService.stop();
+            // }
             externalClients = externalClients.filter(function(s) {
                return s.socketId != socket.id;
             });
@@ -114,13 +110,75 @@ module.exports = function(glossaUser, localSession, io) {
     });
 
 
+    browser = bonjour.find({type: 'http'});
 
-    //Triggered when a client connects to this socket
+    browser.on('down', function(service) {
+        console.log('service went down.......', service);
+    });
+
+    browser.on('up', function(service) {
+        console.log('***** browser listener ... service is up *****');
+
+        if (service.name === 'glossaApp-' + glossaUser._id) {
+            console.log('...local service found IGNORE');
+        } else if (service.name !== 'glossaApp-' + glossaUser._id) {
+            console.log('...connecting to external service as an external-client');
+            //    connect to external service as a client
+            var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
+            var nodeClientSocket = ioClient.connect(externalPath);
+
+            nodeClientSocket.on('connect', function() {
+                console.log('...connected to external socket server as a client');
+
+                nodeClientSocket.on('request:SocketType', function(data) {
+                    console.log('%% request:SocketType %%');
+                    console.log('...outside application asking for socket type');
+
+                    var socketData = {
+                        userName: glossaUser.name,
+                        userid: glossaUser._id,
+                        type: 'external-client',
+                        socketId: data.socketId
+                    };
+
+                    //return socket type to outside application
+                    nodeClientSocket.emit('return:SocketType', socketData);
+                });
+
+                //When outside application disconnects this listener is triggered
+                nodeClientSocket.on('notify:userDisconnected', function(data) {
+                    console.log('%% notify:userDisconnected %%');
+                    console.log('... outside application disconnected');
+
+                    nodeClientSocket.emit('update:userlist', data);
+                });
+
+
+                nodeClientSocket.on('disconnect', function() {
+                    console.log('external-client disconnect listener');
+
+                    //disconnect socket.... this occurrs when the server this socket is connected to closes.
+                    nodeClientSocket.disconnect(true);
+
+                });
+
+
+                nodeClientSocket.on('external-clients:buttonPressed', function(data) {
+                    console.log('%% external-clients:buttonPressed listener %%');
+                    console.log('nodeClientSocket.id', nodeClientSocket.id);
+
+                    io.to(localClient.socketId).emit('external-client:notify:buttonPressed', data);
+                    // nodeClientSocket.emit('notify:buttonPressed', data);
+                })
+
+            })
+        }
+    });
+
+
+    // //Triggered when a client connects to this socket
     function connectExternalClient(socket, ioClient, glossaUser, externalClient) {
         console.log('...an external client connected');
-
-        console.log('external-client data', externalClient);
-        socket.instance = 'Server1';
 
         //check if this external client exists in the list of clients
         // if it does exist, update it.
@@ -154,7 +212,6 @@ module.exports = function(glossaUser, localSession, io) {
         console.log('...update local client with list of online users');
     }
 
-
     function connectLocalClient(socket, ioClient, glossaUser) {
 
         localClient = {
@@ -163,14 +220,9 @@ module.exports = function(glossaUser, localSession, io) {
             userId: glossaUser._id
         };
 
-        console.log('...let local-client know server is connected');
         io.to(localClient.socketId).emit('notify:server-connection');
-        console.log('... Now that a local socket is connected, we want to publish our bonjour service');
-
-        // var onlineServices = browser.services;
 
         if (!browser || !browser.services.length) {
-            console.log('no service published');
 
             myLocalService = bonjour.publish({
                 name:'glossaApp-' + glossaUser._id,
@@ -180,7 +232,7 @@ module.exports = function(glossaUser, localSession, io) {
                         userid: glossaUser._id
                     }
             });
-            console.log('service published...')
+                console.log('service published...')
 
         } else if (browser.services.length > 0) {
             //flag for local service
@@ -195,6 +247,7 @@ module.exports = function(glossaUser, localSession, io) {
 
             //if local service is not published publish service
             if (!localServicePublished) {
+                console.log('... my local service is not published...');
                 myLocalService = bonjour.publish({
                     name:'glossaApp-' + glossaUser._id,
                     type: 'http',
@@ -203,82 +256,21 @@ module.exports = function(glossaUser, localSession, io) {
                         userid: glossaUser._id
                     }
                 });
+            } else {
+                console.log('my local service IS published!!!!!!!');
+
             }
         }
         //look for http services on the network
-        initBonjour();
+        // initBonjour();
     }
 
-    function initBonjour() {
-        console.log('...bonjour activated and listening');
-
-
-        browser = bonjour.find({type: 'http'});
-
-        browser.on('up', function(service) {
-            console.log('***** browser listener *****');
-            console.log('browser.services.length', browser.services.length);
-
-            console.log('...service is up', service.name);
-
-            if (service.name === 'glossaApp-' + glossaUser._id) {
-                console.log('...local service found IGNORE');
-            } else if (service.name !== 'glossaApp-' + glossaUser._id) {
-                console.log('...connecting to external service as an external-client');
-                //    connect to external service as a client
-                var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-                var nodeClientSocket = ioClient.connect(externalPath);
-
-                nodeClientSocket.on('connect', function() {
-                    console.log('...connected to external socket server as a client');
-
-                    nodeClientSocket.on('request:SocketType', function(data) {
-                        console.log('%% request:SocketType %%');
-                        console.log('...outside application asking for socket type');
-
-                        var socketData = {
-                            userName: glossaUser.name,
-                            userid: glossaUser._id,
-                            type: 'external-client',
-                            socketId: data.socketId
-                        };
-
-                        //return socket type to outside application
-                        nodeClientSocket.emit('return:SocketType', socketData);
-                    });
-
-                    //When outside application disconnects this listener is triggered
-                    nodeClientSocket.on('notify:userDisconnected', function(data) {
-                        console.log('%% notify:userDisconnected %%');
-
-                        console.log('... outside application disconnected');
-
-                        nodeClientSocket.emit('update:userlist', data);
-                    });
-
-
-                    nodeClientSocket.on('disconnect', function() {
-                        console.log('external-client disconnect listener');
-
-                        //disconnect socket.... this occurrs when the server this socket is connected to closes.
-                        nodeClientSocket.disconnect(true);
-
-                    });
-
-
-
-                    nodeClientSocket.on('external-clients:buttonPressed', function(data) {
-                        console.log('%% external-clients:buttonPressed listener %%');
-                        console.log('nodeClientSocket.id', nodeClientSocket.id);
-
-
-                        io.to(localClient.socketId).emit('external-client:notify:buttonPressed', data);
-                        // nodeClientSocket.emit('notify:buttonPressed', data);
-
-                    })
-
-                })
-            }
+    function stopService() {
+        myLocalService.stop(function() {
+            console.log('Service Stop Success!');
         });
     }
+
+
+    return bonjourSocketApi;
 };

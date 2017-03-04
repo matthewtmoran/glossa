@@ -14,6 +14,7 @@ var cookieParser = require('cookie-parser');
 var errorHandler = require('errorhandler');
 var path = require('path');
 var config = require('./environment');
+var bonjourInstance = require('../socket-bonjour');
 
 var electron = require('electron'),
     electronApp = electron.app;  // Module to control application life.

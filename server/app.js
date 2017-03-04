@@ -29,6 +29,13 @@ var io = require('socket.io')(server);
 require('./config/express')(app);
 require('./routes')(app);
 
+// process.stdin.resume();
+// process.on('exit', function() {
+//   console.log('exit event');
+//     process.exit();
+// });
+
+
 // var mySession = require('./config/init').checkForSession();
 // var glossaUser = require('./config/init').getGlossaUser();
 Promise.all([
@@ -37,8 +44,10 @@ Promise.all([
 ])
     .then(function(results) {
 
+        var bonjourSocket;
         var mySession = results[0];
         var glossaUser = results[1][0];
+
 
 
         server.listen(config.port, config.ip, function () {
@@ -46,11 +55,42 @@ Promise.all([
             console.log('Listening on Port.');
             console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 
-            require('./socket-bonjour')(glossaUser, mySession, io);
+            bonjourSocket = require('./socket-bonjour')(glossaUser, mySession, io);
 
-            //just a change to push
-            // socketUtilities(io, ioClient, glossaUser);
         });
+
+        process.stdin.resume();
+
+
+        function exitHandler(options, err) {
+            console.log('Node killing local service immediately.... delaying 5 seconds then killing process....');
+            bonjourSocket.stopService();
+
+            setTimeout(function() {
+                console.log('.... 5 seconds delay over... process being killed now!');
+                if (options.cleanup) {
+                    console.log('clean...');
+                    console.log(options.from);
+                }
+                if (err) {
+                    console.log(err.stack);
+                }
+                if (options.exit) {
+                    console.log('exit?', options.exit);
+                    process.exit();
+                }
+            }, 5000);
+
+        }
+
+        //do something when app is closing
+        process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
+
+        //catches ctrl+c event
+        process.on('SIGINT', exitHandler.bind(null, {exit:true, from: 'SIGINT'}));
+
+        //catches uncaught exceptions
+        process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
 
     });
 
