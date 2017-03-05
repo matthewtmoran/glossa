@@ -3,31 +3,32 @@ angular.module('glossa')
 
 function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     var service = {
-        getSession: getSession,
+        // getSession: getSession,
         updateSession: updateSession,
         initListeners: initListeners,
-        getUserList: getUserList
+        getOnlineUsers: getOnlineUsers
     };
 
     // initListeners();
     return service;
 
-    function getSession() {
-        return $http.get('/api/session/')
-            .then(function successCallback(response) {
-                // console.log('Returning Response time:', Date.now());
-                // console.log('Session was success.');
-                return response.data;
-            }, function errorCallback(response) {
-                // console.log('Returning Response time:', Date.now());
-                console.log('There was an error', response);
-                return response.data;
-            });
-    }
+    // function getSession() {
+    //     return $http.get('/api/session/')
+    //         .then(function successCallback(response) {
+    //             // console.log('Returning Response time:', Date.now());
+    //             // console.log('Session was success.');
+    //             return response.data;
+    //         }, function errorCallback(response) {
+    //             // console.log('Returning Response time:', Date.now());
+    //             console.log('There was an error', response);
+    //             return response.data;
+    //         });
+    // }
 
-    function updateSession(session) {
+    function updateSession(user) {
+        console.log('session:', user.session);
         // console.log('Session:', session);
-        return $http.put('/api/session/' + session._id, session)
+        return $http.put('/api/user/' + user._id, user)
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {
@@ -36,7 +37,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             });
     }
 
-    function getUserList() {
+    function getOnlineUsers() {
         socketFactory.emit('get:networkUsers')
     }
 

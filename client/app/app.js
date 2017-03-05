@@ -23,10 +23,11 @@ window.onload = function(){
     // do operations before bootstrap
     // get user sign in status
     $http({
-        url : rootUrl + 'api/session',
+        url : rootUrl + 'api/user',
         method : 'GET'
     }).then(function successCallback(res){
-            angular.module('config').constant('__session', res.data);
+            // angular.module('config').constant('__user.session', res.data.session);
+            angular.module('config').constant('__user', res.data);
             angular.module('config').constant('__rootUrl', rootUrl);
 
 
@@ -36,7 +37,8 @@ window.onload = function(){
         function failureCallback(res){
             console.log('Failed to get user settings...');
 
-            angular.module('config').constant('__session', res.data);
+            angular.module('config').constant('__user', res.data);
+            // angular.module('config').constant('__user.session', res.data);
 
         }).then(function(){
         console.log('Bootstrapping angular....');
@@ -66,9 +68,9 @@ angular.module('glossa', [
     // 'mdWavesurfer'
     ])
     .config(config)
-    .run(function($rootScope, $state, $injector, AppService, __session, socketFactory, $window) {
+    .run(function($rootScope, $state, $injector, AppService, __user, socketFactory, $window) {
 
-        $state.go(__session.currentState, __session.currentStateParams);
+        $state.go(__user.session.currentState, __user.session.currentStateParams);
 
         if (!$window.socket) {
             socketFactory.init();
@@ -77,9 +79,9 @@ angular.module('glossa', [
 
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-            __session.currentState = toState.name;
-            __session.currentStateParams = toParams;
-            AppService.updateSession(__session);
+            __user.session.currentState = toState.name;
+            __user.session.currentStateParams = toParams;
+            AppService.updateSession(__user);
 
             //This keeps the state from redirecting away from the child state when that same child state is clicked.
             var redirect = toState.redirectTo;

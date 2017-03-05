@@ -6,24 +6,85 @@ var currentUser;
 
 module.exports = {
     checkForSession: checkForSession,
-    getGlossaUser: getGlossaUser
+    getGlossaUser: getGlossaUser,
+    checkForApplicationData: checkForApplicationData
 };
 
-var defaultUser = {
-    name: 'glossa user'
-};
+// var defaultUser = {
+//     name: 'glossa user'
+// };
 var defaultSession = {
     currentState: 'corpus.meta'
 };
 var defualtProject = {
     name: 'glossa project'
 };
+
 var defaultSettings = {
     media: {
         waveColor: 'black',
-        skipLength: 2,
+        skipLength: 2
     }
 };
+
+
+function checkForApplicationData() {
+    console.log('checkForApplicationData');
+    return new Promise(function(resolve, reject) {
+        User.findOne({}, function(err, user) {
+            console.log('user', user);
+            if (err) {
+                console.log('There was an error loading session.', err);
+                reject(err);
+            }
+            if (!user) {
+                console.log('No application data exists');
+                resolve(createApplicationData());
+            } else {
+                console.log('resolving user data');
+                resolve(user);
+
+            }
+        });
+    })
+}
+
+function createApplicationData() {
+    var defaultApplicationData = {
+        name: 'glossa user',
+        session: {}
+    };
+
+   return createDefaultUser(defaultApplicationData)
+        .then(function(userData) {
+            return projectCheck(userData)
+                .then(function(projectData) {
+                    return createDefaultSettings(userData, projectData)
+                        .then(function() {
+                            var options = {
+                                returnUpdatedDocs: true
+                            };
+
+                            userData.session.start = Date.now();
+                            userData.session.currentState = 'corpus.meta';
+                            userData.session.projectId = projectData._id;
+                            userData.session.currentStateParams = {user: userData._id, corpus: 'default'};
+
+                            return new Promise(function (resolve, reject) {
+                                User.update({_id: userData._id}, userData, options, function (err, numUpdated, updatedUser) {
+                                    if (err) {
+                                        console.log('Error Creating Session', err);
+                                        reject(err);
+                                    }
+                                    User.persistence.stopAutocompaction();
+                                    resolve(updatedUser);
+                                });
+                            });
+                        });
+                });
+        })
+}
+
 
 //check for session
     //if false check for user
@@ -121,7 +182,7 @@ function projectCheck(user) {
                 });
 
             } else {
-                console.log('Returning existing project.... data needs to be normalized')
+                console.log('Returning existing project.... data needs to be normalized');
                 resolve(project);
                 // return user;
             }
@@ -130,7 +191,7 @@ function projectCheck(user) {
 }
 
 //count users if none exists create a new one and save results somewhere
-function createDefaultUser() {
+function createDefaultUser(defaultUser) {
     defaultUser.createdAt = Date.now();
     return new Promise(function(resolve, reject) {
         return User.insert(defaultUser, function (err, createdUser) {
@@ -138,8 +199,9 @@ function createDefaultUser() {
                 console.log('There was an Error creating User', err);
                 reject(err);
             }
+
+            console.log('created default user', createdUser);
             resolve(createdUser);
-            // return createdUser;
         });
     })
 }
@@ -184,6 +246,7 @@ function createDefaultSettings() {
                 console.log('Error Creating Session', err);
                 reject(err);
             }
+            console.log('created default settings');
             resolve(createdSettings);
         });
     });

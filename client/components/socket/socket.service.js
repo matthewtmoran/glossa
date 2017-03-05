@@ -4,7 +4,7 @@
 angular.module('glossa')
     .factory('socketFactory', socketFactory);
 
-function socketFactory($rootScope, $window, __session) {
+function socketFactory($rootScope, $window) {
 
     var socket;
     var service = {

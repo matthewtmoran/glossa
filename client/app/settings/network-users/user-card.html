@@ -1,13 +1,13 @@
-<md-card>
+<md-card ng-class="{'user-online' : user.online, 'user-offline' : !user.online}">
 	<md-card-title layout="column" layout-align="center center">
 
 		<div class="user-card-items" flex layout="row" layout-align="space-between center">
 
 			<div>
 				<md-button class="md-fab" ng-style="{'background-color': user.color }">
-					<span class="letter">{{user.userName[0]}}</span>
+					<span class="letter">{{user.name[0]}}</span>
 				</md-button>
-				<span>{{user.userName}}</span>
+				<span>{{user.name}}</span>
 			</div>
 
 			<span>{Something to determine if both users have activated sharing with each other}</span>

@@ -51,7 +51,7 @@ exports.update = function(req, res) {
         if (err) { return handleError(res, err); }
         if(!user) { return res.status(404).send('Not Found'); }
         var options = {returnUpdatedDocs: true};
-        var updated = _.merge(user, req.body.dataObj);
+        var updated = _.merge(user, req.body);
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
             User.persistence.stopAutocompaction(); // concat db

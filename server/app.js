@@ -38,16 +38,16 @@ require('./routes')(app);
 
 // var mySession = require('./config/init').checkForSession();
 // var glossaUser = require('./config/init').getGlossaUser();
-Promise.all([
-    require('./config/init').checkForSession(),
-    require('./config/init').getGlossaUser()
-])
-    .then(function(results) {
+Promise.all([require('./config/init').checkForApplicationData()])
+    .then(function(appData) {
+
+        console.log('results', appData);
+
+        console.log('debug1');
 
         var bonjourSocket;
-        var mySession = results[0];
-        var glossaUser = results[1][0];
-
+        var glossaUser = appData[0];
+        var mySession = appData[0].session;
 
 
         server.listen(config.port, config.ip, function () {

@@ -1,6 +1,7 @@
 var config = require('./config/environment');
 var bonjour = require('bonjour')();
 var ioClient = require('socket.io-client');
+var User = require('./api/user/user.model');
 
 module.exports = function(glossaUser, localSession, io) {
 
@@ -17,9 +18,10 @@ module.exports = function(glossaUser, localSession, io) {
     io.sockets.on('connection', function(socket) {
         console.log('...new socket connection');
 
-
         //request the socket type from the newly connected socket
         socket.emit('request:SocketType', {socketId: socket.id});
+
+
 
 
         //socktype listener
@@ -31,7 +33,6 @@ module.exports = function(glossaUser, localSession, io) {
                 console.log('...local client connected');
 
                 connectLocalClient(socket, ioClient, glossaUser);
-
 
             //    if socket is an external-clietn
             } else if (clientData.type === 'external-client') {
@@ -135,8 +136,8 @@ module.exports = function(glossaUser, localSession, io) {
                     console.log('...outside application asking for socket type');
 
                     var socketData = {
-                        userName: glossaUser.name,
-                        userid: glossaUser._id,
+                        name: glossaUser.name,
+                        _id: glossaUser._id,
                         type: 'external-client',
                         socketId: data.socketId
                     };
@@ -180,9 +181,24 @@ module.exports = function(glossaUser, localSession, io) {
     function connectExternalClient(socket, ioClient, glossaUser, externalClient) {
         console.log('...an external client connected');
 
-        //check if this external client exists in the list of clients
-        // if it does exist, update it.
-        //if it does not exist add it.
+
+        console.log('externalClient', externalClient);
+
+        checkForUserConnection(externalClient.userid).then(function(connectedUser) {
+            console.log('checkForUserConnection connectedUser', connectedUser);
+            if (!connectedUser) {
+                console.log('Connection does not currently exist');
+                addToUserConnections(externalClient).then(function(user) {
+                    var newConnection = user;
+                    console.log('Update user', newConnection);
+                });
+            }
+        });
+
+
+
+
+
 
         var exists = false;
         for (var j = 0; j < externalClients.length; j++) {
@@ -195,11 +211,13 @@ module.exports = function(glossaUser, localSession, io) {
         if (!exists) {
 
             var externalClientData = {
-                userName: externalClient.userName,
-                userid: externalClient.userid,
+                userName: externalClient.name,
+                userid: externalClient._id,
                 type: 'external-client',
                 socketId: externalClient.socketId
             };
+
+            console.log('externalClientData', externalClientData)
 
             externalClients.push(externalClientData);
             socket.join('externalClientsRoom');
@@ -211,6 +229,83 @@ module.exports = function(glossaUser, localSession, io) {
 
         console.log('...update local client with list of online users');
     }
+
+    function addToUserConnections(newConnection) {
+
+        return new Promise(function(resolve, reject) {
+
+            User.findOne({_id: glossaUser._id}, function(err, user) {
+                if (err) {
+                    console.log('There was an error getting user data');
+                    reject(err);
+                }
+
+                if (!user.connections) {
+                    user.connections = [];
+                }
+
+                user.connections.push(newConnection);
+                var options = {
+                    returnUpdatedDocs: true
+                };
+
+
+                return User.update({_id: glossaUser._id}, user, options, function(err, updated) {
+                    if (err) {
+                        console.log('Error updating user connection');
+                        reject(err);
+                    }
+
+                    User.persistence.stopAutocompaction();
+                    console.log('Updated user connection success!');
+                    resolve(updated);
+
+                })
+            })
+        });
+    }
+
+    function checkForUserConnection(userId) {
+        console.log('checkForUserConnection');
+        var query = {
+            "connections.userid": userId
+        };
+
+
+        return new Promise(function(resolve, reject) {
+
+            User.findOne(query)
+                .projection({connections: 1})
+                .exec(function(err, user) {
+                    if (err) {
+                        console.log('There was an error looking for user connection')
+                        reject(err);
+                    }
+                    console.log('user: ', user);
+
+                    user.connections.forEach(function(connection) {
+                        if (connection.userid === userId) {
+                            console.log('match', connection);
+                            resolve(connection);
+                            return connection;
+                        }
+                    });
+
+                    // console.log('connectedUser', connectedUser);
+
+
+
+                    // resolve(connectedUser);
+
+            })
+
+
+        });
+
+
+    }
+
+
 
     function connectLocalClient(socket, ioClient, glossaUser) {
 

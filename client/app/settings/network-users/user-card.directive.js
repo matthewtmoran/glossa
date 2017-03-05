@@ -16,7 +16,7 @@ function userCard() {
                 "#5A8770", "#D33F33", "#A2B01F", "#F0B126", "#0087BF", "#F18636", "#0087BF",
                 "#B2B7BB", "#72ACAE", "#9C8AB4", "#5A8770", "#EEB424", "#407887"];
 
-            var colorIndex = Math.floor(($scope.user.userName.charCodeAt(0) - 65) % alphabetColors.length);
+            var colorIndex = Math.floor(($scope.user.name.charCodeAt(0) - 65) % alphabetColors.length);
             $scope.user.color = alphabetColors[colorIndex];
         }
     }

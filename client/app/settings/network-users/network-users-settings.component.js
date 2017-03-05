@@ -8,7 +8,7 @@ angular.module('glossa')
         templateUrl: 'app/settings/network-users/network-users-settings.component.html'
     });
 
-function NetworkSettings(SettingsService, $scope, AppService, socketFactory) {
+function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __user) {
     var vm = this;
 
     vm.$onInit = init;
@@ -22,13 +22,30 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory) {
     }
 
     function init() {
-        AppService.getUserList();
+        getSeenUsers();
+        console.log('user ',__user);
+        AppService.getOnlineUsers();
         console.log('network-users settings init');
+    }
+
+    function getSeenUsers() {
+        if (__user.connections) {
+            vm.networkUsers = __user.connections;
+        } else {
+            vm.networkUsers = [];
+        }
+
     }
 
     $scope.$on('update:networkUsers', function(event, data) {
         console.log('update:networkUsers listener' , data);
         console.log('data', data[0]);
+
+        vm.networkUsers.forEach(function(user) {
+            if (user._id === data.userId) {
+                user.online = true;
+            }
+        });
 
         vm.networkUsers = data;
 
