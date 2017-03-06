@@ -37,9 +37,6 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
     }
 
     $scope.$on('update:networkUsers', function(event, data) {
-        console.log('update:networkUsers listener' , data);
-        console.log('data', data[0]);
-
 
         for (var i = 0; i < vm.networkUsers.length; i++) {
             vm.networkUsers[i]['online'] = false;
@@ -49,29 +46,6 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
                 }
             }
         }
-
-        console.log('   vm.networkUsers after check',    vm.networkUsers);
-
-
-        // vm.networkUsers = data;
-
-        // if (data.length < 1) {
-        //     vm.networkUsers = [];
-        // } else {
-        //     vm.networkUsers = data;
-        //     data.forEach(function(user) {
-        //         if (vm.networkUsers.indexOf(user) < 0) {
-        //             console.log('pushing data');
-        //             vm.networkUsers.push(user);
-        //         } else {
-        //             vm.net
-        //         }
-        //     });
-        // }
-
-
-            console.log('vm.networkUsers', vm.networkUsers);
-
     });
 
     $scope.$on('update:networkUsers:disconnect', function(event, data) {

@@ -20,6 +20,8 @@ function notebookCard($sce, $state, UserService) {
 
     function notebookCardLink(scope, element, attrs) {
 
+        console.log('notebook', scope.notebook);
+
         scope.isCorpus = false;
 
         if ($state.current.name.indexOf('corpus') > -1) {

@@ -1,19 +1,19 @@
-<md-card ng-class="{'user-online' : user.online, 'user-offline' : !user.online}">
+<md-card ng-class="{'user-online' : vm.user.online, 'user-offline' : !vm.user.online}">
 	<md-card-title layout="column" layout-align="center center">
 
 		<div class="user-card-items" flex layout="row" layout-align="space-between center">
 
 			<div>
-				<md-button class="md-fab" ng-style="{'background-color': user.color }">
-					<span class="letter">{{user.name[0]}}</span>
+				<md-button class="md-fab" ng-style="{'background-color': vm.user.color }">
+					<span class="letter">{{vm.user.name[0]}}</span>
 				</md-button>
-				<span>{{user.name}}</span>
+				<span>{{vm.user.name}}</span>
 			</div>
 
 			<span>{Something to determine if both users have activated sharing with each other}</span>
 
-			<md-switch ng-model="user.isSharing" aria-label="Switch 1">
-				Sharing: <span>{{user.isSharing ? 'On' : 'Off'}}</span>
+			<md-switch ng-model="vm.user.isSharing" ng-change="vm.toggleSharing(vm.user.isSharing)" aria-label="Switch 1">
+				Sharing: <span>{{vm.user.isSharing ? 'On' : 'Off'}}</span>
 			</md-switch>
 
 		</div>

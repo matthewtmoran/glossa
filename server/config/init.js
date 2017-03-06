@@ -29,10 +29,8 @@ var defaultSettings = {
 
 
 function checkForApplicationData() {
-    console.log('checkForApplicationData');
     return new Promise(function(resolve, reject) {
         User.findOne({}, function(err, user) {
-            console.log('user', user);
             if (err) {
                 console.log('There was an error loading session.', err);
                 reject(err);

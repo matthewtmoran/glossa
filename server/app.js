@@ -41,9 +41,6 @@ require('./routes')(app);
 Promise.all([require('./config/init').checkForApplicationData()])
     .then(function(appData) {
 
-        console.log('results', appData);
-
-        console.log('debug1');
 
         var bonjourSocket;
         var glossaUser = appData[0];
@@ -96,7 +93,7 @@ Promise.all([require('./config/init').checkForApplicationData()])
         process.on('SIGINT', exitHandler.bind(null, {cleanup:true, exit:true, from: 'SIGINT'}));
 
         //catches uncaught exceptions
-        process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
+        // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
 
     });
 
