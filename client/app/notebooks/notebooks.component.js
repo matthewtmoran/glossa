@@ -15,7 +15,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     nbVm.$onInit = function() {
         queryNotebooks();
         // socketFactory.init();
-        AppService.initListeners();
+        // AppService.initListeners();
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
