@@ -23,12 +23,11 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
 
     function init() {
         getSeenUsers();
-        console.log('user ',__user);
         AppService.getOnlineUsers();
-        console.log('network-users settings init');
     }
 
     function getSeenUsers() {
+            console.log('__user.connections', __user.connections);
         if (__user.connections) {
             vm.networkUsers = __user.connections;
         } else {
@@ -41,13 +40,20 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
         console.log('update:networkUsers listener' , data);
         console.log('data', data[0]);
 
-        vm.networkUsers.forEach(function(user) {
-            if (user._id === data.userId) {
-                user.online = true;
-            }
-        });
 
-        vm.networkUsers = data;
+        for (var i = 0; i < vm.networkUsers.length; i++) {
+            vm.networkUsers[i]['online'] = false;
+            for (var j = 0; j < data.length; j++) {
+                if (vm.networkUsers[i]._id == data[j]._id) {
+                    vm.networkUsers[i]['online'] = true;
+                }
+            }
+        }
+
+        console.log('   vm.networkUsers after check',    vm.networkUsers);
+
+
+        // vm.networkUsers = data;
 
         // if (data.length < 1) {
         //     vm.networkUsers = [];

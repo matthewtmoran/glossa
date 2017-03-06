@@ -11,7 +11,8 @@ module.exports = function(glossaUser, localSession, io) {
     var myLocalService = {};
 
     var bonjourSocketApi = {
-        stopService: stopService
+        stopService: stopService,
+        getService: getService
     };
 
 
@@ -211,8 +212,8 @@ module.exports = function(glossaUser, localSession, io) {
         if (!exists) {
 
             var externalClientData = {
-                userName: externalClient.name,
-                userid: externalClient._id,
+                name: externalClient.name,
+                _id: externalClient._id,
                 type: 'external-client',
                 socketId: externalClient.socketId
             };
@@ -242,9 +243,15 @@ module.exports = function(glossaUser, localSession, io) {
 
                 if (!user.connections) {
                     user.connections = [];
+                    user.connections.push(newConnection);
+                } else {
+                    user.connections.forEach(function(connection, index) {
+                        if (connection._id === newConnection._id) {
+                            connection[index] = newConnection;
+                        }
+                    })
                 }
 
-                user.connections.push(newConnection);
                 var options = {
                     returnUpdatedDocs: true
                 };
@@ -274,28 +281,27 @@ module.exports = function(glossaUser, localSession, io) {
 
         return new Promise(function(resolve, reject) {
 
-            User.findOne(query)
+           return User.findOne(query)
                 .projection({connections: 1})
                 .exec(function(err, user) {
                     if (err) {
-                        console.log('There was an error looking for user connection')
+                        console.log('There was an error looking for user connection');
                         reject(err);
                     }
-                    console.log('user: ', user);
 
-                    user.connections.forEach(function(connection) {
-                        if (connection.userid === userId) {
-                            console.log('match', connection);
-                            resolve(connection);
-                            return connection;
+                    if (!user) {
+                        console.log('this connection does not exist');
+                        resolve(false);
+                    } else {
+                        if (user.connections) {
+                            user.connections.forEach(function(connection) {
+                                if (connection.userid === userId) {
+                                    console.log('match', connection);
+                                    resolve(connection);
+                                }
+                            });
                         }
-                    });
-
-                    // console.log('connectedUser', connectedUser);
-
-
-
-                    // resolve(connectedUser);
+                    }
 
             })
 
@@ -311,8 +317,8 @@ module.exports = function(glossaUser, localSession, io) {
 
         localClient = {
             socketId: socket.id,
-            userName: glossaUser.name,
-            userId: glossaUser._id
+            name: glossaUser.name,
+            _id: glossaUser._id
         };
 
         io.to(localClient.socketId).emit('notify:server-connection');
@@ -358,6 +364,10 @@ module.exports = function(glossaUser, localSession, io) {
         }
         //look for http services on the network
         // initBonjour();
+    }
+
+    function getService() {
+        return myLocalService || null;
     }
 
     function stopService() {

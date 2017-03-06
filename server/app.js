@@ -63,31 +63,37 @@ Promise.all([require('./config/init').checkForApplicationData()])
 
 
         function exitHandler(options, err) {
-            console.log('Node killing local service immediately.... delaying 5 seconds then killing process....');
-            bonjourSocket.stopService();
+            console.log('Node killing local service immediately.... delaying 3 seconds then killing process....');
+            console.log(options.from);
 
-            setTimeout(function() {
-                console.log('.... 5 seconds delay over... process being killed now!');
+
                 if (options.cleanup) {
-                    console.log('clean...');
-                    console.log(options.from);
+                    console.log('cleaning...');
+
+                    if (bonjourSocket && bonjourSocket.getService()) {
+                        console.log('stopping service');
+                        bonjourSocket.stopService();
+                    }
+                    console.log('cleaning done...');
                 }
                 if (err) {
                     console.log(err.stack);
                 }
                 if (options.exit) {
-                    console.log('exit?', options.exit);
-                    process.exit();
+                    setTimeout(function() {
+                        console.log('.... 3 seconds delay over... process being killed now!');
+                        console.log('exit?', options.exit);
+                        process.exit();
+                    }, 3000);
                 }
-            }, 5000);
 
         }
 
         //do something when app is closing
-        process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
+        // process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
 
         //catches ctrl+c event
-        process.on('SIGINT', exitHandler.bind(null, {exit:true, from: 'SIGINT'}));
+        process.on('SIGINT', exitHandler.bind(null, {cleanup:true, exit:true, from: 'SIGINT'}));
 
         //catches uncaught exceptions
         process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));

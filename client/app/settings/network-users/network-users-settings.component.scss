@@ -1,11 +1,12 @@
 .user-card-items {
 	width: 100% !important;
 
-	.user-online {
-		background: green;
-	}
+}
+.user-online {
+	background: green;
+}
 
-	.user-offline {
-		font-style: italic;
-	}
+.user-offline {
+	font-style: italic;
+	color: lightgrey !important;
 }
