@@ -136,32 +136,32 @@ module.exports = function(glossaUser, localSession, io) {
 
         });
 
-        socket.on('get:userUpdates', function() {
-            console.log('%% (local-client listener) get:userUpdates %%');
-
-
-
-            console.log('Check for updates from online users');
-
-            externalClients.forEach(function(client) {
-
-                emitToExternalClient(client.socketId, 'request:updates', client);
-
-
-            });
-
-            // externalClients.forEach(function(exClient) {
-            //     if (exClient.isSharing) {
-            //
-            //     }
-            // });
-
-            // if (glossaUser.connections) {
-            //     glossaUser.connections.forEach(function(connection) {
-            //
-            //     })
-            // }
-        });
+        // socket.on('get:userUpdates', function() {
+        //     console.log('%% (local-client listener) get:userUpdates %%');
+        //
+        //
+        //
+        //     console.log('Check for updates from online users');
+        //
+        //     externalClients.forEach(function(client) {
+        //
+        //         emitToExternalClient(client.socketId, 'request:updates', client);
+        //
+        //
+        //     });
+        //
+        //     // externalClients.forEach(function(exClient) {
+        //     //     if (exClient.isSharing) {
+        //     //
+        //     //     }
+        //     // });
+        //
+        //     // if (glossaUser.connections) {
+        //     //     glossaUser.connections.forEach(function(connection) {
+        //     //
+        //     //     })
+        //     // }
+        // });
 
 
 
@@ -184,6 +184,20 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('%% get:networkUsers listener @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@22%%');
             socket.emit('local-client:send:externalUserList', externalClients)
         });
+
+        socket.on('broadcastUpdates', function(data) {
+
+            var updateObject = {
+                update: data,
+                user: {
+                    _id: glossaUser._id,
+                    name: glossaUser.name
+                }
+            };
+
+           broadcastToExternalClients('updateMade', updateObject)
+        });
+
 
 
 
@@ -343,6 +357,14 @@ module.exports = function(glossaUser, localSession, io) {
                         nodeClientSocket.emit('return:data-changes', {connectionId: glossaUser._id, updatedData: data});
                     });
                 }
+            });
+
+            nodeClientSocket.on('updateMade', function(data) {
+                console.log('%% (client listener) updateMade %%');
+
+                //
+
+                // emitToLocalClient('')
             })
 
 

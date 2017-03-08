@@ -41,6 +41,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     function getOnlineUsers() {
         socketFactory.emit('get:networkUsers')
     }
+
     function getUserUpdates() {
         var msg = 'Looking for updates from clients....';
         var delay = 4000;
@@ -51,6 +52,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
         });
 
         socketFactory.emit('get:userUpdates')
+    }
+
+    function broadcastUpdates(data) {
+        socketFactory.emit('broadcast:Updates', data);
     }
 
     function initListeners() {
