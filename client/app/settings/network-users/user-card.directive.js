@@ -40,11 +40,11 @@ angular.module('glossa')
 
         console.log('vm.user', vm.user);
 
-        vm.toggleSharing = toggleSharing;
+        vm.toggleFollow = toggleFollow;
 
 
-        function toggleSharing(isSharing) {
-            vm.user.isSharing = isSharing;
+        function toggleFollow(following) {
+            vm.user.following = following;
 
             __user.connections.forEach(function(connection, index) {
                 if (connection._id === vm.user._id) {

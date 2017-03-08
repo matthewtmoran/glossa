@@ -10,10 +10,10 @@
 				<span>{{vm.user.name}}</span>
 			</div>
 
-			<span>{Something to determine if both users have activated sharing with each other}</span>
+			<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>
 
-			<md-switch ng-model="vm.user.isSharing" ng-change="vm.toggleSharing(vm.user.isSharing)" aria-label="Switch 1">
-				Sharing: <span>{{vm.user.isSharing ? 'On' : 'Off'}}</span>
+			<md-switch ng-model="vm.user.following" ng-change="vm.toggleFollow(vm.user.following)" aria-label="Switch 1">
+				Following: <span>{{vm.user.following ? 'On' : 'Off'}}</span>
 			</md-switch>
 
 		</div>

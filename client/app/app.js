@@ -50,6 +50,9 @@ window.onload = function(){
             .then(function(){
                 angular.element('.splash-screen').remove();
             });
+
+
+
     });
 };
 

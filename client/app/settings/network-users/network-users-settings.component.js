@@ -52,6 +52,16 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
         vm.networkUsers.splice(vm.networkUsers.indexOf(data), 1);
     });
 
+    $scope.$on('update:connection', function(event, data) {
+
+        console.log('data', data);
+        vm.networkUsers.forEach(function(user, index) {
+            if (user._id === data._id) {
+                user[index] = user;
+            }
+        })
+    })
+
 
 
 

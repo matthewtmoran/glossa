@@ -6,7 +6,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
         // getSession: getSession,
         updateSession: updateSession,
         initListeners: initListeners,
-        getOnlineUsers: getOnlineUsers
+        getOnlineUsers: getOnlineUsers,
+        getUserUpdates: getUserUpdates
     };
 
     // initListeners();
@@ -40,7 +41,17 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     function getOnlineUsers() {
         socketFactory.emit('get:networkUsers')
     }
+    function getUserUpdates() {
+        var msg = 'Looking for updates from clients....';
+        var delay = 4000;
 
+        Notification.show({
+            message: msg,
+            hideDelay: delay
+        });
+
+        socketFactory.emit('get:userUpdates')
+    }
 
     function initListeners() {
 
@@ -103,6 +114,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
                 hideDelay: delay
             });
 
+            // getUserUpdates();
+
+
+
 
             // $rootScope.$broadcast('local:server-connection');
 
@@ -127,6 +142,15 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
 
         socketFactory.on('local-client:send:externalUserList', function(data) {
             console.log('local-client:send:externalUserList', data);
+
+            var msg = 'Users online: ' + data.length;
+            var delay = 3000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
             $rootScope.$broadcast('update:networkUsers', data)
         });
 
@@ -143,6 +167,23 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
                 hideDelay: delay
             });
         });
+
+        socketFactory.on('notify:externalChanges', function(data) {
+            console.log('notify:externalChanges', data);
+            var msg = 'Data synced with ' + data.connection._id;
+            var delay = 3000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
+            $rootScope.$broadcast('update:connection', data.connection);
+            $rootScope.$broadcast('update:externalData', data);
+
+        });
+
+
 
 
         // socketFactory.on('newParticipant', function(userObj) {

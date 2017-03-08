@@ -118,4 +118,12 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         };
         viewDetails(event, notebook)
     }
+
+    $scope.$on('update:externalData', function(event, data) {
+        console.log('update:externalData');
+
+        data.updatedData.forEach(function(data) {
+            nbVm.notebooks.push(data);
+        })
+    })
 }
