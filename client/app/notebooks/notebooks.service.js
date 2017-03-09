@@ -132,6 +132,7 @@ function NotebookService($http, $q, simpleParse, Upload, AppService, UserService
                     method: 'POST'
                 };
                 return uploadReq(notebook, options).then(function(data) {
+                    AppService.broadcastUpdates(data);
                     return data
                 })
             });

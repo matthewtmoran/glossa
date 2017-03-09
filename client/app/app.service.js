@@ -7,7 +7,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
         updateSession: updateSession,
         initListeners: initListeners,
         getOnlineUsers: getOnlineUsers,
-        getUserUpdates: getUserUpdates
+        getUserUpdates: getUserUpdates,
+        broadcastUpdates: broadcastUpdates
     };
 
     // initListeners();
@@ -55,6 +56,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     }
 
     function broadcastUpdates(data) {
+        console.log('broadcastUpdates');
         socketFactory.emit('broadcast:Updates', data);
     }
 
@@ -186,6 +188,19 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             $rootScope.$broadcast('update:connection', data.connection);
             $rootScope.$broadcast('update:externalData', data);
 
+        });
+
+        socketFactory.on('update:external-client', function(data) {
+
+            var msg = 'User ' + data.createdBy._id;
+            var delay = 3000;
+
+            Notification.show({
+                message: msg,
+                hideDelay: delay
+            });
+
+            $rootScope.$broadcast('update:externalData', {updatedData: data});
         });
 
 

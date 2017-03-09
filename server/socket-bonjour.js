@@ -185,7 +185,9 @@ module.exports = function(glossaUser, localSession, io) {
             socket.emit('local-client:send:externalUserList', externalClients)
         });
 
-        socket.on('broadcastUpdates', function(data) {
+        socket.on('broadcast:Updates', function(data) {
+
+            console.log('%% (local-client listener) broadcastUpdates %%');
 
             var updateObject = {
                 update: data,
@@ -195,7 +197,7 @@ module.exports = function(glossaUser, localSession, io) {
                 }
             };
 
-           broadcastToExternalClients('updateMade', updateObject)
+           broadcastToExternalClients('external-ss:real-time-update:all', updateObject)
         });
 
 
@@ -359,16 +361,74 @@ module.exports = function(glossaUser, localSession, io) {
                 }
             });
 
-            nodeClientSocket.on('updateMade', function(data) {
-                console.log('%% (client listener) updateMade %%');
+            //@dataChanges = {update: object, user: object}
+            nodeClientSocket.on('external-ss:real-time-update:all', function(dataChanges) {
+                console.log('%% (client listener) external-ss:real-time-update:all %%');
+
+                var user = dataChanges.user;
+
+
+                //check if we are following this user
+                externalClients.forEach(function(client, index) {
+                    if (client._id === user._id) {
+                        if (client.following) {
+                            //update the user object to get additional properties
+                            user = client;
+                        }
+                    }
+                });
+
+                if (user.following) {
+                    emitToExternalClient(user.socketId, 'request:updates', user)
+                }
+
+
+                // var updatedConnection;
+                // var timeStamp = Date.now();
+                // for (var i = 0; i < glossaUser.connections.length; i++) {
+                //     if (glossaUser.connections[i]._id === dataChanges.connectionId) {
+                //
+                //         glossaUser.connections[i].lastSync = timeStamp;
+                //
+                //         updatedConnection = glossaUser.connections[i];
+                //     }
+                // }
+                //
+                // externalClients.forEach(function(client, index) {
+                //     if (client._id === dataChanges.connectionId) {
+                //         client.lastSync = timeStamp;
+                //     }
+                // });
+                //
+                // updateUser(glossaUser).then(function(data) {
+                //     addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
+                //
+                //         emitToLocalClient('notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
+                //
+                //     });
+                //
+                // });
+                //
+                // addExternalData(update).then(function(data) {
+                //     emitToLocalClient('update:external-client', data);
+                // });
+
 
                 //
 
                 // emitToLocalClient('')
+            });
+
+            nodeClientSocket.on('request-updates:external-client', function(data) {
+                console.log('%% {Process: node-client } request-updates:external-client %%')
             })
 
 
         })
+    }
+
+    function syncUpdates(changes) {
+
     }
 
 
@@ -814,14 +874,17 @@ module.exports = function(glossaUser, localSession, io) {
 
 
 
+    //update the local ui
     function emitToLocalClient(eventName, data) {
         io.to(localClient.socketId).emit(eventName, data);
     }
 
+    //event to all external socket connections
     function broadcastToExternalClients(eventName, data) {
         io.to('externalClientsRoom').emit(eventName, data)
     }
 
+    //emit to specific external client
     function emitToExternalClient(socketId, eventName, data) {
         io.to(socketId).emit(eventName, data);
     }
