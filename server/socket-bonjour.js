@@ -3,6 +3,8 @@ var bonjour = require('bonjour')();
 var ioClient = require('socket.io-client');
 var User = require('./api/user/user.model');
 var Notebooks = require('./api/notebook/notebook.model');
+var fs = require('fs');
+var path = require('path');
 
 module.exports = function(glossaUser, localSession, io) {
 
@@ -105,35 +107,32 @@ module.exports = function(glossaUser, localSession, io) {
         socket.on('return:data-changes', function(dataChanges) {
             console.log('%% (external-client) return:data-changes %%');
 
-            console.log('dataChanges', dataChanges);
+            addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
+                var updatedConnection;
+                var timeStamp = Date.now();
 
-            var updatedConnection;
-            var timeStamp = Date.now();
-            for (var i = 0; i < glossaUser.connections.length; i++) {
-                if (glossaUser.connections[i]._id === dataChanges.connectionId) {
-
-                    glossaUser.connections[i].lastSync = timeStamp;
-
-                    updatedConnection = glossaUser.connections[i];
+                //update application data
+                for (var i = 0; i < glossaUser.connections.length; i++) {
+                    if (glossaUser.connections[i]._id === dataChanges.connectionId) {
+                        glossaUser.connections[i].lastSync = timeStamp;
+                        updatedConnection = glossaUser.connections[i];
+                    }
                 }
-            }
+                //update external client list
+                externalClients.forEach(function(client, index) {
+                    if (client._id === dataChanges.connectionId) {
+                        client.lastSync = timeStamp;
+                    }
+                });
 
-            externalClients.forEach(function(client, index) {
-                if (client._id === dataChanges.connectionId) {
-                    client.lastSync = timeStamp;
-                }
-            });
 
-            updateUser(glossaUser).then(function(data) {
-                addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
-
+                //update persisted data
+                updateUser(glossaUser).then(function(data) {
+                    //emit to client
                     emitToLocalClient('notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
-
                 });
 
             });
-
-
         });
 
         // socket.on('get:userUpdates', function() {
@@ -351,6 +350,9 @@ module.exports = function(glossaUser, localSession, io) {
                 if (!data.lastSync) {
                     console.log('User has never connected');
                     getNotebookChanges({}).then(function(data) {
+
+                        console.log('getNotebookChanges promise has resolved..... ');
+
                         nodeClientSocket.emit('return:data-changes', {connectionId: glossaUser._id, updatedData: data});
                     });
                 } else {
@@ -379,6 +381,7 @@ module.exports = function(glossaUser, localSession, io) {
                 });
 
                 if (user.following) {
+                    console.log('I am following user so request updates....');
                     emitToExternalClient(user.socketId, 'request:updates', user)
                 }
 
@@ -392,13 +395,42 @@ module.exports = function(glossaUser, localSession, io) {
         })
     }
 
-    function syncUpdates(changes) {
-
-    }
-
 
     //data is an array. Nedb allows the insertion of arrays
     function addExternalData(data) {
+
+        console.log('');
+        console.log('addExternalData');
+        console.log('');
+
+        console.log("data.length", data.length);
+
+        data.forEach(function(notebook) {
+            if (notebook.imageBuffer) {
+                console.log('notebook ahs media buffer...');
+                var imagePath = path.join(__dirname, config.dataRoot, notebook.image.path);
+
+                console.log('imagePath',imagePath);
+
+                var buffer = new Buffer(notebook.imageBuffer, 'base64', function(err) {
+                   if (err) {
+                       return console.log('issue decoding base64 data');
+                   }
+                   console.log('buffer created....');
+                });
+
+                fs.writeFile(imagePath, buffer, function(err) {
+                    if (err) {
+                       return console.log('There was an error writing file to filesystem', err);
+                    }
+                    console.log('image written to file system');
+                    delete notebook.imageBuffer
+                })
+            }
+        });
+
+
+
         return new Promise(function(resolve, reject) {
             Notebooks.insert(data, function(err, notebook) {
                 if (err) {
@@ -535,6 +567,7 @@ module.exports = function(glossaUser, localSession, io) {
     }
 
     function getNotebookChanges(query) {
+        console.log('getNotebookChanges');
 
         return new Promise(function(resolve, reject) {
             Notebooks.find(query, function(err, notebooks) {
@@ -542,9 +575,69 @@ module.exports = function(glossaUser, localSession, io) {
                     console.log('There was an error getting Notebook data for external request', err);
                     reject(err);
                 }
-                resolve(notebooks);
+
+
+                var mediaPromises = [];
+                console.log("checking for media files");
+                notebooks.forEach(function(notebook, index) {
+                    if (notebook.image) {
+                        var imagePromise = encodeBase64(notebook.image.path).then(function(data) {
+                            notebook.imageBuffer = data;
+                            return data
+                        });
+                        mediaPromises.push(imagePromise);
+                    }
+
+                    if (notebook.audio) {
+                       var audioPromise = encodeBase64(notebook.audio.path).then(function(data) {
+                            notebook.audioBuffer = data;
+                            return data;
+                        });
+                        mediaPromises.push(audioPromise);
+                    }
+
+                });
+
+                if (mediaPromises.length) {
+
+                    console.log('mediaPromises', mediaPromises);
+                    Promise.all(mediaPromises).then(function(data) {
+                        console.log('all media promises have resolved');
+                        console.log('');
+                        resolve(notebooks);
+                    });
+                } else {
+                    console.log('No media promises to resolve');
+                    resolve(notebooks);
+                }
+
             })
         })
+    }
+
+    function encodeBase64(mediaPath) {
+        console.log('encoding into base64....');
+        console.log('mediaPath', mediaPath);
+
+        var myPath = path.join(__dirname, config.dataRoot, mediaPath);
+        console.log('myPath', myPath);
+        return new Promise(function(resolve, reject){
+            fs.readFile(myPath, function(err, data){
+                if (err) {
+                    console.log('there was an error encoding media...');
+                    reject(err);
+                }
+                console.log('')
+
+                resolve(data.toString('base64'));
+
+
+                // socket.emit('imageConversionByClient', { image: true, buffer: data });
+                // socket.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
+            });
+        });
+
+
     }
 
     function doesConnectionExist(externalClient) {
@@ -597,6 +690,12 @@ module.exports = function(glossaUser, localSession, io) {
         } else {
             console.log('Get updates since last sync');
         }
+    }
+
+
+
+    function getMedia(mediaPath) {
+
     }
 
     // function getUpdatesSinceLastSync(connection) {
