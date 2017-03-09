@@ -333,7 +333,7 @@ module.exports = function(glossaUser, localSession, io) {
             nodeClientSocket.on('disconnect', function() {
                 // console.log('external-client disconnect listener');
 
-                //disconnect socket.... this occurrs when the server this socket is connected to closes.
+                //disconnect socket.... this occurs when the server this socket is connected to closes.
                 nodeClientSocket.disconnect(true);
 
             });
@@ -358,6 +358,8 @@ module.exports = function(glossaUser, localSession, io) {
                 } else {
                     console.log('User has connected before');
                     getNotebookChanges({"updatedAt": {$gte: new Date(data.lastSync)}}).then(function(data) {
+
+                        console.log('getNotebookChanges promise has resolved..... ');
                         nodeClientSocket.emit('return:data-changes', {connectionId: glossaUser._id, updatedData: data});
                     });
                 }
@@ -366,6 +368,8 @@ module.exports = function(glossaUser, localSession, io) {
             //@dataChanges = {update: object, user: object}
             nodeClientSocket.on('external-ss:real-time-update:all', function(dataChanges) {
                 console.log('%% (client listener) external-ss:real-time-update:all %%');
+                console.log('');
+                console.log('dataChanges', dataChanges);
 
                 var user = dataChanges.user;
 

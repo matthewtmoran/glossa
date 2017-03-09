@@ -4,7 +4,7 @@
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
 
-function notebookCard($sce, $state, UserService) {
+function notebookCard($sce, $state, UserService, $timeout) {
     var directive = {
         restrict: 'E',
         templateUrl: 'app/notebooks/notebook-card/notebook-card.directive.html',
@@ -20,7 +20,13 @@ function notebookCard($sce, $state, UserService) {
 
     function notebookCardLink(scope, element, attrs) {
 
-        console.log('notebook', scope.notebook);
+
+        if (scope.notebook.isNew) {
+            element.addClass('new-data');
+            $timeout(function() {
+                element.removeClass('new-data');
+            }, 5000)
+        }
 
         scope.isCorpus = false;
 

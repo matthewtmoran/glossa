@@ -29,8 +29,11 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
     nbVm.notebooks = [];
+    nbVm.externalNotebooks = [];
     nbVm.commonTags = [];
 
+
+    nbVm.showNewUpdates = showNewUpdates;
     nbVm.viewDetails = viewDetails;
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
@@ -55,6 +58,16 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         HashtagService.getCommonTags().then(function(data) {
             nbVm.commonTags = data
         })
+    }
+
+
+    //TODO: deal with updating notebooks
+    function showNewUpdates() {
+        nbVm.externalNotebooks.forEach(function(newNotebook) {
+            newNotebook.isNew = true;
+            nbVm.notebooks.push(newNotebook);
+        });
+        nbVm.externalNotebooks = [];
     }
 
     /**
@@ -123,7 +136,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         console.log('update:externalData');
 
         data.updatedData.forEach(function(data) {
-            nbVm.notebooks.push(data);
+            nbVm.externalNotebooks.push(data);
         })
     })
 }

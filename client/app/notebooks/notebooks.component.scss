@@ -3,11 +3,16 @@
 		color: black;
 	}
 
+
+	.update-btn {
+		//margin-bottom: 15px;
+	}
+
 	.left-side {
 		//overflow: hidden;
 	}
 
-	.md-raised {
+	.tag-btn {
 		margin: 0;
 		width: 100%;
 	}
@@ -76,9 +81,32 @@
 	}
 }
 .grid-tile {
+	&.ng-enter {
+		opacity: 0;
+		transition: all .5s ease;
+	}
+	&.ng-enter-active {
+		opacity: 1;
+	}
+
+	.new-data {
+		transition: all .5s ease;
+
+		.notebook-card {
+			box-shadow: 0 1px 3px 0 #00a8c6, 0 1px 1px 0 #00a8c6, 0 2px 1px -1px #00a8c6;
+		}
+	}
 	//max-width: 530px;
 }
+
+
+.listItem {
+
+}
+
+
 .notebook-card {
+
 
 	.inner-padding {
 		padding: 0 16px 0 16px;
