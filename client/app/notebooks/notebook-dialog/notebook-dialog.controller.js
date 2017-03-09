@@ -15,6 +15,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
         data: null
     };
 
+
     dialogVm.isNewPost = false;
     dialogVm.editorOptions = simplemdeOptions;
     dialogVm.removedMedia = [];

@@ -4,7 +4,7 @@
 angular.module('glossa')
     .directive('notebookCard', notebookCard);
 
-function notebookCard($sce, $state, UserService, $timeout) {
+function notebookCard($sce, $state, UserService, $timeout, __user) {
     var directive = {
         restrict: 'E',
         templateUrl: 'app/notebooks/notebook-card/notebook-card.directive.html',
@@ -20,6 +20,12 @@ function notebookCard($sce, $state, UserService, $timeout) {
 
     function notebookCardLink(scope, element, attrs) {
 
+
+        if (scope.notebook.createdBy._id !== __user._id) {
+
+            scope.notebook.canEdit = false;
+
+        }
 
         if (scope.notebook.isNew) {
             element.addClass('new-data');

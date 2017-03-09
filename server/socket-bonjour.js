@@ -409,7 +409,8 @@ module.exports = function(glossaUser, localSession, io) {
 
         console.log("data.length", data.length);
 
-        data.forEach(function(notebook) {
+        data.forEach(function(notebook, index) {
+
             if (notebook.imageBuffer) {
                 console.log('notebook ahs media buffer...');
                 var imagePath = path.join(__dirname, config.dataRoot, notebook.image.path);

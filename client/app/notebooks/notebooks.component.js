@@ -20,6 +20,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
 
+    nbVm.isLoading = true;
     nbVm.hidden = false;
     nbVm.isOpen = false;
     nbVm.hover = false;
@@ -50,7 +51,8 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
      */
     function queryNotebooks() {
         NotebookService.getNotebooks().then(function(data) {
-            nbVm.notebooks = data
+            nbVm.notebooks = data;
+            nbVm.isLoading = false;
         })
     }
 
