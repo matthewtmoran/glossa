@@ -187,7 +187,7 @@ module.exports = function(glossaUser, localSession, io) {
 
         socket.on('broadcast:Updates', function(data) {
 
-            console.log('%% (local-client listener) broadcastUpdates %%');
+            console.log('%% (local-client listener) broadcast:Updates %%');
 
             var updateObject = {
                 update: data,
@@ -382,41 +382,6 @@ module.exports = function(glossaUser, localSession, io) {
                     emitToExternalClient(user.socketId, 'request:updates', user)
                 }
 
-
-                // var updatedConnection;
-                // var timeStamp = Date.now();
-                // for (var i = 0; i < glossaUser.connections.length; i++) {
-                //     if (glossaUser.connections[i]._id === dataChanges.connectionId) {
-                //
-                //         glossaUser.connections[i].lastSync = timeStamp;
-                //
-                //         updatedConnection = glossaUser.connections[i];
-                //     }
-                // }
-                //
-                // externalClients.forEach(function(client, index) {
-                //     if (client._id === dataChanges.connectionId) {
-                //         client.lastSync = timeStamp;
-                //     }
-                // });
-                //
-                // updateUser(glossaUser).then(function(data) {
-                //     addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
-                //
-                //         emitToLocalClient('notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
-                //
-                //     });
-                //
-                // });
-                //
-                // addExternalData(update).then(function(data) {
-                //     emitToLocalClient('update:external-client', data);
-                // });
-
-
-                //
-
-                // emitToLocalClient('')
             });
 
             nodeClientSocket.on('request-updates:external-client', function(data) {
