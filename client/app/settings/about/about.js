@@ -7,7 +7,7 @@ function config($stateProvider) {
     $stateProvider
         .state('settings.about', {
             url: '/about',
-            template: '<about-settings-component flex layout="column">',
+            template: '<about-settings-component flex layout="row" layout-fill>',
             parent: 'settings'
         });
 }

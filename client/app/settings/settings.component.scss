@@ -3,6 +3,41 @@
 	input, textarea {
 		color: #333 !important;
 	}
+
+	.left-side {
+
+		h1 {
+			font-family: Roboto-Light, "Helvetica Neue", sans-serif;
+			margin: 0 auto;
+
+			span {
+				font-family: Roboto-Thin, Roboto, "Helvetica Neue", sans-serif;
+			}
+		}
+
+		.license-button {
+			margin: 0 auto;
+			width: 100%;
+			max-width: 250px;
+		}
+
+		.image-container {
+			padding-left: 35px;
+			padding-right: 35px;
+
+			.settings-image {
+				display: block;
+				width: 100%;
+
+				margin: 0 auto;
+
+				.logo {
+					max-width: 210px;
+				}
+			}
+		}
+
+	}
 }
 
 .light-toolbar {
