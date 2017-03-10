@@ -21,26 +21,13 @@ if(config.seedDB) { require('./config/seed'); }
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-// var io = require('socket.io')(server);
-// var ioClient = require('socket.io-client');
-// var socketUtilities = require('./socket.io');
-// var bonjourInit = require('./bonjour');
 
 require('./config/express')(app);
 require('./routes')(app);
 
-// process.stdin.resume();
-// process.on('exit', function() {
-//   console.log('exit event');
-//     process.exit();
-// });
 
-
-// var mySession = require('./config/init').checkForSession();
-// var glossaUser = require('./config/init').getGlossaUser();
 Promise.all([require('./config/init').checkForApplicationData()])
     .then(function(appData) {
-
 
         var bonjourSocket;
         var glossaUser = appData[0];
@@ -63,7 +50,6 @@ Promise.all([require('./config/init').checkForApplicationData()])
             console.log('Node killing local service immediately.... delaying 3 seconds then killing process....');
             console.log(options.from);
 
-
                 if (options.cleanup) {
                     console.log('cleaning...');
 
@@ -77,20 +63,20 @@ Promise.all([require('./config/init').checkForApplicationData()])
                     console.log(err.stack);
                 }
                 if (options.exit) {
-                    setTimeout(function() {
-                        console.log('.... 3 seconds delay over... process being killed now!');
-                        console.log('exit?', options.exit);
+                    // setTimeout(function() {
+                    //     console.log('.... 3 seconds delay over... process being killed now!');
+                    //     console.log('exit?', options.exit);
+                    // }, 3000);
                         process.exit();
-                    }, 3000);
                 }
 
         }
 
         //do something when app is closing
-        // process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
+        process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
 
         //catches ctrl+c event
-        process.on('SIGINT', exitHandler.bind(null, {cleanup:true, exit:true, from: 'SIGINT'}));
+        process.on('SIGINT', exitHandler.bind(null, {cleanup:false, exit:true, from: 'SIGINT'}));
 
         //catches uncaught exceptions
         // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
