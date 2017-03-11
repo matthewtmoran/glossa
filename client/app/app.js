@@ -30,8 +30,6 @@ window.onload = function(){
             angular.module('config').constant('__user', res.data);
             angular.module('config').constant('__rootUrl', rootUrl);
 
-
-
         },
         // not signed in {statusCode : 403} // Forbidden
         function failureCallback(res){
@@ -51,8 +49,6 @@ window.onload = function(){
                 angular.element('.splash-screen').remove();
             });
 
-
-
     });
 };
 
@@ -66,25 +62,26 @@ angular.module('glossa', [
     'md.data.table',
     'ngFileUpload',
     'ui.codemirror'
-    // 'socket.io'
-    // 'btford.socket-io'
-    // 'mdWavesurfer'
     ])
     .config(config)
     .run(function($rootScope, $state, $injector, AppService, __user, socketFactory, $window) {
 
         $state.go(__user.session.currentState, __user.session.currentStateParams);
 
-        if (!$window.socket) {
+        //if there is no $window.socket object and if the user has sharing enabled
+        if (!$window.socket && __user.settings.isSharing) {
             socketFactory.init();
             AppService.initListeners();
         }
 
-
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             __user.session.currentState = toState.name;
             __user.session.currentStateParams = toParams;
-            AppService.updateSession(__user);
+            //update session data every state change
+            AppService.updateSession(__user).then(function(data) {
+                //update the __user object in memory
+                __user.session = data.session;
+            });
 
             //This keeps the state from redirecting away from the child state when that same child state is clicked.
             var redirect = toState.redirectTo;
@@ -131,7 +128,7 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
         'A200': '#FF5252',
         'A400': '#ff3838',
         'A700': '#ffd1d1',
-        'contrastDefaultColor': 'light',
+        'contrastDefaultColor': 'light'
     };
     $mdThemingProvider
         .definePalette('customAccent',
@@ -169,9 +166,5 @@ function config($stateProvider, $urlRouterProvider, $mdIconProvider, $mdThemingP
         var state = $injector.get('$state');
         state.go("corpus");
     });
-
-
-
-
 
 }

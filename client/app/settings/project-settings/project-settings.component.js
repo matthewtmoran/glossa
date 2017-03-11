@@ -3,7 +3,10 @@ angular.module('glossa')
         controller: ProjectSettings,
         controllerAs: 'vm',
         transclude: true,
-        templateUrl: 'app/settings/project-settings/project-settings.component.html'
+        templateUrl: 'app/settings/project-settings/project-settings.component.html',
+        bindings: {
+            project: '='
+        }
     });
 
 function ProjectSettings(SettingsService, drawerMenu) {
@@ -11,18 +14,18 @@ function ProjectSettings(SettingsService, drawerMenu) {
 
     vm.$onInit = init;
     vm.updateProject = updateProject;
+    vm.isSaving = false;
 
     function init() {
         console.log('project settings init');
-        SettingsService.getProject().then(function(data) {
-           vm.project = data;
-        });
     }
 
     function updateProject(project) {
+        vm.isSaving = true;
         SettingsService.updateProject(project).then(function(data) {
             vm.project = data;
-            drawerMenu.updateProjectName(vm.project.name)
+            drawerMenu.updateProjectName(vm.project.name);
+            vm.isSaving = false;
         })
     }
 

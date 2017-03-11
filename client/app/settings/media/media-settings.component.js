@@ -11,13 +11,12 @@ angular.module('glossa')
         }
     });
 
-function MediaComponent(SettingsService) {
+function MediaComponent(AppService) {
     var vm = this;
 
     vm.defaultSettings = {
         waveColor: 'black',
-        skipForward: 2,
-        skipBack: 2
+        skipLength: 2
     };
     vm.waveColorOptions = [
         {
@@ -51,13 +50,17 @@ function MediaComponent(SettingsService) {
     }
 
     function saveMediaSettings(settings) {
-        SettingsService.saveSettings(settings).then(function(data) {
-            vm.settings = data;
+
+        vm.settings.waveColor = settings.waveColor;
+        vm.settings.skipLength = settings.skipLength;
+
+        AppService.saveSettings(vm.settings).then(function(data) {
+            vm.settings = data.settings;
         })
     }
 
     function restoreDefaults() {
-        console.log('restoreDefaults');
+        console.log('TODO: restoreDefaults');
     }
 
 }

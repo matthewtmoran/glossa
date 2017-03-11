@@ -1,35 +1,59 @@
 angular.module('glossa')
     .factory('AppService', AppService);
 
-function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
+function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user) {
     var service = {
-        // getSession: getSession,
-        updateSession: updateSession,
+
+        //socket functions
         initListeners: initListeners,
-        getOnlineUsers: getOnlineUsers,
+        getOnlineUsersSE: getOnlineUsersSE,
         getUserUpdates: getUserUpdates,
-        broadcastUpdates: broadcastUpdates
+        broadcastUpdates: broadcastUpdates,
+
+        //dealing with __user constant
+        getUser: getUser,
+        isSharing: isSharing,
+        getSettings: getSettings,
+        getConnections: getConnections,
+
+        //updating __user constant
+        updateSession: updateSession,
+        saveSettings: saveSettings
     };
 
     // initListeners();
     return service;
 
-    // function getSession() {
-    //     return $http.get('/api/session/')
-    //         .then(function successCallback(response) {
-    //             // console.log('Returning Response time:', Date.now());
-    //             // console.log('Session was success.');
-    //             return response.data;
-    //         }, function errorCallback(response) {
-    //             // console.log('Returning Response time:', Date.now());
-    //             console.log('There was an error', response);
-    //             return response.data;
-    //         });
-    // }
+    function getUser() {
+        return __user;
+    }
 
+    function isSharing() {
+        return __user.isSharing;
+    }
+
+    function getSettings() {
+        return __user.settings;
+    }
+
+    function getConnections() {
+        return __user.connections;
+    }
+
+
+    function saveSettings(settings) {
+        __user.settings = settings;
+        return $http.put('/api/user/' + __user._id, __user)
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
+    }
+
+    //should only be called on stateChange
     function updateSession(user) {
-        console.log('session:', user.session);
-        // console.log('Session:', session);
         return $http.put('/api/user/' + user._id, user)
             .then(function successCallback(response) {
                 return response.data;
@@ -39,7 +63,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
             });
     }
 
-    function getOnlineUsers() {
+    function getOnlineUsersSE() {
         socketFactory.emit('get:networkUsers')
     }
 
@@ -61,34 +85,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
     }
 
     function initListeners() {
-
-        socketFactory.on('joined', function(data) {
-            console.log("Heard 'joined' in appFactory.data:", data);
-            service.data = data;
-            // $rootScope.$broadcast('joined');
-
-            var msg = 'Socket Heard: joined from corpus.component' + data.socketId;
-            var delay = 8;
-
-            Notification.show({
-                message: msg,
-                hideDelay: delay
-            });
-
-            // var pinTo = getToastPosition();
-            // var toast = $mdToast.simple()
-            //     .textContent('Socket Heard: joined from corpus.component' + data.socketId)
-            //     .action('Okay')
-            //     .highlightAction(true)
-            //     .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
-            //     .position(pinTo);
-            //
-            // $mdToast.show(toast).then(function(response) {
-            //     if ( response == 'ok' ) {
-            //         alert('You clicked the \'Okay\' action.');
-            //     }
-            // });
-        });
 
         socketFactory.on('request:SocketType', function(data) {
             console.log("Heard 'request:SocketType' in appService.data:", data);
@@ -120,13 +116,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification) {
                 message: msg,
                 hideDelay: delay
             });
-
-            // getUserUpdates();
-
-
-
-
-            // $rootScope.$broadcast('local:server-connection');
 
         });
 

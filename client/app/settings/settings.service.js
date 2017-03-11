@@ -1,37 +1,14 @@
 'use strict';
-
+//TODO: refractor into project service or maybe jsut move to AppService
 angular.module('glossa')
     .factory('SettingsService', SettingsService);
 
-function SettingsService($http) {
+function SettingsService($http, __user) {
     var service = {
-        getSettings: getSettings,
-        saveSettings: saveSettings,
         getProject: getProject,
         updateProject: updateProject
     };
     return service;
-
-
-    function getSettings() {
-        return $http.get('/api/settings/')
-            .then(function successCallback(response) {
-                return response.data[0];
-            }, function errorCallback(response) {
-                console.log('There was an error', response);
-                return response.data;
-            });
-    }
-
-    function saveSettings(settings) {
-        return $http.put('/api/settings/' + settings._id, settings)
-            .then(function successCallback(response) {
-                return response.data;
-            }, function errorCallback(response) {
-                console.log('There was an error', response);
-                return response.data;
-            });
-    }
 
     function getProject() {
         return $http.get('/api/project/')
@@ -52,7 +29,5 @@ function SettingsService($http) {
                 return response.data;
             });
     }
-
-
 
 }

@@ -5,7 +5,8 @@ var Datastore = require('nedb'),
 
     userDb = new Datastore({
         filename: path.join(config.root, config.dbPath, '/user'),
-        autoload: true
+        autoload: true,
+        timestampData: true
     });
 
 module.exports = userDb;

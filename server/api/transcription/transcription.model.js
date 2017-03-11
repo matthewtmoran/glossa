@@ -5,7 +5,8 @@ var Datastore = require('nedb'),
 
     transcriptionDb = new Datastore({
         filename: path.join(config.root, config.dbPath, '/transcription'),
-        autoload: true
+        autoload: true,
+        timestampData: true
     });
 
 module.exports = transcriptionDb;

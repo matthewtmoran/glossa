@@ -37,13 +37,98 @@ function checkForApplicationData() {
             }
             if (!user) {
                 console.log('No application data exists');
-                resolve(createApplicationData());
+                resolve(defaultAppData());
             } else {
                 console.log('resolving user data');
                 resolve(user);
 
             }
         });
+    })
+}
+
+function defaultAppData() {
+    console.log('Creating application data');
+
+    var user = {
+        name: 'glossa user',
+        createdAt: Date.now(),
+        settings: {
+            isSharing: true,
+            waveColor: "black",
+            skipLength: 2
+        },
+        session: {},
+        connections: []
+    };
+
+   return createUserData(user).then(function(userData) {
+        console.log("createUserData promise resolve - userData: ", userData);
+       return createProjectData(userData).then(function(projectData) {
+            console.log("createProjectData promise resolve - userData: ", projectData);
+           return createSessionData(userData, projectData).then(function(updatedUserData) {
+                console.log('createSessionData promise resolve - updatedUserData', updatedUserData);
+                return updatedUserData;
+            })
+
+        })
+    });
+}
+
+function createUserData(user) {
+    console.log('createUserData');
+    return new Promise(function(resolve, reject) {
+        User.insert(user, function (err, createdUser) {
+            if (err) {
+                console.log('There was an Error creating User', err);
+                reject(err);
+            }
+            console.log('Created default user', createdUser);
+            resolve(createdUser);
+        });
+    })
+}
+
+function createProjectData(userData) {
+    console.log('createProjectData');
+    var project = {
+        name: 'glossa project',
+        createdBy: userData._id
+    };
+    return new Promise(function(resolve, reject) {
+        Project.insert(project, function(err, createdProject) {
+            if (err) {
+                console.log('There was an Error creating Project', err);
+                reject(err);
+            }
+            console.log('Created default project', createdProject);
+            resolve(createdProject);
+        })
+    })
+}
+
+function createSessionData(userData, projectData) {
+    console.log('createSessionData');
+    console.log('userData', userData);
+    console.log('projectData', projectData);
+    var options = {returnUpdatedDocs: true};
+    return new Promise(function(resolve, reject) {
+
+        userData.session.start = Date.now();
+        userData.session.currentState = 'corpus.meta';
+        userData.session.projectId = projectData._id;
+        userData.session.currentStateParams = {};
+        userData.session.currentStateParams.user = userData._id;
+        userData.session.currentStateParams.corpus = 'default';
+
+        User.update({_id: userData._id}, userData, options, function(err, updatedCount, updatedUser) {
+            if (err) {
+                console.log('There was an error updating user', err);
+                reject(err);
+            }
+            console.log('Updated user data', updatedUser);
+            resolve(updatedUser);
+        })
     })
 }
 

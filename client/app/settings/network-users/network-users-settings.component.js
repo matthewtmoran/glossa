@@ -5,10 +5,13 @@ angular.module('glossa')
         controller: NetworkSettings,
         controllerAs: 'vm',
         transclude: true,
-        templateUrl: 'app/settings/network-users/network-users-settings.component.html'
+        templateUrl: 'app/settings/network-users/network-users-settings.component.html',
+        bindings: {
+            settings: '='
+        }
     });
 
-function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __user, dialogSrvc) {
+function NetworkSettings(SettingsService, $scope, AppService, socketFactory, dialogSrvc) {
     var vm = this;
 
     vm.$onInit = init;
@@ -40,9 +43,17 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
     vm.testEvent = testEvent;
     vm.toggleSharing = toggleSharing;
 
+    function init() {
+        vm.networkUsers = AppService.getConnections();
+
+        if (vm.settings.isSharing) {
+            AppService.getOnlineUsersSE();
+        }
+    }
+
     function toggleSharing() {
         var options = {};
-        if (!vm.isSharing) {
+        if (!vm.settings.isSharing) {
             options.title = 'Are you sure you want to turn OFF sharing?';
             options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
         } else {
@@ -51,17 +62,22 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
         }
 
         dialogSrvc.confirmDialog(options).then(function(result) {
+            console.log('result', result);
             if (!result) {
-                vm.isSharing = !vm.isSharing;
                 return;
             }
-
-            console.log('TODO: update application data')
-
-
+            if (vm.settings.isSharing) {
+                console.log('sharing is enabled');
+                socketFactory.init();
+                AppService.initListeners();
+                AppService.getOnlineUsersSE();
+            }
+            if (!vm.settings.isSharing) {
+                console.log('sharing should be disabled');
+                socketFactory.disconnect();
+            }
+            AppService.saveSettings(vm.settings);
         })
-
-
     }
 
 
@@ -69,21 +85,6 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
         socketFactory.emit('local-client:buttonTest', {myData: 'just some data'});
     }
 
-    function init() {
-        vm.isSharing = __user.isSharing;
-        getSeenUsers();
-        AppService.getOnlineUsers();
-    }
-
-    function getSeenUsers() {
-            console.log('__user.connections', __user.connections);
-        if (__user.connections) {
-            vm.networkUsers = __user.connections;
-        } else {
-            vm.networkUsers = [];
-        }
-
-    }
 
     $scope.$on('update:networkUsers', function(event, data) {
 
