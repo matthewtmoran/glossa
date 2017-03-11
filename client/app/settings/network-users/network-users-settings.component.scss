@@ -10,3 +10,51 @@
 	font-style: italic;
 	color: lightgrey !important;
 }
+
+.user-list {
+	padding-top: 0;
+
+	.user-card {
+		border-top: 1px solid rgba(0,0,0,0.12);
+
+		.user-avatar-container {
+			position: relative;
+
+			.online-notification {
+				background: #0f9d58;
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				position: absolute;
+				bottom: 3px;
+				right: 5px;
+				z-index: 9999;
+			}
+		}
+
+		.user-name-container {
+			margin-left: 20px;
+		}
+
+		.letter {
+			color: white;
+		}
+
+		.md-button {
+
+			&.is-following {
+				color: rgba(158,158,158, 1);
+			}
+
+			md-icon {
+				position: absolute;
+				top: 3px;
+				right: 20px;
+			}
+		}
+	}
+}
+
+.bottom-border {
+	border-bottom: 1px solid rgba(0,0,0,0.12);
+}

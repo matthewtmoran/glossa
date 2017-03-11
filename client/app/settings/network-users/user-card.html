@@ -1,21 +1,48 @@
-<md-card ng-class="{'user-online' : vm.user.online, 'user-offline' : !vm.user.online}">
-	<md-card-title layout="column" layout-align="center center">
 
-		<div class="user-card-items" flex layout="row" layout-align="space-between center">
+<md-list-item class="user-card md-padding" >
+	<div class="user-avatar-container">
+		<md-button ng-if="!vm.user.avatar" disabled="true" class="md-fab" ng-style="{'background-color': vm.user.color }">
+			<span class="letter">{{vm.user.name[0]}}</span>
+		</md-button>
+		<img ng-if="vm.user.avatar" src="vm.user.avatar" class="md-avatar">
+		<span ng-if="vm.user.isOnline" class="online-notification"></span>
+	</div>
+	<div class="user-name-container">
+		<span>{{vm.user.name}}</span>
+	</div>
+	<span flex></span>
+	<div class="user-sync-containaer">
+		<span ng-if="vm.user.lastSync">Last Sync: </span>
+		<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>
+	</div>
+	<div class="user-follow-container">
+		<md-button  ng-click="vm.toggleFollow(vm.user.following)"
+		            ng-class="{'md-raised not-following': !vm.user.following, 'is-following': vm.user.following}"
+		            class=" md-large-btn">
+			{{vm.user.following ? "Following" : "Follow"}}
+			<md-icon ng-if="vm.user.following">check</md-icon>
+		</md-button>
+	</div>
+</md-list-item>
 
-			<div>
-				<md-button class="md-fab" ng-style="{'background-color': vm.user.color }">
-					<span class="letter">{{vm.user.name[0]}}</span>
-				</md-button>
-				<span>{{vm.user.name}}</span>
-			</div>
+<!--<md-card ng-class="{'user-online' : vm.user.online, 'user-offline' : !vm.user.online}">-->
+	<!--<md-card-title layout="column" layout-align="center center">-->
 
-			<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>
+		<!--<div class="user-card-items" flex layout="row" layout-align="space-between center">-->
 
-			<md-switch ng-model="vm.user.following" ng-change="vm.toggleFollow(vm.user.following)" aria-label="Switch 1">
-				Following: <span>{{vm.user.following ? 'On' : 'Off'}}</span>
-			</md-switch>
+			<!--<div>-->
+				<!--<md-button class="md-fab" ng-style="{'background-color': vm.user.color }">-->
+					<!--<span class="letter">{{vm.user.name[0]}}</span>-->
+				<!--</md-button>-->
+				<!--<span>{{vm.user.name}}</span>-->
+			<!--</div>-->
 
-		</div>
-	</md-card-title>
-</md-card>
+			<!--<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>-->
+
+			<!--<md-switch ng-model="vm.user.following" ng-change="vm.toggleFollow(vm.user.following)" aria-label="Switch 1">-->
+				<!--Following: <span>{{vm.user.following ? 'On' : 'Off'}}</span>-->
+			<!--</md-switch>-->
+
+		<!--</div>-->
+	<!--</md-card-title>-->
+<!--</md-card>-->

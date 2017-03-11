@@ -10,21 +10,6 @@ angular.module('glossa')
         }
     });
 
-// function userCard() {
-
-
-
-    // return {
-    //     restrict: 'E',
-    //     templateUrl: 'app/settings/network-users/user-card.html',
-    //     scope: {
-    //         user: '='
-    //     },
-    //     controller: userCardController,
-    //     controllerAs: 'vm',
-    //     bindToController: true,
-    //     link: userCardLink
-    // };
 
     function userCardController(AppService, socketFactory, __user) {
         var vm = this;
@@ -38,13 +23,13 @@ angular.module('glossa')
 
         vm.user.color = alphabetColors[colorIndex];
 
-        console.log('vm.user', vm.user);
 
         vm.toggleFollow = toggleFollow;
 
 
         function toggleFollow(following) {
-            vm.user.following = following;
+            vm.user.following = !vm.user.following;
+            // vm.user.following = following;
 
             __user.connections.forEach(function(connection, index) {
                 if (connection._id === vm.user._id) {

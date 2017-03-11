@@ -13,7 +13,29 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
 
     vm.$onInit = init;
 
-    vm.networkUsers = [];
+    // vm.networkUsers = [];
+
+    vm.networkUsers = [
+        {
+            name: 'User 1',
+            lastSync: Date.now(),
+            _id: '1234',
+            following: true,
+            isOnline: true
+        },
+        {
+            name: 'Test User 2',
+            lastSync: null,
+            _id: '5678',
+            following: false
+        },
+        {
+            name: 'Another User 3',
+            lastSync: null,
+            _id: '4321',
+            following: false
+        }
+    ];
 
     vm.testEvent = testEvent;
 
@@ -22,8 +44,8 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __u
     }
 
     function init() {
-        getSeenUsers();
-        AppService.getOnlineUsers();
+        // getSeenUsers();
+        // AppService.getOnlineUsers();
     }
 
     function getSeenUsers() {

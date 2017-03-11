@@ -27,6 +27,12 @@ function About() {
             title: 'Field Linguist',
             url: 'onechrisjones.me',
             avatar: ''
+        },
+        {
+            name: 'Justin Rees',
+            title: '',
+            url: 'tribeordie.com',
+            avatar: ''
         }
     ];
 
