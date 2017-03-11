@@ -5,19 +5,20 @@
 // TODO: Need to separate the directive and controller
 angular.module('glossa')
     .controller('wavesurferPlayerController', WavesurferPlayerController)
-    .directive('backImg', function($timeout){
+    .directive('backImg', function($timeout, __rootUrl){
         return function(scope, element, attrs){
             //element where background image should be attached to
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
             attrs.$observe('backImg', function(value) {
 
                 //fix for windows paths... I'm not sure how this will effect mac/linux
+                // TODO: find univeral way to fix path vs regex....
                 var pathFix = value.replace(/\\/g, "\\\\");
 
                 if (value) {
 
                     waveEl.css({
-                        'background-image': 'url(http://localhost:9000/' + pathFix + ')',
+                        'background-image': 'url(' + __rootUrl + pathFix + ')',
                         'background-size' : 'cover',
                         'background-position' : 'center center'
                     });

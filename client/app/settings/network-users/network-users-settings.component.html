@@ -1,0 +1,80 @@
+<md-toolbar class="light-toolbar">
+	<div class="md-toolbar-tools">
+		<h2>Turn Sharing OFF</h2>
+		<span flex></span>
+		<md-switch ng-model="vm.isSharing" ng-change="vm.toggleSharing()" aria-label="Toggle sharing"></md-switch>
+	</div>
+</md-toolbar>
+<div layout="row" class="row-full-height" >
+	<div flex="25" class="left-side" md-whiteframe="2" layout="column">
+
+		<div class="image-container profile-image-container" ng-style="{'background-image':'url(assets/img/profileImage.jpg)'}">
+			<h2>Your Profile</h2>
+			<md-button class="md-icon-button">
+				<md-icon>more_vert</md-icon>
+			</md-button>
+		</div>
+
+		<form action="">
+			<div class="md-padding" layout="row">
+				<div flex="20" class="contact-section-left">
+					<md-icon class="md-36">phone</md-icon>
+				</div>
+				<div flex="80">
+					<md-input-container class="md-block">
+						<input type="text" placeholder="Mobile">
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<input type="text" placeholder="Work">
+					</md-input-container>
+				</div>
+
+			</div>
+			<div class="md-padding" layout="row">
+				<div flex="20" class="contact-section-left">
+					<md-icon class="md-36">email</md-icon>
+				</div>
+				<div flex="80">
+					<md-input-container class="md-block">
+						<input type="email" placeholder="Personal">
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<input type="email" placeholder="Work">
+					</md-input-container>
+				</div>
+			</div>
+		</form>
+
+
+		<md-list>
+			<md-list-item ng-repeat="contact in vm.contributers" class="md-3-line contact-item">
+				<img ng-src="{{contact.avatar}}" class="md-avatar" alt="" />
+				<div class="md-list-item-text compact">
+					<h3>{{contact.name}}</h3>
+					<h4>{{contact.title}}</h4>
+					<p>{{contact.url}}</p>
+				</div>
+			</md-list-item>
+		</md-list>
+	</div>
+	<div flex="75"  layout="column" >
+
+		<md-list class="user-list">
+			<user-card ng-repeat="user in vm.networkUsers" user="user" ng-class="{'bottom-border':$last}"></user-card>
+		</md-list>
+
+	</div>
+</div>
+
+
+
+
+<!--<md-content id="network-users" class="md-padding">-->
+
+	<!--<md-button class="md-raised" ng-click="vm.testEvent()">Test Socket Event</md-button>-->
+
+	<!--<user-card ng-repeat="user in vm.networkUsers" user="user"></user-card>-->
+
+<!--</md-content>-->

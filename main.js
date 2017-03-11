@@ -52,7 +52,7 @@ var electron = require('electron'),
 
 var path = require('path');
 var url = require('url');
-const express = require('./server/app'); //your express app
+// const express = require('./server/app'); //your express app
 
 var config = require('./server/config/environment');
 
@@ -66,15 +66,21 @@ function createWindow () {
 
 
     // and load the index.html of the app.
+    win.loadURL(url.format({
+        pathname: 'http://localhost:9000'
+    }));
+
     // win.loadURL(url.format({
-    //     pathname: 'http://localhost:' + config.port,
+    //     pathname: path.join(__dirname, 'client/index.html'),
     //     protocol: 'file:',
-    //     slashes: false
+    //     slashes: true
     // }));
-    win.loadURL('http://localhost:' + config.port);
+
+    // win.loadURL(__dirname, 'client/index.html');
+    // win.loadURL('http://localhost:' + config.port);
 
     // Open the DevTools.
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
 
     // Emitted when the window is closed.
     win.on('closed', function() {

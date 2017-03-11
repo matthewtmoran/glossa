@@ -39,9 +39,14 @@ function SettingsController($state, $scope, SettingsService, $timeout) {
             index: 2
         },
         {
+            label: 'Network',
+            state: 'settings.network',
+            index: 3
+        },
+        {
             label: 'Hashtags',
             state: 'settings.hashtags',
-            index: 3
+            index: 4
         }
     ];
 
@@ -65,6 +70,11 @@ function SettingsController($state, $scope, SettingsService, $timeout) {
             case 2:
                 vm.selectedTab = vm.tabs[2];
                 $state.go(vm.tabs[2].state);
+                // $location.url("/view3");
+                break;
+            case 3:
+                vm.selectedTab = vm.tabs[3];
+                $state.go(vm.tabs[3].state);
                 // $location.url("/view3");
                 break;
         }

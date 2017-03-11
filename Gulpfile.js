@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     childProcess = require('child_process'),
     mainBowerFiles = require('main-bower-files'),
     gulpLoadPlugins = require('gulp-load-plugins'),
-    // electron = require('electron-prebuilt'),
+    electron = require('electron'),
     _ = require('lodash'),
     runSequence = require('run-sequence'),
     plugins = gulpLoadPlugins(),
@@ -45,9 +45,23 @@ gulp.task('run', function () {
 
     // Set default node environment to development
 
+    console.log('gulp task: run');
 
     // electron.start();
-    return run('electron .').exec();
+    // return run('electron .').exec();
+
+    // childProcess.spawn(electron, ['./'], { stdio: 'inherit' });
+});
+
+gulp.task('server',function(){
+    plugins.nodemon({
+        'script': 'server/app.js',
+        'ignore': ['client/*', 'server/data/*']
+    });
+});
+
+gulp.task('electron', function() {
+   return plugins.run('electron .').exec();
 
     // childProcess.spawn(electron, ['./'], { stdio: 'inherit' });
 });
@@ -138,9 +152,16 @@ gulp.task('index', function() {
         .pipe(gulp.dest(clientPath));
 });
 
-gulp.task('watch', function() {
-    gulp.watch(paths.client.styles, ['styles'] );
+// gulp.task('watch', function() {
+    // gulp.watch(paths.client.styles, ['styles'] );
     // gulp.watch(paths.client.jsScripts, electron.reload);
+// });
+
+gulp.task('watch', function() {
+    // plugins.livereload.listen();
+    // gulp.watch(paths.client.styles, ['styles']);
+    // gulp.watch('public/js/*.js', ['scripts']);
+    // gulp.watch('views/**/*.ejs', ['ejs']);
 });
 
 gulp.task('serve', function (cb) {
@@ -150,7 +171,9 @@ gulp.task('serve', function (cb) {
             'inject',
             'index'
         ],[
+            'server',
             'run',
+            // 'electron',
             'watch'
         ],
         cb

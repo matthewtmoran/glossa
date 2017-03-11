@@ -4,7 +4,7 @@
 		search-text="navVm.searchText">
 </navbar-component>
 
-<md-content layout="row" flex class="corpus-content">
+<md-content layout="row" flex class="corpus-content main">
 
 	<md-button id="uploadButton"
 	           class="md-button md-fab md-grey-fab md-fab-bottom-left"
@@ -27,7 +27,7 @@
 						<md-item-content md-ink-ripple layout="row" layout-align="start center">
 							<div class="md-list-item-text" layout="column">
 								<h3>{{file.displayName}}</h3>
-								<p>{{file.previewContent}}</p>
+								<p>{{file.content | limitTo: 30 }}<span ng-if="file.content.length > 30">...</span></p>
 							</div>
 						</md-item-content>
 					</a>

@@ -5,24 +5,84 @@ var Settings = require('../api/settings/settings.model');
 var currentUser;
 
 module.exports = {
-    checkForSession: checkForSession
+    checkForSession: checkForSession,
+    getGlossaUser: getGlossaUser,
+    checkForApplicationData: checkForApplicationData
 };
 
-var defaultUser = {
-    name: 'glossa user'
-};
+// var defaultUser = {
+//     name: 'glossa user'
+// };
 var defaultSession = {
     currentState: 'corpus.meta'
 };
 var defualtProject = {
     name: 'glossa project'
 };
+
 var defaultSettings = {
     media: {
         waveColor: 'black',
-        skipLength: 2,
+        skipLength: 2
     }
 };
+
+
+function checkForApplicationData() {
+    return new Promise(function(resolve, reject) {
+        User.findOne({}, function(err, user) {
+            if (err) {
+                console.log('There was an error loading session.', err);
+                reject(err);
+            }
+            if (!user) {
+                console.log('No application data exists');
+                resolve(createApplicationData());
+            } else {
+                console.log('resolving user data');
+                resolve(user);
+
+            }
+        });
+    })
+}
+
+function createApplicationData() {
+    var defaultApplicationData = {
+        name: 'glossa user',
+        session: {}
+    };
+
+   return createDefaultUser(defaultApplicationData)
+        .then(function(userData) {
+            return projectCheck(userData)
+                .then(function(projectData) {
+                    return createDefaultSettings(userData, projectData)
+                        .then(function() {
+                            var options = {
+                                returnUpdatedDocs: true
+                            };
+
+                            userData.session.start = Date.now();
+                            userData.session.currentState = 'corpus.meta';
+                            userData.session.projectId = projectData._id;
+                            userData.session.currentStateParams = {user: userData._id, corpus: 'default'};
+
+                            return new Promise(function (resolve, reject) {
+                                User.update({_id: userData._id}, userData, options, function (err, numUpdated, updatedUser) {
+                                    if (err) {
+                                        console.log('Error Creating Session', err);
+                                        reject(err);
+                                    }
+                                    User.persistence.stopAutocompaction();
+                                    resolve(updatedUser);
+                                });
+                            });
+                        });
+                });
+        })
+}
+
 
 //check for session
     //if false check for user
@@ -31,17 +91,21 @@ var defaultSettings = {
     //if user does not exist create new project
 
 function checkForSession() {
-    Session.find({}, function(err, sessions) {
-        if (err) {
-            return console.log('There was an error loading session.', err);
-        }
-        if (sessions.length < 1) {
-            console.log('No Session exists; check for user');
-            return validateAll();
-        }
-        console.log('Session exists');
-        return sessions[0];
-    });
+
+    return new Promise(function(resolve, reject) {
+        Session.find({}, function(err, sessions) {
+            if (err) {
+                console.log('There was an error loading session.', err);
+                reject(err);
+            }
+            if (sessions.length < 1) {
+                console.log('No Session exists; check for user');
+                resolve(validateAll());
+            }
+            resolve(sessions[0]);
+        });
+    })
+
 }
 
 
@@ -50,13 +114,27 @@ function validateAll() {
         .then(function(userData) {
            return projectCheck(userData)
                .then(function(projectData) {
-                   return createDefaultSession(userData, projectData)
+                   return createDefaultSettings(userData, projectData)
                        .then(function(sessionData) {
-                          return createDefaultSettings();
+                          return createDefaultSession(userData, projectData);
                     })
                });
         })
 }
+
+function getGlossaUser() {
+    return new Promise(function(resolve, reject) {
+        User.find({}, function(err, user) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(user);
+            }
+        })
+    })
+}
+
+
 
 function userCheck() {
     return new Promise(function(resolve, reject) {
@@ -102,7 +180,7 @@ function projectCheck(user) {
                 });
 
             } else {
-                console.log('Returning existing project.... data needs to be normalized')
+                console.log('Returning existing project.... data needs to be normalized');
                 resolve(project);
                 // return user;
             }
@@ -111,7 +189,7 @@ function projectCheck(user) {
 }
 
 //count users if none exists create a new one and save results somewhere
-function createDefaultUser() {
+function createDefaultUser(defaultUser) {
     defaultUser.createdAt = Date.now();
     return new Promise(function(resolve, reject) {
         return User.insert(defaultUser, function (err, createdUser) {
@@ -119,8 +197,9 @@ function createDefaultUser() {
                 console.log('There was an Error creating User', err);
                 reject(err);
             }
+
+            console.log('created default user', createdUser);
             resolve(createdUser);
-            // return createdUser;
         });
     })
 }
@@ -148,7 +227,7 @@ function createDefaultSession(user, project) {
     defaultSession.currentStateParams = {user: user._id, corpus:'default'};
 
     return new Promise(function (resolve, reject) {
-       Session.insert(defaultSession, function(err, createdSession) {
+       return Session.insert(defaultSession, function(err, createdSession) {
             if (err) {
                 console.log('Error Creating Session', err);
                 reject(err);
@@ -159,10 +238,14 @@ function createDefaultSession(user, project) {
 }
 
 function createDefaultSettings() {
-    Settings.insert(defaultSettings, function(err, createdSettings) {
-        if (err) {
-            return console.log('Error Creating Session', err);
-        }
-        console.log('Settings Created', createdSettings._id);
+    return new Promise(function (resolve, reject) {
+        Settings.insert(defaultSettings, function (err, createdSettings) {
+            if (err) {
+                console.log('Error Creating Session', err);
+                reject(err);
+            }
+            console.log('created default settings');
+            resolve(createdSettings);
+        });
     });
 }

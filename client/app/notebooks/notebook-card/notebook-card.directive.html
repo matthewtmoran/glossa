@@ -31,7 +31,9 @@
 	<md-divider></md-divider>
 	<md-card-actions flex=10 layout="row" layout-align="end bottom">
 		<md-button ng-if="isCorpus" ng-click="disconnect({notebook: notebook})">Disconnect</md-button>
+
 		<md-button ng-click="openDetails({event: $event}, notebook)">View Details</md-button>
+
 		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
 	</md-card-actions>
 

@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('CorpusService', CorpusService);
 
-function CorpusService($http, Upload, $stateParams) {
+function CorpusService($http, Upload, $stateParams, __user) {
 
     var service = {
         getFiles: getFiles,
@@ -52,16 +52,14 @@ function CorpusService($http, Upload, $stateParams) {
     //create new md file
     function createFile(name) {
 
-        var session = JSON.parse(localStorage.getItem('session'));
-
         var file = {
             displayName: name || 'untitled',
             description: '',
             content: '',
             corpus: $stateParams.corpus,
             createdAt: Date.now(),
-            createdBy: session.userId,
-            projectId: session.projectId
+            createdBy: __user._id,
+            projectId: __user.session.projectId
         };
 
         return $http.post('/api/transcription', file)

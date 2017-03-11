@@ -9,9 +9,12 @@ angular.module('glossa')
         bindings: { markdownFiles: '=' } //defined in route resolve
     });
 
-
-function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookService) {
+//$socket ...custom socket library implementation...
+function corpusCtrl($scope, $state,  Notification, CorpusService, NotebookService, $mdToast, socketFactory, AppService, $window) {
     var vm = this;
+
+    // socketFactory.init();
+    // AppService.initListeners();
 
     vm.$onInit = onInit;
     vm.createMDFile = createMDFile;
@@ -23,9 +26,116 @@ function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookServic
     //watch for file attachment and update object to be bound
     $scope.$watch('vm.currentFile.notebookId', attachmentWatcher);
 
+    $scope.$on('joined', function(data) {
+        console.log("Angular Event Listenettr Joined");
+        var pinTo = $scope.getToastPosition();
+        var toast = $mdToast.simple()
+            .textContent('Socket Heard: joined from corpus.component' + data.socketId)
+            .action('Okay')
+            .highlightAction(true)
+            .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
+            .position(pinTo);
+
+        $mdToast.show(toast).then(function(response) {
+            if ( response == 'ok' ) {
+                alert('You clicked the \'Okay\' action.');
+            }
+        });
+    });
+
+    // $scope.$on('local:server-connection', function() {
+    //     var pinTo = $scope.getToastPosition();
+    //     var toast = $mdToast.simple()
+    //         .textContent('Connection with server complete')
+    //         .action('Okay')
+    //         .highlightAction(true)
+    //         .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
+    //         .position(pinTo);
+    //
+    //     $mdToast.show(toast);
+    // });
+
+
+    //custom socket library implementation begin
+    // $socket.on('echo', function(data) {
+    //     console.log('echo client listener', data);
+    //
+    //     var pinTo = $scope.getToastPosition();
+    //     var toast = $mdToast.simple()
+    //         .textContent('echo client listener' + data.message)
+    //         .action('Okay')
+    //         .highlightAction(true)
+    //         .highlightClass('md-accent')// Accent is used by default, this just demonstrates the usage.
+    //         .position(pinTo);
+    //
+    //     $mdToast.show(toast).then(function(response) {
+    //         if ( response == 'ok' ) {
+    //             alert('You clicked the \'Okay\' action.');
+    //         }
+    //     });
+    //
+    //
+    // });
+    //
+    // $socket.emit('echo', {message: 'This is a message!'});
+    //custom socket library implementation end
+
+
+    var last = {
+        bottom: false,
+        top: true,
+        left: false,
+        right: true
+    };
+
+    // $scope.toastPosition = angular.extend({},last);
+    //
+    // function sanitizePosition() {
+    //     var current = $scope.toastPosition;
+    //
+    //     if ( current.bottom && last.top ) current.top = false;
+    //     if ( current.top && last.bottom ) current.bottom = false;
+    //     if ( current.right && last.left ) current.left = false;
+    //     if ( current.left && last.right ) current.right = false;
+    //
+    //     last = angular.extend({},current);
+    // }
+    // $scope.getToastPosition = function() {
+    //     sanitizePosition();
+    //
+    //     return Object.keys($scope.toastPosition)
+    //         .filter(function(pos) { return $scope.toastPosition[pos]; })
+    //         .join(' ');
+    // };
+
+
+
+
+    // $socket.on('echo', function (data) {
+    //     console.log('echo client listener', data);
+    // });
+    //
+    // $scope.emitBasic = function emitBasic() {
+    //     $socket.emit('echo', $scope.dataToSend);
+    //     $scope.dataToSend = '';
+    // };
+    //
+    // $scope.emitACK = function emitACK() {
+    //     $socket.emit('echo-ack', $scope.dataToSend, function (data) {
+    //         console.log('echo-ack data', data);
+    //         $scope.serverResponseACK = data;
+    //     });
+    //     $scope.dataToSend = '';
+    // };
+
 
     //runs on component initialization
     function onInit() {
+        // if (!$window.socket) {
+        //     socketFactory.init();
+        //     AppService.initListeners();
+        // }
+
         vm.currentFile = vm.markdownFiles[0];
     }
 
@@ -84,5 +194,16 @@ function corpusCtrl($scope, $state,  $stateParams, CorpusService, NotebookServic
             vm.notebookAttachment = null;
         }
     }
+
+    // function showToast() {
+    //     var msg = vm.message;
+    //     if (!msg) {
+    //         msg = 'Toast number ' + ++vm.number;
+    //     }
+    //     Notification.show({
+    //         message: msg,
+    //         hideDelay: vm.delay
+    //     });
+    // }
 
 }

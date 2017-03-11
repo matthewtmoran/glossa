@@ -8,32 +8,23 @@
 angular.module('glossa')
     .factory('baselineSrvc', baselineSrvc);
 
-function baselineSrvc() {
-
-    var content;
+function baselineSrvc($http) {
 
     var service = {
-        readContent: readContent,
         updateContent: updateContent
     };
     return service;
 
-    function readContent(file, cb) {
-       return fs.readFile(path.join(MDRootPath, file.name + file.extension), "utf8", function read(err, data) {
-            if (err) {
-                return console.log('there was an error', err);
-            }
-            content = data;
-            return cb(content);
-        })
-    }
 
-    function updateContent(file, newValue) {
-        fs.writeFileSync(file.path, newValue, 'utf-8');
+    function updateContent(currentFile) {
     //    write to file system new changes
-    }
+        return $http.put('/api/transcription/corpus/' + currentFile._id, currentFile)
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
 
-    function sendFileContent(content) {
-        return content;
     }
 }

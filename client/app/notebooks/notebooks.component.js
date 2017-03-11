@@ -8,16 +8,19 @@ angular.module('glossa')
         templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
-function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService) {
+function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, socketFactory) {
     var nbVm = this;
     var hashtagsUsed = [];
 
     nbVm.$onInit = function() {
         queryNotebooks();
+        // socketFactory.init();
+        // AppService.initListeners();
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
 
+    nbVm.isLoading = true;
     nbVm.hidden = false;
     nbVm.isOpen = false;
     nbVm.hover = false;
@@ -27,8 +30,11 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         { name: "Create Normal Post", icon: "create", direction: "left", type: 'normal' }
     ];
     nbVm.notebooks = [];
+    nbVm.externalNotebooks = [];
     nbVm.commonTags = [];
 
+
+    nbVm.showNewUpdates = showNewUpdates;
     nbVm.viewDetails = viewDetails;
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
@@ -45,7 +51,8 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
      */
     function queryNotebooks() {
         NotebookService.getNotebooks().then(function(data) {
-            nbVm.notebooks = data
+            nbVm.notebooks = data;
+            nbVm.isLoading = false;
         })
     }
 
@@ -53,6 +60,16 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         HashtagService.getCommonTags().then(function(data) {
             nbVm.commonTags = data
         })
+    }
+
+
+    //TODO: deal with updating notebooks
+    function showNewUpdates() {
+        nbVm.externalNotebooks.forEach(function(newNotebook) {
+            newNotebook.isNew = true;
+            nbVm.notebooks.push(newNotebook);
+        });
+        nbVm.externalNotebooks = [];
     }
 
     /**
@@ -116,4 +133,12 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         };
         viewDetails(event, notebook)
     }
+
+    $scope.$on('update:externalData', function(event, data) {
+        console.log('update:externalData');
+
+        data.updatedData.forEach(function(data) {
+            nbVm.externalNotebooks.push(data);
+        })
+    })
 }

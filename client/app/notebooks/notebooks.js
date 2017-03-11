@@ -7,6 +7,6 @@ function config($stateProvider) {
     $stateProvider
         .state('notebook', {
             url: '/notebooks',
-            template: '<notebooks-component flex layout="column">'
+            template: '<notebooks-component ng-cloak flex layout="column">'
         });
 }

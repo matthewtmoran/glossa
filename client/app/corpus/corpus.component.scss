@@ -5,6 +5,12 @@
 		background: lightgrey;
 	}
 
+	.md-list-item-text {
+		p {
+			font-style: italic;
+		}
+	}
+
 	#uploadButton {
 		z-index: 61 !important;
 		left: 215px !important;

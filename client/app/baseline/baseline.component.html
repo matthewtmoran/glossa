@@ -9,5 +9,9 @@
 				back-img="{{blVm.imagePath}}">
 		</wavesurfer-player>
 	</div>
-	<div layout="row" flex ui-codemirror="{ onLoad : blVm.codemirrorLoaded }" ></div>
+	<div ng-model="blVm.currentFile.content"
+	     ng-change="blVm.saveContent(blVm.currentFile)"
+	     ng-model-options="{debounce: 750}" layout="row" flex ui-codemirror="{ onLoad : blVm.codemirrorLoaded }" ></div>
+
+
 </div>

@@ -14,4 +14,33 @@ function About() {
     vm.$onInit = function() {
         console.log('About init');
     };
+
+    vm.contributers = [
+        {
+            name: 'Matthew Moran',
+            title: 'Software Engineer',
+            url: 'http:........',
+            avatar: ''
+        },
+        {
+            name: 'Chris Jones',
+            title: 'Field Linguist',
+            url: 'onechrisjones.me',
+            avatar: ''
+        },
+        {
+            name: 'Justin Rees',
+            title: '',
+            url: 'tribeordie.com',
+            avatar: ''
+        }
+    ];
+
+    vm.softwares = [
+        {
+            name: 'Angular Material',
+            url: 'http://............'
+        }
+    ]
+
 }

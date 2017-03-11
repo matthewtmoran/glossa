@@ -73,8 +73,18 @@ $secondary-text: $lBlack;
 	src: url(../assets/fonts/Roboto-Regular.ttf);
 }
 @font-face {
-	font-family: "Roboto";
+	font-family: "Roboto-light";
 	src: url(../assets/fonts/Roboto-Light.ttf);
+	font-weight: 300;
+}
+@font-face {
+	font-family: "Roboto-Medium";
+	src: url(../assets/fonts/Roboto-Medium.ttf);
+	font-weight: 300;
+}
+@font-face {
+	font-family: "Roboto-Thin";
+	src: url(../assets/fonts/Roboto-Thin.ttf);
 	font-weight: 300;
 }
 
@@ -121,6 +131,7 @@ md-backdrop.md-sidenav-backdrop {
 @import 'notebooks/notebooks.component';
 @import 'settings/about/about-settings.component';
 @import 'settings/media/media-settings.component';
+@import 'settings/network-users/network-users-settings.component';
 @import 'settings/project-settings/project-settings.component';
 @import 'settings/settings.component';
 @import 'tagManagement/hashtags.component';
@@ -231,4 +242,20 @@ md-sidenav {
 .main.ng-enter-active {
 	/* end with opacity 1 (fade in) */
 	opacity: 1;
+}
+
+.md-48 {
+	font-size: 48px;
+}
+
+.md-36 {
+	font-size: 36px;
+}
+
+.md-24 {
+	font-size: 24px;
+}
+
+.md-18 {
+	font-size: 18px;
 }

@@ -9,7 +9,7 @@
 		<h3>users</h3>
 		<md-divider></md-divider>
 		<h3>Common Tags</h3>
-		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised">Tag Management</md-button>
+		<md-button ng-click="nbVm.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
 		<md-list>
 			<md-list-item class="chip-item" ng-repeat="tag in nbVm.commonTags | orderBy: tag.occurrence">
 				<md-chip class="chip-container">
@@ -22,13 +22,24 @@
 		</md-list>
 	</md-content>
 
-	<md-content flex="75" class="notebook-list" layout-padding >
+	<md-content flex="75" class="notebook-list" layout-padding>
+
+
+		<md-progress-circular class="notebook-loader fade-out" ng-hide="!nbVm.isLoading" md-diameter="50"></md-progress-circular>
+
+		<md-button class="md-raised update-btn" ng-if="nbVm.externalNotebooks.length" ng-click="nbVm.showNewUpdates()">
+			<span>{{nbVm.externalNotebooks.length}} updates are available.</span>
+			<span>View changes</span>
+			<md-icon class="">update</md-icon>
+		</md-button>
+
 		<md-grid-list
 			md-cols="1" md-cols-lt-md="1" md-cols-md="2" md-cols-lg="2" md-cols-gt-lg="3"
 			md-row-height="500"
 			md-gutter="16px" md-gutter-gt-sm="24px">
 			<md-grid-tile
-				class="grid-tile mdl-shadow--2dp"
+				ng-show="nbVm.notebooks.length"
+				class="grid-tile mdl-shadow--2dp fade-in"
 				ng-repeat="notebook in nbVm.notebooks | orderBy: '-createdAt' "
 				md-colspan="1">
 

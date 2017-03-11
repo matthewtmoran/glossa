@@ -32,6 +32,7 @@ var all = {
   // List of user roles
   userRoles: ['guest', 'user', 'admin'],
 
+    dataRoot: '/data',
     dbPath: 'server/data/database/',
     imagePath: 'server/data/image',
     audioPath: 'server/data/audio',

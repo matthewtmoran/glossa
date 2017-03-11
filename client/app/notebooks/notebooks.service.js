@@ -3,7 +3,7 @@
 angular.module('glossa')
     .factory('NotebookService', NotebookService);
 
-function NotebookService($http, $q, simpleParse, Upload, AppService, UserService) {
+function NotebookService($http, $q, simpleParse, Upload, AppService, UserService, __user) {
 
     //this is where we customize the toolbar i.e. icons
     var simplemdeTollbar = [
@@ -115,30 +115,55 @@ function NotebookService($http, $q, simpleParse, Upload, AppService, UserService
      */
 
     function createNotebook(notebook) {
-        var sessionData;
-        return AppService.getSession()
-            .then(function (session) {
-                sessionData = session;
-                return UserService.getUser(session.userId)
-            }).then(function(user) {
 
-                notebook.name = simpleParse.title(notebook);
-                notebook.createdAt = Date.now();
-                notebook.createdBy = user;
-                notebook.projectId = sessionData.projectId;
+        notebook.name = simpleParse.title(notebook);
+        // notebook.createdAt = Date.now();
+        notebook.createdBy = {
+            _id: __user._id,
+            name: __user.name
+        };
+        notebook.projectId = __user.session.projectId;
 
-                return $q.when(simpleParse.hashtags(notebook))
-                    .then(function(data) {
-                        notebook.hashtags = data;
-                        var options = {
-                            url:'/api/notebooks/',
-                            method: 'POST'
-                        };
-                        return uploadReq(notebook, options).then(function(data) {
-                            return data
-                        })
-                    });
+        return $q.when(simpleParse.hashtags(notebook))
+            .then(function(data) {
+                notebook.hashtags = data;
+                var options = {
+                    url:'/api/notebooks/',
+                    method: 'POST'
+                };
+                return uploadReq(notebook, options).then(function(data) {
+                    AppService.broadcastUpdates(data);
+                    return data
+                })
             });
+
+
+        // var sessionData;
+        // return AppService.getSession()
+        //     .then(function (session) {
+        //         sessionData = session;
+        //         return UserService.getUser(session.userId)
+        //     }).then(function(user) {
+        //
+        //         notebook.name = simpleParse.title(notebook);
+        //         notebook.createdAt = Date.now();
+        //         notebook.createdBy = user;
+        //         notebook.projectId = sessionData.projectId;
+        //
+        //         return $q.when(simpleParse.hashtags(notebook))
+        //             .then(function(data) {
+        //                 notebook.hashtags = data;
+        //                 var options = {
+        //                     url:'/api/notebooks/',
+        //                     method: 'POST'
+        //                 };
+        //                 return uploadReq(notebook, options).then(function(data) {
+        //                     return data
+        //                 })
+        //             });
+        //     });
+
+
     }
 
     /**
