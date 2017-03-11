@@ -8,44 +8,71 @@ angular.module('glossa')
         templateUrl: 'app/settings/network-users/network-users-settings.component.html'
     });
 
-function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __user) {
+function NetworkSettings(SettingsService, $scope, AppService, socketFactory, __user, dialogSrvc) {
     var vm = this;
 
     vm.$onInit = init;
 
-    // vm.networkUsers = [];
+    vm.networkUsers = [];
 
-    vm.networkUsers = [
-        {
-            name: 'User 1',
-            lastSync: Date.now(),
-            _id: '1234',
-            following: true,
-            isOnline: true
-        },
-        {
-            name: 'Test User 2',
-            lastSync: null,
-            _id: '5678',
-            following: false
-        },
-        {
-            name: 'Another User 3',
-            lastSync: null,
-            _id: '4321',
-            following: false
-        }
-    ];
+    // vm.networkUsers = [
+    //     {
+    //         name: 'User 1',
+    //         lastSync: Date.now(),
+    //         _id: '1234',
+    //         following: true,
+    //         isOnline: true
+    //     },
+    //     {
+    //         name: 'Test User 2',
+    //         lastSync: null,
+    //         _id: '5678',
+    //         following: false
+    //     },
+    //     {
+    //         name: 'Another User 3',
+    //         lastSync: null,
+    //         _id: '4321',
+    //         following: false
+    //     }
+    // ];
 
     vm.testEvent = testEvent;
+    vm.toggleSharing = toggleSharing;
+
+    function toggleSharing() {
+        var options = {};
+        if (!vm.isSharing) {
+            options.title = 'Are you sure you want to turn OFF sharing?';
+            options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
+        } else {
+            options.title = 'Are you sure you want to turn ON sharing?';
+            options.textContent = 'By clicking yes, you will automatically sync data with other users...';
+        }
+
+        dialogSrvc.confirmDialog(options).then(function(result) {
+            if (!result) {
+                vm.isSharing = !vm.isSharing;
+                return;
+            }
+
+            console.log('TODO: update application data')
+
+
+        })
+
+
+    }
+
 
     function testEvent() {
         socketFactory.emit('local-client:buttonTest', {myData: 'just some data'});
     }
 
     function init() {
-        // getSeenUsers();
-        // AppService.getOnlineUsers();
+        vm.isSharing = __user.isSharing;
+        getSeenUsers();
+        AppService.getOnlineUsers();
     }
 
     function getSeenUsers() {

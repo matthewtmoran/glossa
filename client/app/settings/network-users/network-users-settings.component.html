@@ -2,7 +2,7 @@
 	<div class="md-toolbar-tools">
 		<h2>Turn Sharing OFF</h2>
 		<span flex></span>
-		<md-switch></md-switch>
+		<md-switch ng-model="vm.isSharing" ng-change="vm.toggleSharing()" aria-label="Toggle sharing"></md-switch>
 	</div>
 </md-toolbar>
 <div layout="row" class="row-full-height" >
