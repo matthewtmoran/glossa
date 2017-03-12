@@ -14,8 +14,6 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
 
     nbVm.$onInit = function() {
         queryNotebooks();
-        // socketFactory.init();
-        // AppService.initListeners();
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
@@ -32,6 +30,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     nbVm.notebooks = [];
     nbVm.externalNotebooks = [];
     nbVm.commonTags = [];
+    nbVm.uniqueUsers = {};
 
 
     nbVm.showNewUpdates = showNewUpdates;
@@ -39,7 +38,6 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
 
-    nbVm.uniqueUsers = {};
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
     $scope.$watch('nbVm.uniqueUsers', function(newValue) {

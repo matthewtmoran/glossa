@@ -11,7 +11,7 @@ angular.module('glossa')
         }
     });
 
-function NetworkSettings(SettingsService, $scope, AppService, socketFactory, dialogSrvc) {
+function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
     var vm = this;
 
     vm.$onInit = init;
@@ -62,18 +62,15 @@ function NetworkSettings(SettingsService, $scope, AppService, socketFactory, dia
         }
 
         dialogSrvc.confirmDialog(options).then(function(result) {
-            console.log('result', result);
             if (!result) {
                 return;
             }
             if (vm.settings.isSharing) {
-                console.log('sharing is enabled');
                 socketFactory.init();
                 AppService.initListeners();
                 AppService.getOnlineUsersSE();
             }
             if (!vm.settings.isSharing) {
-                console.log('sharing should be disabled');
                 socketFactory.disconnect();
             }
             AppService.saveSettings(vm.settings);

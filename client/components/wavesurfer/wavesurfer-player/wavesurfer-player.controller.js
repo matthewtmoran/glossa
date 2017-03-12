@@ -30,7 +30,7 @@ angular.module('glossa')
 });
 
 
-function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming, SettingsService) {
+function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming, AppService) {
     var control = this,
         timeInterval;
 
@@ -45,10 +45,13 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
         waveColor: 'black'
     };
 
-    SettingsService.getSettings().then(function(data) {
-        control.mediaSettings = data.media;
-        initWaveSurfer();
-    });
+    control.mediaSettings = {
+
+    };
+
+    control.userSettings = AppService.getSettings();
+
+    initWaveSurfer();
 
     var speed = [
         {
@@ -113,9 +116,9 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
             var options = {
                 container: $element[0].querySelector('.waveSurferWave')
             }, defaults = {
-                skipLength: control.mediaSettings.skipLength,
+                skipLength: control.userSettings.skipLength,
                 scrollParent: false,
-                waveColor: control.mediaSettings.waveColor,
+                waveColor: control.userSettings.waveColor,
                 progressColor: 'purple',
                 height: '200'
             };
