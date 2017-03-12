@@ -1,6 +1,7 @@
 <md-toolbar class="light-toolbar">
 	<div class="md-toolbar-tools">
-		<h2>Turn Sharing OFF</h2>
+		<h2>Turn Sharing {{vm.settings.isSharing ?'OFF' : 'ON'}}</h2>
+		<p class="sub-text" ng-if="!vm.settings.isSharing">Turning this on will allow you to share project data over the LAN</p>
 		<span flex></span>
 		<md-switch ng-model="vm.settings.isSharing" ng-change="vm.toggleSharing()" aria-label="Toggle sharing"></md-switch>
 	</div>
