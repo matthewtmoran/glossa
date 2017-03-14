@@ -20,6 +20,7 @@ function userCardController(AppService, socketFactory, __user) {
         "#B2B7BB", "#72ACAE", "#9C8AB4", "#5A8770", "#EEB424", "#407887"];
     var colorIndex = Math.floor((vm.user.name.charCodeAt(0) - 65) % alphabetColors.length);
 
+    console.log('vm.user', vm.user);
 
     vm.user.color = alphabetColors[colorIndex];
 
@@ -31,9 +32,10 @@ function userCardController(AppService, socketFactory, __user) {
         vm.user.following = !vm.user.following;
         // vm.user.following = following;
 
+        console.log('is user folloowing', vm.user.following);
         __user.connections.forEach(function(connection, index) {
             if (connection._id === vm.user._id) {
-                // __user.connections[index] = vm.user;
+                __user.connections[index] = vm.user;
 
                 socketFactory.emit('update:userConnections', angular.toJson(__user.connections));
             }

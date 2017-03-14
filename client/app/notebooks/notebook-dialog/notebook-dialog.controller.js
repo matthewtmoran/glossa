@@ -5,7 +5,7 @@
 angular.module('glossa')
     .controller('notebookDetailsCtrl', notebookDetailsCtrl);
 
-function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookService, $sce, notebook) {
+function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookService, $sce, notebook, $timeout) {
     var dialogVm = this;
 
     //An object to be returned when dialog closes
@@ -104,10 +104,29 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
         }
     }
     //called if media is 'removed' saved tp separate object to send with request to server
-    function removeMedia(media) {
+    function removeMedia(media, selectedTile, otherTile) {
         if (media.createdAt) { //this tells us the media has been saved to the db before
             dialogVm.removedMedia.push(media);
         }
+
+
+        var selectedElement = angular.element('#' + selectedTile);
+
+        $timeout(function() {
+            selectedElement.remove();
+        }, 500);
+        // var animateElement = angular.element('#' + otherTile);
+        //
+        // selectedElement.slideUp('fast', function() {
+        //     angular.element(this).fadeOut();
+        // });
+        //
+        // if (selectedTile === 'image-tile' && animateElement.length) {
+        //     animateElement.css({
+        //         top: '0px'
+        //     });
+        // }
+
     }
     //this is called on cancel and run if media was 'removed' but not saved...
     function restoreMedia() {
@@ -140,7 +159,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
     $scope.$watch('dialogVm.notebook.image', function(newValue, oldValue) {
         if (newValue) {
             if (newValue.originalname) {
-                dialogVm.imagePath = newValue.path
+                dialogVm.imagePath = newValue.path;
             } else {
                 dialogVm.imagePath = window.URL.createObjectURL(newValue);
             }

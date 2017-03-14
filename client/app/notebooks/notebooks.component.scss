@@ -190,12 +190,66 @@
 }
 
 .post-dialog {
+	background: transparent;
+	border: none !important;
+	box-shadow: none;
+
+	.main-card {
+		//height: 100%;
+		//width: 100%;
+	}
+
+	//.ng-move-active {
+	//	transition: .5s;
+	//}
+
+
+
+	.tile-out {
+		//top: -900px !important;
+		//opacity: 0;
+	}
+
+	.tile-out.ng-enter {
+		//transition: .5s;
+	}
+
+	//#image-tile {
+	//	transition: .5s;
+	//	transition-timing-function: ease-in-out;
+	//}
+	//
+	//#audio-tile {
+	//	transition: .5s;
+	//	transition-timing-function: ease-in-out;
+	//}
+
 	.simplemde-wrapper {
 		width: 100% !important;
 	}
 	.CodeMirror {
 	}
 }
+
+.slide-animate.ng-enter {
+	transition: .5s linear all;
+	top: -500px;
+	opacity: 0;
+}
+
+.slide-animate.ng-enter-active {
+	opacity: 1;
+}
+
+.slide-animate.ng-leave {
+	transition: .5s linear all;
+	opacity: 1;
+}
+.slide-animate.ng-leave-active {
+	top: -500px;
+	opacity: 0;
+}
+
 
 #image-post-dialog {
 	.image-caption {

@@ -85,6 +85,15 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
 
     $scope.$on('update:networkUsers', function(event, data) {
 
+        console.log('update:networkUsers listener', data);
+
+        if (vm.networkUsers.length < 1) {
+            data.forEach(function(u) {
+                u.online = true;
+                vm.networkUsers.push(u);
+            })
+        }
+
         for (var i = 0; i < vm.networkUsers.length; i++) {
             vm.networkUsers[i]['online'] = false;
             for (var j = 0; j < data.length; j++) {

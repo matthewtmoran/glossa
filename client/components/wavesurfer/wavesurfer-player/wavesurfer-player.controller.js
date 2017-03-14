@@ -6,6 +6,9 @@
 angular.module('glossa')
     .controller('wavesurferPlayerController', WavesurferPlayerController)
     .directive('backImg', function($timeout, __rootUrl){
+
+
+
         return function(scope, element, attrs){
             //element where background image should be attached to
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));

@@ -1,84 +1,102 @@
-<md-dialog class="post-dialog" flex="50">
+<md-dialog class="post-dialog" flex="95">
 	<form name="postForm" ng-cloak>
+		<md-grid-list layout-fill flex
+		              md-cols-xs="1"
+		              md-cols-sm="1"
+		              md-cols-gt-sm="5"
+		              md-row-height-sm="200px"
+		              md-row-height-gt-sm="50px"
+		              md-gutter="50px">
 
-		<md-toolbar>
-			<div class="md-toolbar-tools">
-				<h2>{{dialogVm.postDetails.title}}</h2>
-			</div>
-		</md-toolbar>
-
-		<md-dialog-content>
-			<div class="md-dialog-content" >
-				<md-input-container class="simplemde-wrapper" >
-					<textarea id="theText"
-					          aria-label="text area"
-							  class="simplemde-textarea"
-					          ng-model="dialogVm.notebook.description"
-					          simplemde="dialogVm.editorOptions"
-					          required >
-					</textarea>
-				</md-input-container>
-
-				<div layout="row">
-					<div flex class="upload-selection">
-						<div layout="row" layout-align="center center">
-							<md-button ngf-select
-							           name="imageUpload"
-							           class="md-icon-button"
-							           ng-model="dialogVm.notebook.image"
-							           accept="image/*">
-								<!--ngf-max-size="5MB"-->
-								<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
-								<md-icon>camera_alt</md-icon>
-							</md-button>
-						</div>
-						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.image" >
-							<md-button class="md-icon-button remove-preview"
-							           ng-click="dialogVm.removeMedia(dialogVm.notebook.image); dialogVm.notebook.image = null" >
-								<md-icon>cancel</md-icon>
-							</md-button>
-							<img ng-show="dialogVm.notebook.image" ngf-src="dialogVm.imagePath" class="thumb">
-						</div>
+			<md-grid-tile md-rowspan="8" md-colspan="3" md-colspan-sm="1" md-colspan-xs="1">
+				<md-card class="main-card" layout-fill >
+					<div layout="row" layout-align="space-between center">
+						<md-button ngf-select
+						           name="imageUpload"
+						           class="md-icon-button"
+						           ng-model="dialogVm.notebook.image"
+						           accept="image/*">
+							<!--ngf-max-size="5MB"-->
+							<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
+							<md-icon>camera_alt</md-icon>
+						</md-button>
+						<md-button ngf-select
+						           name="audioUpload"
+						           class="md-icon-button"
+						           ng-model="dialogVm.notebook.audio"
+						           accept="audio/*">
+							<md-icon>volume_up</md-icon>
+						</md-button>
+					</div>
+					<div>
+						<md-input-container class="simplemde-wrapper" >
+							<textarea id="theText"
+							          aria-label="text area"
+							          class="simplemde-textarea"
+							          ng-model="dialogVm.notebook.description"
+							          simplemde="dialogVm.editorOptions"
+							          required >
+							</textarea>
+						</md-input-container>
 					</div>
 
-					<div flex class="upload-selection">
-						<div layout="row" layout-align="center center">
-							<md-button ngf-select
-							           name="audioUpload"
-							           class="md-icon-button"
-							           ng-model="dialogVm.notebook.audio"
-							           accept="audio/*">
-								<md-icon>volume_up</md-icon>
-							</md-button>
-						</div>
-						<div flex class="md-padding media-container" ng-if="dialogVm.notebook.audio">
-							<md-button class="md-icon-button remove-preview"
-							           ng-click="dialogVm.removeMedia(dialogVm.notebook.audio); dialogVm.notebook.audio = null" >
-								<md-icon>cancel</md-icon>
-							</md-button>
-							<wave-preview
-									ng-if="dialogVm.notebook.audio"
-									flex
-									url="{{dialogVm.audioPath}}"
-									auto-play="false"
-									player-wave-color="white"
-									player-cursor-color="#FF5252"
-									player-height="100"
-									player-progress-color="black">
-							</wave-preview>
-						</div>
+					<span flex></span>
+					<md-card-actions layout="row" layout-align="end center">
+						<md-button ng-click="dialogVm.cancel($event)">Cancel</md-button>
+						<md-button ng-disabled="postForm.$invalid"
+						           ng-click="dialogVm.postDetails.button.action('Create Normal Post')">
+							{{dialogVm.postDetails.button.text}}
+						</md-button>
+					</md-card-actions>
+				</md-card>
+			</md-grid-tile>
+
+			<!--ng-show="dialogVm.notebook.image"-->
+			<md-grid-tile ng-if="dialogVm.notebook.image"
+			              md-rowspan="5"
+			              md-colspan="2"
+			              md-colspan-sm="1"
+			              md-colspan-xs="1"
+			              id="image-tile"
+			              class="slide-animate">
+				<md-card layout-fill >
+					<div background-image="{{dialogVm.imagePath}}"></div>
+					<span flex></span>
+					<md-card-actions layout="row" layout-align="start center">
+						<md-button ng-click="dialogVm.removeMedia(dialogVm.notebook.image, 'image-tile', 'audio-tile');"
+								class="md-warn">Delete</md-button>
+								<!--dialogVm.notebook.image = null"  -->
+					</md-card-actions>
+				</md-card>
+			</md-grid-tile>
+
+			<md-grid-tile id="audio-tile"
+			              ng-if="dialogVm.notebook.audio"
+			              md-rowspan="3"
+			              md-colspan="2"
+			              md-colspan-sm="1"
+			              md-colspan-xs="1"
+			              ng-class="{'tile-out': !dialogVm.notebook.audio}">
+				<md-card layout-fill >
+					<div>
+						<wave-preview
+								ng-if="dialogVm.notebook.audio"
+								flex
+								url="{{dialogVm.audioPath}}"
+								auto-play="false"
+								player-wave-color="white"
+								player-cursor-color="#FF5252"
+								player-height="100"
+								player-progress-color="black">
+						</wave-preview>
 					</div>
-				</div>
-			</div>
-		</md-dialog-content>
-
-		<md-dialog-actions layout="row" class="top-border" >
-			<md-button ng-click="dialogVm.cancel($event)">Cancel</md-button>
-			<md-button ng-disabled="postForm.$invalid"
-			           ng-click="dialogVm.postDetails.button.action('Create Normal Post')">
-				{{dialogVm.postDetails.button.text}}
-			</md-button>
-		</md-dialog-actions>
-
+					<span flex></span>
+					<md-card-actions layout="row" layout-align="start center">
+						<md-button ng-click="dialogVm.removeMedia(dialogVm.notebook.audio, 'audio-tile', 'image-tile')" class="md-warn">Delete</md-button>
+					</md-card-actions>
+				</md-card>
+			</md-grid-tile>
+		</md-grid-list>
 	</form>
+
 </md-dialog>
