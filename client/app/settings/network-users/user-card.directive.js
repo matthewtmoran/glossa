@@ -29,6 +29,7 @@ function userCardController(AppService, socketFactory, __user) {
 
 
     function toggleFollow(user) {
+        console.log('user', user);
         vm.user.following = !vm.user.following;
         AppService.updateConnection(user);
     }

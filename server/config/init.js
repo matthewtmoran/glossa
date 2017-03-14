@@ -39,9 +39,16 @@ function checkForApplicationData() {
                 console.log('No application data exists');
                 resolve(defaultAppData());
             } else {
-                console.log('resolving user data');
-                resolve(user);
+                console.log('When app begins, set connections.online to false');
+                user.connections.forEach(function(connection) {
+                    connection.online = false;
+                });
 
+                var options = {returnUpdatedDocs: true};
+                User.update({_id: user._id}, user, options, function(err, updatedCount, updatedUser) {
+                    console.log('resolving user data');
+                    resolve(updatedUser);
+                });
             }
         });
     })

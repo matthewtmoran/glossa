@@ -7,7 +7,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         //socket functions
         initListeners: initListeners,
         getOnlineUsersSE: getOnlineUsersSE,
-        getUserUpdates: getUserUpdates,
+        getAllUserUpdates: getAllUserUpdates,
         broadcastUpdates: broadcastUpdates,
 
         //dealing with __user constant
@@ -42,15 +42,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     }
 
     function updateConnection(update) {
-        socketFactory.emit('update:userConnection', update);
-
-
-        // __user.connections.forEach(function(connection, index) {
-        //     if (connection._id === update._id) {
-        //         __user.connections[index] = update;
-        //         socketFactory.emit('update:userConnections', angular.toJson(__user.connections));
-        //     }
-        // })
+        console.log('updateConnection', update);
+        var updateString = angular.toJson(update);
+        console.log('updateString', updateString);
+        socketFactory.emit('update:userConnection', updateString);
     }
 
 
@@ -80,8 +75,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         socketFactory.emit('get:networkUsers')
     }
 
-    function getUserUpdates() {
-        var msg = 'Looking for updates from clients....';
+    //look for all updates from users that are being followed
+    function getAllUserUpdates() {
+        var msg = 'Looking for updates from all users...';
         var delay = 4000;
 
         Notification.show({
@@ -89,16 +85,35 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             hideDelay: delay
         });
 
-        socketFactory.emit('get:userUpdates')
+        socketFactory.emit('request:AllUserUpdates')
     }
 
+    function getSingleUserUpdates(user) {
+        var msg = 'Looking for updates from ' + user.name;
+        var delay = 4000;
+
+        Notification.show({
+            message: msg,
+            hideDelay: delay
+        });
+
+        socketFactory.emit('request:SingleUserUpdates', user);
+    }
+
+
+
+    // function get
+
+    //broad cast updates to users that follow
     function broadcastUpdates(data) {
         console.log('broadcastUpdates');
+        console.log('Emiting : broadcast:Updates');
         socketFactory.emit('broadcast:Updates', data);
     }
 
     function initListeners() {
 
+        //hand shake
         socketFactory.on('request:SocketType', function(data) {
             console.log("Heard 'request:SocketType' in appService.data:", data);
 
@@ -119,6 +134,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         });
 
+        //handshake success
         socketFactory.on('notify:server-connection', function(data) {
             console.log("Heard 'notify:server-connection' in appFactory.data:", data);
 
@@ -132,10 +148,11 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         });
 
-        socketFactory.on('local-client:send:userData', function(data) {
-            console.log('this is external client user data', data);
+        //any time external client this should be heard
+        socketFactory.on('send:updatedUserList', function(data) {
+            console.log('Heard : send:updatedUserList in app.service', data.connections);
 
-            var msg = (data.name || data._id) + ' is now connected!';
+            var msg = 'Users online: ' + data.connections.length;
             var delay = 3000;
 
             Notification.show({
@@ -143,46 +160,40 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
-            $rootScope.$broadcast('update:networkUsers', data);
+            console.log('$broadcast : update:networkUsers');
 
+            checkForUpdates(data.connections);
+
+            $rootScope.$broadcast('update:networkUsers', {connections: data.connections})
 
         });
 
+        //When external-client connects to network
+        // socketFactory.on('local-client:send:externalUserList', function(data) {
+        //     console.log('Heard : local-client:send:externalUserList in app.service', data);
+        //
+        //     var msg = 'Users online: ' + data.length;
+        //     var delay = 3000;
+        //
+        //     Notification.show({
+        //         message: msg,
+        //         hideDelay: delay
+        //     });
+        //
+        //     console.log('$broadcast : update:networkUsers');
+        //     $rootScope.$broadcast('update:networkUsers', data)
+        // });
 
-        socketFactory.on('local-client:send:externalUserList', function(data) {
-            console.log('local-client:send:externalUserList', data);
-
-            var msg = 'Users online: ' + data.length;
-            var delay = 3000;
-
-            Notification.show({
-                message: msg,
-                hideDelay: delay
-            });
-
-            checkForUpdates(data);
-
-
-
-            $rootScope.$broadcast('update:networkUsers', data)
-        });
-
+        //when external-client disconnects
         socketFactory.on('userDisconnected', function(data) {
+            console.log('$broadcast : update:networkUsers:disconnect');
             $rootScope.$broadcast('update:networkUsers:disconnect', data)
         });
 
-        socketFactory.on('external-client:notify:buttonPressed', function(data) {
-            var msg = 'Button has been pressed by user ' + data.userId;
-            var delay = 3000;
 
-            Notification.show({
-                message: msg,
-                hideDelay: delay
-            });
-        });
-
+        //when external-client makes changes
         socketFactory.on('notify:externalChanges', function(data) {
-            console.log('notify:externalChanges', data);
+            console.log('Heard : notify:externalChanges in app.service', data);
             var msg = 'Data synced with ' + data.connection._id;
             var delay = 3000;
 
@@ -191,12 +202,15 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
+            console.log('$broadCast event update:connection');
             $rootScope.$broadcast('update:connection', data.connection);
+            console.log('$broadCast event update:externalData');
             $rootScope.$broadcast('update:externalData', data);
-
         });
 
+
         socketFactory.on('update:external-client', function(data) {
+            console.log("Heard : update:external-client in app.service");
 
             var msg = 'User ' + data.createdBy._id;
             var delay = 3000;
@@ -206,8 +220,14 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
+            console.log('$broadCast event update:externalData');
             $rootScope.$broadcast('update:externalData', {updatedData: data});
         });
+
+
+        //Get all following user updates
+        //Get single user updates
+
 
 
 
@@ -239,10 +259,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         // });
 
 
-        function checkForUpdates(data) {
-            data.forEach(function(connection) {
-                if (connection.following) {
-                    socketFactory.emit('')
+        function checkForUpdates(connections) {
+            connections.forEach(function(connection) {
+                if (connection.online && connection.following) {
+                    socketFactory.emit('get:singleUserUpdates')
                 }
             })
         }

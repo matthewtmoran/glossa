@@ -33,6 +33,7 @@ Promise.all([require('./config/init').checkForApplicationData()])
 
         var bonjourSocket;
         var glossaUser = appData[0];
+        console.log('glossaUser', glossaUser);
         var mySession = appData[0].session;
 
 

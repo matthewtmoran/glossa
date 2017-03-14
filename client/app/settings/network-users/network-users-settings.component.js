@@ -44,7 +44,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
     vm.toggleSharing = toggleSharing;
 
     function init() {
-        vm.networkUsers = AppService.getConnections();
+        // vm.networkUsers = AppService.getConnections();
 
         if (vm.settings.isSharing) {
             AppService.getOnlineUsersSE();
@@ -84,24 +84,22 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
 
 
     $scope.$on('update:networkUsers', function(event, data) {
-
         console.log('update:networkUsers listener', data);
 
-        if (vm.networkUsers.length < 1) {
-            data.forEach(function(u) {
-                u.online = true;
-                vm.networkUsers.push(u);
-            })
-        }
-
-        for (var i = 0; i < vm.networkUsers.length; i++) {
-            vm.networkUsers[i]['online'] = false;
-            for (var j = 0; j < data.length; j++) {
-                if (vm.networkUsers[i]._id == data[j]._id) {
-                    vm.networkUsers[i]['online'] = true;
+        data.connections.forEach(function(connection) {
+            var exists = false;
+            vm.networkUsers.forEach(function(user, index) {
+                if (connection._id === user._id) {
+                    user.socketId = connection.socketId;
+                    user.online = connection.online;
+                    exists = true;
                 }
+             });
+            if (!exists) {
+                vm.networkUsers.push(connection);
             }
-        }
+        });
+
     });
 
     $scope.$on('update:networkUsers:disconnect', function(event, data) {
