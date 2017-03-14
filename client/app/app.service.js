@@ -18,7 +18,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         //updating __user constant
         updateSession: updateSession,
-        saveSettings: saveSettings
+        saveSettings: saveSettings,
+        updateConnection: updateConnection
     };
 
     // initListeners();
@@ -38,6 +39,18 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     function getConnections() {
         return __user.connections;
+    }
+
+    function updateConnection(update) {
+        socketFactory.emit('update:userConnection', update);
+
+
+        // __user.connections.forEach(function(connection, index) {
+        //     if (connection._id === update._id) {
+        //         __user.connections[index] = update;
+        //         socketFactory.emit('update:userConnections', angular.toJson(__user.connections));
+        //     }
+        // })
     }
 
 
@@ -147,6 +160,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
+            checkForUpdates(data);
+
+
+
             $rootScope.$broadcast('update:networkUsers', data)
         });
 
@@ -221,6 +238,14 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         //     $rootScope.$broadcast('billsSentToGuests');
         // });
 
+
+        function checkForUpdates(data) {
+            data.forEach(function(connection) {
+                if (connection.following) {
+                    socketFactory.emit('')
+                }
+            })
+        }
 
         var last = {
             bottom: false,

@@ -97,6 +97,18 @@ module.exports = function(glossaUser, localSession, io) {
             updateUserConnection(data)
         });
 
+        socket.on('update:userConnection', function(data) {
+            updateAUserConnection(data);
+        });
+
+        socket.on('request:updates', function(data) {
+            data.forEach(function(connection) {
+                if (connection.following) {
+                    emitToExternalClient(connection.socketId, 'request:updates', connection);
+
+                }
+            })
+        });
 
 
 
@@ -828,6 +840,20 @@ module.exports = function(glossaUser, localSession, io) {
         });
     }
 
+    function updateAUserConnection(updatedConnection) {
+        updateExternalClients(updatedConnection);
+        glossaUser.connections.forEach(function(connection, index) {
+            if (connection._id === updatedConnection._id) {
+                connection[index] = updatedConnection;
+            }
+        });
+        updateUser(glossaUser).then(function(user) {
+            emitToLocalClient('local-client:send:externalUserList', externalClients);
+        })
+
+    }
+
+
     //changes should be an array of user connections
     function updateUserConnection(newConnections) {
         console.log('glossaUser.connections', glossaUser.connections);
@@ -856,11 +882,26 @@ module.exports = function(glossaUser, localSession, io) {
 
         console.log('glossaUser.connections', glossaUser.connections);
 
-        updateUser(glossaUser);
+        updateUser(glossaUser).then(function(data) {
+            // updateExternalClients(data);
+            emitToLocalClient('local-client:send:externalUserList', externalClients);
+        })
 
     }
 
 
+    function updateExternalClients(data) {
+        externalClients.forEach(function(connection, index) {
+            var exists = false;
+            if (connection._id === data._id) {
+                exists = true;
+                connection[index] = data
+            }
+            if (!exists) {
+                externalClients.push(data);
+            }
+        });
+    }
 
 
     //update the local ui

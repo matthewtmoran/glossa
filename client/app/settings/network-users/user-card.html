@@ -16,7 +16,7 @@
 		<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>
 	</div>
 	<div class="user-follow-container">
-		<md-button  ng-click="vm.toggleFollow(vm.user.following)"
+		<md-button  ng-click="vm.toggleFollow(vm.user)"
 		            ng-class="{'md-raised not-following': !vm.user.following, 'is-following': vm.user.following}"
 		            class=" md-large-btn">
 			{{vm.user.following ? "Following" : "Follow"}}

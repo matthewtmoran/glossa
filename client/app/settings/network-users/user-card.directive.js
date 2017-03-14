@@ -28,18 +28,9 @@ function userCardController(AppService, socketFactory, __user) {
     vm.toggleFollow = toggleFollow;
 
 
-    function toggleFollow(following) {
+    function toggleFollow(user) {
         vm.user.following = !vm.user.following;
-        // vm.user.following = following;
-
-        console.log('is user folloowing', vm.user.following);
-        __user.connections.forEach(function(connection, index) {
-            if (connection._id === vm.user._id) {
-                __user.connections[index] = vm.user;
-
-                socketFactory.emit('update:userConnections', angular.toJson(__user.connections));
-            }
-        })
+        AppService.updateConnection(user);
     }
 }
 
