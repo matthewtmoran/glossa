@@ -45,7 +45,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         console.log('updateConnection', update);
         var updateString = angular.toJson(update);
         console.log('updateString', updateString);
-        socketFactory.emit('update:userConnection', updateString);
+        socketFactory.emit('update:userConnection', {connection: updateString});
     }
 
 
@@ -160,10 +160,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
-            console.log('$broadcast : update:networkUsers');
 
             checkForUpdates(data.connections);
 
+            console.log('$broadcast : update:networkUsers');
             $rootScope.$broadcast('update:networkUsers', {connections: data.connections})
 
         });
@@ -262,7 +262,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         function checkForUpdates(connections) {
             connections.forEach(function(connection) {
                 if (connection.online && connection.following) {
-                    socketFactory.emit('get:singleUserUpdates')
+                    socketFactory.emit('get:singleUserUpdates', connection);
                 }
             })
         }

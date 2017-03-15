@@ -29,11 +29,10 @@ require('./routes')(app);
 Promise.all([require('./config/init').checkForApplicationData()])
     .then(function(appData) {
 
-        console.log('Application has created data and is ready to go...', appData);
+        console.log('Application has created data and is ready to go...');
 
         var bonjourSocket;
         var glossaUser = appData[0];
-        console.log('glossaUser', glossaUser);
         var mySession = appData[0].session;
 
 
