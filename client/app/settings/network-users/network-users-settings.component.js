@@ -86,7 +86,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
     $scope.$on('update:networkUsers', function(event, data) {
         console.log('update:networkUsers listener', data);
 
-        data.connections.forEach(function(connection) {
+        data.onlineUsers.forEach(function(connection) {
             var exists = false;
             vm.networkUsers.forEach(function(user, index) {
                 if (connection._id === user._id) {
@@ -96,6 +96,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
                 }
              });
             if (!exists) {
+                connection.online = true;
                 vm.networkUsers.push(connection);
             }
         });

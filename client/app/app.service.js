@@ -151,9 +151,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         //any time external client this should be heard
         socketFactory.on('send:updatedUserList', function(data) {
-            console.log('Heard : send:updatedUserList in app.service', data.connections);
+            console.log('Heard : send:updatedUserList in app.service', data.onlineUsers);
 
-            var msg = 'Users online: ' + data.connections.length;
+            var msg = 'Users online: ' + data.onlineUsers.length;
             var delay = 3000;
 
             Notification.show({
@@ -162,10 +162,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             });
 
 
-            checkForUpdates(data.connections);
+            // checkForUpdates(data.onlineUsers);
 
             console.log('$broadcast : update:networkUsers');
-            $rootScope.$broadcast('update:networkUsers', {connections: data.connections})
+            $rootScope.$broadcast('update:networkUsers', {onlineUsers: data.onlineUsers})
 
         });
 
