@@ -268,12 +268,8 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('');
             console.log('%% SOCKET-SERVER - get:networkUsers listener');
 
-            getUser().then(function(user) {
-                console.log('%% SOCKET-SERVER - send:updatedUserList EMITTER');
-                console.log('user.connections', user.connections);
-                socket.emit('send:updatedUserList', {connections: user.connections})
-            })
-
+            console.log('%% SOCKET-SERVER - send:updatedUserList EMITTER');
+            socket.emit('send:updatedUserList', {onlineUsers: externalClients})
         });
 
 
@@ -286,7 +282,6 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('');
             console.log('%% SOCKET-SERVER - (local-client listener) broadcast:Updates');
             console.log('TODO: Should only broadcast to users that are following...');
-
             var updateObject = {
                 update: data,
                 user: {
@@ -294,7 +289,6 @@ module.exports = function(glossaUser, localSession, io) {
                     name: glossaUser.name
                 }
             };
-
            broadcastToExternalClients('external-ss:real-time-update:all', updateObject)
         });
 
@@ -600,6 +594,10 @@ module.exports = function(glossaUser, localSession, io) {
             externalClients.splice(indexToRemove, 1);
         }
 
+        console.log('Updated externalClients(onlineUsers) send list to local-client');
+        console.log('externalClients', externalClients);
+        console.log('%% SOCKET-SERVER - send:updatedUserList to local-client EMITTER %%');
+
         emitToLocalClient('send:updatedUserList', {onlineUsers: externalClients})
 
     }
@@ -620,6 +618,8 @@ module.exports = function(glossaUser, localSession, io) {
         }
 
         console.log('Updated externalClients(onlineUsers) send list to local-client');
+        console.log('externalClients', externalClients);
+        console.log('%% SOCKET-SERVER - send:updatedUserList to local-client EMITTER %%');
         emitToLocalClient('send:updatedUserList', {onlineUsers: externalClients});
     }
 
@@ -710,10 +710,8 @@ module.exports = function(glossaUser, localSession, io) {
             }
 
             return updateUser(user).then(function(updatedUser) {
-                console.log('... Updated User.connections list with external-client data, return updates to local-client');
+                console.log('... Updated User.connections list with external-client data');
 
-                console.log('%% SOCKET-SERVER - send:updatedUserList to local-client EMITTER %%');
-                console.log('updatedUser.connections', updatedUser.connections);
                return clientDataPersisted;
             });
 

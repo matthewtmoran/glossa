@@ -47,7 +47,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
         vm.networkUsers = AppService.getConnections();
 
         if (vm.settings.isSharing) {
-            // AppService.getOnlineUsersSE();
+            AppService.getOnlineUsersSE();
         }
     }
 
