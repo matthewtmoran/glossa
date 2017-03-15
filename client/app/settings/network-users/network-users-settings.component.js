@@ -44,10 +44,10 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
     vm.toggleSharing = toggleSharing;
 
     function init() {
-        // vm.networkUsers = AppService.getConnections();
+        vm.networkUsers = AppService.getConnections();
 
         if (vm.settings.isSharing) {
-            AppService.getOnlineUsersSE();
+            // AppService.getOnlineUsersSE();
         }
     }
 

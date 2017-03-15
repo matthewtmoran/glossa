@@ -50,8 +50,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
 
     function saveSettings(settings) {
-        __user.settings = settings;
-        return $http.put('/api/user/' + __user._id, __user)
+        console.log('Setting being updated...');
+        return $http.put('/api/user/' + __user._id + '/settings', settings)
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {
@@ -61,8 +61,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     }
 
     //should only be called on stateChange
-    function updateSession(user) {
-        return $http.put('/api/user/' + user._id, user)
+    function updateSession(session) {
+        console.log('Session being updated...');
+        return $http.put('/api/user/' + __user._id + '/session', session)
             .then(function successCallback(response) {
                 return response.data;
             }, function errorCallback(response) {

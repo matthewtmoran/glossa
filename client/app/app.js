@@ -78,7 +78,7 @@ angular.module('glossa', [
             __user.session.currentState = toState.name;
             __user.session.currentStateParams = toParams;
             //update session data every state change
-            AppService.updateSession(__user).then(function(data) {
+            AppService.updateSession(__user.session).then(function(data) {
                 //update the __user object in memory
                 __user.session = data.session;
             });

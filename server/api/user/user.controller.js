@@ -60,6 +60,42 @@ exports.update = function(req, res) {
     });
 };
 
+exports.updateSession = function(req, res) {
+    if(req.body._id) { delete req.body._id; }
+    User.findOne({_id:req.params.id}, function (err, user) {
+        if (err) { return handleError(res, err); }
+        if(!user) { return res.status(404).send('Not Found'); }
+        var options = {returnUpdatedDocs: true};
+
+        var updated = user;
+        updated.session = req.body;
+
+        User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+            if (err) { return handleError(res, err); }
+            User.persistence.stopAutocompaction(); // concat db
+            return res.status(200).json(updatedDoc);
+        });
+    });
+};
+
+exports.updateSettings = function(req, res) {
+    if(req.body._id) { delete req.body._id; }
+    User.findOne({_id:req.params.id}, function (err, user) {
+        if (err) { return handleError(res, err); }
+        if(!user) { return res.status(404).send('Not Found'); }
+        var options = {returnUpdatedDocs: true};
+
+        var updated = user;
+        updated.settings = req.body;
+
+        User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+            if (err) { return handleError(res, err); }
+            User.persistence.stopAutocompaction(); // concat db
+            return res.status(200).json(updatedDoc);
+        });
+    });
+};
+
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
     User.findById(req.params.id, function (err, thing) {

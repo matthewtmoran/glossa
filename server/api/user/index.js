@@ -9,6 +9,8 @@ router.get('/', controller.index);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.put('/:id', controller.update);
+router.put('/:id/session', controller.updateSession);
+router.put('/:id/settings', controller.updateSettings);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 
