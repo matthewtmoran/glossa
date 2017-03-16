@@ -19,7 +19,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         //updating __user constant
         updateSession: updateSession,
         saveSettings: saveSettings,
-        updateConnection: updateConnection
+        toggleFollow: toggleFollow
     };
 
     // initListeners();
@@ -41,11 +41,14 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         return __user.connections;
     }
 
-    function updateConnection(update) {
-        console.log('updateConnection', update);
-        var updateString = angular.toJson(update);
-        console.log('updateString', updateString);
-        socketFactory.emit('update:userConnection', {connection: updateString});
+    function toggleFollow(userId, following, socketId) {
+        console.log('toggleFollow, user', userId);
+        var data = {
+            userId: userId,
+            following: following,
+            socketId: socketId
+        };
+        socketFactory.emit('update:following', data);
     }
 
 

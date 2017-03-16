@@ -103,38 +103,96 @@ module.exports = function(glossaUser, localSession, io) {
             updateUserConnection(data)
         });
 
-        socket.on('update:userConnection', function(data) {
-            console.log('%% SOCKET-SERVER - update:userConnection listener');
-
-            var updatedConnection = JSON.parse(data.connection);
-
+        //data = {userId: String, following: Boolean, socketId: String}
+        socket.on('update:following', function(data) {
             getUser().then(function(user) {
 
-                for(var i = 0; i < user.connections.length; i++) {
-                    if (user.connections[i]._id === updatedConnection._id) {
-                        user.connections[i] = updatedConnection;
+                var updatedConnection;
+                for(var i = 0, len = user.connections.length; i < len; i++) {
+                    if (user.connections[i]._id === data.userId) {
+                        user.connections[i].following = data.following;
+                        updatedConnection = user.connections[i];
+                        updatedConnection.socketId = data.socketId;
+                        break;
                     }
                 }
 
                 updateUser(user).then(function(updatedUser) {
                     if (updatedConnection.following) {
-                        console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
-                        emitToExternalClient(updatedConnection.socketId, 'request:updates', updatedConnection)
+
+                        console.log('TODO: get updates....', updatedConnection);
+
+                        if (updatedConnection.socketId) {
+                            console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
+
+                            emitToExternalClient(updatedConnection.socketId, 'request:updates', updatedConnection)
+                        }
+
                     }
                 })
-            });
+            })
+
         });
 
-        socket.on('request:updates', function(data) {
-            console.log('');
-            console.log('%% SOCKET-SERVER - request:updates listener', data);
-            data.forEach(function(connection) {
-                if (connection.following) {
-                    console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
-                    emitToExternalClient(connection.socketId, 'request:updates', connection);
 
-                }
-            })
+        // socket.on('update:userConnection', function(data) {
+        //     console.log('%% SOCKET-SERVER - update:userConnection listener');
+        //
+        //     var updatedConnection = JSON.parse(data.connection);
+        //
+        //     getUser().then(function(user) {
+        //
+        //         for(var i = 0, len = user.connections.length; i < len; i++) {
+        //             if (user.connections[i]._id === updatedConnection._id) {
+        //                 user.connections[i] = updatedConnection;
+        //             }
+        //         }
+        //
+        //         updateUser(user).then(function(updatedUser) {
+        //             if (updatedConnection.following) {
+        //                 console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
+        //                 emitToExternalClient(updatedConnection.socketId, 'request:updates', updatedConnection)
+        //             }
+        //         })
+        //     });
+        // });
+
+        socket.on('get:updates', function(data) {
+            if (!data.lastSync) {
+                getUser().then(function(user) {
+                    getNotebookChanges({
+                        'createdBy': user._id
+                    }).then(function(data) {
+
+                        console.log('getNotebookChanges promise has resolved..... ');
+                        console.log('%% SOCKET-SERVER return:data-changes EMITTER %%');
+
+                        emitToExternalClient(socket.id, 'return:data-changes', {
+                            connectionId: user._id, updatedData: data
+                        });
+                    });
+                });
+
+                console.log('User has never connected');
+            } else {
+                console.log('User has connected before');
+
+
+                getUser().then(function(user) {
+
+                    getNotebookChanges({
+                        'createdBy._id': user._id,
+                        "updatedAt": {$gte: new Date(data.lastSync)}
+                    }).then(function (results) {
+
+                        console.log('getNotebookChanges promise has resolved..... ');
+                        console.log('%% SOCKET-SERVER return:data-changes EMITTER %%');
+                        emitToExternalClient(socket.id, 'return:data-changes', {
+                            connectionId: user._id, updatedData: results
+                        });
+                    });
+                });
+            }
         });
 
 
@@ -279,6 +337,8 @@ module.exports = function(glossaUser, localSession, io) {
          *
          */
         //TODO: Should only broadcast to users that are following...
+        //Listen from local-client
+        //Emit to all external-clients
         socket.on('broadcast:Updates', function(data) {
             console.log('');
             console.log('%% SOCKET-SERVER - (local-client listener) broadcast:Updates');
@@ -290,7 +350,7 @@ module.exports = function(glossaUser, localSession, io) {
                     name: glossaUser.name
                 }
             };
-           broadcastToExternalClients('external-ss:real-time-update:all', updateObject)
+           broadcastToExternalClients('onlineUser:updatesMade', updateObject)
         });
 
 
@@ -299,7 +359,6 @@ module.exports = function(glossaUser, localSession, io) {
 
         /////////////////////////////////
         //broadcast to external-clients//
-
 
         socket.on('local-client:updates', function(data) {
             console.log('');
@@ -392,6 +451,7 @@ module.exports = function(glossaUser, localSession, io) {
         var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
         var nodeClientSocket = ioClient.connect(externalPath);
 
+        //Listen from external-server
         nodeClientSocket.on('connect', function() {
             console.log('');
             console.log('%% EXTERNAL-CLIENT - CONNECTED as external-client %%');
@@ -412,6 +472,8 @@ module.exports = function(glossaUser, localSession, io) {
                 nodeClientSocket.emit('return:SocketType', socketData);
             });
 
+            //listen from external-server
+            //Emit to external-server
             //When outside application disconnects this listener is triggered
             nodeClientSocket.on('notify:userDisconnected', function(data) {
                 console.log('');
@@ -423,6 +485,7 @@ module.exports = function(glossaUser, localSession, io) {
             });
 
 
+            //Listen from external-server
             nodeClientSocket.on('disconnect', function() {
                 console.log('');
                 // console.log('external-client disconnect listener');
@@ -432,50 +495,99 @@ module.exports = function(glossaUser, localSession, io) {
 
             });
 
+            //event comes from external-server
+            //Emits back to external-server
+            //data = has last sync attached to it....
             nodeClientSocket.on('request:updates', function(data) {
                 console.log('');
                 console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
                 if (!data.lastSync) {
-                    console.log('User has never connected');
-                    getNotebookChanges({'createdBy': glossaUser._id}).then(function(data) {
 
-                        console.log('getNotebookChanges promise has resolved..... ');
-                        console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
-                        nodeClientSocket.emit('return:data-changes', {connectionId: glossaUser._id, updatedData: data});
+                    getUser().then(function(user) {
+                        getNotebookChanges({'createdBy': user._id}).then(function(data) {
+
+                            console.log('getNotebookChanges promise has resolved..... ');
+                            console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
+                            nodeClientSocket.emit('return:data-changes', {connectionId: user._id, updatedData: data});
+                        });
                     });
+
+                    console.log('User has never connected');
                 } else {
                     console.log('User has connected before');
-                    getNotebookChanges({'createdBy._id': glossaUser._id, "updatedAt": {$gte: new Date(data.lastSync)}}).then(function(data) {
 
-                        console.log('getNotebookChanges promise has resolved..... ');
-                        console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
-                        nodeClientSocket.emit('return:data-changes', {connectionId: glossaUser._id, updatedData: data});
+
+                    getUser().then(function(user) {
+
+                        getNotebookChanges({
+                            'createdBy._id': user._id,
+                            "updatedAt": {$gte: new Date(data.lastSync)}
+                        }).then(function (results) {
+
+                            console.log('getNotebookChanges promise has resolved..... ');
+                            console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
+                            nodeClientSocket.emit('return:data-changes', {
+                                connectionId: glossaUser._id,
+                                updatedData: results
+                            });
+                        });
                     });
                 }
             });
 
+            //Listen from external-server
+            //Emit to local-client
+            nodeClientSocket.on('return:data-changes', function(dataChanges) {
+                addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
+                    var updatedConnection;
+                    var timeStamp = Date.now();
+
+                    getUser().then(function(user) {
+                        user.connections.forEach(function(connection, index) {
+                            if (connection._id === dataChanges.connectionId) {
+                                console.log('*...is match');
+                                connection.lastSync = timeStamp;
+                                updatedConnection = connection;
+                            }
+                        });
+
+                        console.log('SYNC TIMESTAMP MUST BE UPDATED !!!!!!');
+                        updateUser(user).then(function(updatedUser) {
+                            //emit to client
+                            console.log('%% SOCKET-SERVER - notify:externalChanges to LOCAL-CLIENT - EMITTER');
+                            emitToLocalClient('notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
+                        });
+                    });
+
+                });
+            });
+
             //@dataChanges = {update: object, user: object}
-            nodeClientSocket.on('external-ss:real-time-update:all', function(dataChanges) {
+            //Listen from external-server
+            //Emit to external-server (if following)
+            nodeClientSocket.on('onlineUser:updatesMade', function(dataChanges) {
                 console.log('');
-                console.log('%% EXTERNAL-CLIENT - external-ss:real-time-update:all listener %%');
+                console.log('%% EXTERNAL-CLIENT - onlineUser:updatesMade listener %%');
 
                 var externalUser = dataChanges.user;
 
                 // //check if we are following this user
                 getUser().then(function(user) {
-                    user.connections.forEach(function(connection) {
-                        if (connection._id === externalUser._id) {
-                            externalUser = connection;
-                        }
-                    })
 
+                    user.connections.forEach(function(connection) {
+                        if (connection._id === externalUser._id && connection.following) {
+                            console.log('Following user, getUpdates');
+                            console.log('%% EXTERNAL-CLIENT - request:updates EMITTER %%');
+                            console.log('');
+                            console.log('Need to get updates from ', dataChanges.user);
+                            console.log('nodeClientSocket.id', nodeClientSocket.id);
+
+                            nodeClientSocket.emit('get:updates', connection); //emit right back to the socket that bradcasted this event
+
+                        }
+                    });
                 });
 
-                if (user.following) {
-                    console.log('I am following user so request updates....');
-                    console.log('%% EXTERNAL-CLIENT - request:updates EMITTER %%');
-                    emitToExternalClient(externalUser.socketId, 'request:updates', externalUser)
-                }
             });
 
             nodeClientSocket.on('request-updates:external-client', function(data) {
@@ -554,6 +666,12 @@ module.exports = function(glossaUser, localSession, io) {
             persitedData.socketId = socket.id;
 
             addToOnlineList(persitedData);
+            socket.join('externalClientsRoom');
+
+            if (persitedData.following) {
+                emitToExternalClient(persitedData.socketId, 'request:updates', {lastSync: persitedData.lastSync});
+            }
+
             console.log('~~connectExternalClient process END~~');
         });
 
@@ -582,25 +700,16 @@ module.exports = function(glossaUser, localSession, io) {
     }
 
     function removeFromOnlineList(socketId) {
-
         for (var i = 0, len = externalClients.length; i < len; i++) {
             if (externalClients[i].socketId === socketId) {
                 externalClients.splice(i, 1);
                 break;
             }
         }
-
-        console.log('Updated externalClients(onlineUsers) send list to local-client');
-        console.log('externalClients', externalClients);
-        console.log('%% SOCKET-SERVER - send:updatedUserList to local-client EMITTER %%');
-
         emitToLocalClient('send:updatedUserList', {onlineUsers: externalClients})
-
     }
 
     function addToOnlineList(client) {
-        console.log('Updating externalClients(onlineUsers)');
-
         var exists = false;
         for (var i = 0, len = externalClients.length; i < len; i++) {
             if (externalClients[i]._id === client._id) {
@@ -613,9 +722,6 @@ module.exports = function(glossaUser, localSession, io) {
         if (!exists) {
             externalClients.push(client);
         }
-
-        console.log('Updated externalClients(onlineUsers) send list to local-client');
-        console.log('externalClients', externalClients);
         console.log('%% SOCKET-SERVER - send:updatedUserList to local-client EMITTER %%');
         emitToLocalClient('send:updatedUserList', {onlineUsers: externalClients});
     }
@@ -675,44 +781,36 @@ module.exports = function(glossaUser, localSession, io) {
         return lastSync;
     }
 
-    function checkForPersistedData(externalClient, callback) {
-            console.log('');
-            console.log('checkForPersistedData FUNCTION', externalClient);
-
+    function checkForPersistedData(externalClient) {
         var clientDataPersisted = {};
+        var connectedBefore = false;
+        return getUser().then(function(user) {
 
-            var connectedBefore = false;
-            return getUser().then(function(user) {
+            for (var i = 0, len = user.connections.length; i < len; i++) {
+               if (user.connections[i]._id === externalClient._id) {
+                   console.log("...external-client exists.  Change dynamic data, save and return list.");
+                   //update changing data...
+                   connectedBefore = true;
+                   clientDataPersisted = user.connections[i];
+               }
+            }
 
+            if (!connectedBefore) {
+                console.log('...external-client never has connected.  Add to connections list, save data and return list.');
+                clientDataPersisted = {
+                    name: externalClient.name,
+                    _id: externalClient._id,
+                    type: 'external-client',
+                    following: false,
+                    lastSync: null
+                };
+                user.connections.push(clientDataPersisted);
+            }
 
-                for (var i = 0, len = user.connections.length; i < len; i++) {
-                   if (user.connections[i]._id === externalClient._id) {
-                       console.log("...external-client exists.  Change dynamic data, save and return list.");
-                       //update changing data...
-                       connectedBefore = true;
-                       clientDataPersisted = user.connections[i];
-                   }
-                }
-
-
-                if (!connectedBefore) {
-                    console.log('...external-client never has connected.  Add to connections list, save data and return list.');
-                    clientDataPersisted = {
-                        name: externalClient.name,
-                        _id: externalClient._id,
-                        type: 'external-client',
-                        following: false
-
-                    };
-                    user.connections.push(clientDataPersisted);
-                }
-
-
-              return updateUser(user).then(function(updatedUser) {
-                    console.log('... Updated User.connections list with external-client data');
-                    console.log('clientDataPersisted', clientDataPersisted);
-                   return clientDataPersisted
-                });
+            return updateUser(user).then(function(updatedUser) {
+                console.log('... Updated User.connections list with external-client data');
+               return clientDataPersisted
+            });
         });
 
 
@@ -760,8 +858,6 @@ module.exports = function(glossaUser, localSession, io) {
                     reject(err);
                 }
                 console.log('Persisted User Data Success');
-                console.log('user', user);
-                glossaUser = user;
                 resolve(user);
                 User.persistence.stopAutocompaction();
             })
@@ -834,58 +930,6 @@ module.exports = function(glossaUser, localSession, io) {
 
 
 
-    function addToUserConnections(newConnection) {
-
-        return new Promise(function(resolve, reject) {
-
-            User.findOne({_id: glossaUser._id}, function(err, user) {
-                if (err) {
-                    console.log('There was an error getting user data');
-                    reject(err);
-                }
-
-
-
-                if (user.connections) {
-                    var exists = false;
-                    user.connections.forEach(function(connection, index) {
-                        if (connection._id === newConnection._id) {
-                            exists = true;
-                            connection[index] = newConnection;
-                        }
-                    });
-                    if (!exists) {
-                        console.log('user.connections exists but is empty...');
-                        user.connections.push(newConnection);
-                    }
-                } else if (!user.connections) {
-                    console.log('user.connections is false...');
-                    user.connections = [];
-                    user.connections.push(newConnection);
-                }
-
-
-
-
-
-
-                var options = { returnUpdatedDocs: true};
-                return User.update({_id: glossaUser._id}, user, options, function(err, updatedCount, updated) {
-                    if (err) {
-                        console.log('Error updating user connection');
-                        reject(err);
-                    }
-
-                    glossaUser = updated;
-
-                    User.persistence.stopAutocompaction();
-                    console.log('Updated user connection success!');
-                    resolve(updated);
-
-                })
-            })
-        });
-    }
 
     function checkForUserConnection(userId) {
         console.log('checkForUserConnection');
@@ -908,7 +952,6 @@ module.exports = function(glossaUser, localSession, io) {
         });
 
     }
-
 
     function connectLocalClient(socket, ioClient, glossaUser) {
 
@@ -964,8 +1007,6 @@ module.exports = function(glossaUser, localSession, io) {
                 console.log('my local service IS published!!!!!!!');
             }
         }
-        //look for http services on the network
-        // initBonjour();
         initiateBonjour()
     }
 
@@ -978,25 +1019,6 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('Service Stop Success!');
         });
     }
-
-    function updateAUserConnection(updatedConnection) {
-        console.log('');
-        console.log('updateAUserConnection');
-
-        //update glossaUser object
-        if (updatedConnection.following) {
-            console.log('requested to follow user so get updates socketId', updatedConnection.socketId);
-            emitToExternalClient(updatedConnection.socketId, 'request:updates', updatedConnection)
-        }
-
-        //update persistent data
-        // updateUser(glossaUser).then(function(user) {
-        //     console.log('externalClients', externalClients);
-        //     emitToLocalClient('local-client:send:externalUserList', externalClients);
-        // })
-
-    }
-
 
     //changes should be an array of user connections
     function updateUserConnection(newConnections) {
@@ -1032,33 +1054,6 @@ module.exports = function(glossaUser, localSession, io) {
         })
 
     }
-
-    function updateGlossaUserObj(updatedConnection) {
-        glossaUser.connections.forEach(function(connection, index) {
-            if (connection._id === updatedConnection._id) {
-                connection[index] = updatedConnection;
-            }
-        });
-
-        console.log('glossaUser has been updated', glossaUser);
-    }
-
-    function updateExternalClients(data) {
-        externalClients.forEach(function(connection, index) {
-            var exists = false;
-            if (connection._id === data._id) {
-                exists = true;
-                connection[index] = data
-            }
-            if (!exists) {
-                externalClients.push(data);
-            }
-        });
-
-        console.log('externalClients have been udpated', externalClients);
-    }
-
-
 
     //update the local ui
     function emitToLocalClient(eventName, data) {

@@ -24,14 +24,16 @@ function userCardController(AppService, socketFactory, __user) {
 
     vm.user.color = alphabetColors[colorIndex];
 
-
     vm.toggleFollow = toggleFollow;
 
 
-    function toggleFollow(user) {
-        console.log('user', user);
+    function toggleFollow(userId) {
+        var socketId = null;
         vm.user.following = !vm.user.following;
-        AppService.updateConnection(user);
+        if (vm.user.online) {
+            socketId = vm.user.socketId;
+        }
+        AppService.toggleFollow(userId, vm.user.following, socketId);
     }
 }
 
