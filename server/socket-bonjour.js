@@ -269,7 +269,8 @@ module.exports = function(glossaUser, localSession, io) {
             console.log('%% SOCKET-SERVER - get:networkUsers listener');
 
             console.log('%% SOCKET-SERVER - send:updatedUserList EMITTER');
-            socket.emit('send:updatedUserList', {onlineUsers: externalClients})
+            console.log('externalClients', externalClients);
+            emitToLocalClient('send:updatedUserList',  {onlineUsers: externalClients});
         });
 
 
@@ -546,12 +547,13 @@ module.exports = function(glossaUser, localSession, io) {
 
         checkForPersistedData(externalClient).then(function(persitedData) {
 
+            console.log('checkForPersistedData persitedData$$$$$$$$$$$$$$$$$', persitedData);
+
 
             persitedData.online = true;
             persitedData.socketId = socket.id;
 
             addToOnlineList(persitedData);
-
             console.log('~~connectExternalClient process END~~');
         });
 
@@ -580,18 +582,12 @@ module.exports = function(glossaUser, localSession, io) {
     }
 
     function removeFromOnlineList(socketId) {
-        var toRemove;
-        var indexToRemove;
 
-        externalClients.forEach(function(client, index) {
-            if (client.socketId === socketId) {
-                toRemove = client;
-                indexToRemove = index
+        for (var i = 0, len = externalClients.length; i < len; i++) {
+            if (externalClients[i].socketId === socketId) {
+                externalClients.splice(i, 1);
+                break;
             }
-        });
-
-        if (indexToRemove) {
-            externalClients.splice(indexToRemove, 1);
         }
 
         console.log('Updated externalClients(onlineUsers) send list to local-client');
@@ -606,12 +602,13 @@ module.exports = function(glossaUser, localSession, io) {
         console.log('Updating externalClients(onlineUsers)');
 
         var exists = false;
-        externalClients.forEach(function(c, i) {
-            if (c._id === client._id) {
+        for (var i = 0, len = externalClients.length; i < len; i++) {
+            if (externalClients[i]._id === client._id) {
                 exists = true;
-                c[i] = client;
+                externalClients[i] = client;
+                break;
             }
-        });
+        }
 
         if (!exists) {
             externalClients.push(client);
@@ -678,45 +675,47 @@ module.exports = function(glossaUser, localSession, io) {
         return lastSync;
     }
 
-    function checkForPersistedData(externalClient) {
-        console.log('');
+    function checkForPersistedData(externalClient, callback) {
+            console.log('');
+            console.log('checkForPersistedData FUNCTION', externalClient);
 
-        var connectedBefore = false;
-       return getUser().then(function(user) {
-            user.connections.forEach(function(connection, index) {
-                if (connection._id === externalClient._id) {
-                    console.log("...external-client exists.  Change dynamic data, save and return list.");
-                    //update changing data...
-                    connectedBefore = true;
-                    // connection.online = true;
-                    // connection.socketId = externalClient.socketId;
+        var clientDataPersisted = {};
 
-                //    Maybe we look for updates here?
+            var connectedBefore = false;
+            return getUser().then(function(user) {
+
+
+                for (var i = 0, len = user.connections.length; i < len; i++) {
+                   if (user.connections[i]._id === externalClient._id) {
+                       console.log("...external-client exists.  Change dynamic data, save and return list.");
+                       //update changing data...
+                       connectedBefore = true;
+                       clientDataPersisted = user.connections[i];
+                   }
                 }
-            });
-            if (!connectedBefore) {
-
-                console.log('...external-client never has connected.  Add to connections list, save data and return list.');
-                var clientDataPersisted = {
-                    name: externalClient.name,
-                    _id: externalClient._id,
-                    type: 'external-client',
-                    following: false,
-                    // online: true,
-                    // socketId: externalClient.socketId
-                };
-
-                user.connections.push(clientDataPersisted);
-            }
-
-            return updateUser(user).then(function(updatedUser) {
-                console.log('... Updated User.connections list with external-client data');
-
-               return clientDataPersisted;
-            });
 
 
+                if (!connectedBefore) {
+                    console.log('...external-client never has connected.  Add to connections list, save data and return list.');
+                    clientDataPersisted = {
+                        name: externalClient.name,
+                        _id: externalClient._id,
+                        type: 'external-client',
+                        following: false
+
+                    };
+                    user.connections.push(clientDataPersisted);
+                }
+
+
+              return updateUser(user).then(function(updatedUser) {
+                    console.log('... Updated User.connections list with external-client data');
+                    console.log('clientDataPersisted', clientDataPersisted);
+                   return clientDataPersisted
+                });
         });
+
+
 
         // update or add user data in db.....
         //update the user's connection data then push the data to connected users array

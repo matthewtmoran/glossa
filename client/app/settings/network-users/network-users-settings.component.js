@@ -86,20 +86,26 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
     $scope.$on('update:networkUsers', function(event, data) {
         console.log('update:networkUsers listener', data);
 
-        data.onlineUsers.forEach(function(connection) {
-            var exists = false;
-            vm.networkUsers.forEach(function(user, index) {
-                if (connection._id === user._id) {
-                    user.socketId = connection.socketId;
-                    user.online = connection.online;
-                    exists = true;
+        if (!data.onlineUsers.length) {
+            vm.networkUsers.forEach(function(client) {
+                client.online = false;
+            })
+        } else {
+            data.onlineUsers.forEach(function(connection) {
+                var exists = false;
+                vm.networkUsers.forEach(function(user, index) {
+                    if (connection._id === user._id) {
+                        user.socketId = connection.socketId;
+                        user.online = connection.online;
+                        exists = true;
+                    }
+                 });
+                if (!exists) {
+                    connection.online = true;
+                    vm.networkUsers.push(connection);
                 }
-             });
-            if (!exists) {
-                connection.online = true;
-                vm.networkUsers.push(connection);
-            }
-        });
+            });
+        }
 
     });
 
