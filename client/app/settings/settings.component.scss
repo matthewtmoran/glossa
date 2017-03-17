@@ -26,13 +26,36 @@
 		}
 
 		.image-container {
-			padding-left: 35px;
-			padding-right: 35px;
+			//padding-left: 35px;
+			//padding-right: 35px;
+
 
 			&.profile-image-container {
 				background-size: cover;
 				min-height: 250px;
 				position: relative;
+				overflow: hidden;
+
+				.upload-button {
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					right: 0;
+					left: 0;
+					height: 40px;
+					width: 200px;
+					opacity: .8;
+					margin: auto;
+				}
+
+				.image-preview {
+					position: absolute;
+					top: 100%;
+					bottom: 100%;
+					margin: auto;
+					width: 100%;
+					transform: scale(1.5);
+				}
 
 				h2 {
 					color: white;
@@ -40,7 +63,7 @@
 					bottom: 15px;
 					left: 15px;
 				}
-				.md-button {
+				.options-button {
 					position: absolute;
 					top: 15px;
 					right: 15px;

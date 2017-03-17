@@ -332,6 +332,19 @@ module.exports = function(glossaUser, localSession, io) {
         });
 
 
+        //data = {userProfile: String, avatarString: String}
+        socket.on('update:userProfile', function(data) {
+            console.log('%% SOCKET SERVER update:userProfile LISTENER%%');
+            var userProfile = JSON.parse(data.userProfile);
+            getUser().then(function(user) {
+                user = userProfile;
+                updateUser(user).then(function(updatedUser) {
+                    console.log('TODO: broadcast to connections updated user data')
+                })
+            })
+        });
+
+
         /**
          * When local-client changes are made, this broadcasts to every online user that changes are made
          *
@@ -928,7 +941,28 @@ module.exports = function(glossaUser, localSession, io) {
         });
     }
 
+    function writeAvatar(avatarString, userData) {
 
+
+        var buffer = new Buffer(avatarString, 'base64', function(err) {
+            if (err) {
+                return console.log('issue decoding base64 data');
+            }
+            console.log('buffer created....');
+        });
+        // var imagePath = path.join(__dirname, config.dataRoot
+
+        console.log('buffer', buffer);
+
+
+        // fs.writeFile(imagePath, buffer, function(err) {
+        //     if (err) {
+        //         return console.log('There was an error writing file to filesystem', err);
+        //     }
+        //     console.log('image written to file system');
+        //     delete notebook.imageBuffer
+        // })
+    }
 
 
     function checkForUserConnection(userId) {

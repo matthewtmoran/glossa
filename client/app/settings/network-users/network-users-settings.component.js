@@ -11,44 +11,53 @@ angular.module('glossa')
         }
     });
 
-function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
+function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, Upload, __rootUrl) {
     var vm = this;
 
     vm.$onInit = init;
 
     vm.networkUsers = [];
 
-    // vm.networkUsers = [
-    //     {
-    //         name: 'User 1',
-    //         lastSync: Date.now(),
-    //         _id: '1234',
-    //         following: true,
-    //         isOnline: true
-    //     },
-    //     {
-    //         name: 'Test User 2',
-    //         lastSync: null,
-    //         _id: '5678',
-    //         following: false
-    //     },
-    //     {
-    //         name: 'Another User 3',
-    //         lastSync: null,
-    //         _id: '4321',
-    //         following: false
-    //     }
-    // ];
 
     vm.testEvent = testEvent;
     vm.toggleSharing = toggleSharing;
+    vm.updateUserProfile = updateUserProfile;
+    vm.uploadAvatar = uploadAvatar;
 
     function init() {
+        vm.userProfile = AppService.getUser();
+        console.log('userProfile on Init:', vm.userProfile);
         vm.networkUsers = AppService.getConnections();
 
         if (vm.settings.isSharing) {
             AppService.getOnlineUsersSE();
         }
+    }
+
+    function uploadAvatar(file) {
+        console.log('uploadAvatar');
+        Upload.upload({
+            url: 'api/user/avatar',
+            data: {files: file},
+            arrayKey: '',
+            headers: { 'Content-Type': undefined }
+        }).then(function (resp) {
+            console.log('Success ');
+            console.log('resp', resp);
+        }, function (resp) {
+            console.log('Error status: ' + resp.status);
+        }, function (evt) {
+            var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+            // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+        });
+
+    }
+
+    function updateUserProfile(userProfile) {
+        console.log('TODO: use socket if sharing... Fallback to HTTP if not sharing...');
+        console.log('updateUserProfile',userProfile);
+
+        AppService.updateUserProfile(userProfile)
     }
 
     function toggleSharing() {
@@ -76,7 +85,6 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
             AppService.saveSettings(vm.settings);
         })
     }
-
 
     function testEvent() {
         socketFactory.emit('local-client:buttonTest', {myData: 'just some data'});
@@ -123,6 +131,18 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc) {
         })
     })
 
+    $scope.$watch('vm.userProfile.avatar', function(newValue, oldValue) {
+        console.log('newValue', newValue);
+        console.log('typeof newValue',typeof newValue);
+
+        if (newValue) {
+            if (typeof newValue === 'string') {
+                vm.imagePath = newValue;
+            } else {
+                vm.imagePath = window.URL.createObjectURL(newValue);
+            }
+        }
+    });
 
 
 

@@ -1,7 +1,7 @@
 angular.module('glossa')
     .factory('AppService', AppService);
 
-function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user) {
+function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user, $timeout) {
     var service = {
 
         //socket functions
@@ -9,6 +9,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         getOnlineUsersSE: getOnlineUsersSE,
         getAllUserUpdates: getAllUserUpdates,
         broadcastUpdates: broadcastUpdates,
+        updateUserProfile: updateUserProfile,
 
         //dealing with __user constant
         getUser: getUser,
@@ -41,6 +42,11 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         return __user.connections;
     }
 
+    function updateUserProfile(userProfile) {
+        var userString = angular.toJson(userProfile);
+        socketFactory.emit('update:userProfile', {userProfile: userString})
+    }
+
     function toggleFollow(userId, following, socketId) {
         console.log('toggleFollow, user', userId);
         var data = {
@@ -65,7 +71,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     //should only be called on stateChange
     function updateSession(session) {
-        console.log('Session being updated...');
         return $http.put('/api/user/' + __user._id + '/session', session)
             .then(function successCallback(response) {
                 return response.data;

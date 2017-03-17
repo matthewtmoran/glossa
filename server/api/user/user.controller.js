@@ -96,6 +96,28 @@ exports.updateSettings = function(req, res) {
     });
 };
 
+exports.avatar = function(req, res) {
+    console.log('Avatar!!!');
+
+    console.log('req.body.dataObj', req.body.dataObj);
+    User.find({}, function (err, user) {
+        if (err) { return handleError(res, err); }
+        if(!user) { return res.status(404).send('Not Found'); }
+        var options = {returnUpdatedDocs: true};
+
+        var updated = user[0];
+        updated.avatar = req.body.dataObj.image.path;
+
+        console.log('updated', updated);
+
+        User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+            if (err) { return handleError(res, err); }
+            User.persistence.stopAutocompaction(); // concat db
+            return res.status(200).json(updatedDoc);
+        });
+    });
+};
+
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
     User.findById(req.params.id, function (err, thing) {

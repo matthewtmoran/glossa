@@ -32,7 +32,7 @@ function SettingsController($state, $scope, AppService, SettingsService) {
             index: 2
         },
         {
-            label: 'Network',
+            label: 'Sharing',
             state: 'settings.network',
             index: 3
         },
