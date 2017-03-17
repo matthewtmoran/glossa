@@ -123,7 +123,9 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
                 scrollParent: false,
                 waveColor: control.userSettings.waveColor,
                 progressColor: 'purple',
-                height: '200'
+                height: '200',
+                barHeight: 4,
+                barWidth: 4
             };
 
             options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);

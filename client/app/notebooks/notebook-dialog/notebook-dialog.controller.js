@@ -8,11 +8,17 @@ angular.module('glossa')
 function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookService, $sce, notebook, $timeout) {
     var dialogVm = this;
 
+    console.log('notebook', notebook);
+    console.log('dialogVm.notebook', dialogVm.notebook);
+
+    var originalCopy = angular.copy(notebook);
+
+
     //An object to be returned when dialog closes
     var dialogObject = {
         dataChanged: false,
         event: 'hide',
-        data: null
+        data: originalCopy
     };
 
 
@@ -32,7 +38,7 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
     }
 
     function cancel(ev, notebook) {
-        restoreMedia()
+        restoreMedia();
         dialogSrvc.cancel(dialogObject);
     }
 
@@ -41,8 +47,6 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
     }
 
     function save() {
-
-        console.log('dialogVm.notebook', dialogVm.notebook);
 
         dialogObject = {
             dataChanged: true,
@@ -103,30 +107,11 @@ function notebookDetailsCtrl(dialogSrvc, simplemdeOptions, $scope, NotebookServi
             }
         }
     }
-    //called if media is 'removed' saved tp separate object to send with request to server
+    //called if media is 'removed' saved to separate object to send with request to server
     function removeMedia(media, selectedTile, otherTile) {
         if (media.createdAt) { //this tells us the media has been saved to the db before
             dialogVm.removedMedia.push(media);
         }
-
-
-        var selectedElement = angular.element('#' + selectedTile);
-
-        $timeout(function() {
-            selectedElement.remove();
-        }, 500);
-        // var animateElement = angular.element('#' + otherTile);
-        //
-        // selectedElement.slideUp('fast', function() {
-        //     angular.element(this).fadeOut();
-        // });
-        //
-        // if (selectedTile === 'image-tile' && animateElement.length) {
-        //     animateElement.css({
-        //         top: '0px'
-        //     });
-        // }
-
     }
     //this is called on cancel and run if media was 'removed' but not saved...
     function restoreMedia() {

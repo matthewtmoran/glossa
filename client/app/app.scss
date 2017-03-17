@@ -58,6 +58,10 @@ $secondary-text: $lBlack;
 	font-feature-settings: 'liga';
 }
 
+.no-padding {
+	padding: 0;
+}
+
 @font-face {
 	font-family: "DejaVu Mono";
 	src: url(../assets/fonts/DejaVuSansMono.ttf);
@@ -168,7 +172,7 @@ main-loader._splash_fade_out{
 }
 
 md-dialog {
-	border-top: 1px solid rgba(0,0,0,0.12) !important;
+	//border-top: 1px solid rgba(0,0,0,0.12) !important;
 }
 
 .CodeMirror-hints {

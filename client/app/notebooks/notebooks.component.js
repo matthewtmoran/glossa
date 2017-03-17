@@ -41,7 +41,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
     $scope.$watch('nbVm.uniqueUsers', function(newValue) {
-        console.log('there was a change', newValue);
+        console.log('there was a change in notebook....', newValue);
     });
 
     /**
@@ -75,7 +75,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
      * @param ev - the event
      * @param notebook object - postType should be defined everytime
      */
-    function viewDetails(ev, notebook) {
+    function viewDetails(ev, notebook, index) {
         //get options depending on post type
         var postOptions = NotebookService.postOptions(ev, notebook);
 
@@ -83,7 +83,8 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         dialogSrvc.notebookDetails(ev, postOptions, notebook).then(function(result) {
             //if there was no data changed just return
             if (result && !result.dataChanged) {
-                return;
+                var index = nbVm.notebooks.indexOf(notebook);
+                nbVm.notebooks[index] = result.data;
             }
 
             //update the specific notebooks in the view
