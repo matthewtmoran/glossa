@@ -14,11 +14,9 @@
 			<div layout="row">
 				<div layout="column"
 				     flex
-				     layout-align="end center"
+				     layout-align="center center"
 				     class=" top-actions">
 					<img ng-show="dialogVm.notebook.image" ngf-src="dialogVm.imagePath" class="thumb image-preview">
-
-				     <!--ng-style="{dialogVm.imagePath: 'background-image':? dialogVm.imagePath : null}">-->
 					<md-button
 							ng-if="!dialogVm.notebook.image"
 							ngf-select
@@ -41,14 +39,15 @@
 						<span>Add Audio</span>
 						<!--<md-icon>volume_up</md-icon>-->
 					</md-button>
-					<div class="remove-container" layout="row" layout-align="end center">
+
+					<div class="remove-container" ng-class="{'dark-theme' :!dialogVm.notebook.image}" layout="row" layout-align="start center">
 						<md-button ng-if="dialogVm.notebook.image" class="md-icon-button remove-button" aria-label="Remove Button"
 						           ng-click="dialogVm.removeMedia(dialogVm.notebook.image); dialogVm.notebook.image = null" >
 							<!--<md-icon>cancel</md-icon>-->
-							<md-icon><visibility_off></visibility_off></md-icon>
+							<md-icon>visibility_off</md-icon>
 						</md-button>
-						<md-button ng-if="dialogVm.notebook.image" class="md-icon-button remove-button" aria-label="Remove Button"
-						           ng-click="dialogVm.removeMedia(dialogVm.notebook.image); dialogVm.notebook.image = null" >
+						<md-button ng-if="dialogVm.notebook.audio" class="md-icon-button remove-button" aria-label="Remove Button"
+						           ng-click="dialogVm.removeMedia(dialogVm.notebook.audio); dialogVm.notebook.audio = null" >
 							<!--<md-icon>cancel</md-icon>-->
 							<md-icon>volume_off</md-icon>
 						</md-button>

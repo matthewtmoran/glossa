@@ -383,9 +383,9 @@
 			height: 40px;
 			min-width: 50%;
 			opacity: .7;
-
-			text-transform: capitalize;
 			font-size: 1.1em;
+			z-index: 102;
+			text-transform: capitalize;
 		}
 
 		.remove-container {
@@ -393,8 +393,16 @@
 			top: 15px;
 			right: 15px;
 
-			.remove-button {
+			&.dark-theme {
+				.remove-button {
+					md-icon {
+						opacity: .8;
+						color: $lBlack;
+					}
+				}
+			}
 
+			.remove-button {
 				md-icon {
 					opacity: .8;
 					color: white;
