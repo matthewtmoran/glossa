@@ -1,7 +1,7 @@
 angular.module('glossa')
     .factory('AppService', AppService);
 
-function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user, $timeout) {
+function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user, Upload) {
     var service = {
 
         //socket functions
@@ -18,6 +18,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         getConnections: getConnections,
 
         //updating __user constant
+        uploadAvatar: uploadAvatar,
+        removeAvatar: removeAvatar,
         updateSession: updateSession,
         saveSettings: saveSettings,
         toggleFollow: toggleFollow
@@ -40,6 +42,40 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     function getConnections() {
         return __user.connections;
+    }
+
+    function uploadAvatar(file) {
+        return Upload.upload({
+            url: 'api/user/avatar',
+            data: {files: file},
+            arrayKey: '',
+            headers: { 'Content-Type': undefined }
+        }).then(function (resp) {
+            console.log('Success ');
+            console.log('resp', resp);
+
+            __user.avatar = resp.data.avatar;
+
+            return resp.data;
+        }, function (resp) {
+            console.log('Error status: ' + resp.status);
+        }, function (evt) {
+            var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+            // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+        });
+    }
+
+    function removeAvatar(filePath) {
+        console.log('Avatar being updated...');
+        console.log('typeof filePath', typeof filePath);
+        var data = {filePath: filePath};
+        return $http.put('/api/user/' + __user._id + '/avatar', data)
+            .then(function successCallback(response) {
+                return response.data;
+            }, function errorCallback(response) {
+                console.log('There was an error', response);
+                return response.data;
+            });
     }
 
     function updateUserProfile(userProfile) {

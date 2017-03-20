@@ -439,6 +439,7 @@ module.exports = function(glossaUser, localSession, io) {
         browser.on('up', function(service) {
             console.log('');
             console.log('Service went/is live........', service.name);
+            console.log('Service ', service);
             console.log('Services on network:', browser.services.length);
 
             //make sure network service is a glossa instance....

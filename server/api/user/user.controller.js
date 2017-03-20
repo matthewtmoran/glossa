@@ -12,6 +12,8 @@
 var _ = require('lodash');
 var User = require('./user.model');
 var path = require('path');
+var config = require('../../config/environment');
+var fs = require('fs');
 
 // var globalPaths = require('electron').remote.getGlobal('userPaths');
 
@@ -94,6 +96,28 @@ exports.updateSettings = function(req, res) {
             return res.status(200).json(updatedDoc);
         });
     });
+};
+
+exports.removeAvatar = function(req, res) {
+    console.log('remove Avataaaaaaaaaaaaar');
+
+    User.find({}, function (err, user) {
+        if (err) { return handleError(res, err); }
+        if(!user) { return res.status(404).send('Not Found'); }
+        var options = {returnUpdatedDocs: true};
+
+        var updated = user[0];
+        delete updated.avatar;
+
+        User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+            if (err) { return handleError(res, err); }
+            console.log('Updated User');
+            User.persistence.stopAutocompaction(); // concat db
+            return res.status(200).json(updatedDoc);
+        });
+    });
+
+
 };
 
 exports.avatar = function(req, res) {

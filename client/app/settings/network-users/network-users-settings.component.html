@@ -11,7 +11,7 @@
 
 		<div class="image-container profile-image-container" >
 
-			<img ng-show="vm.userProfile.avatar" ngf-src="vm.imagePath" class="thumb image-preview">
+			<img ng-show="vm.userProfile.avatar" ng-src="{{vm.userProfile.avatar}}" class="thumb image-preview">
 
 			<h2>Your Profile</h2>
 
@@ -29,8 +29,8 @@
 
 			<!--<md-button class="md-raised upload-button">Upload Photo</md-button>-->
 
-			<md-button class="md-icon-button options-button">
-				<md-icon>more_vert</md-icon>
+			<md-button ng-if="vm.userProfile.avatar" class="md-icon-button options-button">
+				<md-icon ng-click="vm.removeAvatar(vm.userProfile.avatar); vm.userProfile.avatar = null">visibility_off</md-icon>
 			</md-button>
 		</div>
 

@@ -22,7 +22,7 @@ var defualtProject = {
 
 var defaultSettings = {
     media: {
-        waveColor: 'black',
+        waveColor: '#BDBDBD',
         skipLength: 2
     }
 };
@@ -54,7 +54,7 @@ function defaultAppData() {
         createdAt: Date.now(),
         settings: {
             isSharing: true,
-            waveColor: "black",
+            waveColor: "#BDBDBD",
             skipLength: 2
         },
         session: {},

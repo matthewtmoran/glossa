@@ -51,6 +51,8 @@ function validateFilename(req, res, next) {
 }
 
 function MediaObject(file) {
+    console.log('file', file);
+
     var fileObj = {};
     fileObj.originalname = file.originalname;
     fileObj.mimetype = file.mimetype;
@@ -80,20 +82,22 @@ function copyAndWrite(from, to){
     })
 }
 
-function removeMedia(media) {
+
+function removeAvatar(req, res, next) {
+    console.log('removeAvatar&&&&&&&&&&&&&&&&');
+
     var mediaPath;
-    if (media.mimetype.indexOf('image')> -1) {
-        mediaPath = path.join(config.imagePath, media.filename);
-    } else if (media.mimetype.indexOf('audio') > -1) {
-        mediaPath = path.join(config.audioPath, media.filename);
-    }
+    mediaPath = path.join(config.root, 'server/data/', req.body.filePath);
+    console.log('mediaPath', mediaPath);
     fs.unlink(mediaPath);
+    next();
 }
 
 
 module.exports = {
     validateFilename: validateFilename,
-    type:type
+    removeAvatar: removeAvatar,
+    type: type
 };
 
 

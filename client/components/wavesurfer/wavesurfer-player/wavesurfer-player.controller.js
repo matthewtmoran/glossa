@@ -45,7 +45,7 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
     control.defaultSettings = { //not sure we need if db is populated.....
         skipForward: 2,
         skipBack: 2,
-        waveColor: 'black'
+        waveColor: '#BDBDBD'
     };
 
     control.mediaSettings = {
@@ -122,10 +122,11 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
                 skipLength: control.userSettings.skipLength,
                 scrollParent: false,
                 waveColor: control.userSettings.waveColor,
-                progressColor: 'purple',
+                progressColor: '#757575',
                 height: '200',
-                barHeight: 10,
-                barWidth: 4
+                barHeight: 2,
+                barWidth: 1,
+                cursorColor: '#FF5252'
             };
 
             options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);

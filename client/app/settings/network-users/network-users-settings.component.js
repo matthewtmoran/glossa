@@ -11,7 +11,7 @@ angular.module('glossa')
         }
     });
 
-function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, Upload, __rootUrl) {
+function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     var vm = this;
 
     vm.$onInit = init;
@@ -23,6 +23,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, Upload, 
     vm.toggleSharing = toggleSharing;
     vm.updateUserProfile = updateUserProfile;
     vm.uploadAvatar = uploadAvatar;
+    vm.removeAvatar = removeAvatar;
 
     function init() {
         vm.userProfile = AppService.getUser();
@@ -34,23 +35,15 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, Upload, 
         }
     }
 
-    function uploadAvatar(file) {
-        console.log('uploadAvatar');
-        Upload.upload({
-            url: 'api/user/avatar',
-            data: {files: file},
-            arrayKey: '',
-            headers: { 'Content-Type': undefined }
-        }).then(function (resp) {
-            console.log('Success ');
-            console.log('resp', resp);
-        }, function (resp) {
-            console.log('Error status: ' + resp.status);
-        }, function (evt) {
-            var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-            // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
-        });
+    function removeAvatar(path) {
+        AppService.removeAvatar(path);
+    }
 
+    function uploadAvatar(file) {
+        $q.when(AppService.uploadAvatar(file)).then(function(data) {
+            console.log('data', data);
+            vm.userProfile.avatar = data.avatar;
+        });
     }
 
     function updateUserProfile(userProfile) {
@@ -131,18 +124,18 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, Upload, 
         })
     })
 
-    $scope.$watch('vm.userProfile.avatar', function(newValue, oldValue) {
-        console.log('newValue', newValue);
-        console.log('typeof newValue',typeof newValue);
-
-        if (newValue) {
-            if (typeof newValue === 'string') {
-                vm.imagePath = newValue;
-            } else {
-                vm.imagePath = window.URL.createObjectURL(newValue);
-            }
-        }
-    });
+    // $scope.$watch('vm.userProfile.avatar', function(newValue, oldValue) {
+    //     console.log('newValue', newValue);
+    //     console.log('typeof newValue',typeof newValue);
+    //
+    //     if (newValue) {
+    //         if (typeof newValue === 'string') {
+    //             vm.imagePath = newValue;
+    //         } else {
+    //             vm.imagePath = window.URL.createObjectURL(newValue);
+    //         }
+    //     }
+    // });
 
 
 
