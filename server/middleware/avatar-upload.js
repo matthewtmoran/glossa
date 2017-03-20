@@ -19,8 +19,6 @@ var upload = multer({ storage: storage });
 var type = upload.array('files');
 
 function validateFilename(req, res, next) {
-    console.log("req.files:  ", req.files);
-    console.log("req.body:  ", req.body);
     if (!req.files) {
         next();
     }
@@ -30,7 +28,6 @@ function validateFilename(req, res, next) {
     var promises = [];
     var dataObj = {};
 
-    console.log('files that are attemping to be uploaded....', files);
 
     files.forEach(function(file) {
         file = MediaObject(file);
@@ -44,7 +41,6 @@ function validateFilename(req, res, next) {
     });
 
     q.all(promises).then(function(response) {
-        console.log('Promises resolved.... proceed to data update....');
         req.body.dataObj = dataObj;
         next()
     });
@@ -84,8 +80,6 @@ function copyAndWrite(from, to){
 
 
 function removeAvatar(req, res, next) {
-    console.log('removeAvatar&&&&&&&&&&&&&&&&');
-
     var mediaPath;
     mediaPath = path.join(config.root, 'server/data/', req.body.filePath);
     console.log('mediaPath', mediaPath);

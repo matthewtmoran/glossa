@@ -132,64 +132,6 @@
 }
 
 
-.notebook-card {
-
-
-	.inner-padding {
-		padding: 0 16px 0 16px;
-	}
-
-	.card-content {
-		padding: 0;
-		position: relative;
-		overflow: hidden;
-
-		.card-text {
-			position: absolute;
-
-		}
-	}
-
-	.card-title {
-		.title-text {
-
-		}
-	}
-
-	.wave-content-wrapper {
-		background-color: #dedede;
-	}
-
-	.card-image {
-		position: relative;
-		overflow: hidden;
-		max-height: 250px;
-		min-height: 250px;
-
-		img {
-			display: block;
-			width: 100%;
-			height: 100%;
-		}
-	}
-
-	.card-media {
-		position: relative;
-		overflow: hidden;
-		//max-height: 100%;
-		height: 100%;
-		width: 100%;
-		//min-height: 250px;
-
-		img {
-			display: block;
-			width: 100%;
-			height: 100% !important;
-		}
-	}
-}
-
-
 #image-post-dialog {
 	.image-caption {
 		width: 100% !important;
@@ -343,7 +285,6 @@
 }
 
 .post-dialog {
-
 	.audio-container {
 		background: transparent;
 		height: 200px;
@@ -368,11 +309,13 @@
 
 
 	.top-actions {
-		background: $white; /* For browsers that do not support gradients */
-		background: -webkit-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Safari 5.1 to 6.0 */
-		background: -o-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Opera 11.1 to 12.0 */
-		background: -moz-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Firefox 3.6 to 15 */
-		background: linear-gradient(white 24%, $white 46%, $lGrey); /* Standard syntax */
+		@extend .grey-gradient;
+
+		//background: $white; /* For browsers that do not support gradients */
+		//background: -webkit-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Safari 5.1 to 6.0 */
+		//background: -o-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Opera 11.1 to 12.0 */
+		//background: -moz-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Firefox 3.6 to 15 */
+		//background: linear-gradient(white 24%, $white 46%, $lGrey); /* Standard syntax */
 		height: 200px;
 		position: relative;
 

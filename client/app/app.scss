@@ -33,6 +33,7 @@ $secondary-text: $lBlack;
 	url(../assets/fonts/icons/MaterialIcons-Regular.woff) format('woff'),
 	url(../assets/fonts/icons/MaterialIcons-Regular.ttf) format('truetype');
 }
+
 .material-icons {
 	font-family: 'Material Icons';
 	font-weight: normal;
@@ -132,6 +133,7 @@ md-backdrop.md-sidenav-backdrop {
 @import 'help/help.component';
 @import 'meta/attachment/attachment';
 @import 'meta/meta.component';
+@import 'notebooks/notebook-card/notebook-card';
 @import 'notebooks/notebooks.component';
 @import 'settings/about/about-settings.component';
 @import 'settings/media/media-settings.component';
@@ -263,3 +265,13 @@ md-sidenav {
 .md-18 {
 	font-size: 18px;
 }
+
+.grey-gradient {
+	background: $white; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(white 24%, $white 46%, $lGrey); /* Standard syntax */
+}
+
+
