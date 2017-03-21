@@ -382,26 +382,8 @@ module.exports = function(glossaUser, localSession, io) {
 
             broadcastToExternalClients('external-clients:updates', {updates: 'there were some updated made', _id: glossaUser._id})
 
-
-            // io.broadcast.to('externalClientsRoom').emit('external-clients:updates', {updates: 'there were some updated made', userId: glossaUser._id});
         });
 
-
-
-
-
-
-
-
-
-
-        // socket.on('external-client:getUpdates', function(data) {
-        //     console.log('%% external-client:getUpdates %%');
-        //     console.log('...external client is requesting updates');
-        //
-        //     //query the db for updates since last time requesting user has synced with hosting user.
-        //
-        // });
 
 
         /**
@@ -439,7 +421,6 @@ module.exports = function(glossaUser, localSession, io) {
         browser.on('up', function(service) {
             console.log('');
             console.log('Service went/is live........', service.name);
-            console.log('Service ', service);
             console.log('Services on network:', browser.services.length);
 
             //make sure network service is a glossa instance....
@@ -454,13 +435,12 @@ module.exports = function(glossaUser, localSession, io) {
                     connectAsNodeClient(service);
                 }
             }
-
-
         });
 
         console.log('LOCAL CONNECTION DONE - Listening....')
     }
 
+    //where serve connects as node client to other apps
     function connectAsNodeClient(service) {
         var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
         var nodeClientSocket = ioClient.connect(externalPath);
@@ -671,6 +651,15 @@ module.exports = function(glossaUser, localSession, io) {
 
         socket.userId = externalClient._id;
 
+        checkIfFollowing(externalClient, socket.id).then(function(clientStateData) {
+            addToOnlineList(clientStateData);
+            socket.join('externalClientsRoom');
+            if (clientStateData.following) {
+                emitToExternalClient(clientStateData.socketId, 'request:updates', {lastSync: clientStateData.lastSync});
+            }
+        });
+
+        /*
         checkForPersistedData(externalClient).then(function(persitedData) {
 
             console.log('checkForPersistedData persitedData$$$$$$$$$$$$$$$$$', persitedData);
@@ -679,38 +668,51 @@ module.exports = function(glossaUser, localSession, io) {
             persitedData.online = true;
             persitedData.socketId = socket.id;
 
-            addToOnlineList(persitedData);
-            socket.join('externalClientsRoom');
 
-            if (persitedData.following) {
-                emitToExternalClient(persitedData.socketId, 'request:updates', {lastSync: persitedData.lastSync});
-            }
 
             console.log('~~connectExternalClient process END~~');
         });
+         */
+    }
 
-        // externalClient = checkForStateData(socket, externalClient);
-        //
-        // console.log('externalClient', externalClient);
-        //
-        // console.log('Updating local-client with STATE update');
-        //
-        // emitToLocalClient('local-client:send:externalUserList', externalClients);
-        //
-        // console.log('now that an external-client has connected... check if we are following user: ', externalClient._id);
-        //
-        //
-        //
-        //
-        // if(!externalClient.following) {
-        //     console.log('We are not following user so do nothing')
-        // } else {
-        //     console.log('We are following so request changes');
-        //
-        //     emitToExternalClient(externalClient.socketId, 'request:updates', {lastSync: externalClient.lastSync});
-        //
-        // }
+    function checkIfFollowing(externalClient, socketId) {
+        var clientStateData = {
+            name: externalClient.name,
+            _id: externalClient._id,
+            type: 'external-client',
+            following: false,
+            lastSync: null,
+            avatar: externalClient.avatar || null,
+            socketId: socketId,
+            online: true
+        };
+        var isFollowing = false;
+        return getUser().then(function(user) {
+            for (var i = 0, len = user.connections.length; i < len; i++) {
+                //if external client exists... it means user is following
+                if (user.connections[i]._id === externalClient._id) {
+                    isFollowing = true;
 
+                    //update avatar if it is different
+
+                    if (user.connections.avatar !== clientStateData.avatar) {
+                        console.log('TODO: get user avatar...');
+                        user.connections.avatar = clientStateData.avatar;
+                    }
+
+
+                    //update state data
+                    clientStateData.lastSync = user.connection.lastSync;
+                    clientStateData.following = user.connections.following;
+
+
+                    console.log('TODO: get new updates from user');
+
+                    return clientStateData;
+
+                }
+            }
+        })
     }
 
     function removeFromOnlineList(socketId) {
@@ -826,26 +828,6 @@ module.exports = function(glossaUser, localSession, io) {
                return clientDataPersisted
             });
         });
-
-
-
-        // update or add user data in db.....
-        //update the user's connection data then push the data to connected users array
-        // var connectionExists = false;
-        // glossaUser.connections.forEach(function(connection, index) {
-        //     if (connection._id === externalClient._id) {
-        //         connectionExists = true;
-        //
-        //
-        //         console.log('...need to look for changes and update connection');
-        //
-        //         // connection.name = externalClient.name;
-        //     }
-        // });
-        // if (!connectionExists) {
-        //     glossaUser.connections.push(clientDataPersisted)
-        // }
-        // updateUser(glossaUser);
     }
 
 
