@@ -28,13 +28,28 @@
 			position: relative;
 
 			.online-notification {
-				background: #0f9d58;
+				background: #CDDE20;
 				height:15px;
 				width: 15px;
 				border-radius: 50px;
 				position: absolute;
-				bottom: 3px;
-				right: 5px;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: 5px;
+				z-index: 9999;
+			}
+
+			.offline-notification {
+				background: #FF5607;
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				position: absolute;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: 5px;
 				z-index: 9999;
 			}
 		}

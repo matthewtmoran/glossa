@@ -107,25 +107,35 @@ module.exports = function(glossaUser, localSession, io) {
         socket.on('update:following', function(data) {
             getUser().then(function(user) {
 
-                var updatedConnection;
-                for(var i = 0, len = user.connections.length; i < len; i++) {
-                    if (user.connections[i]._id === data.userId) {
-                        user.connections[i].following = data.following;
-                        updatedConnection = user.connections[i];
-                        updatedConnection.socketId = data.socketId;
-                        break;
-                    }
+                if (data.following) {
+                    user.connections.push(data);
+                } else {
+                    user.connections.forEach(function(connections, index) {
+                        if (connections._id === data._id) {
+                            user.connections.splice(index, 1);
+                        }
+                    })
                 }
 
+
+                // for(var i = 0, len = user.connections.length; i < len; i++) {
+                //     if (user.connections[i]._id === data.userId) {
+                //         user.connections[i].following = data.following;
+                //         updatedConnection = user.connections[i];
+                //         updatedConnection.socketId = data.socketId;
+                //         break;
+                //     }
+                // }
+
                 updateUser(user).then(function(updatedUser) {
-                    if (updatedConnection.following) {
+                    if (data.following) {
 
-                        console.log('TODO: get updates....', updatedConnection);
+                        console.log('TODO: get updates....', data);
 
-                        if (updatedConnection.socketId) {
+                        if (data.socketId) {
                             console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
 
-                            emitToExternalClient(updatedConnection.socketId, 'request:updates', updatedConnection)
+                            emitToExternalClient(data.socketId, 'request:updates', data)
                         }
 
                     }
@@ -652,6 +662,7 @@ module.exports = function(glossaUser, localSession, io) {
         socket.userId = externalClient._id;
 
         checkIfFollowing(externalClient, socket.id).then(function(clientStateData) {
+
             addToOnlineList(clientStateData);
             socket.join('externalClientsRoom');
             if (clientStateData.following) {
@@ -676,6 +687,8 @@ module.exports = function(glossaUser, localSession, io) {
     }
 
     function checkIfFollowing(externalClient, socketId) {
+        console.log('');
+        console.log('checkIfFollowing');
         var clientStateData = {
             name: externalClient.name,
             _id: externalClient._id,
@@ -708,10 +721,9 @@ module.exports = function(glossaUser, localSession, io) {
 
                     console.log('TODO: get new updates from user');
 
-                    return clientStateData;
-
                 }
             }
+            return clientStateData;
         })
     }
 
@@ -742,37 +754,37 @@ module.exports = function(glossaUser, localSession, io) {
         emitToLocalClient('send:updatedUserList', {onlineUsers: externalClients});
     }
 
-    function checkForStateData(socket, externalClient) {
-        console.log('')
-        console.log('checkForStateData')
-        var clientDataState = {
-            name: externalClient.name,
-            _id: externalClient._id,
-            type: 'external-client',
-            socketId: externalClient.socketId,
-            lastSync: getLastSync(externalClient._id) || null,
-            following: getFollowing(externalClient._id) || null
-        };
-
-        //add externalClient state data to list
-        var userStateExists = false;
-        externalClients.forEach(function(connection, index) {
-            if (connection._id === externalClient._id) {
-                console.log('this client is already in the online user list....');
-                userStateExists = true;
-                connection[index] = clientDataState;
-            }
-        });
-        if (!userStateExists) {
-            console.log('this client does not exist in the online user list');
-            externalClients.push(clientDataState);
-            socket.join('externalClientsRoom');
-        }
-
-        console.log('externalClients.length', externalClients.length);
-        console.log('State Data Updated');
-        return clientDataState;
-    }
+    // function checkForStateData(socket, externalClient) {
+    //     console.log('')
+    //     console.log('checkForStateData')
+    //     var clientDataState = {
+    //         name: externalClient.name,
+    //         _id: externalClient._id,
+    //         type: 'external-client',
+    //         socketId: externalClient.socketId,
+    //         lastSync: getLastSync(externalClient._id) || null,
+    //         following: getFollowing(externalClient._id) || null
+    //     };
+    //
+    //     //add externalClient state data to list
+    //     var userStateExists = false;
+    //     externalClients.forEach(function(connection, index) {
+    //         if (connection._id === externalClient._id) {
+    //             console.log('this client is already in the online user list....');
+    //             userStateExists = true;
+    //             connection[index] = clientDataState;
+    //         }
+    //     });
+    //     if (!userStateExists) {
+    //         console.log('this client does not exist in the online user list');
+    //         externalClients.push(clientDataState);
+    //         socket.join('externalClientsRoom');
+    //     }
+    //
+    //     console.log('externalClients.length', externalClients.length);
+    //     console.log('State Data Updated');
+    //     return clientDataState;
+    // }
 
     function getFollowing(userId) {
         var isFollowing = false;

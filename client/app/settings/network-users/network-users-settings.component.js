@@ -87,10 +87,22 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     $scope.$on('update:networkUsers', function(event, data) {
         console.log('update:networkUsers listener', data);
 
+        var nonFollowingUsers = [];
+
         if (!data.onlineUsers.length) {
             vm.networkUsers.forEach(function(client) {
-                client.online = false;
-            })
+                if (!client.following) {
+                    nonFollowingUsers.push(client);
+                } else {
+                    client.online = false;
+                }
+            });
+
+            nonFollowingUsers.forEach(function(client) {
+               vm.networkUsers.splice(vm.networkUsers.indexOf(client));
+            });
+
+
         } else {
             data.onlineUsers.forEach(function(connection) {
                 var exists = false;

@@ -83,14 +83,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         socketFactory.emit('update:userProfile', {userProfile: userString})
     }
 
-    function toggleFollow(userId, following, socketId) {
-        console.log('toggleFollow, user', userId);
-        var data = {
-            userId: userId,
-            following: following,
-            socketId: socketId
-        };
-        socketFactory.emit('update:following', data);
+    function toggleFollow(user) {
+        console.log('toggleFollow, user', user);
+        socketFactory.emit('update:following', user);
     }
 
 

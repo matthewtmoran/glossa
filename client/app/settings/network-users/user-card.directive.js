@@ -28,12 +28,10 @@ function userCardController(AppService, socketFactory, __user) {
 
 
     function toggleFollow(userId) {
-        var socketId = null;
         vm.user.following = !vm.user.following;
-        if (vm.user.online) {
-            socketId = vm.user.socketId;
-        }
-        AppService.toggleFollow(userId, vm.user.following, socketId);
+        // var socketId = vm.user.socketId;
+        // AppService.toggleFollow(userId, vm.user.following, socketId);
+        AppService.toggleFollow(vm.user);
     }
 }
 
