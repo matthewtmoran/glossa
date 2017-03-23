@@ -143,7 +143,8 @@ module.exports = function(glossaUser, localSession, io) {
                         //if client is online and if we are following user.
                         if (client.socketId && client.following) {
                             console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
-                            emitToExternalClient(client.socketId, 'request:updates', client)
+                            // emitToExternalClient(client.socketId, 'request:updates', client)
+                            requestingUpdates(client);
                         }
                     }
                 })
@@ -309,6 +310,55 @@ module.exports = function(glossaUser, localSession, io) {
 
         });
 
+        //@data = {updates: Array, clientId: String}
+        socket.on('return:updates', function(data) {
+            console.log('');
+            console.log('%% return:updates Listener %%');
+            console.log('data: ', data);
+
+            Notebooks.insert(data.updates, function(err, newNotebooks) {
+                if (err) {
+                    return console.log('Error inserting new notebooks', err);
+                }
+                var timeStamp = Date.now();
+                var updatedConnection;
+
+                console.log('number of new notebooks inserted:', newNotebooks.length);
+
+                getUser().then(function(user) {
+
+                    var userId;
+                    externalClients.forEach(function(client) {
+                        if (client.socketId === socket.id) {
+                            userId = client._id;
+                        }
+                    });
+
+                    user.connections.forEach(function(connection, index) {
+                        if (connection._id === userId) {
+                            console.log('*...is match');
+                            connection.lastSync = timeStamp;
+                            updatedConnection = connection;
+                        }
+                    });
+
+                    console.log('SYNC TIMESTAMP MUST BE UPDATED !!!!!!');
+                    updateUser(user).then(function(updatedUser) {
+                        //emit to client
+                        console.log('%% SOCKET-SERVER - notify:externalChanges to LOCAL-CLIENT - EMITTER');
+
+
+
+                        emitToLocalClient('notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
+                    });
+                });
+            });
+
+
+
+
+        });
+
 
         // socket.on('get:userUpdates', function() {
         //     console.log('%% (local-client listener) get:userUpdates %%');
@@ -342,14 +392,14 @@ module.exports = function(glossaUser, localSession, io) {
          *  Triggered when an external-client requests info
          *  Emits to specific external client
          */
-        socket.on('request:userData', function(data) {
-            console.log('');
-            console.log('%% SOCKET-SERVER - request:userData listener');
-            console.log('... user ' + data.name + ' is requesting data');
-
-            console.log('%% SOCKET-SERVER - return:userData to EXTERNAL-CLIENT EMITTER');
-            emitToExternalClient(socket.id, 'return:userData', glossaUser);
-        });
+        // socket.on('request:userData', function(data) {
+        //     console.log('');
+        //     console.log('%% SOCKET-SERVER - request:userData listener');
+        //     console.log('... user ' + data.name + ' is requesting data');
+        //
+        //     console.log('%% SOCKET-SERVER - return:userData to EXTERNAL-CLIENT EMITTER');
+        //     emitToExternalClient(socket.id, 'return:userData', glossaUser);
+        // });
 
 
         ///////////////////////////////
@@ -549,6 +599,57 @@ module.exports = function(glossaUser, localSession, io) {
             //event comes from external-server
             //Emits back to external-server
             //data = has last sync attached to it....
+
+            nodeClientSocket.on('request:updates', function(data) {
+                console.log('');
+                console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
+                console.log('Data that already exists.....::', data);
+                var userId;
+                getUser().then(function(user) {
+                    userId = user._id
+                });
+
+
+                var newNotebookEntries = [];
+
+                Notebooks.find({}, function(err, notebooks) {
+                    if (err) {
+                        return console.log('There was an Error', err);
+                    }
+
+                    notebooks.forEach(function(notebook) {
+                        var exists = false;
+                        data.forEach(function(d) {
+                            if (notebook._id === d._id) {
+                                console.log('Notebook data MATCHES check for update');
+                                exists = true;
+
+                                if (notebook.updatedAt == d.updatedAt) {
+                                    console.log('updatedAt is equal....');
+                                } else {
+                                    console.log('typeof notebook.updatedAt', typeof notebook.updatedAt);
+                                    console.log('typeof d.updatedAt',typeof d.updatedAt);
+                                }
+                            }
+                        });
+
+                        if(!exists) {
+                            console.log('This is a new entry.........');
+                            newNotebookEntries.push(notebook);
+                        }
+
+                    });
+
+
+
+                    console.log('Notebooks that are new sending back to requester:', newNotebookEntries);
+
+                    nodeClientSocket.emit('return:updates', {updates: newNotebookEntries});
+                });
+
+
+            });
+
             // nodeClientSocket.on('request:updates', function(data) {
             //     console.log('');
             //     console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
@@ -660,7 +761,7 @@ module.exports = function(glossaUser, localSession, io) {
         console.log("Amount of data we are adding: ", data.length);
 
         data.forEach(function(notebook, index) {
-
+            //TODO: imagebuffer is not being deleted
             if (notebook.imageBuffer) {
                 console.log('notebook ahs media buffer...');
                 var imagePath = path.join(__dirname, config.dataRoot, notebook.image.path);
@@ -743,8 +844,8 @@ module.exports = function(glossaUser, localSession, io) {
                     clientStateData.socketId = externalClient.socketId;
 
                     console.log('A user we are following is online so get updates....');
-                    emitToExternalClient(clientStateData.socketId, 'request:updates', externalClient);
-
+                    // emitToExternalClient(clientStateData.socketId, 'request:updates', externalClient);
+                    requestingUpdates(clientStateData);
 
                     //At this point clientStateData should be the most up-to-date
 
@@ -808,6 +909,32 @@ module.exports = function(glossaUser, localSession, io) {
                 console.log('adding to onine list....');
                 addToOnlineList(clientStateData)
         });
+
+
+        function requestingUpdates(client) {
+            console.log('');
+            console.log('requestingUpdates');
+            console.log('client', client);
+
+
+            var query = {'createdBy._id': client._id};
+            var notebookData = [];
+
+            Notebooks.find(query, function(err, notebooks) {
+                if (err) {
+                    console.log('error finding notebooks....', err);
+                }
+                console.log('Notebooks found..', notebooks.length);
+                notebooks.forEach(function(nb) {
+                    notebookData.push({_id: nb._id, updatedAt: nb.updatedAt})
+                });
+
+                console.log('notebookData', notebookData);
+                emitToExternalClient(client.socketId, 'request:updates', notebookData);
+            });
+
+
+        }
 
 
 
