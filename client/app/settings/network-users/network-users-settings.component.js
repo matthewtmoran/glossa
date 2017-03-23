@@ -109,7 +109,7 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
                 vm.networkUsers.forEach(function(user, index) {
                     if (connection._id === user._id) {
                         user.socketId = connection.socketId;
-                        user.online = connection.online;
+                        user.online = true;
                         exists = true;
                     }
                  });

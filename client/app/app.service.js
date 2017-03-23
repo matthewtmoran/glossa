@@ -85,7 +85,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     function toggleFollow(user) {
         console.log('toggleFollow, user', user);
-        socketFactory.emit('update:following', user);
+        var userString = angular.toJson(user);
+
+        socketFactory.emit('update:following', {connection: userString});
     }
 
 

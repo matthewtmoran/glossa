@@ -20,9 +20,11 @@ function userCardController(AppService, socketFactory, __user) {
         "#B2B7BB", "#72ACAE", "#9C8AB4", "#5A8770", "#EEB424", "#407887"];
     var colorIndex = Math.floor((vm.user.name.charCodeAt(0) - 65) % alphabetColors.length);
 
-    console.log('vm.user', vm.user);
-
     vm.user.color = alphabetColors[colorIndex];
+
+    if (vm.user.avatar) {
+        // vm.imagePath =
+    }
 
     vm.toggleFollow = toggleFollow;
 

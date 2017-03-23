@@ -36,7 +36,7 @@
 				bottom: 0;
 				top: 0;
 				margin: auto;
-				left: 5px;
+				left: -3px;
 				z-index: 9999;
 			}
 
@@ -49,10 +49,16 @@
 				bottom: 0;
 				top: 0;
 				margin: auto;
-				left: 5px;
+				left: -3px;
 				z-index: 9999;
 			}
 		}
+
+		.user-sync-containaer {
+			font-size: .9em;
+			font-style: italic;
+			color: $lGrey;
+		};
 
 		.user-name-container {
 			margin-left: 20px;
