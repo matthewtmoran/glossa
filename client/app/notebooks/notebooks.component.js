@@ -8,12 +8,13 @@ angular.module('glossa')
         templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
-function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, socketFactory) {
+function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, $window) {
     var nbVm = this;
     var hashtagsUsed = [];
 
     nbVm.$onInit = function() {
         queryNotebooks();
+        console.log('$window.socket', $window.socket);
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
@@ -134,10 +135,15 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     }
 
     $scope.$on('update:externalData', function(event, data) {
-        console.log('update:externalData');
+        console.log('update:externalData', data);
 
-        data.updatedData.forEach(function(data) {
-            nbVm.externalNotebooks.push(data);
-        })
+        if (Array.isArray(data.updatedData)) {
+            data.updatedData.forEach(function(data) {
+                nbVm.externalNotebooks.push(data);
+            })
+        } else {
+            nbVm.externalNotebooks.push(data.updatedData);
+        }
+
     })
 }

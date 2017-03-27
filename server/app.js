@@ -21,6 +21,7 @@ if(config.seedDB) { require('./config/seed'); }
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var bonjourService = require('./socket/bonjour-service');
 
 require('./config/express')(app);
 require('./routes')(app);
@@ -41,7 +42,9 @@ Promise.all([require('./config/init').checkForApplicationData()])
             console.log('Listening on Port.');
             console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 
-            bonjourSocket = require('./socket-bonjour')(glossaUser, mySession, io);
+            bonjourSocket = require('./socket')(glossaUser, mySession, io);
+
+            // bonjourSocket = require('./socket/socket-bonjour')(glossaUser, mySession, io);
 
         });
 
@@ -55,10 +58,11 @@ Promise.all([require('./config/init').checkForApplicationData()])
                 if (options.cleanup) {
                     console.log('cleaning...');
 
-                    if (bonjourSocket && bonjourSocket.getService()) {
-                        console.log('stopping service');
-                        bonjourSocket.stopService();
-                    }
+                    bonjourService.destroy();
+                    // if (bonjourSocket && bonjourSocket.getService()) {
+                    //     console.log('stopping service');
+                    //     bonjourSocket.stopService();
+                    // }
                     console.log('cleaning done...');
                 }
                 if (err) {
