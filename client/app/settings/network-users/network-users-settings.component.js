@@ -127,13 +127,23 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     });
 
     $scope.$on('update:connection', function(event, data) {
-
-        console.log('data', data);
-        vm.networkUsers.forEach(function(user, index) {
-            if (user._id === data._id) {
-                user[index] = user;
+        console.log('TODO: is this needed and what was i using it for? (update:connection)')
+        // console.log(data);
+        //
+        for (var i = 0, len = vm.networkUsers.length; i < len; i++) {
+            if (vm.networkUsers[i]._id === data._id) {
+                console.log('vm.networkUsers[i]', vm.networkUsers[i]);
+                console.log('data', data);
+                vm.networkUsers[i].following = data.following;
             }
-        })
+        }
+
+        // console.log('data', data);
+        // vm.networkUsers.forEach(function(user, index) {
+        //     if (user._id === data._id) {
+        //         user[index] = user;
+        //     }
+        // })
     })
 
     // $scope.$watch('vm.userProfile.avatar', function(newValue, oldValue) {

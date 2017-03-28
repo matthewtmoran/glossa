@@ -8,6 +8,7 @@ var localClient = {};
 var externalClients = [];
 var externalSocketClient = require('./socket-client');
 var path = require('path');
+var fs = require('fs');
 var config = require('./../config/environment/index');
 
 module.exports = function(glossaUser, mySession, io) {
@@ -88,6 +89,8 @@ module.exports = function(glossaUser, mySession, io) {
             console.log('%% update:following Listener %%');
 
             var client = JSON.parse(data.connection);
+
+            console.log('client', client);
 
             socketUtil.getUser().then(function(user) {
                 //if we are following

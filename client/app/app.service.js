@@ -85,9 +85,12 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     function toggleFollow(user) {
         console.log('toggleFollow, user', user);
+        console.log('type of user', typeof user);
         var userString = angular.toJson(user);
+        console.log('after angualr  toString', userString);
 
         socketFactory.emit('update:following', {connection: userString});
+
     }
 
 
@@ -244,8 +247,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
                 hideDelay: delay
             });
 
-            console.log('$broadCast event update:connection');
-            $rootScope.$broadcast('update:connection', data.connection);
+            // console.log('$broadCast event update:connection');
+            // $rootScope.$broadcast('update:connection', data.connection);
             console.log('$broadCast event update:externalData');
             $rootScope.$broadcast('update:externalData', data);
         });
