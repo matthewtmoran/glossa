@@ -7,11 +7,13 @@ var Notebooks = require('./../api/notebook/notebook.model.js');
 var localClient = {};
 var externalClients = [];
 var externalSocketClient = require('./socket-client');
+var path = require('path');
+var config = require('./../config/environment/index');
 
 module.exports = function(glossaUser, mySession, io) {
     io.sockets.on('connection', function(socket) {
-        console.log('');
-        console.log('%% SOCKET-SERVER - New socket connection - begin handshake');
+        console.log('%% SOCKET-SERVER - New socket connection');
+        console.log('...begin handshake');
 
 
         ///////////////////////
@@ -34,24 +36,15 @@ module.exports = function(glossaUser, mySession, io) {
          * @clientData - {socketType: String}
          */
         socket.on('return:SocketType', function(clientData) {
-            console.log('');
-            console.log('%% SOCKET-SERVER - Socket type returned: ', clientData.type);
+            console.log('...client accepted handshake');
             //if socket is a local client
             if (clientData.type === 'local-client') {
 
-
-                console.log('glossaUser', glossaUser);
                 localClientConnection(socket, glossaUser, io);
 
-                //    if socket is an external-client
             } else if (clientData.type === 'external-client') {
 
-                console.log('');
-                console.log('CLIENT ONLINE - send updated user list to local-client');
-
                 externalClientConnection(socket, io, glossaUser, clientData);
-
-                // connectExternalClient(socket, ioClient, glossaUser, clientData)
 
             }
         });
@@ -82,9 +75,6 @@ module.exports = function(glossaUser, mySession, io) {
                         socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: externalClients});
                     }
                 }, 5000);
-
-
-                console.log('CLIENT OFFLINE - send updated user list to local-client', externalClients);
             }
         });
 
@@ -148,18 +138,12 @@ module.exports = function(glossaUser, mySession, io) {
          */
         //TODO: change this to user other event and verify we even need this listener
         socket.on('get:networkUsers', function(data) {
-            console.log('');
-            console.log('%% SOCKET-SERVER - get:networkUsers listener');
-
-            console.log('%% SOCKET-SERVER - send:updatedUserList EMITTER');
-            console.log('externalClients', externalClients);
             socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList',  {onlineUsers: externalClients});
         });
 
 
         //data = {userProfile: String, avatarString: String}
         socket.on('update:userProfile', function(data) {
-            console.log('%% SOCKET SERVER update:userProfile LISTENER%%');
             var userProfile = JSON.parse(data.userProfile);
             socketUtil.getUser().then(function(user) {
                 user = userProfile;
@@ -178,17 +162,39 @@ module.exports = function(glossaUser, mySession, io) {
         //Listen from local-client
         //Emit to all external-clients
         socket.on('broadcast:Updates', function(data) {
-            console.log('');
-            console.log('%% SOCKET-SERVER - (local-client listener) broadcast:Updates');
-            console.log('TODO: Should only broadcast to users that are following...');
-            var updateObject = {
-                update: data,
-                user: {
-                    _id: glossaUser._id,
-                    name: glossaUser.name
-                }
-            };
-            socketUtil.broadcastToExternalClients(io, 'onlineUser:updatesMade', updateObject)
+            var mediaPromises = [];
+            if (data.image) {
+                mediaPromises.push(
+                    socketUtil.encodeBase64(data.image.path).then(function(imageString) {
+                        data.imageBuffer = imageString;
+                    })
+                )
+            }
+
+            if (data.audio) {
+                mediaPromises.push(
+                    socketUtil.encodeBase64(data.audio.path).then(function(audioString) {
+                        data.audioBuffer = audioString;
+                    })
+                )
+            }
+
+            Promise.all(mediaPromises).then(function(result) {
+                console.log('all media promises have resolved');
+                console.log('');
+
+                var updateObject = {
+                    update: data,
+                    user: {
+                        _id: glossaUser._id,
+                        name: glossaUser.name
+                    }
+                };
+
+
+                socketUtil.broadcastToExternalClients(io, 'onlineUser:updatesMade', updateObject);
+            });
+
         });
 
 
@@ -261,47 +267,81 @@ module.exports = function(glossaUser, mySession, io) {
         socket.on('return:updates', function(data) {
             console.log('');
             console.log('%% return:updates Listener %%');
-            console.log('data: ', data);
+
+            var mediaPromises = [];
 
             if (data.updates.length) {
+                console.log('data.updates exists!!!!!!!!!');
+                console.log('data.updates.length', data.updates.length);
 
-                Notebooks.insert(data.updates, function(err, newNotebooks) {
-                    if (err) {
-                        return console.log('Error inserting new notebooks', err);
+                data.updates.forEach(function(update) {
+                    console.log('update.name', update.name);
+                    if (update.imageBuffer) {
+                        console.log('There is an image to transfer...');
+                        var imageUpdateObject = {
+                            path: update.image.path,
+                            buffer: update.imageBuffer
+                        };
+                        mediaPromises.push(
+                            socketUtil.writeMediaFile(imageUpdateObject)
+                        );
+
+                        delete update.imageBuffer;
                     }
-                    var timeStamp = Date.now();
-                    var updatedConnection;
+                    if (update.audioBuffer) {
+                        var audioUpdateObject = {
+                            path: update.audio.path,
+                            buffer: update.audioBuffer
+                        };
+                        mediaPromises.push(
+                            socketUtil.writeMediaFile(audioUpdateObject)
+                        );
 
-                    console.log('number of new notebooks inserted:', newNotebooks.length);
+                        delete update.audioBuffer
+                    }
+                });
 
-                    socketUtil.getUser().then(function(user) {
+                Promise.all(mediaPromises).then(function(result) {
 
-                        var userId;
-                        externalClients.forEach(function(client) {
-                            if (client.socketId === socket.id) {
-                                userId = client._id;
-                            }
-                        });
+                    console.log('inserting updates count:...', data.updates.length);
+                    Notebooks.insert(data.updates, function(err, newNotebooks) {
+                        if (err) {
+                            return console.log('Error inserting new notebooks', err);
+                        }
+                        var timeStamp = Date.now();
+                        var updatedConnection;
 
-                        user.connections.forEach(function(connection, index) {
-                            if (connection._id === userId) {
-                                console.log('*...is match');
-                                connection.lastSync = timeStamp;
-                                updatedConnection = connection;
-                            }
-                        });
+                        console.log('number of new notebooks inserted:', newNotebooks.length);
 
-                        console.log('SYNC TIMESTAMP MUST BE UPDATED !!!!!!');
-                        socketUtil.updateUser(user).then(function(updatedUser) {
-                            //emit to client
-                            console.log('%% SOCKET-SERVER - notify:externalChanges to LOCAL-CLIENT - EMITTER');
+                        socketUtil.getUser().then(function(user) {
+
+                            var userId;
+                            externalClients.forEach(function(client) {
+                                if (client.socketId === socket.id) {
+                                    userId = client._id;
+                                }
+                            });
+
+                            user.connections.forEach(function(connection, index) {
+                                if (connection._id === userId) {
+                                    console.log('*...is match');
+                                    connection.lastSync = timeStamp;
+                                    updatedConnection = connection;
+                                }
+                            });
+
+                            console.log('SYNC TIMESTAMP MUST BE UPDATED !!!!!!');
+                            socketUtil.updateUser(user).then(function(updatedUser) {
+                                //emit to client
+                                console.log('%% SOCKET-SERVER - notify:externalChanges to LOCAL-CLIENT - EMITTER');
 
 
 
-                            socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
+                                socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
+                            });
                         });
                     });
-                });
+                })
             }
 
         });
@@ -364,7 +404,7 @@ module.exports = function(glossaUser, mySession, io) {
 
     function localClientConnection(socket, glossaUser, io) {
         console.log('');
-        console.log('localClient data being updated... socket.id', socket.id);
+        console.log('local-client connecting');
 
         localClient = {
             socketId: socket.id,
@@ -375,21 +415,15 @@ module.exports = function(glossaUser, mySession, io) {
 
         updatePersistedSocketConnection(localClient.socketId);
 
+        console.log('initiate bonjour service');
         bonjourService.initListeners(localClient).then(function(service) {
+            console.log('connect as a client to an external server.');
             externalSocketClient.initNodeClient(service, localClient, io);
         });
-        // externalSocketClient.initNodeClientListeners(service, localClient, io);
 
-        //initiate bonjour service listeners
-        // bonjourService.initListeners(localClient, function(err, service) {
-        //     if (err) {
-        //         return console.log('Error initiating bonjour service')
-        //     }
-        //     console.log('Initiating NodeClient...');
-        //     externalSocketClient.initNodeClient(service, localClient, io);
-        // });
         //publish our bonjour service
         //TODO: not sure we need this callback for anything but maybe it will be good if we actually pass errors
+        console.log('publishing our bonjour service')
         bonjourService.publish(glossaUser, function(err) {
             if (err) {
                 return console.log('There was an error publishing bonjour service...');

@@ -2,7 +2,9 @@
 
 var User = require('./../api/user/user.model.js');
 var Notebooks = require('./../api/notebook/notebook.model.js');
-
+var path = require('path');
+var fs = require('fs');
+var config = require('./../config/environment/index');
 module.exports = {
 
     getUser: function() {
@@ -20,17 +22,44 @@ module.exports = {
 
     encodeBase64: function(mediaPath) {
         console.log('encoding into base64....');
-
-        var myPath = path.join(__dirname, config.dataRoot, mediaPath);
+        var myPath = path.join(config.root, '/server/data/', mediaPath);
+        console.log('myPath', myPath);
         return new Promise(function(resolve, reject){
             fs.readFile(myPath, function(err, data){
                 if (err) {
                     console.log('there was an error encoding media...');
                     reject(err);
                 }
+                console.log('read file:');
                 resolve(data.toString('base64'));
             });
         });
+    },
+
+    writeMediaFile: function(data) {
+        return new Promise(function(resolve, reject) {
+            var mediaPath = path.join(config.root, '/server/data/', data.path);
+
+            var buffer = new Buffer(data.buffer, 'base64', function(err) {
+                if (err) {
+                    console.log('issue decoding base64 data');
+                    reject(err);
+                }
+                console.log('buffer created....');
+            });
+
+            fs.writeFile(mediaPath, buffer, function(err) {
+                if (err) {
+                    console.log('There was an error writing file to filesystem', err);
+                    reject(err);
+                }
+                console.log('media file written to file system');
+                resolve('success');
+            })
+        });
+
+
+
     },
 
     addExternalData: function(data) {

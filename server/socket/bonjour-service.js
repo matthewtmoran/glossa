@@ -4,23 +4,20 @@ var bonjour = require('bonjour')();
 var config = require('./../config/environment/index');
 var browser;
 var myLocalService = {};
-var listenerAmount = 0;
 var browserInitiated = false;
 
 
 
 module.exports = {
 
-    initListeners: function(glossaUser, callback) {
-        console.log('init listeners should be running ...', glossaUser.socketId);
+    initListeners: function(glossaUser) {
+        console.log("");
+        console.log("initListeners called");
         return new Promise(function(resolve, reject) {
             if (!browserInitiated) {
                 browser = bonjour.find({type: 'http'});
-                listenerAmount++;
-
-            } else {
-                // browser.find()
             }
+
             browser.on('down', function(service) {
                 console.log('');
                 console.log('Service went down.......', service.name);
@@ -40,12 +37,7 @@ module.exports = {
                         browserInitiated = true;
                     } else if (service.name !== 'glossaApp-' + glossaUser._id) {
                         console.log('...External service found CONNECT');
-                        //    connect to external service as a client
-                        // connectAsNodeClient(service);
-
-
                         resolve(service);
-                        // callback(null, service);
                     }
                 }
             });
@@ -54,6 +46,8 @@ module.exports = {
     },
 
     publish: function(glossaUser, callback) {
+        console.log('');
+        console.log('publish being called');
         if (!browser || !browser.services.length) {
             //publish service
             myLocalService = bonjour.publish({

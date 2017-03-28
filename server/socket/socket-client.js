@@ -18,8 +18,6 @@ module.exports = {
             console.log('');
             console.log('server to server connection made');
             console.log('I am client', nodeClientSocket.id);
-            console.log('my local socket instance:', me);
-            console.log('');
 
             initNodeClientListeners(nodeClientSocket, me, io);
 
@@ -92,52 +90,83 @@ function initNodeClientListeners(socketClient, me, io) {
     //Emits back to external-server
     //data = has last sync attached to it....
 
+    //data should be a list of notebook ids and updatedAt that the requesting user already has in his db
+    //@data = {_id: String, updatedAt: Date}
     socketClient.on('request:updates', function(data) {
         console.log('');
         console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
-        console.log('Data that already exists.....::', data);
-        var userId;
+        //get me
         socketUtil.getUser().then(function(user) {
-            userId = user._id
-        });
+            return user._id;
+        }).then(function(userId) {
+            var newNotebookEntries = [];
+            var mediaPromises = [];
+
+            Notebooks.find({"createdBy._id": userId}, function(err, notebooks) {
+                if (err) {
+                    return console.log('There was an Error', err);
+                }
+
+                notebooks.forEach(function(notebook) {
+                    var exists = false;
+
+                    //if user requesting data has sent over the notebooke he already has....
+                    if (data) {
+                        data.forEach(function(d) {
+                            //if the notebook _ids match
+                            if (notebook._id === d._id) {
+                                console.log('Notebook data MATCHES check for update');
+                                exists = true;
+                                if (notebook.updatedAt == d.updatedAt) {
+                                    console.log('updatedAt is equal.... so we need to get updated notebook');
+                                } else {
+                                    console.log('typeof notebook.updatedAt', typeof notebook.updatedAt);
+                                    console.log('typeof d.updatedAt',typeof d.updatedAt);
+                                }
+                            }
+                        });
+                    }
 
 
-        var newNotebookEntries = [];
 
-        Notebooks.find({}, function(err, notebooks) {
-            if (err) {
-                return console.log('There was an Error', err);
-            }
-
-            notebooks.forEach(function(notebook) {
-                var exists = false;
-                data.forEach(function(d) {
-                    if (notebook._id === d._id) {
-                        console.log('Notebook data MATCHES check for update');
-                        exists = true;
-
-                        if (notebook.updatedAt == d.updatedAt) {
-                            console.log('updatedAt is equal....');
-                        } else {
-                            console.log('typeof notebook.updatedAt', typeof notebook.updatedAt);
-                            console.log('typeof d.updatedAt',typeof d.updatedAt);
+                    if(!exists) {
+                        console.log('Notebook is new...');
+                        if (notebook.image) {
+                            console.log('Notebook has image');
+                            mediaPromises.push(
+                                socketUtil.encodeBase64(notebook.image.path).then(function(imageString) {
+                                    console.log('Encoded notebook image.');
+                                    notebook.imageBuffer = imageString;
+                                })
+                            );
                         }
+
+                        if (notebook.audio) {
+                            mediaPromises.push(
+                                socketUtil.encodeBase64(notebook.audio.path).then(function(audioString) {
+                                    console.log('Encoded notebook audio.');
+                                    notebook.audioBuffer = audioString;
+                                })
+                            )
+                        }
+
+                        newNotebookEntries.push(notebook);
+
+
                     }
                 });
 
-                if(!exists) {
-                    console.log('This is a new entry.........');
-                    newNotebookEntries.push(notebook);
-                }
+                Promise.all(mediaPromises).then(function(data) {
+                    console.log('');
+                    console.log('all media promises have resolved');
+                    console.log('mediaPromises.length', mediaPromises.length);
 
+                    console.log('Notebooks that are new sending back to requester:');
+                    socketClient.emit('return:updates', {updates: newNotebookEntries});
+                });
             });
+        })
 
-
-
-            console.log('Notebooks that are new sending back to requester:', newNotebookEntries);
-
-            socketClient.emit('return:updates', {updates: newNotebookEntries});
-        });
 
 
     });
@@ -210,8 +239,8 @@ function initNodeClientListeners(socketClient, me, io) {
     //Listen from external-server
     //Emit to external-server (if following)
     socketClient.on('onlineUser:updatesMade', function(dataChanges) {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - onlineUser:updatesMade listener %%');
+
+        console.log('%%  onlineUser:updatesMade  %%');
 
         var externalUser = dataChanges.user;
 
@@ -221,21 +250,40 @@ function initNodeClientListeners(socketClient, me, io) {
             user.connections.forEach(function(connection) {
                 if (connection._id === externalUser._id && connection.following) {
                     console.log('%% EXTERNAL-CLIENT - request:updates EMITTER %%');
-                    console.log('');
                     console.log(' I am follwing user - store the updates sent....');
 
-                    console.log('dataChanges', dataChanges);
+                    var mediaPromises = [];
+                    if (dataChanges.update.imageBuffer) {
+                        var imageMediaObject = {
+                            path: dataChanges.update.image.path,
+                            buffer: dataChanges.update.imageBuffer
+                        };
+                        mediaPromises.push(socketUtil.writeMediaFile(imageMediaObject));
+                        // delete dataChanges.update.imageBuffer;
+                    }
+                    if (dataChanges.update.audioBuffer) {
+                        var audioMediaObject = {
+                            path: dataChanges.update.audio.path,
+                            buffer: dataChanges.update.audioBuffer
+                        };
+                        mediaPromises.push(socketUtil.writeMediaFile(audioMediaObject));
+                        // delete dataChanges.update.audioBuffer;
+                    }
 
-                    Notebooks.insert(dataChanges.update, function(err, updatedDocs) {
-                        if (err) {
-                            return console.log('Error inserting external Updates', err);
-                        }
+                    Promise.all(mediaPromises).then(function(result) {
 
-                        console.log('Inserted notebook success');
+                        Notebooks.insert(dataChanges.update, function(err, updatedDocs) {
+                            if (err) {
+                                return console.log('Error inserting external Updates');
+                            }
+
+                            console.log('Inserted notebook success');
 
 
 
-                        socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
+                            socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
+                        });
+
                     });
                 }
             });
