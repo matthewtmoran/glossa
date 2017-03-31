@@ -22,6 +22,9 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var bonjourService = require('./socket/bonjour-service');
+var bonjour = require('bonjour')();
+var browser = null;
+var externalSocketClient = require('./socket/socket-client');
 
 require('./config/express')(app);
 require('./routes')(app);
@@ -42,39 +45,85 @@ Promise.all([require('./config/init').checkForApplicationData()])
             console.log('Listening on Port.');
             console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 
-            bonjourSocket = require('./socket')(glossaUser, mySession, io);
+            browser = bonjour.find({type: 'http'});
 
-            // bonjourSocket = require('./socket/socket-bonjour')(glossaUser, mySession, io);
+            browser.on('down', function(service) {
+                console.log('');
+                console.log('Service went down.......', service.name);
+                console.log('Service on network:', browser.services.length);
+            });
+
+            browser.on('up', function(service) {
+                console.log('');
+                console.log('Service went/is live........', service.name);
+                console.log('Services on network:', browser.services.length);
+
+                //make sure network service is a glossa instance....
+                if (service.name.indexOf('glossaApp') > -1) {
+                    console.log('A glossa Application is online');
+                    if (service.name === 'glossaApp-' + glossaUser._id) {
+                        console.log('...Local service found IGNORE');
+                    } else if (service.name !== 'glossaApp-' + glossaUser._id) {
+                        console.log('...External service found CONNECT');
+
+                        externalSocketClient.initNodeClient(service, glossaUser, io)
+
+                    }
+                }
+            });
+
+            bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
+
 
         });
 
         process.stdin.resume();
 
-
+        //TODO: figure this out....
         function exitHandler(options, err) {
             console.log('Node killing local service immediately.... delaying 3 seconds then killing process....');
-            console.log(options.from);
+            var myBonjourService = bonjourService.getMyBonjourService();
+            console.log('myBonjourService', myBonjourService);
 
-                if (options.cleanup) {
-                    console.log('cleaning...');
+            myBonjourService.stop(function() {
+                console.log('stopping my bonjour service....');
+            });
+            if (options.cleanup) {
+                console.log('cleaning...');
 
-                    bonjourService.destroy();
-                    // if (bonjourSocket && bonjourSocket.getService()) {
-                    //     console.log('stopping service');
-                    //     bonjourSocket.stopService();
-                    // }
-                    console.log('cleaning done...');
-                }
-                if (err) {
-                    console.log(err.stack);
-                }
-                if (options.exit) {
-                    // setTimeout(function() {
-                    //     console.log('.... 3 seconds delay over... process being killed now!');
-                    //     console.log('exit?', options.exit);
-                    // }, 3000);
-                        process.exit();
-                }
+                // bonjour.destroy();
+
+
+
+                // bonjourService.destroy();
+
+                // browser.services.forEach(function(service) {
+                //     if (service.name === 'glossaApp-' + glossaUser._id) {
+                //         service.stop(function() {
+                //             console.log('stoping service...');
+                //         })
+                //     }
+                // });
+                // bonjourService.destroy();
+                // if (bonjourSocket && bonjourSocket.getService()) {
+                //     console.log('stopping service');
+                //     bonjourSocket.stopService();
+                // }
+                console.log('cleaning done...');
+                console.log('browser.services.length',browser.services.length);
+            }
+            if (err) {
+                console.log(err.stack);
+            }
+            if (options.exit) {
+                // setTimeout(function() {
+                //     console.log('.... 3 seconds delay over... process being killed now!');
+                //     console.log('exit?', options.exit);
+                // }, 3000);
+                setTimeout(function() {
+                    process.exit();
+                }, 4000)
+            }
 
         }
 

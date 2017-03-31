@@ -106,12 +106,8 @@ module.exports = {
      })
     },
 
+    //Queries the database for a clients data to send to client to compare against.
     requestingUpdates: function(client, callback) {
-        console.log('');
-        console.log('requestingUpdates');
-        console.log('client', client);
-
-
         var query = {'createdBy._id': client._id};
         var notebookData = [];
 

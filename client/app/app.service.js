@@ -269,6 +269,26 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             $rootScope.$broadcast('update:externalData', {updatedData: data});
         });
 
+        //update dynamic data that connection may update manually
+        socketFactory.on('update:connectionInfo', function(data) {
+
+            console.log('update:connectionInfo', data);
+
+            __user.connections.forEach(function(connection) {
+                if (connection._id === data.connection._id) {
+
+                    if (connection.name != data.connection.name) {
+                        connection.name = data.connection.name;
+                    }
+
+                    if (connection.avatar != data.connection.avatar) {
+                        connection.avatar = data.connection.avatar;
+                    }
+
+                }
+            })
+        });
+
 
         //Get all following user updates
         //Get single user updates

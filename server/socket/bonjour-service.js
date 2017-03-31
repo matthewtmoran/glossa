@@ -1,6 +1,6 @@
 'use strict';
 
-var bonjour = require('bonjour')();
+// var bonjour = require('bonjour')();
 var config = require('./../config/environment/index');
 var browser;
 var myLocalService = {};
@@ -9,14 +9,13 @@ var browserInitiated = false;
 
 
 module.exports = {
-
-    initListeners: function(glossaUser) {
+    initListeners: function(glossaUser, browser) {
         console.log("");
         console.log("initListeners called");
         return new Promise(function(resolve, reject) {
-            if (!browserInitiated) {
-                browser = bonjour.find({type: 'http'});
-            }
+            // if (!browserInitiated) {
+            //     browser = bonjour.find({type: 'http'});
+            // }
 
             browser.on('down', function(service) {
                 console.log('');
@@ -37,7 +36,9 @@ module.exports = {
                         browserInitiated = true;
                     } else if (service.name !== 'glossaApp-' + glossaUser._id) {
                         console.log('...External service found CONNECT');
-                        resolve(service);
+
+
+
                     }
                 }
             });
@@ -45,7 +46,7 @@ module.exports = {
 
     },
 
-    publish: function(glossaUser, callback) {
+    publish: function(glossaUser, browser, bonjour, callback) {
         console.log('');
         console.log('publish being called');
         if (!browser || !browser.services.length) {
@@ -91,9 +92,14 @@ module.exports = {
         }
     },
 
-
+    getMyBonjourService: function() {
+        console.log('getMyBonjourService');
+        return myLocalService;
+    },
 
     destroy: function() {
+        console.log("destroying bonjour service.... ");
+        console.log('myLocalService', myLocalService);
         myLocalService.stop(function() {
             console.log('Service Stop Success!');
         });

@@ -10,8 +10,10 @@ var externalSocketClient = require('./socket-client');
 var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
+var browser = null;
 
-module.exports = function(glossaUser, mySession, io) {
+module.exports = function(glossaUser, mySession, io, browser, bonjour) {
+
     io.sockets.on('connection', function(socket) {
         console.log('%% SOCKET-SERVER - New socket connection');
         console.log('...begin handshake');
@@ -41,9 +43,11 @@ module.exports = function(glossaUser, mySession, io) {
             //if socket is a local client
             if (clientData.type === 'local-client') {
 
-                localClientConnection(socket, glossaUser, io);
+                localClientConnection(socket, glossaUser, io, browser, bonjour);
 
             } else if (clientData.type === 'external-client') {
+
+                console.log('!!!!!!!! hand shake returned.  External Client !!!!!!!!!!');
 
                 externalClientConnection(socket, io, glossaUser, clientData);
 
@@ -52,6 +56,7 @@ module.exports = function(glossaUser, mySession, io) {
 
         socket.on('disconnect', function() {
             console.log('############DISCONNECT###################');
+            console.log('browser.services.length', browser.services.length);
             //watch for local-client disconnect.... utliamtely this should shut down the server all together when we are using electron...  but for refresh, act like application is just starting up
 
             // externalSocketClient.destroyNodeClient();
@@ -63,7 +68,7 @@ module.exports = function(glossaUser, mySession, io) {
                         localClient = {};
                         bonjourService.destroy();
                     }
-                }, 5000);
+                }, 3000);
 
             } else {
                 var currentClient = getClientBySocketId(socket.id);
@@ -72,10 +77,11 @@ module.exports = function(glossaUser, mySession, io) {
 
                 setTimeout(function() {
                     if (currentClient.disconnect) {
+                        console.log('browser.services.length', browser.services.length)
                         removeFromOnlineList(currentClient.socketId);
                         socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: externalClients});
                     }
-                }, 5000);
+                }, 3000);
             }
         });
 
@@ -90,11 +96,11 @@ module.exports = function(glossaUser, mySession, io) {
 
             var client = JSON.parse(data.connection);
 
-            console.log('client', client);
-
             socketUtil.getUser().then(function(user) {
                 //if we are following
                 if (client.following) {
+
+                    console.log('...we are following connection');
 
                     //create object with only properties we want to store
                     var persistedData = {
@@ -109,6 +115,8 @@ module.exports = function(glossaUser, mySession, io) {
                     //add to connections array
                     user.connections.push(persistedData);
                 } else {
+                    console.log('...we are nto following user')
+                    console.log('TODO: remove avatar image from filesystem if one exists.');
                     //if user is not following
                     user.connections.forEach(function(connection, index) {
                         if (connection._id === client._id) {
@@ -118,15 +126,23 @@ module.exports = function(glossaUser, mySession, io) {
                     })
                 }
 
+                console.log('...updating user because we changed following status of connection');
                 //update user with new connection data
                 socketUtil.updateUser(user).then(function(updatedUser) {
+                    console.log('updated user affter following... connection shoudl be added to array...',  updatedUser);
                     if (client.following) {
+                        console.log('...becuase we are following user... get update and avatar...')
                         //if client is online and if we are following user.
-                        if (client.socketId && client.following) {
+                        if (client.socketId) {
+                            console.log('... client is online');
                             console.log('%% SOCKET-SERVER - request:updates to EXTERNAL-CLIENT - EMITTER');
-                            // socketUtil.emitToExternalClient(client.socketId, 'request:updates', client)
+                            //get client data we already have.
+                            // @data = {_id: String(notebook id), updatedAt: Date}
+                            //we send the ids and the updated time of the notebooks to client that we are requesting updates from so they can take the data and compare it to their db and get updates and new ntoebook entries.
                             socketUtil.requestingUpdates(client, function(data) {
+                                console.log('requesting updatess success....');
                                 socketUtil.emitToExternalClient(io, client.socketId, 'request:updates', data);
+                                socketUtil.emitToExternalClient(io, client.socketId, 'request:avatar', {});
                             });
                         }
                     }
@@ -151,6 +167,19 @@ module.exports = function(glossaUser, mySession, io) {
             socketUtil.getUser().then(function(user) {
                 user = userProfile;
                 socketUtil.updateUser(user).then(function(updatedUser) {
+
+                    var completeConnectionData = {
+                        name: user.name,
+                        avatar: user.avatar,
+                        _id: user._id
+                    };
+
+                    console.log('completeConnectionData', completeConnectionData);
+                    // socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: completeConnectionData});
+
+                    socketUtil.broadcastToExternalClients(io, 'update:toConnectionData', completeConnectionData);
+
+
                     console.log('TODO: broadcast to connections updated user data')
                 })
             })
@@ -244,26 +273,45 @@ module.exports = function(glossaUser, mySession, io) {
         // });
 
 
-        //data: {avatarString: Base64, imagePath: String}
+        //data: {avatarString: Base64, imagePath: String, userData: object}
         socket.on('return:avatar', function(data) {
             console.log('%% return:avatar listener %%');
 
-            var imagePath = path.join(__dirname, config.dataRoot, data.imagePath);
+            console.log('return:avatar data', data.userData);
 
-            var buffer = new Buffer(data.avatarString, 'base64', function(err) {
-                if (err) {
-                    return console.log('issue decoding base64 data');
-                }
-                console.log('buffer created....');
+            var avatarData = {
+                buffer: data.avatarString,
+                path: data.imagePath
+            };
+
+            var completeConnectionData = {};
+
+
+
+            socketUtil.writeMediaFile(avatarData).then(function() {
+                console.log('Avatar Image udpated.... .');
+
+                socketUtil.getUser().then(function(user) {
+                    console.log('...use found update info...', user);
+                    user.connections.forEach(function(connection) {
+                        if (connection._id === data.userData._id) {
+                            console.log('connection and user data match');
+                            if (connection.name != data.userData.name) {
+                                connection.name = data.userData.name
+                            }
+                            if (connection.avatar != data.userData.avatar) {
+                                connection.avatar = data.userData.avatar
+                            }
+                            completeConnectionData = connection
+                        }
+                    });
+
+                    console.log('completeConnectionData', completeConnectionData);
+                    socketUtil.updateUser(user).then(function() {
+                        socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: completeConnectionData})
+                    })
+                });
             });
-
-            fs.writeFile(imagePath, buffer, function(err) {
-                if (err) {
-                    return console.log('There was an error writing file to filesystem', err);
-                }
-                console.log('image written to file system');
-            })
-
         });
 
         //@data = {updates: Array, clientId: String}
@@ -396,7 +444,50 @@ module.exports = function(glossaUser, mySession, io) {
             // }
         });
 
+
+
+        //////////////////////
+        //tunneled listeners//
+        //////////////////////
+
+        socket.on('tunnel:update:toConnectionData', function(data) {
+            console.log('%% tunnel:update:toConnectionData %%', data);
+            externalClients.forEach(function(exClient) {
+                if (exClient._id === data._id) {
+                    exClient.name = data.name;
+
+                    if (exClient.following) {
+                        exClient.avatar = data.avatar
+                    }
+                }
+            });
+
+            var completeConnectionData = {};
+            socketUtil.getUser().then(function(user) {
+                user.connections.forEach(function(connection) {
+                    if (connection._id === data._id) {
+
+                        connection.name = data.name;
+                        connection.avatar = data.avatar;
+
+                        completeConnectionData = connection;
+                    }
+                });
+
+                socketUtil.updateUser(user).then(function(updatedUser) {
+                    socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: completeConnectionData})
+                })
+            })
+
+        })
+
+
     });
+
+
+
+
+
 
     function updatePersistedSocketConnection(socketId) {
         socketUtil.getUser().then(function(user) {
@@ -405,7 +496,7 @@ module.exports = function(glossaUser, mySession, io) {
         })
     }
 
-    function localClientConnection(socket, glossaUser, io) {
+    function localClientConnection(socket, glossaUser, io, browser, bonjour) {
         console.log('');
         console.log('local-client connecting');
 
@@ -416,24 +507,27 @@ module.exports = function(glossaUser, mySession, io) {
             disconnect: false
         };
 
+        // bonjourService.initListeners(localClient, browser).then(function(service) {
+        //     console.log('connect as a client to an external server.');
+        //     externalSocketClient.initNodeClient(service, localClient, io);
+        // });
+
         updatePersistedSocketConnection(localClient.socketId);
 
         console.log('initiate bonjour service');
-        bonjourService.initListeners(localClient).then(function(service) {
-            console.log('connect as a client to an external server.');
-            externalSocketClient.initNodeClient(service, localClient, io);
-        });
+
 
         //publish our bonjour service
         //TODO: not sure we need this callback for anything but maybe it will be good if we actually pass errors
-        console.log('publishing our bonjour service')
-        bonjourService.publish(glossaUser, function(err) {
+        console.log('publishing our bonjour service');
+        bonjourService.publish(glossaUser, browser, bonjour, function(err) {
             if (err) {
                 return console.log('There was an error publishing bonjour service...');
             }
         });
 
     }
+
     function externalClientConnection(socket, io, glossaUser, externalClient) {
         socketUtil.getPersistedData(externalClient)
             .then(function(clientPersistedData) {
