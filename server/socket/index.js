@@ -167,7 +167,9 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
         //data = {userProfile: String, avatarString: String}
         socket.on('update:userProfile', function(data) {
+
             var userProfile = JSON.parse(data.userProfile);
+
             socketUtil.getUser().then(function(user) {
                 user = userProfile;
                 socketUtil.updateUser(user).then(function(updatedUser) {
@@ -178,13 +180,16 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                         _id: user._id
                     };
 
-                    console.log('completeConnectionData', completeConnectionData);
-                    // socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: completeConnectionData});
+                    //here we update the notebooks in our db with our updated profile information.
+                    socketUtil.normalizeNotebooks(updatedUser).then(function(changeObject) {
+                        socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
+                    });
+
+                    console.log('TODO: broadcast to connections updated user data (and have them normalize the data)');
+                    console.log('TODO: normalize our data');
 
                     socketUtil.broadcastToExternalClients(io, 'update:toConnectionData', completeConnectionData);
 
-
-                    console.log('TODO: broadcast to connections updated user data')
                 })
             })
         });
@@ -261,7 +266,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
             };
 
             socketUtil.writeMediaFile(avatarData).then(function() {
-                console.log('Avatar Image udpated.... .');
+                console.log('Avatar Image updated.... .');
 
                 socketUtil.getConnection(data.userData._id).then(function(connection) {
                     if (connection.name != data.userData.name) {
@@ -336,7 +341,6 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                     });
                 })
             }
-
         });
 
 

@@ -56,7 +56,7 @@ exports.update = function(req, res) {
         var updated = _.merge(user, req.body);
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            User.persistence.stopAutocompaction(); // concat db
+            User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });
@@ -74,7 +74,7 @@ exports.updateSession = function(req, res) {
 
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            User.persistence.stopAutocompaction(); // concat db
+            User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });
@@ -92,15 +92,13 @@ exports.updateSettings = function(req, res) {
 
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            User.persistence.stopAutocompaction(); // concat db
+            User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });
 };
 
 exports.removeAvatar = function(req, res) {
-    console.log('remove Avataaaaaaaaaaaaar');
-
     User.find({}, function (err, user) {
         if (err) { return handleError(res, err); }
         if(!user) { return res.status(404).send('Not Found'); }
@@ -112,7 +110,7 @@ exports.removeAvatar = function(req, res) {
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
             console.log('Updated User');
-            User.persistence.stopAutocompaction(); // concat db
+            User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });
@@ -136,7 +134,7 @@ exports.avatar = function(req, res) {
 
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            User.persistence.stopAutocompaction(); // concat db
+            User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });

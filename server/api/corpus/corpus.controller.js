@@ -92,7 +92,7 @@ exports.update = function(req, res) {
         var updated = _.merge(corpus, req.body.dataObj);
         Corpus.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            Corpus.persistence.stopAutocompaction(); // concat db
+            Corpus.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });

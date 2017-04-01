@@ -172,8 +172,8 @@ module.exports = {
     normalizeNotebooks: function(client) {
         console.log('normalizeNotebooks - client:', client);
         return new Promise(function(resolve, reject) {
-            var query = {"createdBy._id": client._id};
 
+            var query = {"createdBy._id": client._id};
             var options = {returnUpdatedDocs: true, multi: true};
             var update =  {$set: {"createdBy.name": client.name, "createdBy.avatar": client.avatar}};
 

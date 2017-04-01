@@ -53,7 +53,7 @@ exports.update = function(req, res) {
         updated.hashtags = req.body.dataObj.hashtags || [];
         Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            Notebook.persistence.stopAutocompaction(); // concat db
+            Notebook.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });

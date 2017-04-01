@@ -52,7 +52,7 @@ exports.update = function(req, res) {
         var updated = _.merge(project, req.body);
         Project.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            Project.persistence.stopAutocompaction(); // concat db
+            Project.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
     });

@@ -77,6 +77,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             });
     }
 
+    //TODO: emit update:userProfile in the avatar changes......
+
     function updateUserProfile(userProfile) {
         var userString = angular.toJson(userProfile);
         socketFactory.emit('update:userProfile', {userProfile: userString})

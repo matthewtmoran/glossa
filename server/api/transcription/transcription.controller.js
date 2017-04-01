@@ -74,7 +74,7 @@ exports.update = function(req, res) {
 
         Transcription.update({_id:req.params.id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            Transcription.persistence.stopAutocompaction();
+            Transcription.persistence.compactDatafile();
             return res.status(200).json(updatedDoc);
         });
     });
