@@ -395,7 +395,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
 
 
-
+    //basically keeps the socketId up-to-date
     function updatePersistedSocketConnection(socketId) {
         socketUtil.getUser().then(function(user) {
             user.localSocketId = socketId;
@@ -414,11 +414,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
             disconnect: false
         };
 
-        // bonjourService.initListeners(localClient, browser).then(function(service) {
-        //     console.log('connect as a client to an external server.');
-        //     externalSocketClient.initNodeClient(service, localClient, io);
-        // });
-
+        //basically keeps the socketId up-to-date in persisted data
         updatePersistedSocketConnection(localClient.socketId);
 
         console.log('initiate bonjour service');

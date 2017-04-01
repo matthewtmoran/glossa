@@ -11,6 +11,7 @@
 
 var _ = require('lodash');
 var User = require('./user.model');
+var Notebooks = require('./../notebook/notebook.model');
 var path = require('path');
 var config = require('../../config/environment');
 var fs = require('fs');
@@ -110,6 +111,7 @@ exports.removeAvatar = function(req, res) {
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
             console.log('Updated User');
+            normalizeNotebooks(updatedDoc);
             User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
@@ -119,9 +121,7 @@ exports.removeAvatar = function(req, res) {
 };
 
 exports.avatar = function(req, res) {
-    console.log('Avatar!!!');
-
-    console.log('req.body.dataObj', req.body.dataObj);
+    console.log('Adding Avatar');
     User.find({}, function (err, user) {
         if (err) { return handleError(res, err); }
         if(!user) { return res.status(404).send('Not Found'); }
@@ -134,6 +134,9 @@ exports.avatar = function(req, res) {
 
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
+
+            normalizeNotebooks(updatedDoc);
+
             User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });
@@ -151,6 +154,22 @@ exports.destroy = function(req, res) {
         });
     });
 };
+
+function normalizeNotebooks(updateDetails) {
+    console.log("...normalizing notebooks.  Triggered by http request");
+
+    var query = {"createdBy._id": updateDetails._id};
+    var options = {returnUpdatedDocs: true, multi: true};
+    var update =  {$set: {"createdBy.name": updateDetails.name, "createdBy.avatar": updateDetails.avatar}};
+
+    Notebooks.update(query, update, options, function(err, updatedCount, updatedDocs) {
+        if (err) {
+            return console.log('Error normalizing notebook data', err);
+        }
+        console.log('Updated count: ', updatedCount);
+        Notebooks.persistence.compactDatafile();
+    });
+}
 
 function handleError(res, err) {
     return res.status(500).send(err);
