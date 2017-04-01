@@ -144,6 +144,15 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         } else {
             nbVm.externalNotebooks.push(data.updatedData);
         }
+    });
 
+    $scope.$on('normalize:notebooks', function(event, data) {
+        console.log('normalize:notebooks', data);
+        nbVm.notebooks.forEach(function(notebook) {
+            if (notebook.createdBy._id === data._id) {
+                notebook.createdBy.name = data.name;
+                notebook.createdBy.avatar = data.avatar;
+            }
+        })
     })
 }

@@ -207,6 +207,13 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         });
 
+        socketFactory.on('normalize:notebooks', function(data) {
+            console.log('Heard : normalize:notebooks in app.service', data);
+
+            $rootScope.$broadcast('normalize:notebooks', data)
+
+        });
+
         //When external-client connects to network
         // socketFactory.on('local-client:send:externalUserList', function(data) {
         //     console.log('Heard : local-client:send:externalUserList in app.service', data);

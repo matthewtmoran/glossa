@@ -268,20 +268,25 @@ function initNodeClientListeners(socketClient, me, io) {
     socketClient.on('update:toConnectionData', function(data) {
         console.log('');
         console.log('%% EXTERNAL-CLIENT - update:toConnectionData %%');
-        console.log('data', data);
-
-
         socketUtil.getConnection(data._id).then(function(connection) {
-             connection.name = data.name;
-             connection.avatar = data.avatar;
 
-             socketUtil.updateConnection(connection).then(function(updatedConnection) {
-                 socketUtil.getUser().then(function(user) {
+            connection.name = data.name;
+            connection.avatar = data.avatar;
+
+            socketUtil.getUser().then(function(user) {
+                socketUtil.updateConnection(connection).then(function(updatedConnection) {
+
                     socketUtil.emitToLocalClient(io, user.localSocketId, 'update:connectionInfo', {connection: updatedConnection})
 
-                 })
-             })
-        });
+                });
+                socketUtil.normalizeNotebooks(connection).then(function(changeObject) {
 
+                    socketUtil.emitToLocalClient(io, user.localSocketId, 'normalize:notebooks', changeObject)
+
+                });
+
+            });
+
+        });
     })
 }

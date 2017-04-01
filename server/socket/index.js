@@ -436,6 +436,8 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
         socketUtil.getConnection(externalClient._id).then(function(persistedClientData) {
             if (persistedClientData.following) {
 
+                var changesMade = false;
+
                 persistedClientData.online = true;
                 persistedClientData.socketId = externalClient.socketId;
                 persistedClientData.disconnect = false;
@@ -445,6 +447,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                 if (externalClient.name != persistedClientData.name) {
                     persistedClientData.name = name;
                     console.log('TODO: name is different... Update');
+                    changesMade = true;
                 }
 
                 //TODO: this needs ot be more indepth
@@ -452,7 +455,13 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                     console.log('TODO: Avatar is different... Update');
                     persistedClientData.avatar = externalClient.avatar;
                     socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:avatar', {});
+                    changesMade = true;
+                }
 
+                if (changesMade) {
+                    socketUtil.normalizeNotebooks(persistedClientData).then(function(changeObject) {
+                        socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
+                    });
                 }
 
                 socketUtil.getCurrentData(persistedClientData).then(function(data) {
