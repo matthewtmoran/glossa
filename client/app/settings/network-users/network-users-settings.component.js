@@ -28,10 +28,11 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     function init() {
         vm.userProfile = AppService.getUser();
         console.log('userProfile on Init:', vm.userProfile);
-        vm.networkUsers = AppService.getConnections();
+
+        AppService.getConnections();
 
         if (vm.settings.isSharing) {
-            AppService.getOnlineUsersSE();
+            // AppService.getOnlineUsersSE();
         }
     }
 
@@ -87,38 +88,40 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     $scope.$on('update:networkUsers', function(event, data) {
         console.log('update:networkUsers listener', data);
 
-        var nonFollowingUsers = [];
+        vm.networkUsers = data.onlineUsers;
 
-        if (!data.onlineUsers.length) {
-            vm.networkUsers.forEach(function(client) {
-                if (!client.following) {
-                    nonFollowingUsers.push(client);
-                } else {
-                    client.online = false;
-                }
-            });
-
-            nonFollowingUsers.forEach(function(client) {
-               vm.networkUsers.splice(vm.networkUsers.indexOf(client));
-            });
-
-
-        } else {
-            data.onlineUsers.forEach(function(connection) {
-                var exists = false;
-                vm.networkUsers.forEach(function(user, index) {
-                    if (connection._id === user._id) {
-                        user.socketId = connection.socketId;
-                        user.online = true;
-                        exists = true;
-                    }
-                 });
-                if (!exists) {
-                    connection.online = true;
-                    vm.networkUsers.push(connection);
-                }
-            });
-        }
+        // var nonFollowingUsers = [];
+        //
+        // if (!data.onlineUsers.length) {
+        //
+        //     vm.networkUsers.forEach(function(client) {
+        //         if (!client.following) {
+        //             nonFollowingUsers.push(client);
+        //         } else {
+        //             client.online = false;
+        //         }
+        //     });
+        //
+        //     nonFollowingUsers.forEach(function(client) {
+        //        vm.networkUsers.splice(vm.networkUsers.indexOf(client));
+        //     });
+        //
+        //
+        // } else {
+        //     data.onlineUsers.forEach(function(connection) {
+        //         var exists = false;
+        //         vm.networkUsers.forEach(function(user, index) {
+        //             if (connection._id === user._id) {
+        //                 user.socketId = connection.socketId;
+        //                 exists = true;
+        //             }
+        //          });
+        //         if (!exists) {
+        //             connection.online = true;
+        //             vm.networkUsers.push(connection);
+        //         }
+        //     });
+        // }
 
     });
 
@@ -126,25 +129,23 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
         vm.networkUsers.splice(vm.networkUsers.indexOf(data), 1);
     });
 
+
     $scope.$on('update:connection', function(event, data) {
-        console.log('TODO: is this needed and what was i using it for? (update:connection)')
-        // console.log(data);
-        //
-        for (var i = 0, len = vm.networkUsers.length; i < len; i++) {
-            if (vm.networkUsers[i]._id === data._id) {
-                console.log('vm.networkUsers[i]', vm.networkUsers[i]);
-                console.log('data', data);
-                vm.networkUsers[i].following = data.following;
+
+        console.log('update:connection Heard in network-users-settings.component', data);
+
+        for(var i = 0, len = vm.networkUsers.length; i < len; i++) {
+            if (vm.networkUsers[i]._id === data.connection._id) {
+                vm.networkUsers[i] = data.connection;
             }
         }
 
-        // console.log('data', data);
-        // vm.networkUsers.forEach(function(user, index) {
-        //     if (user._id === data._id) {
-        //         user[index] = user;
-        //     }
-        // })
-    })
+    });
+
+    $scope.$on('update:connections', function(event, data) {
+        console.log('update:connections Heard in network-users-settings.component', data);
+        vm.networkUsers = data.connections;
+    });
 
     // $scope.$watch('vm.userProfile.avatar', function(newValue, oldValue) {
     //     console.log('newValue', newValue);

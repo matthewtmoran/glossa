@@ -110,6 +110,7 @@ function initNodeClientListeners(socketClient, me, io) {
             var newNotebookEntries = [];
             var mediaPromises = [];
 
+            console.log('looking for the notebooks i created.... ');
             Notebooks.find({"createdBy._id": userId}, function (err, notebooks) {
                 if (err) {
                     return console.log('There was an Error', err);
@@ -117,7 +118,7 @@ function initNodeClientListeners(socketClient, me, io) {
 
                 //if no data... get all notebooks
                 if (!data) {
-                    console.log('no data sent')
+                    console.log('no data sent to compare against');
                     // notebooks.forEach(function (notebook) {
                     //     if (notebook.image) {
                     //         console.log('Notebook has image');
@@ -139,7 +140,7 @@ function initNodeClientListeners(socketClient, me, io) {
                     //     newNotebookEntries.push(notebook);
                     // });
                 } else {
-                    console.log('some data sent');
+                    console.log('some data sent to compare against: ', data.length);
                     //if there is data compare so we can get updates to notebooks...
 
                     notebooks.forEach(function(notebook) {
@@ -192,42 +193,6 @@ function initNodeClientListeners(socketClient, me, io) {
         });
     });
 
-    // socketClient.on('request:updates', function(data) {
-    //     console.log('');
-    //     console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
-    //     if (!data.lastSync) {
-    //
-    //         socketUtil.getUser().then(function(user) {
-    //             getNotebookChanges({'createdBy': user._id}).then(function(data) {
-    //
-    //                 console.log('getNotebookChanges promise has resolved..... ');
-    //                 console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
-    //                 socket.emit('return:data-changes', {connectionId: user._id, updatedData: data});
-    //             });
-    //         });
-    //
-    //         console.log('User has never connected');
-    //     } else {
-    //         console.log('User has connected before');
-    //
-    //
-    //         socketUtil.getUser().then(function(user) {
-    //
-    //             getNotebookChanges({
-    //                 'createdBy._id': user._id,
-    //                 "updatedAt": {$gte: new Date(data.lastSync)}
-    //             }).then(function (results) {
-    //
-    //                 console.log('getNotebookChanges promise has resolved..... ');
-    //                 console.log('%% EXTERNAL-CLIENT return:data-changes EMITTER %%');
-    //                 socket.emit('return:data-changes', {
-    //                     connectionId: glossaUser._id,
-    //                     updatedData: results
-    //                 });
-    //             });
-    //         });
-    //     }
-    // });
 
     //Listen from external-server
     //Emit to local-client
@@ -236,22 +201,13 @@ function initNodeClientListeners(socketClient, me, io) {
             var updatedConnection;
             var timeStamp = Date.now();
 
-            socketUtil.getUser().then(function(user) {
 
-                user.connections.forEach(function(connection, index) {
-                    if (connection._id === dataChanges.connectionId) {
-                        console.log('*...is match');
-                        connection.lastSync = timeStamp;
-                        updatedConnection = connection;
-                    }
-                });
-
-                console.log('SYNC TIMESTAMP MUST BE UPDATED !!!!!!');
-                socketUtil.updateUser(user).then(function(updatedUser) {
-                    //emit to client
-                    console.log('%% SOCKET-SERVER - notify:externalChanges to LOCAL-CLIENT - EMITTER');
+            socketUtil.getConnection(dataChanges.connectionId).then(function(connection) {
+                connection.lastSync = timeStamp;
+                socketUtil.updateConnection(connection).then(function() {
                     socketUtil.emitToLocalClient(localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
-                });
+                })
+
             });
         });
     });
@@ -265,51 +221,46 @@ function initNodeClientListeners(socketClient, me, io) {
 
         var externalUser = dataChanges.user;
 
-        // //check if we are following this user
-        socketUtil.getUser().then(function(user) {
+        socketUtil.getConnection(externalUser._id).then(function(connection) {
+            if (connection.following) {
 
-            user.connections.forEach(function(connection) {
-                if (connection._id === externalUser._id && connection.following) {
-                    console.log('%% EXTERNAL-CLIENT - request:updates EMITTER %%');
-                    console.log(' I am follwing user - store the updates sent....');
+                var mediaPromises = [];
+                if (dataChanges.update.imageBuffer) {
+                    var imageMediaObject = {
+                        path: dataChanges.update.image.path,
+                        buffer: dataChanges.update.imageBuffer
+                    };
+                    mediaPromises.push(socketUtil.writeMediaFile(imageMediaObject));
+                    // delete dataChanges.update.imageBuffer;
+                }
+                if (dataChanges.update.audioBuffer) {
+                    var audioMediaObject = {
+                        path: dataChanges.update.audio.path,
+                        buffer: dataChanges.update.audioBuffer
+                    };
+                    mediaPromises.push(socketUtil.writeMediaFile(audioMediaObject));
+                    // delete dataChanges.update.audioBuffer;
+                }
 
-                    var mediaPromises = [];
-                    if (dataChanges.update.imageBuffer) {
-                        var imageMediaObject = {
-                            path: dataChanges.update.image.path,
-                            buffer: dataChanges.update.imageBuffer
-                        };
-                        mediaPromises.push(socketUtil.writeMediaFile(imageMediaObject));
-                        // delete dataChanges.update.imageBuffer;
-                    }
-                    if (dataChanges.update.audioBuffer) {
-                        var audioMediaObject = {
-                            path: dataChanges.update.audio.path,
-                            buffer: dataChanges.update.audioBuffer
-                        };
-                        mediaPromises.push(socketUtil.writeMediaFile(audioMediaObject));
-                        // delete dataChanges.update.audioBuffer;
-                    }
+                Promise.all(mediaPromises).then(function(result) {
 
-                    Promise.all(mediaPromises).then(function(result) {
+                    Notebooks.insert(dataChanges.update, function(err, updatedDocs) {
+                        if (err) {
+                            return console.log('Error inserting external Updates');
+                        }
 
-                        Notebooks.insert(dataChanges.update, function(err, updatedDocs) {
-                            if (err) {
-                                return console.log('Error inserting external Updates');
-                            }
+                        console.log('Inserted notebook success');
 
-                            console.log('Inserted notebook success');
-
-
-
+                        socketUtil.getUser().then(function(user) {
                             socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
-                        });
+                        })
+
 
                     });
-                }
-            });
-        });
 
+                });
+            }
+        });
     });
 
 
@@ -317,16 +268,20 @@ function initNodeClientListeners(socketClient, me, io) {
     socketClient.on('update:toConnectionData', function(data) {
         console.log('');
         console.log('%% EXTERNAL-CLIENT - update:toConnectionData %%');
+        console.log('data', data);
 
 
-        console.log('me.socketId', me);
-        io.to(me.socketId).emit('tunnel:update:toConnectionData', data);
+        socketUtil.getConnection(data._id).then(function(connection) {
+             connection.name = data.name;
+             connection.avatar = data.avatar;
 
+             socketUtil.updateConnection(connection).then(function(updatedConnection) {
+                 socketUtil.getUser().then(function(user) {
+                    socketUtil.emitToLocalClient(io, user.localSocketId, 'update:connectionInfo', {connection: updatedConnection})
 
+                 })
+             })
+        });
 
-    //    Update names in realtime
-    //    check if we are following user
-    //    if we are following user and avatar is differnt
-    //    request avatar
     })
 }

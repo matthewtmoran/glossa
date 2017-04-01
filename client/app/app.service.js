@@ -41,7 +41,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     }
 
     function getConnections() {
-        return __user.connections;
+        socketFactory.emit('get:connections')
     }
 
     function uploadAvatar(file) {
@@ -67,7 +67,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
     function removeAvatar(filePath) {
         console.log('Avatar being updated...');
-        console.log('typeof filePath', typeof filePath);
         var data = {filePath: filePath};
         return $http.put('/api/user/' + __user._id + '/avatar', data)
             .then(function successCallback(response) {
@@ -84,13 +83,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     }
 
     function toggleFollow(user) {
-        console.log('toggleFollow, user', user);
-        console.log('type of user', typeof user);
         var userString = angular.toJson(user);
-        console.log('after angualr  toString', userString);
-
         socketFactory.emit('update:following', {connection: userString});
-
     }
 
 
@@ -274,19 +268,17 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
             console.log('update:connectionInfo', data);
 
-            __user.connections.forEach(function(connection) {
-                if (connection._id === data.connection._id) {
+            $rootScope.$broadcast('update:connection', data);
 
-                    if (connection.name != data.connection.name) {
-                        connection.name = data.connection.name;
-                    }
+        });
 
-                    if (connection.avatar != data.connection.avatar) {
-                        connection.avatar = data.connection.avatar;
-                    }
+        socketFactory.on('update:connection', function(data) {
+            $rootScope.$broadcast('update:connection', data);
+        });
 
-                }
-            })
+        socketFactory.on('send:connections', function(data) {
+            console.log('send:connections Hear in app.service', data);
+           $rootScope.$broadcast('update:connections', data);
         });
 
 

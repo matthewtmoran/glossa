@@ -30,12 +30,7 @@ function userCardController(AppService, socketFactory, __user) {
 
 
     function toggleFollow(userId) {
-        console.log(' vm.user.following', vm.user.following);
         vm.user.following = !vm.user.following;
-        // var socketId = vm.user.socketId;
-        // AppService.toggleFollow(userId, vm.user.following, socketId);
-        console.log('type vm.user', typeof vm.user);
-        console.log('vm.user', vm.user);
         AppService.toggleFollow(vm.user);
     }
 }
