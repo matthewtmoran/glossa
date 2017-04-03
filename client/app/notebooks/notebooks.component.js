@@ -138,11 +138,40 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         console.log('update:externalData', data);
 
         if (Array.isArray(data.updatedData)) {
-            data.updatedData.forEach(function(data) {
-                nbVm.externalNotebooks.push(data);
+            data.updatedData.forEach(function(notebook) {
+
+                var isUpdate = false;
+
+                for(var i = 0, len = nbVm.notebooks.length; i < len; i++) {
+                    if (nbVm.notebooks[i]._id === notebook._id) {
+                        isUpdate = true;
+                        console.log('this means notebook exists already and its just an update that was submitted');
+                        nbVm.notebooks[i] = notebook;
+                        console.log("Notebook shoudl be updated... ");
+                        console.log("TODO: give user notification update was made.... ")
+                    }
+                }
+                if (!isUpdate) {
+                    nbVm.externalNotebooks.push(notebook);
+                }
             })
         } else {
-            nbVm.externalNotebooks.push(data.updatedData);
+            console.log('single update received.... ');
+
+            var isUpdate = false;
+            for(var i = 0, len = nbVm.notebooks.length; i < len; i++) {
+                if (nbVm.notebooks[i]._id === data.updatedData._id) {
+                    isUpdate = true;
+                    console.log('this means notebook exists already and its just an update that was submitted');
+                    nbVm.notebooks[i] = data.updatedData;
+                    console.log("Notebook should be updated... ");
+                    console.log("TODO: give user notification update was made.... ")
+                }
+            }
+
+            if (!isUpdate) {
+                nbVm.externalNotebooks.push(data.updatedData);
+            }
         }
     });
 

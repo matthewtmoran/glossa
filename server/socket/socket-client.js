@@ -145,22 +145,31 @@ function initNodeClientListeners(socketClient, me, io) {
 
                     notebooks.forEach(function(notebook) {
                         var exists = false;
+                        var updates = false;
 
                         data.forEach(function(d) {
                             if (d._id === notebook._id) {
+                                console.log('');
                                 console.log('This notebook entry already exists.');
+                                console.log('...checking if updates have been made.');
+
                                 exists = true;
-                                if (notebook.updatedAt == d.updatedAt) {
-                                    console.log('updatedAt is equal.... so we need to get updated notebook');
-                                } else {
-                                    console.log('typeof notebook.updatedAt', typeof notebook.updatedAt);
-                                    console.log('typeof d.updatedAt', typeof d.updatedAt);
+
+                                var externalUpdatedAtDateObject = new Date(d.updatedAt);
+
+                                console.log('local notebook update time:', notebook.updatedAt.getTime());
+                                console.log('external notebook update time:', externalUpdatedAtDateObject.getTime());
+
+                                if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
+                                    updates = true;
+                                    console.log('Dates are not equal.');
+                                    console.log('TODO: send this notebook to user....');
                                 }
                             }
                         });
 
-                        if (!exists) {
-                            console.log('Notebook is new...');
+                        if (!exists || updates) {
+                            console.log('Notebook is new or has un-synced updates...');
                             if (notebook.image) {
                                 console.log('Notebook has image');
                                 mediaPromises.push(
@@ -244,7 +253,10 @@ function initNodeClientListeners(socketClient, me, io) {
 
                 Promise.all(mediaPromises).then(function(result) {
 
-                    Notebooks.insert(dataChanges.update, function(err, updatedDocs) {
+                    var options = {returnUpdatedDocs: true, upsert: true};
+                    var query = {_id: dataChanges.update._id};
+
+                    Notebooks.update(query, dataChanges.update, options, function(err, updatedCount, updatedDocs) {
                         if (err) {
                             return console.log('Error inserting external Updates');
                         }

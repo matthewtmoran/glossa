@@ -77,7 +77,7 @@ function createWindow () {
     // }));
 
     // win.loadURL(__dirname, 'client/index.html');
-    // win.loadURL('http://localhost:' + config.port);
+    win.loadURL('http://localhost:' + config.port);
 
     // Open the DevTools.
     win.webContents.openDevTools();

@@ -148,7 +148,7 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     //broad cast updates to users that follow
     function broadcastUpdates(data) {
         console.log('broadcastUpdates');
-        console.log('Emiting : broadcast:Updates');
+        console.log('Emmiting : broadcast:Updates');
         socketFactory.emit('broadcast:Updates', data);
     }
 

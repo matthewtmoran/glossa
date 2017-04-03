@@ -204,6 +204,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
         //Emit to all external-clients
         socket.on('broadcast:Updates', function(data) {
             var mediaPromises = [];
+            //encode image
             if (data.image) {
                 mediaPromises.push(
                     socketUtil.encodeBase64(data.image.path).then(function(imageString) {
@@ -211,7 +212,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                     })
                 )
             }
-
+            //encode audio
             if (data.audio) {
                 mediaPromises.push(
                     socketUtil.encodeBase64(data.audio.path).then(function(audioString) {
@@ -220,6 +221,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                 )
             }
 
+            //once image and audio has been encoded...
             Promise.all(mediaPromises).then(function(result) {
                 console.log('all media promises have resolved');
                 console.log('');
@@ -232,7 +234,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                     }
                 };
 
-
+                //send to clients
                 socketUtil.broadcastToExternalClients(io, 'onlineUser:updatesMade', updateObject);
             });
 
@@ -324,21 +326,61 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
                 Promise.all(mediaPromises).then(function(result) {
 
+                    var insertedAndUpdated = [];
                     console.log('inserting updates count:...', data.updates.length);
-                    Notebooks.insert(data.updates, function(err, newNotebooks) {
-                        if (err) {
-                            return console.log('Error inserting new notebooks', err);
-                        }
-                        var timeStamp = Date.now();
-                        console.log('number of new notebooks inserted:', newNotebooks.length);
+                    var query = {};
+                    var options = {returnUpdatedDocs: true, upsert: true};
 
-                        socketUtil.getConnectionBySocketId(socket.id).then(function(connection) {
-                            connection.lastSync = timeStamp;
-                            socketUtil.updateConnection(connection).then(function(updatedConnection) {
-                                socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
-                            })
-                        });
+                    data.updates.forEach(function(update) {
+                       query = {_id: update._id};
+
+                       Notebooks.update(query, update, options, function(err, updateCount, updatedDoc) {
+                           if (err) {
+                               return console.log('Error inserting new notebooks', err);
+                           }
+                           var timeStamp = Date.now();
+
+                           insertedAndUpdated.push(updatedDoc);
+
+                           socketUtil.getConnectionBySocketId(socket.id).then(function(connection) {
+                               connection.lastSync = timeStamp;
+                               socketUtil.updateConnection(connection).then(function(updatedConnection) {
+                                   socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: insertedAndUpdated});
+                               })
+                           });
+                       })
                     });
+
+
+
+                    // Notebooks.update(data.updates, function(err, newNotebooks) {
+                    //     if (err) {
+                    //         return console.log('Error inserting new notebooks', err);
+                    //     }
+                    //     var timeStamp = Date.now();
+                    //     console.log('number of new notebooks inserted:', newNotebooks.length);
+                    //
+                    //     socketUtil.getConnectionBySocketId(socket.id).then(function(connection) {
+                    //         connection.lastSync = timeStamp;
+                    //         socketUtil.updateConnection(connection).then(function(updatedConnection) {
+                    //             socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
+                    //         })
+                    //     });
+                    // });
+                    // Notebooks.insert(data.updates, function(err, newNotebooks) {
+                    //     if (err) {
+                    //         return console.log('Error inserting new notebooks', err);
+                    //     }
+                    //     var timeStamp = Date.now();
+                    //     console.log('number of new notebooks inserted:', newNotebooks.length);
+                    //
+                    //     socketUtil.getConnectionBySocketId(socket.id).then(function(connection) {
+                    //         connection.lastSync = timeStamp;
+                    //         socketUtil.updateConnection(connection).then(function(updatedConnection) {
+                    //             socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: newNotebooks});
+                    //         })
+                    //     });
+                    // });
                 })
             }
         });
