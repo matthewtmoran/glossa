@@ -193,7 +193,14 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         socketFactory.on('send:updatedUserList', function(data) {
             console.log('Heard : send:updatedUserList in app.service', data.onlineUsers);
 
-            var msg = 'Users online: ' + data.onlineUsers.length;
+            var onlineClients = [];
+            data.onlineUsers.forEach(function(client) {
+                if (client.online) {
+                    onlineClients.push(client);
+                }
+            });
+
+            var msg = 'Users list count: ' + onlineClients.length;
             var delay = 3000;
 
             Notification.show({

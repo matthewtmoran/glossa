@@ -14,6 +14,9 @@ var browser = null;
 module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
     io.sockets.on('connection', function(socket) {
+        console.log('');
+        console.log('');
+        console.log('');
         console.log('%% SOCKET-SERVER - New socket connection');
         console.log('...begin handshake');
 
@@ -64,36 +67,63 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
                 setTimeout(function() {
                     if (localClient.disconnect) {
-                        localClient = {};
-                        bonjourService.destroy();
+                        // localClient = {};
+
+                        socketUtil.resetClientData().then(function() {
+
+                            bonjourService.destroy();
+
+                            setTimeout(function() {
+                                process.exit();
+                            }, 1000)
+
+                        });
+
                     }
-                }, 3000);
+                }, 2000);
 
             } else {
+                console.log('DEALING WITH CLIENT DISCONNECTING');
+                console.log('DEALING WITH CLIENT DISCONNECTING -  searching for clients by socketId');
+
                 socketUtil.getConnectionBySocketId(socket.id).then(function(currentClient) {
+                    console.log('DEALING WITH CLIENT DISCONNECTING - client found:', currentClient);
                     currentClient.disconnect = true;
+                    console.log('DEALING WITH CLIENT DISCONNECTING - pausing for 3 seconds');
                     setTimeout(function() {
                         if (currentClient.disconnect) {
-                            console.log('client has disconnected.');
+                            console.log('DEALING WITH CLIENT DISCONNECTING - client has disconnected.');
 
                             if (!currentClient.following) {
+                                console.log('DEALING WITH CLIENT DISCONNECTING - we are NOT following client');
                                 socketUtil.removeConnection(currentClient).then(function() {
-                                    console.log('removed connection');
-                                    socketUtil.getConnections().then(function(connections) {
-                                        console.log("emitting updated network user list", connections);
-                                        socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: connections});
+                                    console.log('DEALING WITH CLIENT DISCONNECTING - removed connection');
+                                    console.log('DEALING WITH CLIENT DISCONNECTING - getting connections');
+                                    socketUtil.getConnections().then(function(data) {
+                                        console.log('DEALING WITH CLIENT DISCONNECTING - connections:', data);
+
+                                        console.log('data should be array.', Array.isArray(data));
+
+                                        console.log('DEALING WITH CLIENT DISCONNECTING - sending updated connections to local-client');
+                                        socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
+                                        // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: connections});
                                     })
                                 })
                             } else {
-
+                                console.log('DEALING WITH CLIENT DISCONNECTING - We are following client');
+                                console.log('DEALING WITH CLIENT DISCONNECTING - modify client data');
                                 currentClient.online = false;
                                 delete currentClient.socketId;
 
+                                console.log('DEALING WITH CLIENT DISCONNECTING - update client data');
                                 socketUtil.updateConnection(currentClient).then(function(data) {
-                                    console.log('client data updated');
-                                    socketUtil.getConnections().then(function(connections) {
-                                        console.log("emitting updated network user list");
-                                        socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: connections});
+                                    console.log('DEALING WITH CLIENT DISCONNECTING - client data updated', data);
+                                    console.log('DEALING WITH CLIENT DISCONNECTING - getting connections');
+                                    socketUtil.getConnections().then(function(data) {
+                                        console.log('DEALING WITH CLIENT DISCONNECTING - "emitting updated connections', data);
+                                        console.log('data should be array.', Array.isArray(data));
+                                        socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
+                                        // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: connections});
                                     })
                                 });
                             }
@@ -160,7 +190,9 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
         //TODO: change this to user other event and verify we even need this listener
         socket.on('get:networkUsers', function(data) {
             socketUtil.getConnections().then(function(data) {
-                socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList',  {onlineUsers: data});
+                console.log('data should be array.', Array.isArray(data));
+                socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
+                // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList',  {onlineUsers: data});
             })
         });
 
@@ -244,6 +276,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
         socket.on('get:connections', function() {
             console.log('%% get:connections Heard in index.js %%');
             socketUtil.getConnections().then(function(data) {
+                console.log('data should be array.', Array.isArray(data));
                 socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data})
             })
         });
@@ -372,6 +405,8 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
             disconnect: false
         };
 
+        console.log('CURRENT LOCAL-CLIENT SOCKET ID: ', localClient.socketId);
+
         //basically keeps the socketId up-to-date in persisted data
         updatePersistedSocketConnection(localClient.socketId);
 
@@ -391,10 +426,12 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
     //when an external client comes online...
     function externalClientConnection(socket, io, glossaUser, externalClient) {
 
+        console.log('DEALING WITH CLIENT...');
         //check persisted data for client
         socketUtil.getConnection(externalClient._id).then(function(persistedClientData) {
             //if we are following the user
             if (persistedClientData.following) {
+                console.log('DEALING WITH CLIENT - we are following');
                 var changesMade = false; //flag 
 
                 persistedClientData.online = true; // update data that toggles when user comes online
@@ -416,17 +453,21 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                 }
 
                 if (changesMade) {
+                    console.log('DEALING WITH CLIENT - changes made in client data');
                     //normalize notebooks
                     socketUtil.normalizeNotebooks(persistedClientData).then(function(changeObject) {
+                        console.log('DEALING WITH CLIENT - normalized notebooks now emitting to local-client');
                         socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
                     });
                 }
                 //get data we have already synced with user
                 socketUtil.getUserSyncedData(persistedClientData).then(function(data) {
+                    console.log('DEALING WITH CLIENT - requesting updates from external-client');
                     socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:updates', data);
                 });
 
             } else {
+                console.log('DEALING WITH CLIENT - we are NOT following');
                // if we are not following user the create new object to cache
                persistedClientData = {
                     name: externalClient.name,
@@ -440,18 +481,30 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                 };
             }
 
+            console.log('DEALING WITH CLIENT - updating data with new state details');
             //store information in database
             socketUtil.updateConnection(persistedClientData).then(function(updatedClient) {
 
+                console.log('DEALING WITH CLIENT - we sending updated connection info to local client');
+                console.log('updated connection: ', updatedClient);
                 //send updated connection data to local-client
-                socketUtil.emitToLocalClient(io. localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
+                console.log('');
+                console.log('localClient', localClient);
 
+                socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
+
+                console.log('DEALING WITH CLIENT - we are getting the most recent list of clients...');
                 //get most recent list of clients and send to local-client;
                 socketUtil.getConnections().then(function(data) {
-                    socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: data});
+                    console.log('DEALING WITH CLIENT - sending that list of clients to local-client');
+                    console.log('this is the list of connections: ', data);
+                    console.log('data should be array.', Array.isArray(data));
+                    socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
+                    // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: data});
                 })
             });
 
+            console.log('DEALING WITH CLIENT - are making client join a socket room');
             //join the external room so we can broadcast events to all connections
             socket.join('externalClientsRoom');
         });

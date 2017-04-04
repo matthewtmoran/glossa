@@ -143,7 +143,8 @@ function NetworkSettings($scope, AppService, socketFactory, dialogSrvc, $q) {
     });
 
     $scope.$on('update:connections', function(event, data) {
-        console.log('update:connections Heard in network-users-settings.component', data);
+        console.log('update:connections Heard in network-users-settings.component', data.connections);
+        console.log('data.connections should be array.', Array.isArray(data.connections));
         vm.networkUsers = data.connections;
     });
 

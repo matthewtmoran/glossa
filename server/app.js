@@ -24,6 +24,7 @@ var io = require('socket.io')(server);
 var bonjourService = require('./socket/bonjour-service');
 var bonjour = require('bonjour')();
 var browser = null;
+var myBonjourService = null;
 var externalSocketClient = require('./socket/socket-client');
 
 require('./config/express')(app);
@@ -77,66 +78,59 @@ Promise.all([require('./config/init').checkForApplicationData()])
 
         });
 
-        process.stdin.resume();
-
-        //TODO: figure this out....
         function exitHandler(options, err) {
-            console.log('Node killing local service immediately.... delaying 3 seconds then killing process....');
-            var myBonjourService = bonjourService.getMyBonjourService();
-            console.log('myBonjourService', myBonjourService);
+            console.log('exit handler from:', options.from);
 
-            myBonjourService.stop(function() {
-                console.log('stopping my bonjour service....');
-            });
+
             if (options.cleanup) {
                 console.log('cleaning...');
+                console.log('browser.services.length', browser.services.length);
 
-                // bonjour.destroy();
+                myBonjourService = bonjourService.getMyBonjourService();
 
+                if (myBonjourService) {
+                    console.log('Bonjour process exists', myBonjourService);
+                    myBonjourService.stop(function() {
+                        console.log('Service Stop Success! called from app.js');
+                    });
+                }
 
-
-                // bonjourService.destroy();
-
-                // browser.services.forEach(function(service) {
-                //     if (service.name === 'glossaApp-' + glossaUser._id) {
-                //         service.stop(function() {
-                //             console.log('stoping service...');
-                //         })
-                //     }
-                // });
-                // bonjourService.destroy();
-                // if (bonjourSocket && bonjourSocket.getService()) {
-                //     console.log('stopping service');
-                //     bonjourSocket.stopService();
-                // }
+                console.log('browser.services.length', browser.services.length);
                 console.log('cleaning done...');
-                console.log('browser.services.length',browser.services.length);
             }
             if (err) {
                 console.log(err.stack);
             }
             if (options.exit) {
-                // setTimeout(function() {
-                //     console.log('.... 3 seconds delay over... process being killed now!');
-                //     console.log('exit?', options.exit);
-                // }, 3000);
+
+                console.log('Exit is true');
+                console.log('....3 seconds delay start');
+
                 setTimeout(function() {
+                    console.log('Delay over.  Exiting.');
                     process.exit();
-                }, 4000)
+                }, 3000);
             }
 
         }
 
-        //do something when app is closing
-        process.on('exit', exitHandler.bind(null,{cleanup:true, from: 'exit'}));
+//do something when app is closing
+        process.on('exit', exitHandler.bind(null, {cleanup:true, exit:true, from: 'exit'}));
 
-        //catches ctrl+c event
+//catches ctrl+c event
         process.on('SIGINT', exitHandler.bind(null, {cleanup:false, exit:true, from: 'SIGINT'}));
+
+        // process.stdin.resume();
+
+
 
         //catches uncaught exceptions
         // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
 
     });
+
+//TODO: figure this out....
+
 
 
 exports = module.exports = app;

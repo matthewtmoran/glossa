@@ -129,9 +129,14 @@ module.exports = {
     },
 
     getConnections: function() {
+        console.log('getConnections called');
         return new Promise(function(resolve, reject) {
             Connection.find({}, function(err, connections) {
-                if (err) reject(err);
+                if (err) {
+                    console.log('There was an error finding connections', err);
+                    reject(err);
+                }
+                console.log('Connections were found. ', connections.length);
                 resolve(connections);
             })
         })
@@ -251,6 +256,19 @@ module.exports = {
                 console.log('Persisted User Data Success');
                 resolve(user);
                     User.persistence.compactDatafile();
+            })
+        })
+    },
+
+    resetClientData: function() {
+        return new Promise(function(resolve, reject) {
+            var update = {$set:{online: false, socketId: null}};
+            Connection.update({}, update, function(err, updatedCount) {
+                if (err) {
+                    console.log('There was an error updating clients on disconnect', err);
+                    reject(err)
+                }
+                resolve();
             })
         })
     },

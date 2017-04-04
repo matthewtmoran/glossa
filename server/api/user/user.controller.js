@@ -22,8 +22,6 @@ var fs = require('fs');
 exports.index = function(req, res) {
     User.findOne({}, function (err, user) {
         if(err) { return handleError(res, err); }
-        console.log('user', user);
-
         return res.status(200).json(user);
     });
 };

@@ -3,7 +3,7 @@
 // var bonjour = require('bonjour')();
 var config = require('./../config/environment/index');
 var browser;
-var myLocalService = {};
+var myLocalService = null;
 var browserInitiated = false;
 
 
@@ -98,10 +98,10 @@ module.exports = {
     },
 
     destroy: function() {
-        console.log("destroying bonjour service.... ");
-        console.log('myLocalService', myLocalService);
+        console.log("destroying bonjour service called ");
         myLocalService.stop(function() {
-            console.log('Service Stop Success!');
+            console.log('Service Stop Success! called from bonjour-service.js');
+            myLocalService = null;
         });
     }
 };

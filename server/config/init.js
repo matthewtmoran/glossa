@@ -108,8 +108,6 @@ function createProjectData(userData) {
 
 function createSessionData(userData, projectData) {
     console.log('createSessionData');
-    console.log('userData', userData);
-    console.log('projectData', projectData);
     var options = {returnUpdatedDocs: true};
     return new Promise(function(resolve, reject) {
 
