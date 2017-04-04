@@ -108,7 +108,7 @@ module.exports = {
     },
 
     //Queries the database for a clients data to send to client to compare against.
-    getCurrentData: function(client) {
+    getUserSyncedData: function(client) {
         return new Promise(function(resolve, reject) {
             var query = {'createdBy._id': client._id};
             var notebookData = [];
