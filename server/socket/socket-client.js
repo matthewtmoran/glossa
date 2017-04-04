@@ -162,6 +162,13 @@ function initNodeClientListeners(socketClient, me, io) {
 
                                 if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
                                     updates = true;
+
+                                    if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
+                                        console.log('my update is more recent....');
+                                    } else {
+                                        console.log('my update is NOT more recent....');
+                                    }
+
                                     console.log('Dates are not equal.');
                                     console.log('TODO: send this notebook to user....');
                                 }
@@ -187,6 +194,8 @@ function initNodeClientListeners(socketClient, me, io) {
                                     })
                                 )
                             }
+                            console.log('notebook.updatedAt', notebook.updatedAt);
+                            console.log('notebook.updatedAt.getTime()', notebook.updatedAt.getTime());
                             newNotebookEntries.push(notebook);
                         }
                     });
@@ -256,6 +265,8 @@ function initNodeClientListeners(socketClient, me, io) {
                     var options = {returnUpdatedDocs: true, upsert: true};
                     var query = {_id: dataChanges.update._id};
 
+                    console.log('dataChanges.update.updatedAt', dataChanges.update.updatedAt);
+
                     Notebooks.update(query, dataChanges.update, options, function(err, updatedCount, updatedDocs) {
                         if (err) {
                             return console.log('Error inserting external Updates');
@@ -263,6 +274,7 @@ function initNodeClientListeners(socketClient, me, io) {
 
                         console.log('Inserted notebook success');
 
+                        Notebooks.persistence.compactDatafile();
                         socketUtil.getUser().then(function(user) {
                             socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
                         })
