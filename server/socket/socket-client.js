@@ -160,10 +160,10 @@ function initNodeClientListeners(socketClient, me, io) {
                                 console.log('local notebook update time:', notebook.updatedAt.getTime());
                                 console.log('external notebook update time:', externalUpdatedAtDateObject.getTime());
 
+                                //TODO: when manual timestamp is implemented - change this to be more simple
                                 if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
-                                    updates = true;
-
                                     if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
+                                        updates = true;
                                         console.log('my update is more recent....');
                                     } else {
                                         console.log('my update is NOT more recent....');
