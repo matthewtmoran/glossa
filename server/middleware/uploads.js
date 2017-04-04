@@ -6,7 +6,9 @@ var q = require('q');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'server/data/tmp/')
+        var tempPath = path.join(config.root, 'server/data/tmp/');
+        console.log('tempPath', tempPath);
+        cb(null, tempPath)
     },
     filename: function (req, file, cb) {
         var name = file.originalname;
@@ -19,8 +21,6 @@ var upload = multer({ storage: storage });
 var type = upload.array('files');
 
 function validateFilename(req, res, next) {
-    console.log("req.files:  ", req.files);
-    console.log("req.body:  ", req.body);
     if (!req.files) {
         next();
     }
@@ -41,7 +41,8 @@ function validateFilename(req, res, next) {
     files.forEach(function(file) {
         file = MediaObject(file);
         if (file.mimetype === 'image/jpeg') {
-            var imagePromise = copyAndWrite(file.path, path.join(config.imagePath, file.filename))
+            console.log('file.filename', file.filename);
+            var imagePromise = copyAndWrite(file.path, path.join(config.root, config.imagePath, file.filename))
                 .then(function(response) {
                     file.path = path.join('image',file.filename);
                     dataObj.image = file;
@@ -50,7 +51,7 @@ function validateFilename(req, res, next) {
             promises.push(imagePromise);
         } else if (file.mimetype.indexOf('audio') > -1) {
             file = MediaObject(file);
-            var audioPromise = copyAndWrite(file.path, path.join(config.audioPath, file.filename))
+            var audioPromise = copyAndWrite(file.path, path.join(config.root, config.audioPath, file.filename))
                 .then(function(response) {
                     file.path = path.join('audio', file.filename);
                     dataObj.audio = file;
@@ -101,9 +102,9 @@ function copyAndWrite(from, to){
 function removeMedia(media) {
     var mediaPath;
     if (media.mimetype.indexOf('image')> -1) {
-        mediaPath = path.join(config.imagePath, media.filename);
+        mediaPath = path.join(config.root, config.imagePath, media.filename);
     } else if (media.mimetype.indexOf('audio') > -1) {
-        mediaPath = path.join(config.audioPath, media.filename);
+        mediaPath = path.join(config.root, config.audioPath, media.filename);
     }
     fs.unlink(mediaPath);
 }

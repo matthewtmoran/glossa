@@ -21,6 +21,9 @@ function createWindow () {
         }
     });
 
+
+    // var dataPath = app.getPath('userData');
+
     var express = require('./server/app')();
 
     // and load the index.html of the app.
@@ -38,7 +41,7 @@ function createWindow () {
     // win.loadURL('http://localhost:' + config.port);
 
     // Open the DevTools.
-    // win.webContents.openDevTools();
+    win.webContents.openDevTools();
 
     // Emitted when the window is closed.
     win.on('closed', function() {

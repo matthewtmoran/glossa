@@ -6,9 +6,11 @@
 
 module.exports = function() {
 
+
     var express = require('express');
     var config = require('./config/environment');
     var path = require('path');
+
 
     // Populate DB with sample data
     if(config.seedDB) { require('./config/seed'); }
