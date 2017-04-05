@@ -265,7 +265,7 @@ module.exports = {
         return new Promise(function(resolve, reject) {
             var promises = [];
             promises.push(removeConnectionsOnClose());
-            promises.push(updateConnectionsOnClose())
+            promises.push(updateConnectionsOnClose());
 
             Promise.all(promises).then(function() {
                 resolve('closing cleaning data done');
@@ -294,11 +294,13 @@ module.exports = {
 
 function removeConnectionsOnClose() {
     return new Promise(function(resolve, reject) {
-        Connection.remove({following: false}, function(err, notFollowingUsers) {
+        var options = {multi: true};
+        Connection.remove({following: false}, options, function(err, notFollowingUsers) {
             if (err) {
                 console.log('Issue finding non-following users');
                 reject(err);
             }
+            console.log("removed connections: ", notFollowingUsers);
             resolve('success remove on close');
         });
     })
