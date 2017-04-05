@@ -5,7 +5,7 @@
 			<span class="letter">{{vm.user.name[0]}}</span>
 		</md-button>
 
-		<img ng-if="vm.user.avatar" ng-src="{{vm.user.avatar}}" class="md-avatar">
+		<img ng-if="vm.user.avatar && vm.user.following" ng-src="{{vm.user.avatar}}" class="md-avatar">
 		<span ng-class="vm.user.online ? 'online-notification' : 'offline-notification'"></span>
 		<!--<span ng-class="{'online-notification': vm.user.online, 'offline-notification': !vm.user.online}"></span>-->
 	</div>

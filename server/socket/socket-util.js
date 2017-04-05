@@ -261,17 +261,19 @@ module.exports = {
     },
 
     resetClientData: function() {
+        console.log('resetClientData called success');
         return new Promise(function(resolve, reject) {
-            var update = {$set:{online: false, socketId: null}};
-            Connection.update({}, update, function(err, updatedCount) {
-                if (err) {
-                    console.log('There was an error updating clients on disconnect', err);
-                    reject(err)
-                }
-                resolve();
+            var promises = [];
+            promises.push(removeConnectionsOnClose());
+            promises.push(updateConnectionsOnClose())
+
+            Promise.all(promises).then(function() {
+                resolve('closing cleaning data done');
             })
         })
     },
+
+
 
     //TODO: concat these function
     emitToLocalClient: function(io, socketId, eventName, data) {
@@ -289,3 +291,29 @@ module.exports = {
 
 
 };
+
+function removeConnectionsOnClose() {
+    return new Promise(function(resolve, reject) {
+        Connection.remove({following: false}, function(err, notFollowingUsers) {
+            if (err) {
+                console.log('Issue finding non-following users');
+                reject(err);
+            }
+            resolve('success remove on close');
+        });
+    })
+}
+
+function updateConnectionsOnClose() {
+    return new Promise(function(resolve, reject) {
+        var update = {$set:{online: false, socketId: null}};
+        Connection.update({following: true}, update, function(err, updatedCount) {
+            if (err) {
+                console.log('Issue finding non-following users');
+                reject(err);
+            }
+            console.log('Updated following user success! - updatedCount', updatedCount);
+            resolve('success update on close');
+        });
+    })
+}

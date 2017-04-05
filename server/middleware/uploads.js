@@ -6,9 +6,7 @@ var q = require('q');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        var tempPath = path.join(config.root, 'server/data/tmp/');
-        console.log('tempPath', tempPath);
-        cb(null, tempPath)
+        cb(null, path.join(config.root, 'server/data/tmp/'))
     },
     filename: function (req, file, cb) {
         var name = file.originalname;

@@ -6,7 +6,7 @@ var q = require('q');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'server/data/tmp/')
+        cb(null, path.join(config.root, 'server/data/tmp/'))
     },
     filename: function (req, file, cb) {
         var name = file.originalname;
@@ -31,7 +31,7 @@ function validateFilename(req, res, next) {
 
     files.forEach(function(file) {
         file = MediaObject(file);
-        var imagePromise = copyAndWrite(file.path, path.join(config.imagePath, file.filename))
+        var imagePromise = copyAndWrite(file.path, path.join(config.root, config.imagePath, file.filename))
             .then(function(response) {
                 file.path = path.join('image',file.filename);
                 dataObj.image = file;
@@ -82,7 +82,6 @@ function copyAndWrite(from, to){
 function removeAvatar(req, res, next) {
     var mediaPath;
     mediaPath = path.join(config.root, 'server/data/', req.body.filePath);
-    console.log('mediaPath', mediaPath);
     fs.unlink(mediaPath);
     next();
 }

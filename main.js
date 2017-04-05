@@ -2,6 +2,7 @@ var electron = require('electron'),
     app = electron.app,
     BrowserWindow = electron.BrowserWindow;
 
+var socketUtil = require('./server/socket/socket-util');
 var url = require('url');
 // var config = require('./server/config/environment');
 
@@ -59,11 +60,16 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
+    console.log('');
+    console.log('window-all-closed');
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
-    app.quit()
-}
+        socketUtil.resetClientData().then(function() {
+            console.log('resetClientData being called')
+            app.quit()
+        });
+    }
 });
 
 app.on('activate', function() {
