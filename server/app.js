@@ -78,11 +78,10 @@ module.exports = function() {
 
                 bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
 
-
             });
 
             function exitHandler(options, err) {
-                console.log('exit handler from:', options.from);
+                console.log('exit handler from: ', options.from);
 
 
                 if (options.cleanup) {
@@ -92,7 +91,7 @@ module.exports = function() {
                     myBonjourService = bonjourService.getMyBonjourService();
 
                     if (myBonjourService) {
-                        console.log('Bonjour process exists', myBonjourService);
+                        console.log('Bonjour process exists');
                         myBonjourService.stop(function() {
                             console.log('Service Stop Success! called from app.js');
                         });

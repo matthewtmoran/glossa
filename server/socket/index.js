@@ -54,25 +54,29 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
         });
 
         socket.on('disconnect', function() {
-            //watch for local-client disconnect.... utliamtely this should shut down the server all together when we are using electron...  but for refresh, act like application is just starting up
+            console.log('');
+            console.log('#### disconnect ####');
 
             // externalSocketClient.destroyNodeClient();
             if (socket.id === localClient.socketId) {
+                console.log('The local-client electron window has closed or app has quit');
                 localClient.disconnect = true;
 
                 setTimeout(function() {
                     if (localClient.disconnect) {
                         // localClient = {};
 
-                        socketUtil.resetClientData().then(function() {
+                        console.log('Im not sure we should try to disconnect here');
 
-                            bonjourService.destroy();
-
-                            setTimeout(function() {
-                                process.exit();
-                            }, 1000)
-
-                        });
+                        // socketUtil.resetClientData().then(function() {
+                        //
+                        //     bonjourService.destroy();
+                        //
+                        //     setTimeout(function() {
+                        //         process.exit();
+                        //     }, 1000)
+                        //
+                        // });
 
                     }
                 }, 2000);
@@ -111,6 +115,7 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
 
             }
+            console.log('');
         });
 
     //////////////////////////

@@ -261,9 +261,11 @@ module.exports = {
     },
 
     resetClientData: function() {
-        console.log('resetClientData called success');
+        console.log('');
+        console.log('resetClientData called');
         return new Promise(function(resolve, reject) {
             var promises = [];
+
             promises.push(removeConnectionsOnClose());
             promises.push(updateConnectionsOnClose());
 
@@ -314,7 +316,7 @@ function updateConnectionsOnClose() {
                 console.log('Issue finding non-following users');
                 reject(err);
             }
-            console.log('Updated following user success! - updatedCount', updatedCount);
+            console.log('Updated connections: ', updatedCount);
             resolve('success update on close');
         });
     })
