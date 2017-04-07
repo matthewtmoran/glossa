@@ -17,7 +17,10 @@ var menuTemplate = [{
     label: 'Sample',
     submenu: [
         {label: 'About App', selector: 'orderFrontStandardAboutPanel:'},
-        {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; beforeQuitThenQuit();}}
+        {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {
+            console.log('CmdOrCtrl+Q or quit label selected');
+            forceQuit = true; app.quit();
+        }}
     ]
 }];
 //
@@ -54,13 +57,18 @@ function createWindow () {
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
 
-        if (process.platform === 'darwin') {
+        //if the process is not windows (aka mac or linux)
+        if (process.platform != 'win32') {
+            //if force quite is false (not cmd+Q) aka the 'x'
             if(!forceQuit){
+                //prevent the default action.  What is the default action?
                 e.preventDefault();
+                //hide window.  does this dock it?  does the socket remain in tact when docked?
                 win.hide();
             }
 
         } else {
+            //if the process is windows.... destroy the window object.
             win = null;
         }
 
@@ -72,10 +80,13 @@ function createWindow () {
 app.on('before-quit', function (e) {
     console.log('');
     console.log('before-quit');
+    //if force quite is false (not cmd+Q) aka the 'x'
     if(!forceQuit){
         console.log('no force quit');
+        //prevent the default action.  What is the default action?
         e.preventDefault();
-        win.hide();
+        //hide window.  does this dock it?  does the socket remain in tact when docked?
+        // win.hide();
     } else {
         console.log('yes force quit');
         beforeQuitThenQuit();
@@ -114,7 +125,9 @@ app.on('window-all-closed', function() {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
         //this only happens when it's not a mac
-        beforeQuitThenQuit();
+        console.log('quitting app now.');
+        forceQuit = true;
+        app.quit();
     }
 });
 
@@ -130,8 +143,6 @@ app.on('activate', function() {
 function beforeQuitThenQuit() {
     socketUtil.resetClientData().then(function() {
         console.log('resetClientData promise resolved');
-        console.log('calling app.quit()');
-        app.quit();
     });
 }
 
