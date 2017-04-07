@@ -17,10 +17,8 @@ var menuTemplate = [{
     label: 'Sample',
     submenu: [
         {label: 'About App', selector: 'orderFrontStandardAboutPanel:'},
-        {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {
-            console.log('CmdOrCtrl+Q or quit label selected');
-            forceQuit = true; app.quit();
-        }}
+        {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; app.quit();}},
+        {label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();}}
     ]
 }];
 //
