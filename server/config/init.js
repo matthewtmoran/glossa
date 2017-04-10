@@ -57,16 +57,18 @@ function defaultAppData() {
             waveColor: "#BDBDBD",
             skipLength: 2
         },
-        session: {},
-        connections: []
+        session: {}
     };
 
-   return createUserData(user).then(function(userData) {
-        console.log("createUserData promise resolve - userData: ", userData);
-       return createProjectData(userData).then(function(projectData) {
-            console.log("createProjectData promise resolve - userData: ", projectData);
-           return createSessionData(userData, projectData).then(function(updatedUserData) {
-                console.log('createSessionData promise resolve - updatedUserData', updatedUserData);
+   return createUserData(user)
+       .then(function(userData) {
+        console.log("createUserData promise resolved ");
+       return createProjectData(userData)
+           .then(function(projectData) {
+            console.log("createProjectData promise resolved ");
+           return createSessionData(userData, projectData)
+               .then(function(updatedUserData) {
+                console.log('createSessionData promise resolved');
                 return updatedUserData;
             })
 

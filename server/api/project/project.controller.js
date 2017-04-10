@@ -13,6 +13,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var Project = require('./project.model');
+var archiver = require('archiver');
 var AdmZip = require('adm-zip');
 
 
@@ -20,6 +21,8 @@ var User = require('./../user/user.model');
 var Notebooks = require('./../notebook/notebook.model');
 var Transcriptions = require('./../transcription/transcription.model');
 var Projects = require('./../project/project.model');
+var Connections = require('./../connections/connection.model');
+// var Connections = require('./../connections/connections.model');
 var config = require('./../../config/environment/index');
 
 
@@ -89,6 +92,8 @@ exports.exportProject = function(req, res) {
     var me = {};
     var myProject = {};
     var myNotebooks;
+    var myConnections;
+    var myTranscriptions;
 
     var databasePromises = [];
 
@@ -98,51 +103,95 @@ exports.exportProject = function(req, res) {
 
     databasePromises.push(getNotebook(userId));
 
+    databasePromises.push(getConnections());
+
+    databasePromises.push(getTranscriptions());
+
     Promise.all(databasePromises).then(function(results) {
         console.log('TODO: do everything else with data');
 
         me = results[0];
         myProject = results[1];
         myNotebooks = results[2];
+        myConnections = results[3];
+        myTranscriptions = results[4];
 
 
-
-
-
-        createExportDirecotry(myProject).then(function(exportTempPath) {
-
-            getMediaFiles(myNotebooks).then(function(notebooksWithBuffer) {
+        getMediaFiles(myNotebooks)
+            .then(function(notebooksWithBuffer) {
                 console.log('notebooksWithBuffer returned');
 
                 var myJson = {
-                    notebooks: notebooksWithBuffer
+                    user: me,
+                    notebooks: notebooksWithBuffer,
+                    project: myProject,
+                    transcriptions: myTranscriptions
                 };
-                console.log('createExportDirecotry promise resolved');
 
-                var fileName = path.join(exportTempPath, 'notebooks.json');
+                res.set('Content-disposition', 'attachment; filename=' + 'project-' + myProject._id + '.glossa');
+                res.set('Content-Type', 'application/zip');
 
-                createJsonFile(myJson, fileName).then(function() {
-                    console.log('createJsonFile promise resolved');
+                var archive = archiver('zip'); // Sets the compression level.
 
-                    var zip = new AdmZip();
-                    console.log('zip', zip);
+                archive.pipe(res);
 
-                    zip.addLocalFolder(exportTempPath);
-                    console.log('debug1 ');
+                archive.on('error', function(err) {
+                    console.error(err);
+                    throw err;
+                });
 
-                    zip.writeZip(__dirname);
-                    console.log('debug2 ');
+                res.on('close', function() {
+                    console.log('closing zip');
+                    return res.status(200).send('OK').end();
+                });
 
-                })
+                archive.append(JSON.stringify(myJson), { name: 'project-' + myProject._id + '.json'});
 
-            });
-        })
+                archive.finalize();
 
-
-
-    });
-
+            })
+        });
 };
+
+function getConnections() {
+    return new Promise(function(resolve, reject) {
+        Connections.find({}, function(err, connections) {
+            if (err) {
+                console.log('There was an error finding connections', err);
+                reject(err);
+            }
+            resolve(connections);
+        });
+    })
+}
+
+function getCorpus() {
+
+}
+
+function getHashtags() {
+
+}
+
+function getSession() {
+
+}
+
+function getSettings() {
+
+}
+
+function getTranscriptions() {
+    return new Promise(function(resolve, reject) {
+        Transcriptions.find({}, function(err, transcriptions) {
+            if (err) {
+                console.log('There was an error finding transcriptions', err);
+                reject(err);
+            }
+            resolve(transcriptions);
+        });
+    });
+}
 
 function getMediaFiles(array) {
     var mediaPromises = [];

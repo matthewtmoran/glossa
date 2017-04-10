@@ -44,10 +44,6 @@ function ProjectSettings(SettingsService, drawerMenu, dialogSrvc) {
             SettingsService.exportProject(project).then(function(data) {
                  console.log('export project returned', data);
             });
-
-
-
-
         });
     }
 

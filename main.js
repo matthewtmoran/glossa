@@ -12,16 +12,21 @@ var url = require('url');
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var forceQuit = false;
-//
 var menuTemplate = [{
     label: 'Sample',
     submenu: [
         {label: 'About App', selector: 'orderFrontStandardAboutPanel:'},
         {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; app.quit();}},
-        {label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();}}
+        {label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();}},
+        {
+            label: 'Toggle Developer Tools',
+            accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+            click: function (item, focusedWindow) {
+                if (focusedWindow) focusedWindow.webContents.toggleDevTools()
+            }
+        },
     ]
 }];
-//
 var menu = Menu.buildFromTemplate(menuTemplate);
 
 
@@ -56,20 +61,21 @@ function createWindow () {
         // when you should delete the corresponding element.
 
         //if the process is not windows (aka mac or linux)
-        if (process.platform != 'win32') {
-            //if force quite is false (not cmd+Q) aka the 'x'
-            if(!forceQuit){
-                //prevent the default action.  What is the default action?
-                e.preventDefault();
-                //hide window.  does this dock it?  does the socket remain in tact when docked?
-                win.hide();
-            }
+        // if (process.platform != 'win32') {
+        //     //if force quite is false (not cmd+Q) aka the 'x'
+        //     if(!forceQuit){
+        //         //prevent the default action.  What is the default action?
+        //         e.preventDefault();
+        //         //hide window.  does this dock it?  does the socket remain in tact when docked?
+        //         win.hide();
+        //     }
+        //
+        // } else {
+        //     //if the process is windows.... destroy the window object.
+        //     win = null;
+        // }
 
-        } else {
-            //if the process is windows.... destroy the window object.
-            win = null;
-        }
-
+        win = null;
 
     })
 }
