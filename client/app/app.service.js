@@ -1,6 +1,5 @@
 var ipc = require('electron').ipcRenderer;
 var dialog  = require('electron').remote.dialog;
-console.log('dialog', dialog);
 
 angular.module('glossa')
     .factory('AppService', AppService);
@@ -29,34 +28,9 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         toggleFollow: toggleFollow
     };
 
-    ipc.on('changeState', function(event, state) {
-        $state.go(state, {});
-    });
-
-    ipc.on('import:project', function(event, message) {
-
-        dialog.showOpenDialog({
-                filters: [
-                    { name: 'Glossa File (.glossa)', extensions: ['glossa'] }
-                ]
-            }, function(selectedFiles) {
-
-            if (selectedFiles) {
-                $http.post('/api/project/import', {projectPath: selectedFiles[0]})
-                    .then(function successCallback(response) {
-                        $window.location.reload();
-                        return response.data;
-                    }, function errorCallback(response) {
-                        console.log('There was an error', response);
-
-                        return response.data;
-                    });
-                }
-            }
-
-        );
-
-    });
+    //TODO: move ipc listeners to their own service
+    ipc.on('changeState', ipcChangeState);
+    ipc.on('import:project', ipcImportProject);
 
     // initListeners();
     return service;
@@ -84,8 +58,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             arrayKey: '',
             headers: { 'Content-Type': undefined }
         }).then(function (resp) {
-            console.log('Success ');
-            console.log('resp', resp);
 
             __user.avatar = resp.data.avatar;
 
@@ -99,7 +71,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
     }
 
     function removeAvatar(filePath) {
-        console.log('Avatar being updated...');
         var data = {filePath: filePath};
         return $http.put('/api/user/' + __user._id + '/avatar', data)
             .then(function successCallback(response) {
@@ -121,7 +92,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         var userString = angular.toJson(user);
         socketFactory.emit('update:following', {connection: userString});
     }
-
 
     function saveSettings(settings) {
         console.log('Setting being updated...');
@@ -145,6 +115,11 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             });
     }
 
+    ///////////////////
+    //Socket Emitters//
+    ///////////////////
+
+
     function getOnlineUsersSE() {
         socketFactory.emit('get:networkUsers')
     }
@@ -162,26 +137,8 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         socketFactory.emit('request:AllUserUpdates')
     }
 
-    function getSingleUserUpdates(user) {
-        var msg = 'Looking for updates from ' + user.name;
-        var delay = 4000;
-
-        Notification.show({
-            message: msg,
-            hideDelay: delay
-        });
-
-        socketFactory.emit('request:SingleUserUpdates', user);
-    }
-
-
-
-    // function get
-
     //broad cast updates to users that follow
     function broadcastUpdates(data) {
-        console.log('broadcastUpdates');
-        console.log('Emmiting : broadcast:Updates');
         socketFactory.emit('broadcast:Updates', data);
     }
 
@@ -256,22 +213,6 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
 
         });
 
-        //When external-client connects to network
-        // socketFactory.on('local-client:send:externalUserList', function(data) {
-        //     console.log('Heard : local-client:send:externalUserList in app.service', data);
-        //
-        //     var msg = 'Users online: ' + data.length;
-        //     var delay = 3000;
-        //
-        //     Notification.show({
-        //         message: msg,
-        //         hideDelay: delay
-        //     });
-        //
-        //     console.log('$broadcast : update:networkUsers');
-        //     $rootScope.$broadcast('update:networkUsers', data)
-        // });
-
         //when external-client disconnects
         socketFactory.on('userDisconnected', function(data) {
             console.log('$broadcast : update:networkUsers:disconnect');
@@ -325,84 +266,44 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
             $rootScope.$broadcast('update:connection', data);
         });
 
+        //Listen for connections list
+        //broadcast all connections to controllers that display connections
         socketFactory.on('send:connections', function(data) {
             console.log('send:connections Hear in app.service', data);
            $rootScope.$broadcast('update:connections', data);
         });
 
+        //TODO: currently we do not use consider using socket vs http
         socketFactory.on('import:project', function(data) {
             alert('importing project....');
         });
 
+    }
 
-        //Get all following user updates
-        //Get single user updates
+    //Electron Renderer listeners (from main process)
 
+    function ipcImportProject(event, message) {
+        var options = {
+            filters: [{ name: 'Glossa File (.glossa)', extensions: ['glossa'] }]
+        };
 
+        dialog.showOpenDialog(options, function(selectedFiles) {
 
+                if (selectedFiles) {
 
-
-        // socketFactory.on('newParticipant', function(userObj) {
-        //     console.log("Heard 'newParticipant' in appFactory:", userObj);
-        //     services.data.users.push(userObj);
-        // });
-        //
-        // socketFactory.on('dishAdded', function(dish) {
-        //     console.log("Heard 'dishAdded' in appFactory.data:", dish);
-        //     addDish(dish);
-        // });
-        //
-        // socketFactory.on('dishShared', function(data) {
-        //     console.log("Heard 'dishShared' in appFactory.data:", data);
-        //     shareDish(data.dish_id, data.user_id, data.firstShare);
-        // });
-        //
-        // socketFactory.on('dishUnshared', function(data) {
-        //     console.log("Heard 'dishUnshared' in appFactory.data:", data);
-        //     unshareDish(data.dish_id, data.user_id);
-        // });
-        //
-        // socketFactory.on('billsSentToGuests', function(data) {
-        //     console.log("Heard 'billsSentToGuests' in appFactory.data:", data);
-        //     services.data.billData = data;
-        //     $rootScope.$broadcast('billsSentToGuests');
-        // });
-
-
-        function checkForUpdates(connections) {
-            connections.forEach(function(connection) {
-                if (connection.online && connection.following) {
-                    socketFactory.emit('get:singleUserUpdates', connection);
+                    $http.post('/api/project/import', {projectPath: selectedFiles[0]})
+                        .then(function successCallback(response) {
+                            $window.location.reload();
+                        }, function errorCallback(response) {
+                            console.log('There was an error', response);
+                            $window.location.reload();
+                        });
                 }
-            })
-        }
+            }
+        );
+    }
 
-        var last = {
-            bottom: false,
-            top: true,
-            left: false,
-            right: true
-        };
-
-        var toastPosition = angular.extend({},last);
-
-        function sanitizePosition() {
-            var current = toastPosition;
-
-            if ( current.bottom && last.top ) current.top = false;
-            if ( current.top && last.bottom ) current.bottom = false;
-            if ( current.right && last.left ) current.left = false;
-            if ( current.left && last.right ) current.right = false;
-
-            last = angular.extend({},current);
-        }
-        var getToastPosition = function() {
-            sanitizePosition();
-
-            return Object.keys(toastPosition)
-                .filter(function(pos) { return toastPosition[pos]; })
-                .join(' ');
-        };
-
+    function ipcChangeState(event, state) {
+        $state.go(state, {});
     }
 }

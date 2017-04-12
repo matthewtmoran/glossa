@@ -33,45 +33,16 @@ function SettingsService($http, $window, $q) {
 
     function exportProject(project) {
 
-
-        // $q(function(resolve, reject) {
-        //     $window.location.assign('/api/project/'+ project.createdBy +'/' + project._id + '/export');
-        // });
-
-        // $http.post(url, requestData, {
-        //     params: {
-        //         queryParam: 'queryParamValue'
-        //     },
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': expectedMediaType
-        //     }
-        // }).then(function (response) {
-        //     var filename = (...)
-        //     openSaveAsDialog(filename, response.data, expectedMediaType);
-        // });
-
         return $http.post('/api/project/'+ project.createdBy +'/' + project._id + '/export', {}, {
             responseType: "arraybuffer",
             cache: false,
             headers: {
                 'Content-Type': 'application/zip; charset=utf-8',
                 'Accept': 'application/zip'
-            },
-            // transformResponse: function (data, headers) {
-            //     //The data argument over here is arraybuffer but $http returns response
-            //     // as object, thus returning the response as an object with a property holding the
-            //     // binary file arraybuffer data
-            //     var response = {};
-            //     response.data = data;
-            //     return response;
-            // }
+            }
         }).then(function successCallback(response) {
-                console.log('response', response);
-
 
                 var blob = new Blob([response.data], {type: 'application/zip'});
-                console.log('blob', blob);
                 var fileName = getFileNameFromHttpResponse(response);
                 var url = $window.URL.createObjectURL(blob);
 
@@ -79,10 +50,6 @@ function SettingsService($http, $window, $q) {
                 downloadLink.attr('href', url);
                 downloadLink.attr('download', fileName);
                 downloadLink[0].click();
-
-                // var blob = b64toBlob(data, 'application/zip');
-                // var fileName = "download.zip";
-
 
                 return response.data;
             }, function errorCallback(response) {
