@@ -112,9 +112,6 @@ exports.importProject = function(req, res) {
         replacePromises.push(replaceTranscriptions(newProjectData.transcriptions));
 
 
-
-
-
         Promise.all(replacePromises).then(function(results) {
 
             var updatedData = {
