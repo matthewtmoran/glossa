@@ -11,12 +11,8 @@ module.exports = function() {
     var config = require('./config/environment');
     var path = require('path');
 
-
     // Populate DB with sample data
     if(config.seedDB) { require('./config/seed'); }
-
-
-
 
     // Setup server
     var app = express();
@@ -130,8 +126,4 @@ module.exports = function() {
             // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
 
         });
-}
-
-
-
-// exports = module.exports = app;
+};

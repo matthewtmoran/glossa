@@ -83,75 +83,116 @@ exports.destroy = function(req, res) {
     });
 };
 
+exports.importProject = function(req, res) {
+    console.log('req.body', req.body);
+    var newProjectData;
+    var zip = new AdmZip(req.body.projectPath);
+    var zipEntries = zip.getEntries();
+    zipEntries.forEach(function(zipEntry) {
+        newProjectData = JSON.parse(zip.readAsText(zipEntry));
+        var replacePromises = [];
+
+
+        // replacePromises.push(replaceProject(userId));
+        // replacePromises.push(replaceUser(newProjectData.user));
+
+        // replacePromises.push(replaceProject(newProjectData.project));
+
+        console.log('newProjectData.notebooks.length', newProjectData.notebooks.length);
+
+        replacePromises.push(replaceNotebooks(newProjectData.notebooks));
+
+        replacePromises.push(replaceConnections(newProjectData.connections));
+
+        replacePromises.push(replaceTranscriptions(newProjectData.transcriptions));
+
+
+
+
+
+        Promise.all(replacePromises).then(function(results) {
+
+            var updatedData = {
+                notebooks: results[0],
+                connections: results[1],
+                transcriptions: results[2]
+            };
+
+            return res.status(200).send(updatedData);
+        });
+
+    });
+};
+
 exports.exportProject = function(req, res) {
     console.log('exportProject called');
-    console.log('req.params', req.params);
     var userId = req.params.userId;
     var projectId = req.params.projectId;
-
-    var me = {};
-    var myProject = {};
-    var myNotebooks;
-    var myConnections;
-    var myTranscriptions;
-
+    var projectData = {};
     var databasePromises = [];
 
+    //TODO: queries need to be refractored
     databasePromises.push(getUser());
-
     databasePromises.push(getProject(userId));
-
     databasePromises.push(getNotebook(userId));
-
     databasePromises.push(getConnections());
-
     databasePromises.push(getTranscriptions());
 
     Promise.all(databasePromises).then(function(results) {
         console.log('TODO: do everything else with data');
 
-        me = results[0];
-        myProject = results[1];
-        myNotebooks = results[2];
-        myConnections = results[3];
-        myTranscriptions = results[4];
+        projectData.user = results[0];
+        projectData.project = results[1];
+        projectData.notebooks = results[2];
+        projectData.connections = results[3];
+        projectData.transcriptions = results[4];
 
 
-        getMediaFiles(myNotebooks)
-            .then(function(notebooksWithBuffer) {
-                console.log('notebooksWithBuffer returned');
+        //sending response to here
 
-                var myJson = {
-                    user: me,
-                    notebooks: notebooksWithBuffer,
-                    project: myProject,
-                    transcriptions: myTranscriptions
-                };
+        res.set('Content-disposition', 'attachment; filename=' + 'project-' +  projectData.project._id + '.glossa');
+        res.set('Content-Type', 'application/zip');
 
-                res.set('Content-disposition', 'attachment; filename=' + 'project-' + myProject._id + '.glossa');
-                res.set('Content-Type', 'application/zip');
+        var archive = archiver('zip'); // Sets the compression level.
 
-                var archive = archiver('zip'); // Sets the compression level.
+        archive.pipe(res);
 
-                archive.pipe(res);
-
-                archive.on('error', function(err) {
-                    console.error(err);
-                    throw err;
-                });
-
-                res.on('close', function() {
-                    console.log('closing zip');
-                    return res.status(200).send('OK').end();
-                });
-
-                archive.append(JSON.stringify(myJson), { name: 'project-' + myProject._id + '.json'});
-
-                archive.finalize();
-
-            })
+        archive.on('error', function(err) {
+            console.error(err);
+            throw err;
         });
+
+        res.on('close', function() {
+            console.log('closing zip');
+            return res.status(200).send('OK').end();
+        });
+
+        archive.append(JSON.stringify(projectData), { name: 'project-' +  projectData.project._id + '.json'});
+
+        archive.finalize();
+
+    })
 };
+
+function replaceConnections(newConnections) {
+    return new Promise(function(resolve, reject) {
+        Connections.remove({}, {multi: true}, function(err, numRemoved) {
+            if (err) {
+                console.log('Error removing connections', err);
+                reject(err);
+            }
+
+            Connections.insert(newConnections, function(err, connections) {
+                if (err) {
+                    console.log('Error inserting new connections connections', err);
+                    reject(err);
+                }
+                resolve(connections);
+            })
+
+        })
+    })
+}
 
 function getConnections() {
     return new Promise(function(resolve, reject) {
@@ -181,6 +222,26 @@ function getSettings() {
 
 }
 
+function replaceTranscriptions(newTranscriptions) {
+    return new Promise(function(resolve, reject) {
+        Transcriptions.remove({}, {multi: true}, function(err, numRemoved) {
+            if (err) {
+                console.log('Error removing transcriptions', err);
+                reject(err);
+            }
+
+            Transcriptions.insert(newTranscriptions, function(err, transcriptions) {
+                if (err) {
+                    console.log('Error inserting new transcriptions', err);
+                    reject(err);
+                }
+                resolve(transcriptions);
+            })
+
+        })
+    })
+}
+
 function getTranscriptions() {
     return new Promise(function(resolve, reject) {
         Transcriptions.find({}, function(err, transcriptions) {
@@ -193,7 +254,48 @@ function getTranscriptions() {
     });
 }
 
-function getMediaFiles(array) {
+function decodeMediaFiles(array) {
+    var mediaPromises = [];
+    return new Promise(function(resolve, reject) {
+        array.map(function(object) {
+            if (object.imageBuffer) {
+
+                var imageData = {
+                    buffer: data.imageBuffer,
+                    path: object.image.path
+                };
+
+                mediaPromises.push(
+                    writeMediaFile(imageData).then(function() {
+                        delete object.imageBuffer
+                    })
+                )
+            }
+            if (object.audioBuffer) {
+
+                var audioData = {
+                    buffer: data.audioBuffer,
+                    path: object.audio.path
+                };
+
+                mediaPromises.push(
+                    writeMediaFile(audioData).then(function() {
+                        delete object.audioBuffer
+                    })
+                )
+            }
+        });
+        Promise.all(mediaPromises).then(function(results) {
+            resolve(array);
+        })
+    });
+}
+
+
+
+
+
+function encodeMediaFiles(array) {
     var mediaPromises = [];
     return new Promise(function(resolve, reject) {
         array.map(function(object) {
@@ -223,7 +325,7 @@ function getMediaFiles(array) {
 }
 
 
-// function getMediaFiles(array) {
+// function encodeMediaFiles(array) {
 //     return new Promise(function(resolve, reject) {
 //         array.map(function(object) {
 //             if (object.image) {
@@ -242,6 +344,29 @@ function getMediaFiles(array) {
 //         resolve(array);
 //     });
 // }
+
+function writeMediaFile(data) {
+    return new Promise(function(resolve, reject) {
+        var mediaPath = path.join(config.root, '/server/data/', data.path);
+
+        var buffer = new Buffer(data.buffer, 'base64', function(err) {
+            if (err) {
+                console.log('issue decoding base64 data');
+                reject(err);
+            }
+            console.log('buffer created....');
+        });
+
+        fs.writeFile(mediaPath, buffer, function(err) {
+            if (err) {
+                console.log('There was an error writing file to filesystem', err);
+                reject(err);
+            }
+            console.log('media file written to file system');
+            resolve('success');
+        })
+    });
+}
 
 function encodeBase64(mediaPath) {
     var myPath = path.join(config.root, '/server/data/', mediaPath);
@@ -309,6 +434,29 @@ function getProject(userId) {
     });
 }
 
+function replaceNotebooks(newNotebooks) {
+    return new Promise(function(resolve, reject) {
+        Notebooks.remove({}, {multi: true}, function(err, numRemoved) {
+            if (err) {
+                console.log('Error removing notebooks', err);
+                reject(err);
+            }
+
+            decodeMediaFiles(newNotebooks).then(function(notebooksWithoutBuffer) {
+                console.log('notebooksWithoutBuffer.length', notebooksWithoutBuffer.length);
+                Notebooks.insert(notebooksWithoutBuffer, function(err, notebooks) {
+                    if (err) {
+                        console.log('Error inserting new notebooks', err);
+                        reject(err);
+                    }
+                    console.log('notebooks.length', notebooks.length);
+                    resolve(notebooks);
+                })
+            })
+        })
+    })
+}
+
 function getNotebook(userId) {
     return new Promise(function(resolve, reject) {
         var query = {'createdBy._id': userId};
@@ -317,8 +465,11 @@ function getNotebook(userId) {
                 console.log('There was an error finding notebooks', err);
                 reject(err);
             }
-            console.log('myNotebooks', myNotebooks);
-            resolve(myNotebooks);
+
+            encodeMediaFiles(myNotebooks).then(function(notebooksWithBuffer) {
+                resolve(notebooksWithBuffer);
+            });
+
         });
     })
 }

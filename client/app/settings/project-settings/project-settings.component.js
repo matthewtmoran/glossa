@@ -15,6 +15,7 @@ function ProjectSettings(SettingsService, drawerMenu, dialogSrvc) {
     vm.$onInit = init;
     vm.updateProject = updateProject;
     vm.exportProject = exportProject;
+    vm.importProject = importProject;
     vm.isSaving = false;
 
     function init() {
@@ -45,6 +46,10 @@ function ProjectSettings(SettingsService, drawerMenu, dialogSrvc) {
                  console.log('export project returned', data);
             });
         });
+    }
+
+    function importProject() {
+
     }
 
 

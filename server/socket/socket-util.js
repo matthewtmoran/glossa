@@ -58,9 +58,6 @@ module.exports = {
                 resolve('success');
             })
         });
-
-
-
     },
 
     addExternalData: function(data) {
@@ -290,7 +287,6 @@ module.exports = {
     broadcastToExternalClients: function(io, eventName, data) {
         io.to('externalClientsRoom').emit(eventName, data)
     }
-
 
 };
 

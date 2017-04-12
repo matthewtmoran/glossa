@@ -10,6 +10,8 @@ var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
 var browser = null;
+var AdmZip = require('adm-zip');
+
 
 module.exports = function(glossaUser, mySession, io, browser, bonjour) {
 
@@ -258,6 +260,22 @@ module.exports = function(glossaUser, mySession, io, browser, bonjour) {
                 console.log('data should be array.', Array.isArray(data));
                 socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data})
             })
+        });
+
+
+        socket.on('import:project', function(data) {
+
+            // fs.readFile(data.projectPath, 'utf8', function(err, data) {
+            //    if (err) {
+            //        return console.log('Error reading file', err);
+            //    }
+            //    console.log('data', data);
+            // });
+
+
+
+
+
         });
 
 

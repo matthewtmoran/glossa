@@ -1,7 +1,11 @@
+var ipc = require('electron').ipcRenderer;
+var dialog  = require('electron').remote.dialog;
+console.log('dialog', dialog);
+
 angular.module('glossa')
     .factory('AppService', AppService);
 
-function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user, Upload) {
+function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __user, Upload, $state, $timeout, $window) {
     var service = {
 
         //socket functions
@@ -24,6 +28,35 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         saveSettings: saveSettings,
         toggleFollow: toggleFollow
     };
+
+    ipc.on('changeState', function(event, state) {
+        $state.go(state, {});
+    });
+
+    ipc.on('import:project', function(event, message) {
+
+        dialog.showOpenDialog({
+                filters: [
+                    { name: 'Glossa File (.glossa)', extensions: ['glossa'] }
+                ]
+            }, function(selectedFiles) {
+
+            if (selectedFiles) {
+                $http.post('/api/project/import', {projectPath: selectedFiles[0]})
+                    .then(function successCallback(response) {
+                        $window.location.reload();
+                        return response.data;
+                    }, function errorCallback(response) {
+                        console.log('There was an error', response);
+
+                        return response.data;
+                    });
+                }
+            }
+
+        );
+
+    });
 
     // initListeners();
     return service;
@@ -295,6 +328,10 @@ function AppService($http, socketFactory, $rootScope, $mdToast, Notification, __
         socketFactory.on('send:connections', function(data) {
             console.log('send:connections Hear in app.service', data);
            $rootScope.$broadcast('update:connections', data);
+        });
+
+        socketFactory.on('import:project', function(data) {
+            alert('importing project....');
         });
 
 

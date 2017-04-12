@@ -51,11 +51,22 @@ function SettingsController($state, $scope, AppService, SettingsService) {
 
 
     function init() {
+        getDefaultState();
         //get user settings
         vm.settings = AppService.getSettings();
         SettingsService.getProject().then(function(data) {
             vm.project = data;
         });
+    }
+
+    function getDefaultState() {
+        vm.tabs.forEach(function(tab, index) {
+            if (tab.state === $state.current.name) {
+                console.log('match');
+                vm.selectedTab = tab;
+                $scope.selectedIndex = index;
+            }
+        })
     }
 
     //go back to previous parent state

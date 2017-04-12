@@ -1,7 +1,8 @@
 var electron = require('electron'),
     app = electron.app,
     BrowserWindow = electron.BrowserWindow,
-    Menu = electron.Menu;
+    Menu = electron.Menu,
+    ipcMain = electron.ipcMain;
 
 
 var socketUtil = require('./server/socket/socket-util');
@@ -15,7 +16,9 @@ var forceQuit = false;
 var menuTemplate = [{
     label: 'Sample',
     submenu: [
-        {label: 'About App', selector: 'orderFrontStandardAboutPanel:'},
+        {label: 'About App', click: function(item, focusedWindow){
+            focusedWindow.webContents.send('changeState', 'settings.about');
+        }},
         {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; app.quit();}},
         {label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();}},
         {
@@ -25,10 +28,23 @@ var menuTemplate = [{
                 if (focusedWindow) focusedWindow.webContents.toggleDevTools()
             }
         },
+        {label: 'Import Project', click: importProject},
+        {
+            label: 'Prefs',
+            click: function(item, focusedWindow){
+                focusedWindow.webContents.send('changeState', 'settings.project');
+            }
+        }
     ]
 }];
+
+
 var menu = Menu.buildFromTemplate(menuTemplate);
 
+
+function importProject() {
+    win.webContents.send('import:project');
+}
 
 function createWindow () {
 
@@ -37,7 +53,7 @@ function createWindow () {
         width: 1200,
         height: 750,
         webPreferences: {
-            nodeIntegration: false,
+            // nodeIntegration: false,
             webSecurity: false
         }
     });
