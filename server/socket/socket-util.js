@@ -184,7 +184,6 @@ module.exports = {
                     console.log('Error normalizing notebook data', err);
                     reject(err);
                 }
-                console.log('Updated count: ', updatedCount);
                 Notebooks.persistence.compactDatafile();
                 resolve({_id: client._id, name: client.name, avatar: client.avatar});
             });
@@ -211,6 +210,7 @@ module.exports = {
                     console.log('There eas an error updating connection');
                     reject(err);
                 }
+                Connection.persistence.compactDatafile();
                 resolve(updatedDoc);
             })
         })
@@ -251,8 +251,8 @@ module.exports = {
                     reject(err);
                 }
                 console.log('Persisted User Data Success');
+                User.persistence.compactDatafile();
                 resolve(user);
-                    User.persistence.compactDatafile();
             })
         })
     },
@@ -270,6 +270,28 @@ module.exports = {
                 resolve('closing cleaning data done');
             })
         })
+    },
+
+    updateOrInsert: (array) => {
+        return new Promise((resolve, reject) => {
+            let options = {returnUpdatedDocs: true, upsert: true};
+            array.map((update) => {
+                let query = {_id: update._id};
+                let manualTimeEntry = new Date(update.updatedAt);
+                update.updatedAt = new Date(manualTimeEntry.getTime());
+                Notebooks.update(query, update, options, (err, updateCount, updatedDoc) => {
+                    if (err) {
+                        console.log('Error inserting new notebooks', err);
+                        reject(err);
+                    }
+                    update = updatedDoc;
+                });
+            });
+
+            console.log('array map is done. resolving.....');
+
+            resolve(array);
+        });
     },
 
 
@@ -298,7 +320,6 @@ function removeConnectionsOnClose() {
                 console.log('Issue finding non-following users');
                 reject(err);
             }
-            console.log("removed connections: ", notFollowingUsers);
             resolve('success remove on close');
         });
     })
@@ -312,7 +333,7 @@ function updateConnectionsOnClose() {
                 console.log('Issue finding non-following users');
                 reject(err);
             }
-            console.log('Updated connections: ', updatedCount);
+            Connection.persistence.compactDatafile();
             resolve('success update on close');
         });
     })

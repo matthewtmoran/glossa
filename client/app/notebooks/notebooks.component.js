@@ -66,7 +66,9 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     function showNewUpdates() {
         nbVm.externalNotebooks.forEach(function(newNotebook) {
             newNotebook.isNew = true;
-            nbVm.notebooks.push(newNotebook);
+            if (nbVm.notebooks.indexOf(newNotebook) < 0) {
+                nbVm.notebooks.push(newNotebook);
+            }
         });
         nbVm.externalNotebooks = [];
     }
@@ -134,25 +136,35 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         viewDetails(event, notebook)
     }
 
-    $scope.$on('update:externalData', function(event, data) {
+    $scope.$on('update:externalData', (event, data) => {
         console.log('update:externalData', data);
 
         if (Array.isArray(data.updatedData)) {
-            data.updatedData.forEach(function(notebook) {
 
-                var isUpdate = false;
+            data.updatedData.forEach((notebook) => {
 
-                for(var i = 0, len = nbVm.notebooks.length; i < len; i++) {
+                let isUpdate = false;
+
+                for(let i = 0, len = nbVm.notebooks.length; i < len; i++) {
                     if (nbVm.notebooks[i]._id === notebook._id) {
                         isUpdate = true;
-                        console.log('this means notebook exists already and its just an update that was submitted');
                         nbVm.notebooks[i] = notebook;
-                        console.log("Notebook shoudl be updated... ");
                         console.log("TODO: give user notification update was made.... ")
                     }
                 }
                 if (!isUpdate) {
-                    nbVm.externalNotebooks.push(notebook);
+
+                    let exists = false;
+                    nbVm.externalNotebooks.forEach((exNb) => {
+                         if (exNb._id === notebook._id) {
+                             exists = true;
+                         }
+                    });
+
+                    if (!exists) {
+                        nbVm.externalNotebooks.push(notebook);
+                    }
+
                 }
             })
         } else {
