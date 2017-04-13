@@ -10,7 +10,8 @@ function socketFactory($rootScope, $window) {
     var service = {
         on: on,
         emit: emit,
-        init: init
+        init: init,
+        disconnect: disconnect
     };
 
 
@@ -40,6 +41,10 @@ function socketFactory($rootScope, $window) {
                 }
             });
         });
+    }
+
+    function disconnect() {
+        $window.socket.disconnect(true);
     }
 }
 

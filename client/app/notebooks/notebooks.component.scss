@@ -132,71 +132,6 @@
 }
 
 
-.notebook-card {
-
-
-	.inner-padding {
-		padding: 0 16px 0 16px;
-	}
-
-	.card-content {
-		padding: 0;
-		position: relative;
-		overflow: hidden;
-
-		.card-text {
-			position: absolute;
-
-		}
-	}
-
-	.card-title {
-		.title-text {
-
-		}
-	}
-
-	.wave-content-wrapper {
-		background-color: #dedede;
-	}
-
-	.card-image {
-		position: relative;
-		overflow: hidden;
-		max-height: 250px;
-		min-height: 250px;
-
-		img {
-			display: block;
-			width: 100%;
-			height: 100%;
-		}
-	}
-
-	.card-media {
-		position: relative;
-		overflow: hidden;
-		//max-height: 100%;
-		height: 100%;
-		width: 100%;
-		//min-height: 250px;
-
-		img {
-			display: block;
-			width: 100%;
-			height: 100% !important;
-		}
-	}
-}
-
-.post-dialog {
-	.simplemde-wrapper {
-		width: 100% !important;
-	}
-	.CodeMirror {
-	}
-}
-
 #image-post-dialog {
 	.image-caption {
 		width: 100% !important;
@@ -350,17 +285,89 @@
 }
 
 .post-dialog {
+	.audio-container {
+		background: transparent;
+		height: 200px;
+		width: 100%;
+		position: absolute;
+		top: 100px;
+
+		.wave-content-wrapper {
+			background: transparent;
+		}
+
+		.md-player-controls {
+			top: 65px;
+			z-index: 101;
+			width: 90px;
+		}
+
+		.waveSurferWave:after{
+			box-shadow: none !important;
+		}
+	}
+
+
+	.top-actions {
+		height: 200px;
+		position: relative;
+		@extend .grey-gradient;
+
+		.add-button {
+			margin: 15px;
+			height: 40px;
+			min-width: 50%;
+			opacity: .7;
+			font-size: 1.1em;
+			z-index: 102;
+			text-transform: capitalize;
+		}
+
+		.remove-container {
+			position: absolute;
+			top: 15px;
+			right: 15px;
+
+			&.dark-theme {
+				.remove-button {
+					md-icon {
+						opacity: .8;
+						color: $lBlack;
+					}
+				}
+			}
+
+			.remove-button {
+				md-icon {
+					opacity: .8;
+					color: white;
+				}
+			}
+		}
+
+
+		.image-preview {
+			position: absolute;
+			top: 100%;
+			bottom: 100%;
+			margin: auto;
+			width: 100%;
+		}
+	}
 	.md-dialog-content {
 		padding-right: 0;
 		padding-left: 0;
 
-		.simplemde-wrapper {
-			padding: 0;
-		}
+	}
+	.simplemde-wrapper {
+		z-index: 100;
+		padding: 0;
+		width: 100% !important;
 	}
 
 	.editor-toolbar {
 		border-radius: 0 !important;
+		background: white;
 
 		.toolbar-icon {
 			position: relative;
@@ -389,7 +396,12 @@
 		}
 
 	}
+	.CodeMirror {
+		//height:
+		padding: 0;
+	}
 	.CodeMirror-wrap {
+		border: none;
 		border-radius: 0 !important;
 	}
 }

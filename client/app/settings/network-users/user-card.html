@@ -1,22 +1,23 @@
 
 <md-list-item class="user-card md-padding" >
 	<div class="user-avatar-container">
-		<md-button ng-if="!vm.user.avatar" disabled="true" class="md-fab" ng-style="{'background-color': vm.user.color }">
+		<md-button ng-if="!vm.user.following" disabled="true" class="md-fab" ng-style="{'background-color': vm.user.color }">
 			<span class="letter">{{vm.user.name[0]}}</span>
 		</md-button>
-		<img ng-if="vm.user.avatar" src="vm.user.avatar" class="md-avatar">
-		<span ng-if="vm.user.isOnline" class="online-notification"></span>
+
+		<img ng-if="vm.user.avatar && vm.user.following" ng-src="{{vm.user.avatar}}" class="md-avatar">
+		<span ng-class="vm.user.online ? 'online-notification' : 'offline-notification'"></span>
+		<!--<span ng-class="{'online-notification': vm.user.online, 'offline-notification': !vm.user.online}"></span>-->
 	</div>
 	<div class="user-name-container">
 		<span>{{vm.user.name}}</span>
 	</div>
 	<span flex></span>
 	<div class="user-sync-containaer">
-		<span ng-if="vm.user.lastSync">Last Sync: </span>
-		<span>{{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>
+		<p ng-if="vm.user.lastSync">Last Sync: {{vm.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</p>
 	</div>
 	<div class="user-follow-container">
-		<md-button  ng-click="vm.toggleFollow(vm.user.following)"
+		<md-button  ng-click="vm.toggleFollow(vm.user._id)"
 		            ng-class="{'md-raised not-following': !vm.user.following, 'is-following': vm.user.following}"
 		            class=" md-large-btn">
 			{{vm.user.following ? "Following" : "Follow"}}

@@ -1,3 +1,5 @@
+'use strict';
+//TODO: consider combining settigns service and appServicde
 angular.module('glossa')
     .component('settingsComponent', {
         controller: SettingsController,
@@ -9,17 +11,8 @@ angular.module('glossa')
         }
     });
 
-function SettingsController($state, $scope, SettingsService, $timeout) {
+function SettingsController($state, $scope, AppService, SettingsService) {
     var vm = this;
-
-    vm.$onInit = function() {
-        //get user settings
-        SettingsService.getSettings().then(function(data) {
-            vm.settings = data;
-        });
-    };
-
-    vm.back = back;
 
     //Settings Tabs
     vm.tabs = [
@@ -39,7 +32,7 @@ function SettingsController($state, $scope, SettingsService, $timeout) {
             index: 2
         },
         {
-            label: 'Network',
+            label: 'Sharing',
             state: 'settings.network',
             index: 3
         },
@@ -50,8 +43,36 @@ function SettingsController($state, $scope, SettingsService, $timeout) {
         }
     ];
 
+    vm.$onInit = init;
+    vm.back = back;
+
     //keep index of tabs updated
     $scope.$watch('selectedIndex', selectedIndexWatch);
+
+
+    function init() {
+        getDefaultState();
+        //get user settings
+        vm.settings = AppService.getSettings();
+        SettingsService.getProject().then(function(data) {
+            vm.project = data;
+        });
+    }
+
+    function getDefaultState() {
+        vm.tabs.forEach(function(tab, index) {
+            if (tab.state === $state.current.name) {
+                console.log('match');
+                vm.selectedTab = tab;
+                $scope.selectedIndex = index;
+            }
+        })
+    }
+
+    //go back to previous parent state
+    function back() {
+        $state.go(vm.previousState.Name, vm.previousState.Params);
+    }
 
     //tab click events - changes child state
     function selectedIndexWatch(current, old) {
@@ -78,10 +99,5 @@ function SettingsController($state, $scope, SettingsService, $timeout) {
                 // $location.url("/view3");
                 break;
         }
-    }
-
-    //go back to previous parent state
-    function back() {
-        $state.go(vm.previousState.Name, vm.previousState.Params);
     }
 }

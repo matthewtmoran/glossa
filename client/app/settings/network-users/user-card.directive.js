@@ -20,24 +20,18 @@ function userCardController(AppService, socketFactory, __user) {
         "#B2B7BB", "#72ACAE", "#9C8AB4", "#5A8770", "#EEB424", "#407887"];
     var colorIndex = Math.floor((vm.user.name.charCodeAt(0) - 65) % alphabetColors.length);
 
-
     vm.user.color = alphabetColors[colorIndex];
 
+    if (vm.user.avatar) {
+        // vm.imagePath =
+    }
 
     vm.toggleFollow = toggleFollow;
 
 
-    function toggleFollow(following) {
+    function toggleFollow(userId) {
         vm.user.following = !vm.user.following;
-        // vm.user.following = following;
-
-        __user.connections.forEach(function(connection, index) {
-            if (connection._id === vm.user._id) {
-                // __user.connections[index] = vm.user;
-
-                socketFactory.emit('update:userConnections', angular.toJson(__user.connections));
-            }
-        })
+        AppService.toggleFollow(vm.user);
     }
 }
 

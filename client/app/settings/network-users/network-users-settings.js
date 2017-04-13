@@ -7,7 +7,7 @@ function config($stateProvider) {
     $stateProvider
         .state('settings.network', {
             url: '/network',
-            template: '<network-settings-component flex layout="column" >',
+            template: '<network-settings-component settings="vm.settings" flex layout="column" >',
             parent: 'settings'
         });
 }

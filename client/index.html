@@ -20,7 +20,6 @@
 <title>Glossa</title>
 
 <body layout="column" >
-<!--<body ng-app="glossa" layout="column" ng-cloak>-->
 
 	<div ui-view
 	     flex
@@ -31,6 +30,7 @@
 	<div class="splash-screen" style="position: fixed; top: 0; bottom: 0; right: 0; left: 0;" >
 		<img style="position: absolute; top: 0; bottom: 0; right: 0; left: 0; display: block; margin: auto"  src="assets/img/logo_basic.svg" alt="">
 	</div>
+
 
 	<!--fix for jquery and electron issue see: http://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined-->
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
@@ -120,6 +120,7 @@
 	<script src="components/socket/socket.service.js"></script>
 	<script src="components/notification/notificaiton.component.js"></script>
 	<script src="components/notification/notification.service.js"></script>
+	<script src="components/background-image/background-image.js"></script>
 	<script src="app/settings/network-users/user-card.directive.js"></script>
 
 	<script type="text/javascript" src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>

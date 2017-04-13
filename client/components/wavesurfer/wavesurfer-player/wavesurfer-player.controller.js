@@ -6,6 +6,9 @@
 angular.module('glossa')
     .controller('wavesurferPlayerController', WavesurferPlayerController)
     .directive('backImg', function($timeout, __rootUrl){
+
+
+
         return function(scope, element, attrs){
             //element where background image should be attached to
             var waveEl = angular.element(element[0].querySelector('.waveSurferWave'));
@@ -30,7 +33,7 @@ angular.module('glossa')
 });
 
 
-function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming, SettingsService) {
+function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdTheming, AppService) {
     var control = this,
         timeInterval;
 
@@ -42,13 +45,16 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
     control.defaultSettings = { //not sure we need if db is populated.....
         skipForward: 2,
         skipBack: 2,
-        waveColor: 'black'
+        waveColor: '#BDBDBD'
     };
 
-    SettingsService.getSettings().then(function(data) {
-        control.mediaSettings = data.media;
-        initWaveSurfer();
-    });
+    control.mediaSettings = {
+
+    };
+
+    control.userSettings = AppService.getSettings();
+
+    initWaveSurfer();
 
     var speed = [
         {
@@ -113,11 +119,14 @@ function WavesurferPlayerController($element, $scope, $attrs, $interval, $mdThem
             var options = {
                 container: $element[0].querySelector('.waveSurferWave')
             }, defaults = {
-                skipLength: control.mediaSettings.skipLength,
+                skipLength: control.userSettings.skipLength,
                 scrollParent: false,
-                waveColor: control.mediaSettings.waveColor,
-                progressColor: 'purple',
-                height: '200'
+                waveColor: control.userSettings.waveColor,
+                progressColor: '#757575',
+                height: '200',
+                barHeight: 2,
+                barWidth: 1,
+                cursorColor: '#FF5252'
             };
 
             options = angular.extend(defaults, $attrs, (control.playerProperties || {}), options);

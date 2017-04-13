@@ -8,14 +8,13 @@ angular.module('glossa')
         templateUrl: 'app/notebooks/notebooks.component.html'
     });
 
-function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, socketFactory) {
+function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagService, UserService, AppService, $window) {
     var nbVm = this;
     var hashtagsUsed = [];
 
     nbVm.$onInit = function() {
         queryNotebooks();
-        // socketFactory.init();
-        // AppService.initListeners();
+        console.log('$window.socket', $window.socket);
         // queryCommonTags();
         // nbVm.occurringTags = HashtagService.countHashtags();
     };
@@ -32,6 +31,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     nbVm.notebooks = [];
     nbVm.externalNotebooks = [];
     nbVm.commonTags = [];
+    nbVm.uniqueUsers = {};
 
 
     nbVm.showNewUpdates = showNewUpdates;
@@ -39,11 +39,10 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     nbVm.tagManageDialog = tagManageDialog;
     nbVm.newPost = newPost;
 
-    nbVm.uniqueUsers = {};
 
     $scope.$watch('nbVm.isOpen', isOpenWatch);
     $scope.$watch('nbVm.uniqueUsers', function(newValue) {
-        console.log('there was a change', newValue);
+        console.log('there was a change in notebook....', newValue);
     });
 
     /**
@@ -67,7 +66,9 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
     function showNewUpdates() {
         nbVm.externalNotebooks.forEach(function(newNotebook) {
             newNotebook.isNew = true;
-            nbVm.notebooks.push(newNotebook);
+            if (nbVm.notebooks.indexOf(newNotebook) < 0) {
+                nbVm.notebooks.push(newNotebook);
+            }
         });
         nbVm.externalNotebooks = [];
     }
@@ -77,7 +78,7 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
      * @param ev - the event
      * @param notebook object - postType should be defined everytime
      */
-    function viewDetails(ev, notebook) {
+    function viewDetails(ev, notebook, index) {
         //get options depending on post type
         var postOptions = NotebookService.postOptions(ev, notebook);
 
@@ -85,7 +86,8 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         dialogSrvc.notebookDetails(ev, postOptions, notebook).then(function(result) {
             //if there was no data changed just return
             if (result && !result.dataChanged) {
-                return;
+                var index = nbVm.notebooks.indexOf(notebook);
+                nbVm.notebooks[index] = result.data;
             }
 
             //update the specific notebooks in the view
@@ -134,11 +136,64 @@ function notebookCtrl(NotebookService, $scope, $timeout, dialogSrvc, HashtagServ
         viewDetails(event, notebook)
     }
 
-    $scope.$on('update:externalData', function(event, data) {
-        console.log('update:externalData');
+    $scope.$on('update:externalData', (event, data) => {
+        console.log('update:externalData', data);
 
-        data.updatedData.forEach(function(data) {
-            nbVm.externalNotebooks.push(data);
+        if (Array.isArray(data.updatedData)) {
+
+            data.updatedData.forEach((notebook) => {
+
+                let isUpdate = false;
+
+                for(let i = 0, len = nbVm.notebooks.length; i < len; i++) {
+                    if (nbVm.notebooks[i]._id === notebook._id) {
+                        isUpdate = true;
+                        nbVm.notebooks[i] = notebook;
+                        console.log("TODO: give user notification update was made.... ")
+                    }
+                }
+                if (!isUpdate) {
+
+                    let exists = false;
+                    nbVm.externalNotebooks.forEach((exNb) => {
+                         if (exNb._id === notebook._id) {
+                             exists = true;
+                         }
+                    });
+
+                    if (!exists) {
+                        nbVm.externalNotebooks.push(notebook);
+                    }
+
+                }
+            })
+        } else {
+            console.log('single update received.... ');
+
+            var isUpdate = false;
+            for(var i = 0, len = nbVm.notebooks.length; i < len; i++) {
+                if (nbVm.notebooks[i]._id === data.updatedData._id) {
+                    isUpdate = true;
+                    console.log('this means notebook exists already and its just an update that was submitted');
+                    nbVm.notebooks[i] = data.updatedData;
+                    console.log("Notebook should be updated... ");
+                    console.log("TODO: give user notification update was made.... ")
+                }
+            }
+
+            if (!isUpdate) {
+                nbVm.externalNotebooks.push(data.updatedData);
+            }
+        }
+    });
+
+    $scope.$on('normalize:notebooks', function(event, data) {
+        console.log('normalize:notebooks', data);
+        nbVm.notebooks.forEach(function(notebook) {
+            if (notebook.createdBy._id === data._id) {
+                notebook.createdBy.name = data.name;
+                notebook.createdBy.avatar = data.avatar;
+            }
         })
     })
 }

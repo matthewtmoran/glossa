@@ -116,12 +116,16 @@ function NotebookService($http, $q, simpleParse, Upload, AppService, UserService
 
     function createNotebook(notebook) {
 
+        var user = AppService.getUser();
+
         notebook.name = simpleParse.title(notebook);
         // notebook.createdAt = Date.now();
         notebook.createdBy = {
-            _id: __user._id,
-            name: __user.name
+            _id: user._id,
+            avatar: user.avatar || null,
+            name: user.name
         };
+
         notebook.projectId = __user.session.projectId;
 
         return $q.when(simpleParse.hashtags(notebook))
@@ -184,6 +188,7 @@ function NotebookService($http, $q, simpleParse, Upload, AppService, UserService
                     method: 'PUT'
                 };
                 return uploadReq(notebook, options).then(function(data) {
+                    AppService.broadcastUpdates(data);
                     return data;
                 })
             });

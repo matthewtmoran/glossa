@@ -11,6 +11,13 @@
 	color: lightgrey !important;
 }
 
+.sub-text {
+	color: rgba(158,158,158, 1);
+	font-size: .9em;
+	padding-left: 25px;
+	font-style: italic;
+}
+
 .user-list {
 	padding-top: 0;
 
@@ -21,16 +28,37 @@
 			position: relative;
 
 			.online-notification {
-				background: #0f9d58;
+				background: #CDDE20;
 				height:15px;
 				width: 15px;
 				border-radius: 50px;
 				position: absolute;
-				bottom: 3px;
-				right: 5px;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: -3px;
+				z-index: 9999;
+			}
+
+			.offline-notification {
+				background: #FF5607;
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				position: absolute;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: -3px;
 				z-index: 9999;
 			}
 		}
+
+		.user-sync-containaer {
+			font-size: .9em;
+			font-style: italic;
+			color: $lGrey;
+		};
 
 		.user-name-container {
 			margin-left: 20px;

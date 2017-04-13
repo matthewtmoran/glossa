@@ -15,7 +15,6 @@ function config($stateProvider) {
                         Params: $state.params,
                         URL: $state.href($state.current.name, $state.params)
                     };
-                    console.log('PreviousState', currentStateData);
                     return currentStateData;
                 }
             }

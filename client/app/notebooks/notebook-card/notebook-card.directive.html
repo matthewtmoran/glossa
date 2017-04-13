@@ -1,8 +1,11 @@
 <md-card class="notebook-card" flex layout-fill layout="column">
 	<md-card-header ng-if="!isCorpus" class="card-title" flex="12">
+		<md-card-avatar ng-if="notebook.createdBy.avatar" alt="">
+			<img class="md-user-avatar"  ng-src="{{notebook.createdBy.avatar}}"/>
+		</md-card-avatar>
 		<md-card-header-text class="title-text ">
-			<span>{{notebook.createdBy.name}}</span>
-			<!--<span class="md-headline">{{notebooks.name}}</span>-->
+			<span class="md-title">{{notebook.createdBy.name}}</span>
+			<!--<span class="md-headline">{{notebook.updatedAt | date}}</span>-->
 		</md-card-header-text>
 		<md-divider></md-divider>
 	</md-card-header>
