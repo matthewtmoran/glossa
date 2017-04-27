@@ -8,6 +8,7 @@ export const appComponent = {
 
       // this.authService = AuthService;
       this.$state = $state;
+      this.searchText = '';
       // this.user = AuthService.getUser();
     }
     logout() {
@@ -15,5 +16,10 @@ export const appComponent = {
       //   .logout()
       //   .then(() => this.$state.go('auth.login'));
     }
+
+    searchSubmit(event) {
+      this.searchText = event.searchText;
+    }
+
   },
 };

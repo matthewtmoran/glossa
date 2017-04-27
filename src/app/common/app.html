@@ -1,10 +1,11 @@
 <div class="root" layout="column" flex>
-  <app-nav ng-if="!('settings' | includedByState)"></app-nav><!--global -->
+  <app-nav ng-if="!('settings' | includedByState)"
+    on-search-submit="$ctrl.searchSubmit($event)"></app-nav><!--global -->
   <!--<app-nav ng-if="$state.includes('**.settings')"></app-nav>&lt;!&ndash;global &ndash;&gt;-->
   <app-drawer></app-drawer> <!-- global -->
   <!--<app-nav user="$ctrl.user" on-logout="$ctrl.logout();"></app-nav>-->
    <!-- corpus -->
   <div class="app" layout="column" flex>
-    <div ui-view layout="column" flex></div>
+    <div ui-view layout="column" flex search-text="$ctrl.searchText"></div>
   </div>
 </div>

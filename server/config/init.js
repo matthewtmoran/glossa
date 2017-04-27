@@ -14,7 +14,7 @@ module.exports = {
 //     name: 'glossa user'
 // };
 var defaultSession = {
-    currentState: 'corpus.meta'
+    currentState: 'notebook'
 };
 var defualtProject = {
     name: 'glossa project'
@@ -114,7 +114,7 @@ function createSessionData(userData, projectData) {
     return new Promise(function(resolve, reject) {
 
         userData.session.start = Date.now();
-        userData.session.currentState = 'corpus.meta';
+        userData.session.currentState = 'notebook';
         userData.session.projectId = projectData._id;
         userData.session.currentStateParams = {};
         userData.session.currentStateParams.user = userData._id;
@@ -148,7 +148,7 @@ function createApplicationData() {
                             };
 
                             userData.session.start = Date.now();
-                            userData.session.currentState = 'corpus.meta';
+                            userData.session.currentState = 'notebook';
                             userData.session.projectId = projectData._id;
                             userData.session.currentStateParams = {user: userData._id, corpus: 'default'};
 

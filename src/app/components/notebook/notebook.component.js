@@ -2,7 +2,7 @@ import templateUrl from './notebook.html';
 
 export const notebookComponent = {
   bindings: {
-
+    searchText: '<'
   },
   templateUrl,
   controller: class NotebookComponent {
@@ -28,7 +28,9 @@ export const notebookComponent = {
     }
 
     $onChanges(changes) {
-
+      if (changes.searchText) {
+        console.log('this.searchText', this.searchText)
+      }
     }
 
     $onInit() {

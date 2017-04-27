@@ -2,7 +2,8 @@ import templateUrl from './corpus.html';
 
 export const corpusComponent = {
   bindings: {
-    markDownFiles: '<'
+    markDownFiles: '<',
+    searchText: '<'
   },
   templateUrl,
   controller: class CorpusComponent {
