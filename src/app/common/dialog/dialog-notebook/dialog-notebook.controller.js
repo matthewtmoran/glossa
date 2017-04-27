@@ -1,5 +1,5 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, $window, DialogService, simplemdeOptions,  NotebookService, notebook) {
+  constructor($scope, $timeout, $window, DialogService, simplemdeOptions,  NotebookService, notebook, onDeleteNotebook) {
     'ngInject';
     this.$scope = $scope;
     this.$timeout = $timeout;
@@ -16,7 +16,9 @@ export class NotebookDialogController {
       event: 'hide',
       // data: originalCopy
     };
-    
+
+    this.onDeleteNotebook = onDeleteNotebook
+
     this.editorOptions = this.simplemdeOptions;
 
     this.$scope.$watch(() => this.currentNotebook.image, this.imageWatcher.bind(this));
@@ -75,6 +77,15 @@ export class NotebookDialogController {
         }
       }
     }
+  }
+
+  deleteNotebook() {
+    this.dialogService.hide('hideToConfirm');
+    this.onDeleteNotebook({
+      $event: {
+        notebook: this.notebook
+      }
+    })
   }
     //called if media is 'removed' saved to separate object to send with request to server
   removeMedia(media, selectedTile, otherTile) {

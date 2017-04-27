@@ -1,4 +1,5 @@
 import templateUrl from './notebook.html';
+import AttachmentTemplate from '../../common/dialog/dialog-notebook/dialog.notebook-normal.html';
 
 export const notebookComponent = {
   bindings: {
@@ -7,7 +8,7 @@ export const notebookComponent = {
   },
   templateUrl,
   controller: class NotebookComponent {
-    constructor($scope, $timeout, DialogService, NotebookService, cfpLoadingBar, RootService) {
+    constructor($scope, $timeout, DialogService, NotebookService, cfpLoadingBar, RootService, $mdDialog) {
       'ngInject';
 
       this.$scope = $scope;
@@ -16,6 +17,7 @@ export const notebookComponent = {
       this.notebookService = NotebookService;
       this.cfpLoadingBar = cfpLoadingBar;
       this.rootService = RootService;
+      this.$mdDialog = $mdDialog;
 
 
       this.$scope.$watch('this.isOpen', this.isOpenWatch.bind(this));
@@ -26,6 +28,7 @@ export const notebookComponent = {
       this.$scope.$on('update:externalData', this.updateExternalData.bind(this));
       this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this))
 
+      this.deleteNotebook = this.deleteNotebook.bind(this);
 
     }
 
@@ -115,6 +118,10 @@ export const notebookComponent = {
       })
     }
 
+    deleteNotebook(event) {
+      console.log('delteNotebook in notebook component', event);
+    }
+
     /**
      * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebooks to the array
      * @param event - the event
@@ -122,15 +129,29 @@ export const notebookComponent = {
     viewDetails(event) {
       //get options depending on post type
       let postOptions = this.notebookService.postOptions(event);
-
+      event.deleteNotebook = this.deleteNotebook;
       //open post dialog
       this.dialogService.notebookDetails(event, postOptions)
         .then((result) => {
+          console.log('result', result);
           if (!result) {
             return;
           }
+          if (result === 'hideToConfirm'){
+            let options = {
+              title: "Are you sure you want to delete this post?",
+              textContent: "By deleting this post... it wont be here anymore..."
+            };
+            this.dialogService.confirmDialog(options)
+              .then((result) => {
+                  if (!result) {
+                    this.viewDetails(event);
+                  } else {
+
+                  }
+              })
+          } else if (result._id) {
           this.cfpLoadingBar.start();
-          if (result._id) {
             this.notebookService.updateNotebook(result)
               .then((data) => {
                 this.notebooks.map((notebook, index) => {
@@ -159,6 +180,37 @@ export const notebookComponent = {
         .catch((result) => {
           console.log('catch result', result);
         });
+    }
+
+    // viewDetails(event) {
+    //
+    //   event.postOptions = this.notebookService.postOptions(event);
+    //   console.log('event.postOptions', event.postOptions);
+    //   this.simplemdeOptions = event.postOptions.simplemde;
+    //   this.$mdDialog.show({
+    //     templateUrl: AttachmentTemplate,
+    //     targetEvent: event,
+    //     clickOutsideToClose: false,
+    //     controller: () => this,
+    //     controllerAs: '$ctrl'
+    //     // parent: angular.element(document.body),
+    //     // bindToController: true,
+    //     // locals: {
+    //     //   simplemdeOptions: options.simplemde,
+    //     //   notebook: event.notebook,
+    //     //   onDeleteNotebook: event.deleteNotebook
+    //     // }
+    //   }).then((data) => {
+    //
+    //     return data;
+    //   }).catch((data) => {
+    //     return data;
+    //   });
+    // }
+
+    cancel() {
+      console.log('cancel happening');
+      this.$mdDialog.cancel();
     }
 
     tagManageDialog() {

@@ -100,6 +100,7 @@ export class DialogService {
   }
 
   notebookDetails(event, options) {
+    console.log('event', event);
     return this.$mdDialog.show({
       controller: 'notebookDialogController',
       templateUrl: options.template,
@@ -110,7 +111,8 @@ export class DialogService {
       bindToController: true,
       locals: {
         simplemdeOptions: options.simplemde,
-        notebook: event.notebook
+        notebook: event.notebook,
+        onDeleteNotebook: event.deleteNotebook
       }
     }).then((data) => {
       return data;
@@ -120,7 +122,7 @@ export class DialogService {
   }
 
   viewDetails(event, options) {
-    console.log('viewDetails in dialog.service')
+    console.log('viewDetails in dialog.service', event);
     return this.$mdDialog.show({
       controller: 'notebookDialogController',
       controllerAs: '$ctrl',
@@ -131,13 +133,17 @@ export class DialogService {
       bindToController: true,
       locals: {
         simplemdeOptions: options.simplemde,
-        notebook: event.notebook
+        notebook: event.notebook,
+        // onDeleteNotebook: event.deleteNotebook
       }
     }).then((data) => {
 
       return data;
-    }).catch((data) => {
-      return data;
+    }).catch((err) => {
+
+      console.log('error viewing details', err);
+
+      return false;
     });
   }
 
