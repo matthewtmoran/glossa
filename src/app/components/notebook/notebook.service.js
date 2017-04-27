@@ -124,7 +124,7 @@ export class NotebookService {
       name: user.name
     };
 
-    notebook.projectId = __user.session.projectId;
+    notebook.projectId = this.__user.session.projectId;
 
     return this.$q.when(this.parseService.hashtags(notebook))
       .then((data) => {

@@ -29,10 +29,6 @@ export const corpusComponent = {
       if (changes.selectedFiles) {
 
       }
-
-      if (changes.selectedFile) {
-
-      }
     }
 
     $onInit() {
@@ -56,6 +52,9 @@ export const corpusComponent = {
               .then((data) => {
                 this.cfpLoadingBar.complete();
                 this.selectedFile = data;
+                if (this.selectedFile.notebookId) {
+                  this.getAttchachedNotebook(this.selectedFile.notebookId);
+                }
                 this.markDownFiles.map((file, index) => {
                   if (file._id === this.selectedFile._id) {
                     this.markDownFiles[index] = this.selectedFile;
@@ -77,6 +76,7 @@ export const corpusComponent = {
           this.cfpLoadingBar.complete();
           this.markDownFiles.push(data);
           this.selectedFile = data;
+          this.notebookAttachment = null;
         })
         .catch((data) => {
           console.log('there was an issue', data)
@@ -121,13 +121,20 @@ export const corpusComponent = {
     fileSelection(event) {
       this.selectedFile = this.markDownFiles.find(file => file._id == event.fileId);
       if (this.selectedFile.notebookId) {
-        this.notebookService.findNotebook(this.selectedFile.notebookId)
-          .then((data) => {
-            this.notebookAttachment = data;
-          })
+        this.getAttchachedNotebook(this.selectedFile.notebookId);
       } else {
         this.notebookAttachment = null;
       }
+    }
+
+    getAttchachedNotebook(notebookId) {
+      this.notebookService.findNotebook(notebookId)
+        .then((data) => {
+          this.notebookAttachment = data;
+        })
+        .catch(() => {
+          this.notebookAttachment = null;
+        })
     }
 
     updateMarkdown(event) {

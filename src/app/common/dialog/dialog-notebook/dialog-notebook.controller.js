@@ -1,8 +1,9 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, DialogService, simplemdeOptions,  NotebookService, notebook) {
+  constructor($scope, $timeout, $window, DialogService, simplemdeOptions,  NotebookService, notebook) {
     'ngInject';
     this.$scope = $scope;
-    this.$timeout = $timeout; 
+    this.$timeout = $timeout;
+    this.$window = $window;
     
     this.dialogService = DialogService;
     this.simplemdeOptions = simplemdeOptions; 
