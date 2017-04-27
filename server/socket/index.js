@@ -122,6 +122,18 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
         //local-Client listeners//
         //////////////////////////
 
+        socket.on('get:ConnectionsCB', function(data, callback) {
+          console.log('');
+          console.log('%% get:ConnectionsCB Listener %%');
+          console.log('data: ', data);
+
+          socketUtil.getConnections()
+            .then(function(connections) {
+                console.log('connections found: amount', connections.length);
+                return callback(connections)
+            })
+        });
+
 
         socket.on('update:following', function (data) {
             console.log('');

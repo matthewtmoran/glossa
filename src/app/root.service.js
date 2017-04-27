@@ -73,6 +73,12 @@ export class RootService {
     this.socketService.emit('get:connections')
   }
 
+  getConnectionsCB(callback) {
+    this.socketService.emit('get:ConnectionsCB', {}, (connections) => {
+      return callback(connections);
+    })
+  }
+
   getProject() {
     return this.$http.get('/api/project/')
       .then((response) => {
@@ -299,14 +305,12 @@ export class RootService {
         hideDelay: delay
       });
 
-      console.log('$broadCast event update:externalData');
       this.$rootScope.$broadcast('update:externalData', {updatedData: data});
     });
 
     //update dynamic data that connection may update manually
     this.socketService.on('update:connectionInfo', (data) => {
 
-      console.log('update:connectionInfo', data);
 
       this.$rootScope.$broadcast('update:connection', data);
 

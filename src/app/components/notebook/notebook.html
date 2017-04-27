@@ -1,12 +1,18 @@
-<!--<navbar-component-->
-		<!--layout="row"-->
-		<!--search-text="navVm.searchText">-->
-<!--</navbar-component>-->
-
 <md-content id="notebook-container" layout="row" flex ng-cloak>
 
 	<md-content flex="25" layout-padding class="left-side">
-		<h3>users</h3>
+		<h3>Users</h3>
+		<md-list>
+			<md-list-item ng-repeat="user in $ctrl.connections  | filter: { following: true } ">
+
+				<md-checkbox aria-label="{{user.name}} Checkbox" ng-checked="$ctrl.exists(user, $ctrl.selected)" ng-click="$ctrl.toggle(user, $ctrl.selected)">
+					{{ user.name }}
+
+					<!--<span ng-if="$ctrl.exists(user, $ctrl.selected)">selected</span>-->
+				</md-checkbox>
+
+			</md-list-item>
+		</md-list>
 		<md-divider></md-divider>
 		<h3>Common Tags</h3>
 		<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
@@ -39,14 +45,19 @@
 			<md-grid-tile
 					ng-show="$ctrl.notebooks.length"
 					class="grid-tile mdl-shadow--2dp fade-in"
-					ng-repeat="notebook in $ctrl.notebooks | filter: $ctrl.searchText | orderBy: '-createdAt' "
+					ng-repeat="notebook in $ctrl.notebooks | filter: $ctrl.searchText | exists: $ctrl.selected | orderBy: '-createdAt' "
 					md-colspan="1">
+				<!--filter: $ctrl.exists(notebook.createdBy, $ctrl.selected) |-->
+				<!--{{notebook.createdBy}}-->
+
+				<!--filter: $ctrl.searchText |-->
 
 				<notebook-card unique-users="$ctrl.uniqueUsers"
 				               notebook="notebook"
 				               on-view-details="$ctrl.viewDetails($event)"
 				               flex
 				               layout-fill></notebook-card>
+				               <!--ng-if="$ctrl.selected.indexOf(notebook.createdBy._id) > -1"-->
 
 			</md-grid-tile>
 		</md-grid-list>

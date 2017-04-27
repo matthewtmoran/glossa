@@ -1,6 +1,7 @@
 import { NotebookService } from './notebook.service';
 import { notebookComponent } from './notebook.component';
 import { notebookCard } from './notebook-card/notebook-card.module';
+import Exists from './notebook.filter';
 import './notebook.scss';
 
 export const notebook = angular
@@ -28,5 +29,6 @@ export const notebook = angular
         }
       })
   })
+  .filter('exists', Exists)
   .service('NotebookService', NotebookService)
   .name;

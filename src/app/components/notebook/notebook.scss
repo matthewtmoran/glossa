@@ -12,6 +12,12 @@ notebook {
 		color: black;
 	}
 
+	md-checkbox {
+		.md-label {
+			display: inline-block !important
+		}
+	}
+
 
 	.update-btn {
 		//margin-bottom: 15px;
@@ -132,6 +138,8 @@ notebook {
 			box-shadow: 0 1px 3px 0 #00a8c6, 0 1px 1px 0 #00a8c6, 0 2px 1px -1px #00a8c6;
 		}
 	}
+
+
 	//max-width: 530px;
 }
 

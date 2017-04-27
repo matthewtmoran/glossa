@@ -2,11 +2,12 @@ import templateUrl from './notebook.html';
 
 export const notebookComponent = {
   bindings: {
-    searchText: '<'
+    searchText: '<',
+    currentUser: '<'
   },
   templateUrl,
   controller: class NotebookComponent {
-    constructor($scope, $timeout, DialogService, NotebookService, cfpLoadingBar) {
+    constructor($scope, $timeout, DialogService, NotebookService, cfpLoadingBar, RootService) {
       'ngInject';
 
       this.$scope = $scope;
@@ -14,6 +15,7 @@ export const notebookComponent = {
       this.dialogService = DialogService;
       this.notebookService = NotebookService;
       this.cfpLoadingBar = cfpLoadingBar;
+      this.rootService = RootService;
 
 
       this.$scope.$watch('this.isOpen', this.isOpenWatch.bind(this));
@@ -39,6 +41,8 @@ export const notebookComponent = {
       this.isOpen = false;
       this.hover = false;
 
+      this.selected = [];
+
       this.items = [
         {name: "Create Audio Post", icon: "volume_up", direction: "left", type: 'audio'},
         {name: "Create Image Post", icon: "camera_alt", direction: "left", type: 'image'},
@@ -49,9 +53,29 @@ export const notebookComponent = {
       this.commonTags = [];
       this.uniqueUsers = {};
 
-      this.queryNotebooks()
+      this.queryNotebooks();
+
+      this.rootService.getConnectionsCB((data) => {
+        this.connections = data;
+      });
+
+
 
     }
+
+    exists(user, list) {
+        return list.indexOf(user._id) > -1;
+    };
+
+    toggle(user, list) {
+      let idx = list.indexOf(user._id);
+      if (idx > -1) {
+        list.splice(idx, 1);
+      }
+      else {
+        list.push(user._id);
+      }
+    };
 
     queryNotebooks() {
       this.notebookService.getNotebooks()
