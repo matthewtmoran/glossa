@@ -6,4 +6,10 @@
 	.editor-toolbar {
 		opacity: 1 !important;
 	}
+
+	md-toolbar {
+		top: 60px;
+		position: absolute;
+		z-index: 101;
+	}
 }
