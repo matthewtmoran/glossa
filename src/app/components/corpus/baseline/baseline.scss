@@ -1,0 +1,35 @@
+@import "colors";
+
+baseline {
+	flex-direction: row;
+	display: flex;
+	-webkit-box-flex: 1;
+	height:100%;
+	.baseline {
+		.CodeMirror{
+			width: 100%;
+			height: auto;
+			//min-height: 100%;
+		}
+
+		//.waveSurferWave {
+		//
+		//	@extend .grey-gradient;
+		//}
+	}
+
+	.cm-timestamp {
+		background: $lGrey;
+		color: white !important;
+		transition: .3s;
+		padding-left: 3px;
+		padding-right: 3px;
+		border-radius: 6px;
+
+		&:hover {
+			cursor: pointer;
+			background: $red;
+		}
+	}
+}
+

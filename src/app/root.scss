@@ -1,0 +1,33 @@
+@import "colors";
+@import "global";
+@import "fonts";
+@import "forms";
+@import "loading-bar";
+@import "~simplemde/dist/simplemde.min.css";
+
+root {
+  display: block;
+
+
+  .loader {
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    font-size: 24px;
+    display: block;
+    text-align: center;
+    font-weight: 900;
+  }
+
+  md-backdrop.md-sidenav-backdrop {
+    z-index: 62 !important;
+  }
+
+  .md-grey-fab {
+    background-color: $newGrey !important;
+    //@extend .smooth;
+    &:hover {
+      background-color: $lGrey !important;
+    }
+  }
+}

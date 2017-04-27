@@ -1,0 +1,63 @@
+@import 'colors';
+user-card {
+	.user-card {
+		border-top: 1px solid rgba(0,0,0,0.12);
+
+		.user-avatar-container {
+			position: relative;
+
+			.online-notification {
+				background: #CDDE20;
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				position: absolute;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: -3px;
+				z-index: 9999;
+			}
+
+			.offline-notification {
+				background: #FF5607;
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				position: absolute;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+				left: -3px;
+				z-index: 9999;
+			}
+		}
+
+		.user-sync-containaer {
+			font-size: .9em;
+			font-style: italic;
+			color: $lGrey;
+		};
+
+		.user-name-container {
+			margin-left: 20px;
+		}
+
+		.letter {
+			color: white;
+		}
+
+		.md-button {
+
+			&.is-following {
+				color: rgba(158,158,158, 1);
+			}
+
+			md-icon {
+				position: absolute;
+				top: 3px;
+				right: 20px;
+			}
+		}
+	}
+}

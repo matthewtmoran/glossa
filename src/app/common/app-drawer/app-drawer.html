@@ -1,0 +1,70 @@
+<md-sidenav class="drawer site-sidenav md-sidenav-left collapsable-nav"
+            md-component-id="drawer"
+            md-whiteframe="24"
+            tabindex="-1"
+            layout="column"
+            layout-align="space-between center">
+	<md-list>
+		<md-toolbar class="nav-header logo-container">
+			<img src="../../../img/logo_basic.svg" alt="">
+		</md-toolbar>
+		<md-content flex="" role="navigation" class="_md flex">
+			<ul class="side-menu">
+				<li ng-repeat="section in $ctrl.menu"
+				    class="parent-list-item"
+				    ng-class="{'parentActive' : $ctrl.isSectionSelected(section)}">
+
+					<!--if type is heading show this element-->
+					<h2 class="menu-heading md-subhead ng-binding ng-scope"
+					    ng-if="section.type === 'heading'"
+					    id="heading_{{ section.name | nospace }}">{{section.name}}</h2>
+
+
+					<drawer-toggle section="section"
+					               ng-if="section.type === 'toggle'"
+					               on-toggle-open="$ctrl.toggleOpen($event)"
+					               on-is-open-parent="$ctrl.isOpenParent($event)"></drawer-toggle>
+
+					<!--if type is link show this element   (which is actually inject as stated above)-->
+					<drawer-link section="section"
+					             on-focus-section="$ctrl.focusSection($event)"
+					             ng-if="section.type === 'link'"></drawer-link>
+
+					<!--if type is toggle show this element (which is actually inject as stated above)-->
+				</li>
+			</ul>
+		</md-content>
+	</md-list>
+
+	<md-list class="bottom-list">
+		<md-content flex role="navigation" >
+			<ul class="side-menu">
+				<li class="parent-list-item">
+					<md-button class="md-button-toggle" ui-sref="project" ng-click="$ctrl.closeSideNav()">
+						<div flex layout="row" layout-align="center center">
+							Settings
+							<span flex></span>
+
+							<span aria-hidden="true"
+							      class="md-toggle-icon">
+								<md-icon md-font-library="material-icons">settings</md-icon>
+							</span>
+						</div>
+					</md-button>
+					<!--<md-button class="md-button-toggle" ng-click="$ctrl.showSettings()">-->
+					<!--<div flex layout="row" layout-align="center center">-->
+					<!--Settings-->
+					<!--<span flex></span>-->
+
+					<!--<span aria-hidden="true"-->
+					<!--class="md-toggle-icon">-->
+					<!--<md-icon md-font-library="material-icons">settings</md-icon>-->
+					<!--</span>-->
+					<!--</div>-->
+					<!--</md-button>-->
+				</li>
+			</ul>
+		</md-content>
+	</md-list>
+
+</md-sidenav>

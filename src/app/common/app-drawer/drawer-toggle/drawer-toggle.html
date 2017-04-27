@@ -1,0 +1,26 @@
+<md-button class="md-button-toggle"
+           ng-click="$ctrl.toggle()"
+           aria-controls="docs-menu-{{$ctrl.section.name | nospace}}"
+           aria-expanded="{{$ctrl.isOpen()}}">
+	<div flex layout="row">
+		{{$ctrl.section.name}}
+		<span flex></span>
+
+		<drawer-submenu section="$ctrl.section" ng-if="$ctrl.section.settings"></drawer-submenu>
+
+		<span class="md-toggle-icon"
+		      ng-class="{'toggled' : $ctrl.isOpen()}">
+			<md-icon md-font-library="material-icons ">keyboard_arrow_up</md-icon>
+			<!--<md-icon md-svg-icon="md-toggle-arrow"></md-icon>-->
+		</span>
+	</div>
+	<span class="md-visually-hidden">
+		Toggle {{$ctrl.isOpen()? 'expanded' : 'collapsed'}}
+	</span>
+</md-button>
+<ul ng-show="$ctrl.isOpen()" id="docs-menu-{{$ctrl.section.name | nospace}}" class="menu-toggle-list">
+	<li ng-repeat="page in $ctrl.section.pages">
+		<drawer-link section="page"></drawer-link>
+	</li>
+</ul>
+

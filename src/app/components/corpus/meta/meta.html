@@ -1,0 +1,101 @@
+<div class="meta">
+	<h1 ng-if="!$ctrl.currentFile">Selected a file or create a new file</h1>
+	<form name="fileMeta" ng-if="$ctrl.currentFile">
+		<md-input-container class="md-block" flex-gt-sm="">
+			<label>File Name</label>
+			<input ng-blur="$ctrl.update('name', $ctrl.currentFile)"
+			       ng-model="$ctrl.currentFile.displayName"
+			       value="$ctrl.currentFile.displayName">
+		</md-input-container>
+		<md-input-container class="md-block">
+			<textarea aria-label="textarea"
+			          simplemde="$ctrl.editorOptions"
+			          update-function="$ctrl.updateMarkdown($ctrl.currentFile)"
+			          file-binding="$ctrl.currentFile"
+			          ng-model="$ctrl.currentFile.description"
+			          ng-trim="false"
+			          autocomplete="off"
+			          id="meta-description"
+			          rows="5">
+			</textarea>
+		</md-input-container>
+	</form>
+	<div ng-if="$ctrl.currentFile" layout="row" layout-align="space-between center">
+		<md-button ng-click="$ctrl.deleteMarkdown($event)" class="md-warn">Delete Text
+		</md-button>
+		<md-button ng-disabled="$ctrl.currentFile.notebookId || ($ctrl.currentFile.image && $ctrl.currentFile.audio)"
+		           ng-click="$ctrl.addAttachment($event)">Attach
+		</md-button>
+	</div>
+	<div ng-if="$ctrl.currentFile" layout="column" class="attached-media">
+		<h3>Associated Media</h3>
+		<md-content layout="row">
+			<!--Independent Media-->
+
+			<!--image-->
+			<md-card flex="50"
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-if="$ctrl.currentFile.image">
+				<md-card-content class="media-content">
+					<md-card-title class="media-title" layout-align="center space-between">
+						<md-card-title-text>
+							<span class="md-headline">{{$ctrl.currentFile.image.name}}</span>
+							<span class="md-subhead">Independent Media File</span>
+						</md-card-title-text>
+					</md-card-title>
+					<div class="media-image">
+						<img ng-src="{{$ctrl.currentFile.image.path}}" alt="">
+					</div>
+				</md-card-content>
+
+				<span flex></span>
+
+				<md-divider></md-divider>
+
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="$ctrl.removeMedia($event, $ctrl.currentFile.image, 'image')">Delete</md-button>
+				</md-card-actions>
+
+			</md-card>
+
+			<!--audio-->
+			<md-card flex="50"
+			         class="mdl-shadow--2dp attachment-card"
+			         ng-if="$ctrl.currentFile.audio">
+				<md-card-content class="media-content">
+					<md-card-title class="media-title" layout-align="center space-between">
+						<md-card-title-text>
+							<span class="md-headline">{{$ctrl.currentFile.audio.name}}</span>
+							<span class="md-subhead">Independent Media File</span>
+						</md-card-title-text>
+					</md-card-title>
+					<div>
+						<wave-surfer-preview
+								flex
+								url-src="$ctrl.currentFile.audio.path"
+								auto-play="false">
+						</wave-surfer-preview>
+					</div>
+				</md-card-content>
+
+				<span flex></span>
+
+				<md-divider></md-divider>
+
+				<md-card-actions layout="row" layout-align="start center">
+					<md-button ng-click="$ctrl.removeMedia($event, $ctrl.currentFile.audio, 'audio')">Delete</md-button>
+				</md-card-actions>
+
+			</md-card>
+
+
+			<!--Notebook Attachment-->
+			<notebook-card flex="50"
+			               ng-if="$ctrl.notebookAttached"
+			               notebook="$ctrl.notebookAttached"
+			               disconnect-notebook="$ctrl.disconnectNotebook(notebook)"
+			               on-view-details="$ctrl.viewDetailsMid($event)"></notebook-card>
+		</md-content>
+	</div>
+	<md-divider></md-divider>
+</div>

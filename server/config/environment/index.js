@@ -3,7 +3,8 @@
 var path = require('path');
 var _ = require('lodash');
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
+console.log('process.env',process.env.NODE_ENV );
 
 function requiredProcessEnv(name) {
     if (!process.env[name]) {

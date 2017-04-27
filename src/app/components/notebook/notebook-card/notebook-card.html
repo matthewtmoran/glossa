@@ -1,0 +1,40 @@
+<md-card class="notebook-card" flex layout-fill layout="column">
+	<md-card-header ng-if="!$ctrl.isCorpus" class="card-title" flex="12">
+		<md-card-avatar ng-if="$ctrl.notebook.createdBy.avatar" alt="">
+			<img class="md-user-avatar"  ng-src="{{$ctrl.notebook.createdBy.avatar}}"/>
+		</md-card-avatar>
+		<md-card-header-text class="title-text ">
+			<span class="md-title">{{$ctrl.notebook.createdBy.name}}</span>
+			<!--<span class="md-headline">{{notebook.updatedAt | date}}</span>-->
+		</md-card-header-text>
+		<md-divider></md-divider>
+	</md-card-header>
+
+	<md-card-content class="card-content" flex>
+		<div ng-if="$ctrl.notebook.image" class="md-media-lg card-image">
+			<img ng-src="{{$ctrl.notebook.image.path}}" class="md-card-image" alt="">
+		</div>
+		<div class="wave-container" ng-if="$ctrl.notebook.postType === 'audio'">
+			<wave-surfer-preview
+					flex
+					url-src="$ctrl.notebook.audio.path"
+					auto-play="false">
+			</wave-surfer-preview>
+		</div>
+
+		<div class="card-text inner-padding">
+			<div ng-if="$ctrl.previewText" ng-bind-html="$ctrl.previewText"></div>
+		</div>
+	</md-card-content>
+
+	<md-divider></md-divider>
+	<md-card-actions flex=10 layout="row" layout-align="end bottom">
+		<md-button ng-if="$ctrl.isCorpus" ng-click="$ctrl.disconnect({notebook: $ctrl.notebook})">Disconnect</md-button>
+
+		<md-button ng-click="$ctrl.viewDetails()">View Details</md-button>
+
+		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
+	</md-card-actions>
+
+	<!--<pre>{{notebook | json}}</pre>-->
+</md-card>

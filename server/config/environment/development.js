@@ -3,5 +3,6 @@
 // Development specific configuration
 // ==================================
 module.exports = {
-  seedDB: false
+    seedDB: false,
+    clientDir: 'client'
 };

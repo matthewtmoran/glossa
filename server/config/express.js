@@ -19,7 +19,10 @@ var electron = require('electron'),
     electronApp = electron.app;  // Module to control application life.
 
 module.exports = function(app) {
+  console.log('What is happeing');
   var env = app.get('env');
+
+  console.log('env', env);
 
   app.set('views', config.root + '/server/views');
   app.engine('html', require('ejs').renderFile);
@@ -29,8 +32,10 @@ module.exports = function(app) {
   app.use(bodyParser.json());
   app.use(methodOverride());
   app.use(cookieParser());
-  
+
+  console.log('debug1');
   if ('production' === env) {
+    console.log('environment is production');
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));
     app.set('appPath', path.join(config.root, 'public'));
@@ -38,6 +43,7 @@ module.exports = function(app) {
   }
 
   if ('development' === env || 'test' === env) {
+    console.log('is dev environment!!!');
     // app.use(require('connect-livereload')());
     app.use(express.static(path.join(config.root, '.tmp')));
     app.use(express.static(path.join(config.root, 'client')));
@@ -46,4 +52,16 @@ module.exports = function(app) {
     app.use(morgan('dev'));
     app.use(errorHandler()); // Error handler - has to be last
   }
+
+    if ('dev-es6' === env) {
+        console.log('es6 dev environment!');
+        // app.use(require('connect-livereload')());
+        app.use(express.static(path.join(config.root, '.tmp')));
+        app.use(express.static(path.join(config.root, 'dist')));
+        app.use(express.static(path.join(config.root, 'server/data')));
+        app.set('appPath', path.join(config.root, 'dist'));
+        app.use(morgan('dev'));
+        app.use(errorHandler()); // Error handler - has to be last
+    }
+  console.log('debug2');
 };

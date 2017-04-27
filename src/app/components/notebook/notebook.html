@@ -1,0 +1,74 @@
+<!--<navbar-component-->
+		<!--layout="row"-->
+		<!--search-text="navVm.searchText">-->
+<!--</navbar-component>-->
+
+<md-content id="notebook-container" layout="row" flex ng-cloak>
+
+	<md-content flex="25" layout-padding class="left-side">
+		<h3>users</h3>
+		<md-divider></md-divider>
+		<h3>Common Tags</h3>
+		<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
+		<md-list>
+			<md-list-item class="chip-item" ng-repeat="tag in $ctrl.commonTags | orderBy: tag.occurrence">
+				<md-chip class="chip-container">
+					<span>
+						<span class="chip-icon">#</span>
+						<span class="chip-text">{{tag.tag}}</span>
+					</span>
+				</md-chip>
+			</md-list-item>
+		</md-list>
+	</md-content>
+
+	<md-content flex="75" class="notebook-list" layout-padding>
+
+		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>
+
+		<md-button class="md-raised update-btn" ng-if="$ctrl.externalNotebooks.length" ng-click="$ctrl.showNewUpdates()">
+			<span>{{$ctrl.externalNotebooks.length}} updates are available.</span>
+			<span>View changes</span>
+			<md-icon class="">update</md-icon>
+		</md-button>
+
+		<md-grid-list
+				md-cols="1" md-cols-lt-md="1" md-cols-md="2" md-cols-lg="2" md-cols-gt-lg="3"
+				md-row-height="500"
+				md-gutter="16px" md-gutter-gt-sm="24px">
+			<md-grid-tile
+					ng-show="$ctrl.notebooks.length"
+					class="grid-tile mdl-shadow--2dp fade-in"
+					ng-repeat="notebook in $ctrl.notebooks | orderBy: '-createdAt' "
+					md-colspan="1">
+
+				<notebook-card unique-users="$ctrl.uniqueUsers"
+				               notebook="notebook"
+				               on-view-details="$ctrl.viewDetails($event)"
+				               flex
+				               layout-fill></notebook-card>
+
+			</md-grid-tile>
+		</md-grid-list>
+	</md-content>
+	<md-fab-speed-dial
+			ng-hide="$ctrl.hidden"
+			md-direction="up"
+			md-open="metaVm.isOpen"
+			class="md-scale md-fab-bottom-right "
+			ng-class="{ 'md-hover-full': $ctrl.hover }"
+			ng-mouseenter="$ctrl.isOpen = true"
+			ng-mouseleave="$ctrl.isOpen = false">
+		<md-fab-trigger>
+			<md-button aria-label="menu" class="md-fab md-grey-fab">
+				<md-icon aria-label="menu">add</md-icon>
+			</md-button>
+		</md-fab-trigger>
+		<md-fab-actions>
+			<md-button ng-repeat="item in $ctrl.items" class="md-fab md-raised md-mini" ng-click="$ctrl.newPost($event, item.type)">
+				<md-icon>{{item.icon}}</md-icon>
+			</md-button>
+		</md-fab-actions>
+	</md-fab-speed-dial>
+
+</md-content>
