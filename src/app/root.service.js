@@ -103,17 +103,19 @@ export class RootService {
       arrayKey: '',
       headers: {'Content-Type': undefined}
     }).then((resp) => {
+      console.log('TODO: consider not updating here becuase we set user avatar in other component....');
 
       this.__user.avatar = resp.data.avatar;
 
       return resp.data;
     }).catch((resp) => {
       console.log('Error status: ' + resp.status);
-    }).then((evt) => {
-      console.log('TODO: fixe progress.... or not')
-      // let progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-      // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
     });
+    //   .then((evt) => {
+    //   console.log('TODO: fixe progress.... or not')
+    //   // let progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+    //   // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+    // });
   }
 
   removeAvatar(filePath) {

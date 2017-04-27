@@ -39,6 +39,8 @@ export const settingsSharingComponent = {
       this.cfpLoadingBar.start();
       this.$q.when(this.rootService.uploadAvatar(file))
         .then((data) => {
+          console.log('data', data);
+          console.log('this.userProfile', this.userProfile);
           this.userProfile.avatar = data.avatar;
           this.cfpLoadingBar.complete();
         });
