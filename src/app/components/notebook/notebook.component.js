@@ -91,8 +91,7 @@ export const notebookComponent = {
 
     /**
      * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebooks to the array
-     * @param ev - the event
-     * @param notebook object - postType should be defined everytime
+     * @param event - the event
      */
     viewDetails(event) {
       //get options depending on post type
@@ -161,10 +160,11 @@ export const notebookComponent = {
      * @param type - the type of notebooks selected to create (picture, audio, normal)
      */
     newPost(event, type) {
-      let notebook = {
+      event.notebook = {
         postType: type
       };
-      this.viewDetails(event, notebook)
+
+      this.viewDetails(event)
     }
 
     updateExternalData(event, data) {

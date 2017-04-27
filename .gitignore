@@ -4,6 +4,7 @@ node_modules
 client/app/*.css
 ToDo.md
 client/app/audioSandbox/*
+dist/*
 
 # server/data/audio/*
 # server/data/database/*
