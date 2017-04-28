@@ -22,14 +22,11 @@ export const corpusSidebarComponent = {
 
     }
 
-
-
     createNewMarkdown() {
       this.onNew()
     }
 
     onSelection(fileId) {
-
       this.fileSelection({
         $event: {
           fileId: fileId

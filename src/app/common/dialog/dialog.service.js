@@ -134,14 +134,12 @@ export class DialogService {
       locals: {
         simplemdeOptions: options.simplemde,
         notebook: event.notebook,
-        // onDeleteNotebook: event.deleteNotebook
+        onDeleteNotebook: null
       }
     }).then((data) => {
 
       return data;
     }).catch((err) => {
-
-      console.log('error viewing details', err);
 
       return false;
     });

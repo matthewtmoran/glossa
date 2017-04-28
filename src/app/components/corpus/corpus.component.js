@@ -16,7 +16,7 @@ export const corpusComponent = {
       this.dialogService = DialogService;
       this.notebookService = NotebookService;
       this.filteredFiles = [];
-      this.selectedFile = {};
+      // this.selectedFile = {};
       this.markDownFiles = [];
 
       // this.newAttachment = this.newAttachment.bind(this);
@@ -24,19 +24,21 @@ export const corpusComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in corpus.component', changes);
       if (changes.markDownFiles) {
         this.markDownFiles = changes.markDownFiles.currentValue;
       }
-      if (changes.selectedFiles) {
-
+      if (changes.selectedFile) {
+        console.log('selectedFile changed')
       }
     }
 
     $onInit() {
+      console.log('$onInit in corpus component');
       if (this.markDownFiles.length > 0) {
-        this.selectedFile = this.markDownFiles[0];
+        this.fileSelection({fileId: this.markDownFiles[0]._id});
       } else {
-        this.selectedFile = null;
+        this.selectedFile = {};
       }
     }
 
@@ -133,9 +135,6 @@ export const corpusComponent = {
         .then((data) => {
           this.notebookAttachment = data;
         })
-        .catch(() => {
-          this.notebookAttachment = null;
-        })
     }
 
     updateMarkdown(event) {
@@ -180,7 +179,11 @@ export const corpusComponent = {
                 }
               });
 
-              this.selectedFile = this.markDownFiles[0];
+              if (this.markDownFiles.length > 0) {
+                this.fileSelection(this.markDownFiles[0]._id)
+              } else {
+                this.selectedFile = null;
+              }
               this.cfpLoadingBar.complete();
           })
         });

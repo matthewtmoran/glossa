@@ -133,11 +133,11 @@ export const notebookComponent = {
       //open post dialog
       this.dialogService.notebookDetails(event, postOptions)
         .then((result) => {
-          console.log('result', result);
           if (!result) {
             return;
           }
           if (result === 'hideToConfirm'){
+
             let options = {
               title: "Are you sure you want to delete this post?",
               textContent: "By deleting this post... it wont be here anymore..."
@@ -147,7 +147,21 @@ export const notebookComponent = {
                   if (!result) {
                     this.viewDetails(event);
                   } else {
-
+                    this.cfpLoadingBar.start();
+                    this.notebookService.deleteNotebook(event.notebook)
+                      .then((data) => {
+                        if(!data) {
+                          return;
+                        }
+                        if (data) {
+                          this.notebooks.map((notebook, index) => {
+                            if (notebook._id === event.notebook._id) {
+                              this.notebooks.splice(index, 1);
+                            }
+                          });
+                          this.cfpLoadingBar.complete();
+                        }
+                      });
                   }
               })
           } else if (result._id) {
@@ -172,7 +186,7 @@ export const notebookComponent = {
                 this.cfpLoadingBar.complete();
               })
               .catch((data) => {
-                console.log('There was an error ', data)
+                console.log('There was an error ', data);
                 this.cfpLoadingBar.complete();
               })
           }

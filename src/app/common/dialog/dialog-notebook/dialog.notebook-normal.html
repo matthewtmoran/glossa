@@ -85,7 +85,7 @@
 		</md-dialog-content>
 
 		<md-dialog-actions layout="row" class="top-border" >
-			<md-button ng-click="$ctrl.deleteNotebook($event)" class="md-icon-button"><md-icon>delete</md-icon></md-button>
+			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button"><md-icon>delete</md-icon></md-button>
 			<span flex></span>
 				<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
 				<md-button ng-disabled="postForm.$invalid"

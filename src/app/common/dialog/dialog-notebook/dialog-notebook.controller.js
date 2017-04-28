@@ -17,7 +17,7 @@ export class NotebookDialogController {
       // data: originalCopy
     };
 
-    this.onDeleteNotebook = onDeleteNotebook
+    this.onDeleteNotebook = onDeleteNotebook;
 
     this.editorOptions = this.simplemdeOptions;
 

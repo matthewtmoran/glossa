@@ -104,7 +104,7 @@ export class NotebookService {
       })
       .catch((response) => {
         console.log('There was an error', response);
-        return response.data;
+        return false;
       });
   }
   /**
@@ -166,6 +166,19 @@ export class NotebookService {
           })
       });
     }
+
+  deleteNotebook(notebook) {
+   return this.$http.delete(`/api/notebooks/${notebook._id}`)
+      .then((response) => {
+        if (response.status === 204) {
+          return true;
+        }
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return false;
+      })
+  }
 
     //////////
     //helper//

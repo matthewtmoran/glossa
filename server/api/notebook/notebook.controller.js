@@ -11,6 +11,7 @@
 
 var _ = require('lodash');
 var Notebook = require('./notebook.model');
+var Transcriptions = require('../transcription/transcription.model');
 var path = require('path');
 
 // var globalPaths = require('electron').remote.getGlobal('userPaths');
@@ -61,13 +62,34 @@ exports.update = function(req, res) {
 
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {
-    Notebook.findById(req.params.id, function (err, thing) {
+
+    Notebook.findOne({_id: req.params.id}, function(err, notebook) {
+      if(err) { return handleError(res, err); }
+
+      Transcriptions.find({notebookId: req.params.id}, function(err, transcriptions) {
         if(err) { return handleError(res, err); }
-        if(!thing) { return res.status(404).send('Not Found'); }
-        thing.remove(function(err) {
-            if(err) { return handleError(res, err); }
-            return res.status(204).send('No Content');
-        });
+        if (transcriptions.length > 0) {
+          transcriptions.forEach(function(file) {
+            if (notebook.image) {
+              file.image = notebook.image;
+            }
+            if (notebook.audio) {
+              file.audio = notebook.audio;
+            }
+            delete file.notebookId;
+            Transcriptions.update({_id: file._id}, file, function(err, updatedFile) {
+              if(err) { return handleError(res, err); }
+            })
+          })
+        }
+      });
+
+      Notebook.remove({_id: req.params.id}, function(err, numRemoved) {
+        if (err) {
+          return handleError(res, err);
+        }
+        return res.status(204).send('No Content');
+      });
     });
 };
 
