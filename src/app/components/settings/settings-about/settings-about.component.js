@@ -1,4 +1,5 @@
 import templateUrl from './settings-about.html';
+import licenseDialog from './license-dialog.html';
 
 export const settingsAboutComponent = {
   bindings: {
@@ -8,8 +9,9 @@ export const settingsAboutComponent = {
   },
   templateUrl,
   controller: class SettingsAboutComponent {
-    constructor() {
+    constructor($mdDialog) {
       'ngInject';
+      this.$mdDialog = $mdDialog;
     }
 
     $onInit() {
@@ -41,6 +43,27 @@ export const settingsAboutComponent = {
         }
       ]
 
+    }
+
+    viewLicense(event) {
+      this.$mdDialog.show({
+        controller: () => this,
+        controllerAs: '$ctrl',
+        templateUrl: licenseDialog,
+        targetEvent: event,
+        clickOutsideToClose: true,
+      })
+        .then((data) => {
+
+        return data;
+      })
+      .catch(() => {
+        return false;
+      })
+    }
+
+    cancel(msg) {
+      this.$mdDialog.cancel();
     }
 
   }
