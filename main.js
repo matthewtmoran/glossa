@@ -47,16 +47,22 @@ function importProject() {
 }
 
 function createWindow () {
+  console.log('WINDOW BEING CREATED');
+  console.log('win', win  );
 
     // Create the browser window.
     win = new BrowserWindow({
         width: 1200,
         height: 750,
         webPreferences: {
-            // nodeIntegration: false,
-            webSecurity: false
+            webSecurity: false,
+            zoomFactor: 1
         }
     });
+
+    console.log('BrowserWindow',BrowserWindow)
+
+    console.log('win.webPreferences', win.webPreferences);
 
     var express = require('./server/app')();
 

@@ -20,12 +20,19 @@ import { components } from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
 
+// var electron = window.require('electron');
+// console.log('electron: ', electron);
+// console.log('electron.webFrame: ', electron.webFrame);
+// console.log('electron.webFrame.getZoomFactor(): ',electron.webFrame.getZoomFactor())
+// electron.webFrame.setZoomFactor(.75);
+// console.log('electron.webFrame.getZoomFactor(): ',electron.webFrame.getZoomFactor())
 //TODO: figure out how to make this shit modular and WORK
 angular.module('config', []);
 //needed for ui-codemirror not sure this is the best way to bind to window objet
 window.CodeMirror = CodeMirror;
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
+
   const rootUrl = 'http://localhost:9000/';
   let initInjector = angular.injector(['ng']);
   let $http = initInjector.get('$http');

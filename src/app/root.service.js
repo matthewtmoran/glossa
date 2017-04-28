@@ -3,7 +3,6 @@
 // const ipc = require('electron').ipcRenderer;
 // const dialog  = require('electron').remote.dialog;
 
-// const electron = require('electron');
 // const remote = electron.remote;
 // var ipc = window.require('electron').ipcRenderer;
 // var dialog  = window.require('electron').remote.dialog;
