@@ -132,10 +132,14 @@ notebook {
 	}
 
 	.new-data {
-		transition: all .5s ease;
-
-		.notebook-card {
-			box-shadow: 0 1px 3px 0 #00a8c6, 0 1px 1px 0 #00a8c6, 0 2px 1px -1px #00a8c6;
+		md-card-header:after{
+			content: '';
+			height: 12px;
+			width: 12px;
+			border-radius: 50%;
+			background: #60B4F9;
+			display: block;
+			transition: all .5s ease;
 		}
 	}
 

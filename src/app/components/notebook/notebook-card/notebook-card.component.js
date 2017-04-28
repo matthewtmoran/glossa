@@ -37,8 +37,6 @@ export const notebookCardComponent = {
     }
 
     viewDetails() {
-      console.log('view details in card component');
-      console.log('this.notebook in card component', this.notebook);
       this.onViewDetails({
         $event: {
           notebook: this.notebook
