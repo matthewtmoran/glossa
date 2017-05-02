@@ -22,13 +22,15 @@ export class DrawerService {
             name: '@matthewtmoran',
             state: 'munchies.bananachips',
             type: 'link',
-            icon: 'fa fa-map-marker'
+            icon: 'fa fa-map-marker',
+            disabled: true
           },
           {
             name: '@justin_rees',
             state: 'munchies.donuts',
             type: 'link',
-            icon: 'fa fa-map-marker'
+            icon: 'fa fa-map-marker',
+            disabled: true
           }
         ],
         orderNum: 2
@@ -74,7 +76,8 @@ export class DrawerService {
           {
             // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
             name: 'Duplicate',
-            type: ''
+            type: '',
+            disabled: true
           },
           {
             name: 'Bulk-Edit Word Forms',
@@ -93,7 +96,8 @@ export class DrawerService {
           },
           {
             name: 'Export',
-            type: ''
+            type: '',
+            disabled: true
           }
         ],
         orderNum: 3
@@ -101,6 +105,7 @@ export class DrawerService {
       {
         name: 'Lexicon',
         type: 'toggle',
+        disabled: true,
         pages: [
           {
             name: 'View / Edit',
@@ -134,6 +139,7 @@ export class DrawerService {
       {
         name: 'Grammar',
         type: 'toggle',
+        disabled: true,
         pages: [
           {
             name: 'Affix Templates',
@@ -159,11 +165,13 @@ export class DrawerService {
       {
         name: 'Help',
         type: 'heading',
-        orderNum: 6
+        orderNum: 6,
+        disabled: true
       },
       {
         name: 'Glossa Basics',
         type: 'toggle',
+        disabled: true,
         pages: [
           {
             name: 'Glossa Basics sub item 1',
@@ -190,21 +198,25 @@ export class DrawerService {
       {
         name: 'Grammatical Helps',
         type: 'toggle',
+        disabled: true,
         orderNum: 8
       },
       {
         name: 'Phonology Helps',
         type: 'toggle',
+        disabled: true,
         orderNum: 9
       },
       {
         name: 'Dev',
         type: 'heading',
+        disabled: true,
         orderNum: 10
       },
       {
         name: 'Sandbox States',
         type: 'toggle',
+        disabled: true,
         pages: [
           {
             name:'wavesurfer sandbox',
@@ -228,6 +240,7 @@ export class DrawerService {
         name: 'Help',
         type: 'link',
         state:'help',
+        disabled: true,
         orderNum: 12
       },
     ];
@@ -236,9 +249,10 @@ export class DrawerService {
   }
 
   init() {
-    this.rootService.getProject().then((data) => {
-      this.section[0].name = data.name;
-    });
+    this.rootService.getProject()
+      .then((data) => {
+        this.section[0].name = data.name;
+      });
     this.addCustomItems();
   }
 

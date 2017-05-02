@@ -20,7 +20,7 @@
 </md-button>
 <ul ng-show="$ctrl.isOpen()" id="docs-menu-{{$ctrl.section.name | nospace}}" class="menu-toggle-list">
 	<li ng-repeat="page in $ctrl.section.pages">
-		<drawer-link section="page"></drawer-link>
+		<drawer-link ng-if="!page.disabled" section="page"></drawer-link>
 	</li>
 </ul>
 

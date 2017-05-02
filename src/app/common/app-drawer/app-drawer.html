@@ -12,25 +12,27 @@
 			<ul class="side-menu">
 				<li ng-repeat="section in $ctrl.menu"
 				    class="parent-list-item"
+				    ng-if="!section.disabled"
 				    ng-class="{'parentActive' : $ctrl.isSectionSelected(section)}">
-
+					<span>{{section.disabled}}</span>
 					<!--if type is heading show this element-->
 					<h2 class="menu-heading md-subhead ng-binding ng-scope"
 					    ng-if="section.type === 'heading'"
 					    id="heading_{{ section.name | nospace }}">{{section.name}}</h2>
+						<span>{{section.disabled}}</span>
 
-
+					<!--if type is toggle show this element (which is actually inject as stated above)-->
 					<drawer-toggle section="section"
-					               ng-if="section.type === 'toggle'"
+					               ng-if="!section.disabled && section.type === 'toggle'"
 					               on-toggle-open="$ctrl.toggleOpen($event)"
 					               on-is-open-parent="$ctrl.isOpenParent($event)"></drawer-toggle>
 
 					<!--if type is link show this element   (which is actually inject as stated above)-->
 					<drawer-link section="section"
 					             on-focus-section="$ctrl.focusSection($event)"
-					             ng-if="section.type === 'link'"></drawer-link>
+					             ng-if="!section.disabled && section.type === 'link'"></drawer-link>
+					             <!--ng-if="!section.disabled && section.type === 'link'"></drawer-link>-->
 
-					<!--if type is toggle show this element (which is actually inject as stated above)-->
 				</li>
 			</ul>
 		</md-content>
