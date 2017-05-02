@@ -10,7 +10,10 @@ meta-c {
 	//width: 100%;
 	//min-height: 100%;
 	//height: 100%;
-
+	flex-direction: row;
+	display: flex;
+	-webkit-box-flex: 1;
+	height:100%;
 	.meta {
 		height:100%;
 

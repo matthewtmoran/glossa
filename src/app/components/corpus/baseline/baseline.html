@@ -1,5 +1,8 @@
 <div class="baseline" layout="column" flex>
-	<div layout="row">
+	<div layout="column" flex ng-if="!$ctrl.currentFile._id" layout-align="center center">
+		<h2>Selected a file or create a new file</h2>
+	</div>
+	<div ng-if="$ctrl.currentFile._id" layout="row">
 		<!--get-time-stamp="blVm.getTimeStamp"-->
 		<wave-surfer-full
 				ng-if="$ctrl.audioPath"
@@ -9,7 +12,7 @@
 		</wave-surfer-full>
 				<!--back-img="{{$ctrl.imagePath}}">-->
 	</div>
-	<div ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
+	<div ng-if="$ctrl.currentFile._id" ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
 	     ng-model="$ctrl.currentFile.content"
 	     ng-change="$ctrl.saveContent()"
 	     ng-model-options="{debounce: 750}"
