@@ -22,8 +22,8 @@ module.exports = function() {
 
     var browser = null;
     var myBonjourService = null;
-    var bonjourService = require('./socket2/bonjour-service');
-    var externalSocketClient = require('./socket2/socket-client');
+    var bonjourService = require('./socket/bonjour-service');
+    var externalSocketClient = require('./socket/socket-client');
 
     require('./config/express')(app);
     require('./routes')(app);
@@ -73,7 +73,7 @@ module.exports = function() {
                     console.log('');
                 });
 
-                bonjourSocket = require('./socket2')(glossaUser, mySession, io, browser, bonjour);
+                bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
 
             });
 

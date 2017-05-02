@@ -5,7 +5,7 @@ var electron = require('electron'),
     ipcMain = electron.ipcMain;
 
 
-var socketUtil = require('./server/socket2/socket-util');
+var socketUtil = require('./server/socket/socket-util');
 var url = require('url');
 // var config = require('./server/config/environment');
 
