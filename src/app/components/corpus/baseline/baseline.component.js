@@ -42,9 +42,11 @@ export const baselineComponent = {
       this._doc = _editor.getDoc();
       this.isDoubleClick = false;
       _editor.setOption('lineNumbers', true);
+      _editor.setOption('lineWrapping', true);
       _editor.setOption('extraKeys', {
         Enter: this.enterEvent
       });
+      console.log('_editor',_editor);
       this.timestampOverlay(_editor);
     }
 
