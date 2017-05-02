@@ -23,7 +23,9 @@ export const metaComponent = {
     }
 
     $onChanges(changes) {
-      if (this.selectedFile) {
+      console.log('changes in meta componenet', changes);
+      if (changes.selectedFile) {
+        console.log('selected file changed...', this.selectedFile);
         this.currentFile = angular.copy(this.selectedFile);
       }
       this.editorOptions = {

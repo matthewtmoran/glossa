@@ -12,12 +12,18 @@
       <md-icon class="material-icons">add</md-icon>
     </md-button>
 
-    <md-button ng-click="$ctrl.createNewMarkdown()"
-               ng-if="!$ctrl.markDownFiles.length">Create New File</md-button>
                <!--ng-if="!$ctrl.filteredFiles.length">Create New File</md-button>-->
 
 
     <md-list>
+
+      <md-list-item ng-if="!$ctrl.markDownFiles.length" class="md-2-line" ng-click="$ctrl.createNewMarkdown()">
+         <md-item-content>
+           <div class="md-list-item-text">
+            <h3>Create New File</h3>
+           </div>
+         </md-item-content>
+      </md-list-item>
 
               <!--ng-repeat="file in $ctrl.markDownFiles"-->
               <!--ng-repeat="file in $ctrl.filteredFiles = ($ctrl.markDownFiles | filter: $ctrl.searchText)"-->

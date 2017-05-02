@@ -27,6 +27,13 @@ export const corpusComponent = {
       console.log('$onChanges in corpus.component', changes);
       if (changes.markDownFiles) {
         this.markDownFiles = changes.markDownFiles.currentValue;
+        console.log('this.markDownFiles.length',this.markDownFiles.length);
+
+        if (this.markDownFiles.length < 1) {
+          console.log('no markdown files....');
+          this.selectedFile = null;
+        }
+
       }
       if (changes.selectedFile) {
         console.log('selectedFile changed')
@@ -182,6 +189,7 @@ export const corpusComponent = {
               if (this.markDownFiles.length > 0) {
                 this.fileSelection(this.markDownFiles[0]._id)
               } else {
+                console.log("no more files exist....");
                 this.selectedFile = null;
               }
               this.cfpLoadingBar.complete();
