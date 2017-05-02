@@ -13,7 +13,8 @@ meta-c {
 	flex-direction: row;
 	display: flex;
 	-webkit-box-flex: 1;
-	height:100%;
+	min-height:100%;
+
 	.meta {
 		height:100%;
 
@@ -28,8 +29,6 @@ meta-c {
 			border-right: none;
 			background: transparent;
 			min-height: 50px!important;
-			height: 100px !important;
-			max-height: 100px !important;
 		}
 
 
