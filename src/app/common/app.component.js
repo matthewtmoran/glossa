@@ -113,5 +113,9 @@ export const appComponent = {
       this.searchText = event.searchText;
     }
 
+    clearSearch(event) {
+      this.searchText = '';
+    }
+
   },
 };

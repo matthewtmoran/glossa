@@ -2,17 +2,19 @@ import templateUrl from './app-nav.html';
 
 export const navComponent = {
   bindings: {
-    onSearchSubmit: '&'
+    onSearchSubmit: '&',
+    onCreateNewMarkdown: '&',
+    onClearSearch: '&'
   },
   templateUrl,
   controller: class NavComponent {
-    constructor($state, $mdSidenav, $scope) {
+    constructor($state, $mdSidenav, $scope, RootService) {
       'ngInject';
 
+      this.$state = $state;
       this.$mdSidenav = $mdSidenav;
       this.$scope = $scope;
-
-
+      this.rootService = RootService;
     }
 
 
@@ -22,7 +24,6 @@ export const navComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in app-nav', changes);
       if (changes.searchText) {
         this.searchSubmit();
       }
@@ -37,6 +38,13 @@ export const navComponent = {
           searchText: this.searchText
         }
       })
+    }
+
+    create() {
+      if (this.$state.current.parent === 'corpus') {
+        this.rootService.tunnelEvent('createNamedMarkdown', {name: this.searchText});
+        this.onClearSearch();
+      }
     }
   }
 };

@@ -2,6 +2,7 @@ import templateUrl from './corpus-sidebar.html';
 
 export const corpusSidebarComponent = {
   bindings: {
+    searchText: '<',
     selectedFile: '<',
     markDownFiles: '<',
     fileSelection: '&',
@@ -19,6 +20,9 @@ export const corpusSidebarComponent = {
     }
 
     $onChanges(changes) {
+      if (changes.searchText) {
+        console.log('changes to search text heard in corpus.sidebar');
+      }
 
     }
 

@@ -7,7 +7,7 @@ export const corpusComponent = {
   },
   templateUrl,
   controller: class CorpusComponent {
-    constructor($state, $filter, CorpusService, cfpLoadingBar, DialogService, NotebookService) {
+    constructor($scope, $state, $filter, CorpusService, cfpLoadingBar, DialogService, NotebookService) {
       'ngInject';
       this.cfpLoadingBar = cfpLoadingBar;
       // this.$state = $state;
@@ -19,24 +19,25 @@ export const corpusComponent = {
       // this.selectedFile = {};
       this.markDownFiles = [];
 
+      this.$scope = $scope;
+
+      this.$scope.$on('createNamedMarkdown', this.namedMarkdown.bind(this));
+
       // this.newAttachment = this.newAttachment.bind(this);
 
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in corpus.component', changes);
       if (changes.markDownFiles) {
         this.markDownFiles = changes.markDownFiles.currentValue;
-        console.log('this.markDownFiles.length',this.markDownFiles.length);
 
         if (this.markDownFiles.length < 1) {
-          console.log('no markdown files....');
           this.selectedFile = null;
         }
-
       }
-      if (changes.selectedFile) {
-        console.log('selectedFile changed')
+      if (changes.searchText) {
+        // this.searchText = changes.searchText;
+        console.log('change in search Text');
       }
     }
 
@@ -82,6 +83,20 @@ export const corpusComponent = {
     newMarkdown(event) {
       this.cfpLoadingBar.start();
       this.corpusService.createFile()
+        .then((data) => {
+          this.cfpLoadingBar.complete();
+          this.markDownFiles.push(data);
+          this.selectedFile = data;
+          this.notebookAttachment = null;
+        })
+        .catch((data) => {
+          console.log('there was an issue', data)
+        });
+    }
+
+    namedMarkdown(event, data) {
+      this.cfpLoadingBar.start();
+      this.corpusService.createFile(data.name)
         .then((data) => {
           this.cfpLoadingBar.complete();
           this.markDownFiles.push(data);

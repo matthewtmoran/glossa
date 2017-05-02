@@ -72,6 +72,10 @@ export class RootService {
     this.socketService.emit('get:connections')
   }
 
+  tunnelEvent(name, data) {
+    this.$rootScope.$broadcast(name, data);
+  }
+
   getConnectionsCB(callback) {
     this.socketService.emit('get:ConnectionsCB', {}, (connections) => {
       return callback(connections);

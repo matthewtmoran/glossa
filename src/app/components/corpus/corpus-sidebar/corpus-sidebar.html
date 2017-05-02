@@ -26,13 +26,13 @@
       </md-list-item>
 
               <!--ng-repeat="file in $ctrl.markDownFiles"-->
-              <!--ng-repeat="file in $ctrl.filteredFiles = ($ctrl.markDownFiles | filter: $ctrl.searchText)"-->
+              <!--ng-repeat="file in $ctrl.markDownFiles | filter:$ctrl.searchText"-->
       <md-list-item
-		      ui-sref-active="fileSelected"
-              ng-repeat="file in $ctrl.markDownFiles"
-              ng-class="{'active': $ctrl.selectedFile._id === file._id}"
-              ng-click="$ctrl.onSelection(file._id)"
-              class="md-2-line">
+        ui-sref-active="fileSelected"
+        ng-repeat="file in $ctrl.filteredFiles = ($ctrl.markDownFiles | filter: $ctrl.searchText)"
+        ng-class="{'active': $ctrl.selectedFile._id === file._id}"
+        ng-click="$ctrl.onSelection(file._id)"
+        class="md-2-line">
         <a>
           <md-item-content md-ink-ripple layout="row" layout-align="start center">
             <div class="md-list-item-text" layout="column">
