@@ -5,7 +5,7 @@ var electron = require('electron'),
     ipcMain = electron.ipcMain;
 
 
-var socketUtil = require('./server/socket/socket-util');
+var socketUtil = require('./server/socket2/socket-util');
 var url = require('url');
 // var config = require('./server/config/environment');
 
@@ -47,9 +47,6 @@ function importProject() {
 }
 
 function createWindow () {
-  console.log('WINDOW BEING CREATED');
-  console.log('win', win  );
-
     // Create the browser window.
     win = new BrowserWindow({
         width: 1200,
@@ -60,9 +57,6 @@ function createWindow () {
         }
     });
 
-    console.log('BrowserWindow',BrowserWindow)
-
-    console.log('win.webPreferences', win.webPreferences);
 
     var express = require('./server/app')();
 

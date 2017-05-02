@@ -48,7 +48,6 @@ module.exports = {
 
     publish: function(glossaUser, browser, bonjour, callback) {
         console.log('');
-        console.log('publish being called');
         if (!browser || !browser.services.length) {
             //publish service
             myLocalService = bonjour.publish({

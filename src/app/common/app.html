@@ -6,6 +6,10 @@
   <!--<app-nav user="$ctrl.user" on-logout="$ctrl.logout();"></app-nav>-->
    <!-- corpus -->
   <div class="app" layout="column" flex>
-    <div ui-view layout="column" flex current-user="$ctrl.currentUser" search-text="$ctrl.searchText"></div>
+    <div ui-view layout="column" flex
+         all-connections="$ctrl.allConnections"
+         online-connections="$ctrl.onlineConnections"
+         current-user="$ctrl.currentUser"
+         search-text="$ctrl.searchText"></div>
   </div>
 </div>

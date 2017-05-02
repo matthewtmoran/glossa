@@ -6,10 +6,19 @@ export const navComponent = {
   },
   templateUrl,
   controller: class NavComponent {
-    constructor($state, $mdSidenav) {
+    constructor($state, $mdSidenav, $scope) {
       'ngInject';
 
       this.$mdSidenav = $mdSidenav;
+      this.$scope = $scope;
+
+
+    }
+
+
+
+    $onInit() {
+      this.onlineConnections = [];
     }
 
     $onChanges(changes) {

@@ -2,7 +2,9 @@ import templateUrl from './settings.html';
 
 export const settingsComponent = {
   bindings: {
-    previousState: '<'
+    previousState: '<',
+    allConnections: '<',
+    onlineConnections: '<',
   },
   templateUrl,
   controller: class SettingsComponent {

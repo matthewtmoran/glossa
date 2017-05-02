@@ -7,7 +7,7 @@
 // var ipc = window.require('electron').ipcRenderer;
 // var dialog  = window.require('electron').remote.dialog;
 export class RootService {
-  constructor($http, $rootScope, __user, $state, $window, SocketService, NotificationService, Upload) {
+  constructor($http, $rootScope, __user, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar) {
     'ngInject';
     //Notification
     //Upload
@@ -20,6 +20,8 @@ export class RootService {
     this.socketService = SocketService;
     this.NotificationService = NotificationService;
     this.Upload = Upload;
+    this.cfpLoadingBar = cfpLoadingBar;
+    this.currentOnlineList = [];
 
   //TODO: move ipc listeners to their own service
   //   ipc.on('changeState', this.ipcChangeState.bind(this));
@@ -51,8 +53,6 @@ export class RootService {
   }
 
   ipcChangeState(event, state) {
-    console.log('TODO: update state....')
-    console.log('ipcChangeState', state);
     this.$state.go(state, {});
   }
 
@@ -137,7 +137,6 @@ export class RootService {
   
 
   saveSettings(settings) {
-    console.log('Setting being updated...');
     return $http.put(`/api/user/${this.__user._id}/settings`, settings)
       .then((response) => {
         return response.data;
@@ -178,21 +177,18 @@ export class RootService {
     this.socketFactory.emit('get:networkUsers')
   }
 
+  getConnections() {
+    this.socketService.emit('request:connections');
+  }
+
   //look for all updates from users that are being followed
   getAllUserUpdates() {
-    let msg = 'Looking for updates from all users...';
-    let delay = 4000;
-
-    this.NotificationService.show({
-      message: msg,
-      hideDelay: delay
-    });
-
     this.socketService.emit('request:AllUserUpdates')
   }
 
   //broad cast updates to users that follow
   broadcastUpdates(data) {
+    console.log('broadcastUpdates');
     this.socketService.emit('broadcast:Updates', data);
   }
 
@@ -202,14 +198,14 @@ export class RootService {
     this.socketService.on('request:SocketType', (data) => {
       console.log("Heard 'request:SocketType' in rootService:", data);
 
-      let msg = 'server requesting socket type... ';
-      let delay = 3000;
-
-
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
+      // let msg = 'server requesting socket type... ';
+      // let delay = 3000;
+      //
+      //
+      // this.NotificationService.show({
+      //   message: msg,
+      //   hideDelay: delay
+      // });
 
       let socketData = {
         type: 'local-client',
@@ -225,13 +221,13 @@ export class RootService {
     this.socketService.on('notify:server-connection', (data) => {
       console.log("Heard 'notify:server-connection' in rootService.data:", data);
 
-      let msg = 'connected to local server';
-      let delay = 3000;
-
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
+      // let msg = 'connected to local server';
+      // let delay = 3000;
+      //
+      // this.NotificationService.show({
+      //   message: msg,
+      //   hideDelay: delay
+      // });
 
     });
 
@@ -278,17 +274,15 @@ export class RootService {
 
     //when external-client makes changes
     this.socketService.on('notify:externalChanges', (data) => {
-      console.log('Heard : notify:externalChanges in app.service', data);
-      let msg = `Data synced with ${data.connection._id}`;
-      let delay = 3000;
+      console.log('on:: notify:externalChanges', data);
+      // let msg = `Data synced with ${data.connection.name}`;
+      // let delay = 3000;
+      //
+      // this.NotificationService.show({
+      //   message: msg,
+      //   hideDelay: delay
+      // });
 
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
-
-      // console.log('$broadCast event update:connection');
-      // $rootScope.$broadcast('update:connection', data.connection);
       console.log('$broadCast event update:externalData');
       this.$rootScope.$broadcast('update:externalData', data);
     });
@@ -317,12 +311,16 @@ export class RootService {
 
     //update connection
     this.socketService.on('update:connection', (data) => {
+      console.log('on:: update:connection - data', data);
       this.$rootScope.$broadcast('update:connection', data);
     });
 
     //Listen for connections list
     //broadcast all connections to controllers that display connections
+    //here we track the entire user list and add or remove users ids from an array.
     this.socketService.on('send:connections', (data) => {
+      console.log('on:: send:connections');
+      console.log('$broadcast:: update:connections');
       this.$rootScope.$broadcast('update:connections', data);
     });
 
@@ -330,6 +328,35 @@ export class RootService {
     this.socketService.on('import:project', (data) => {
       alert('importing project....');
     });
+
+    /////////////////
+    //Newer Methods//
+    /////////////////
+
+    this.socketService.on('request:socket-type', () => {
+      console.log('on:: request:socket-type');
+      console.log('emit:: return:socket-type');
+      this.socketService.emit('return:socket-type', {type: 'local-client'});
+    });
+
+    this.socketService.on('notify:sync-begin', () => {
+      console.log('on:: notify:sync-begin');
+
+      let msg = `Data Syncing`;
+      let delay = 3000;
+
+      this.NotificationService.show({
+        message: msg,
+        hideDelay: delay
+      });
+
+      this.cfpLoadingBar.start();
+    });
+
+    this.socketService.on('notify:sync-end', () => {
+      console.log('on:: notify:sync-end');
+      this.cfpLoadingBar.complete();
+    })
 
   }
 

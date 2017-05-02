@@ -91,7 +91,7 @@
 	<div flex="75"  layout="column" >
 		<md-list class="user-list">
 
-			<user-card ng-repeat="user in $ctrl.networkUsers"
+			<user-card ng-repeat="user in $ctrl.allConnections"
 			           user="user"
 			           on-toggle-follow="$ctrl.toggleFollow($event)"
 			           ng-class="{'bottom-border':$last}">

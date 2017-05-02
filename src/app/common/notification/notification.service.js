@@ -44,7 +44,7 @@ export class NotificationService {
   internalShow(toast) {
     (() => {
       if (this.lastMsg === toast.message) {
-        this.$timeout.cancel(debounce);
+        this.$timeout.cancel(this.debounce);
       }
       this.lastMsg = toast.message;
       this.debounce = this.$timeout(() => {
@@ -67,6 +67,21 @@ export class NotificationService {
       position: 'top right',
       hideDelay: options.hideDelay,
     };
+  }
+
+  syncToast(options) {
+    return {
+      template: `<md-toast>
+                    <span flex>${options.message}</span>
+                    <md-button class="md-highlight" ng-click="closeToast($event)">
+                        More info
+                    </md-button>
+                 </md-toast>`
+    }
+  }
+
+  closeToast(event) {
+    this.$mdToast.hide();
   }
 
 }

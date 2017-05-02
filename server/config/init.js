@@ -2,6 +2,7 @@ var Project = require('../api/project/project.model');
 var User = require('../api/user/user.model');
 var Session = require('../api/session/session.model');
 var Settings = require('../api/settings/settings.model');
+var Connections = require('../api/connections/connection.model');
 var currentUser;
 
 module.exports = {
@@ -40,10 +41,29 @@ function checkForApplicationData() {
                 resolve(defaultAppData());
             } else {
                 console.log('When app begins, set connections.online to false');
+              resetConnections().then(function(){
                 resolve(user);
+              });
             }
         });
     })
+}
+
+function resetConnections() {
+  return new Promise(function(resolve, reject) {
+
+    Connections.find({}, function(err, connections) {
+      connections.forEach(function(connection) {
+        if (!connection.following) {
+          Connections.remove({_id: connection._id});
+        } else {
+          Connections.update({_id: connection._id}, {$set: {online: false}})
+        }
+      })
+    });
+    resolve();
+
+  })
 }
 
 function defaultAppData() {

@@ -295,6 +295,15 @@ module.exports = {
     },
 
 
+  validateOnlineConnections: function() {
+      console.log('validateOnlineConnections');
+      Connection.find({}, function(err, connections) {
+        console.log('TODO: set all connections.online to false or ping them.')
+        console.log('connections length', connections.length);
+      })
+  },
+
+
 
     //TODO: concat these function
     emitToLocalClient: function(io, socketId, eventName, data) {

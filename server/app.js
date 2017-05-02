@@ -22,8 +22,8 @@ module.exports = function() {
 
     var browser = null;
     var myBonjourService = null;
-    var bonjourService = require('./socket/bonjour-service');
-    var externalSocketClient = require('./socket/socket-client');
+    var bonjourService = require('./socket2/bonjour-service');
+    var externalSocketClient = require('./socket2/socket-client');
 
     require('./config/express')(app);
     require('./routes')(app);
@@ -31,8 +31,6 @@ module.exports = function() {
 
     Promise.all([require('./config/init').checkForApplicationData()])
         .then(function(appData) {
-
-            console.log('Application has created data and is ready to go...');
 
             var bonjourSocket;
             var glossaUser = appData[0];
@@ -42,21 +40,23 @@ module.exports = function() {
             server.listen(config.port, config.ip, function () {
             // server.listen(config.port, config.ip, function () {
 
-                console.log('Listening on Port.');
                 console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 
                 browser = bonjour.find({type: 'http'});
+                console.log('Bonjour is listening...');
 
                 browser.on('down', function(service) {
                     console.log('');
                     console.log('Service went down.......', service.name);
                     console.log('Service on network:', browser.services.length);
+                    console.log('');
                 });
 
                 browser.on('up', function(service) {
                     console.log('');
                     console.log('Service went/is live........', service.name);
                     console.log('Services on network:', browser.services.length);
+                    console.log('');
 
                     //make sure network service is a glossa instance....
                     if (service.name.indexOf('glossaApp') > -1) {
@@ -66,13 +66,14 @@ module.exports = function() {
                         } else if (service.name !== 'glossaApp-' + glossaUser._id) {
                             console.log('...External service found CONNECT');
 
-                            externalSocketClient.initNodeClient(service, glossaUser, io)
+                            externalSocketClient.initAsClient(service, glossaUser, io)
 
                         }
                     }
+                    console.log('');
                 });
 
-                bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
+                bonjourSocket = require('./socket2')(glossaUser, mySession, io, browser, bonjour);
 
             });
 

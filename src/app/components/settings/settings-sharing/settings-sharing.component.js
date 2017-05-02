@@ -2,7 +2,9 @@ import templateUrl from './settings-sharing.html';
 
 export const settingsSharingComponent = {
   bindings: {
-    settings: '<'
+    settings: '<',
+    allConnections: '<',
+    onlineConnections: '<'
   },
   templateUrl,
   controller: class SettingsSharingComponent {
@@ -28,7 +30,7 @@ export const settingsSharingComponent = {
     $onInit() {
       this.networkUsers = [];
       this.userProfile = this.rootService.getUser();
-      this.rootService.getConnections();
+      // this.rootService.getConnections();
     }
 
     removeAvatar(path) {

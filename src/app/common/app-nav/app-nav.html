@@ -22,6 +22,15 @@
         </form>
         <!--<input ng-show="$ctrl.showSearch" ng-model="searchInput" placeholder="Search...">-->
       </md-input-container>
+
+        <div layout="row">
+            <div flex="50" ng-repeat="connection in $ctrl.allConnections">
+                {{connections.name}}
+            </div>
+            <div flex="50" ng-repeat="online in $ctrl.onlineConnections">
+                {{online.name}}
+            </div>
+        </div>
       <!--</div>-->
 
       <!-- ADD THE STUFF BELOW BACK IN LATER, WHEN I THINK THROUGH WHAT NEEDS TO GO IN THERE A BIT BETTER-->
