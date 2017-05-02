@@ -1,11 +1,12 @@
 <md-list-item class="user-card md-padding" >
+	<span ng-class="$ctrl.user.online ? 'online-notification' : 'offline-notification'"></span>
 	<div class="user-avatar-container">
-		<md-button ng-if="!$ctrl.user.following" disabled="true" class="md-fab" ng-style="{'background-color': $ctrl.user.color }">
+		<md-button ng-if="!$ctrl.user.following" disabled="true" class="md-fab avatar-button" ng-style="{'background-color': $ctrl.user.color }">
 			<span class="letter">{{$ctrl.user.name[0]}}</span>
 		</md-button>
 
 		<img ng-if="$ctrl.user.avatar && $ctrl.user.following" ng-src="{{$ctrl.user.avatar}}" class="md-avatar">
-		<span ng-class="$ctrl.user.online ? 'online-notification' : 'offline-notification'"></span>
+
 		<!--<span ng-class="{'online-notification': $ctrl.user.online, 'offline-notification': !$ctrl.user.online}"></span>-->
 	</div>
 	<div class="user-name-container">

@@ -10,7 +10,6 @@ export class SettingsTabIndex {
   link($scope, $element, $attrs) {
 
     $scope.$watch($attrs.settingsTabIndex, (newValue, oldValue) => {
-      console.log('there is a change in tabs');
       switch (newValue) {
         case 0:
           this.$state.go('project');
@@ -21,15 +20,15 @@ export class SettingsTabIndex {
           // $location.url("/main.baseline");
           break;
         case 2:
-          this.$state.go('about');
-          // $location.url("/view3");
-          break;
-        case 3:
           this.$state.go('sharing');
           // $location.url("/view3");
           break;
-        case 4:
+        case 3:
           this.$state.go('hashtags');
+          // $location.url("/view3");
+          break;
+        case 4:
+          this.$state.go('about');
           // $location.url("/view3");
           break;
       }

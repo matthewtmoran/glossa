@@ -1,19 +1,19 @@
 <md-content id="media-settings" class="md-padding">
 	<form name="mediaSettings" flex="50" flex-offset="25" ng-submit="$ctrl.saveMediaSettings($ctrl.settings)">
 		<div layout="row">
-			<md-input-container class="md-block " flex="20">
-				<label>Wave Color</label>
-				<md-select class="select-input" ng-model="$ctrl.settings.waveColor" aria-label="select color">
-					<md-optgroup label="Wave Color">
-						<md-option ng-value="color.value" ng-repeat="color in $ctrl.waveColorOptions">{{color.name}}</md-option>
-					</md-optgroup>
-				</md-select>
-			</md-input-container>
+			<!--<md-input-container class="md-block " flex="20">-->
+				<!--<label>Wave Color</label>-->
+				<!--<md-select class="select-input" ng-model="$ctrl.settings.waveColor" aria-label="select color">-->
+					<!--<md-optgroup label="Wave Color">-->
+						<!--<md-option ng-value="color.value" ng-repeat="color in $ctrl.waveColorOptions">{{color.name}}</md-option>-->
+					<!--</md-optgroup>-->
+				<!--</md-select>-->
+			<!--</md-input-container>-->
 		</div>
 
 		<div layout="row">
 			<md-input-container class="md-block" flex="20">
-				<label>Skip Length (in seconds)</label>
+				<label>Scrub Length (in seconds)</label>
 				<input ng-model="$ctrl.settings.skipLength" min="1" max="99" type="number">
 			</md-input-container>
 		</div>

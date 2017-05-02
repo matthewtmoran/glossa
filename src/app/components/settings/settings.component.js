@@ -40,18 +40,18 @@ export const settingsComponent = {
           index: 1
         },
         {
-          label: 'About',
-          state: 'about',
-          index: 2
-        },
-        {
           label: 'Sharing',
           state: 'sharing',
-          index: 3
+          index: 2
         },
         {
           label: 'Hashtags',
           state: 'hashtags',
+          index: 3
+        },
+        {
+          label: 'About',
+          state: 'about',
           index: 4
         }
       ];

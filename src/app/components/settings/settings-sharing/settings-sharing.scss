@@ -5,6 +5,10 @@ settings-sharing {
 	display: flex;
 	-webkit-box-flex: 1;
 	height:100%;
+
+	.avatar-button {
+		box-shadow: none !important;
+	}
 }
 
 .user-card-items {

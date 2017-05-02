@@ -5,8 +5,10 @@
 		<span flex></span>
 		<md-switch ng-model="$ctrl.settings.isSharing" ng-change="$ctrl.toggleSharing()" aria-label="Toggle sharing"></md-switch>
 	</div>
+	<md-divider></md-divider>
 </md-toolbar>
 <div layout="row" class="row-full-height" >
+	<!--<md-divider></md-divider>-->
 	<div flex="25" class="left-side" md-whiteframe="2" layout="column">
 
 		<div class="image-container profile-image-container" >
@@ -45,21 +47,21 @@
 					</md-input-container>
 				</div>
 			</div>
-			<div class="" layout="row">
-				<div flex="20" class="contact-section-left">
-					<md-icon class="md-36">phone</md-icon>
-				</div>
-				<div flex="80">
-					<md-input-container class="md-block">
-						<input type="text" placeholder="Mobile" ng-model="$ctrl.userProfile.mobilePhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">
-					</md-input-container>
+			<!--<div class="" layout="row">-->
+				<!--<div flex="20" class="contact-section-left">-->
+					<!--<md-icon class="md-36">phone</md-icon>-->
+				<!--</div>-->
+				<!--<div flex="80">-->
+					<!--<md-input-container class="md-block">-->
+						<!--<input type="text" placeholder="Mobile" ng-model="$ctrl.userProfile.mobilePhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">-->
+					<!--</md-input-container>-->
 
-					<md-input-container class="md-block">
-						<input type="text" placeholder="Work" ng-model="$ctrl.userProfile.workPhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">
-					</md-input-container>
-				</div>
+					<!--<md-input-container class="md-block">-->
+						<!--<input type="text" placeholder="Work" ng-model="$ctrl.userProfile.workPhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">-->
+					<!--</md-input-container>-->
+				<!--</div>-->
 
-			</div>
+			<!--</div>-->
 			<div class="" layout="row">
 				<div flex="20" class="contact-section-left">
 					<md-icon class="md-36">email</md-icon>
