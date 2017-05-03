@@ -199,23 +199,23 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
             }
           }
 
-        console.log('update connection in database');
-        socketUtil.updateConnection(clientPersistedData)
-          .then(function (updatedConnection) {
-            if (updatedConnection.following) {
-              console.log('we are following connection');
-              console.log('sync data with connection');
-              console.log('TODO: notify local-client sync is taking place.');
-              socketUtil.getUserSyncedData(updatedConnection)
-                .then(function (data) {
-                  console.log('base data queried to compare against.');
-                  console.log('emit:: request:updates  to:: external-client');
-                  socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:updates', data);
-                  console.log("requesting avatar.... ");
-                  console.log('emit:: request:avatar  to:: external-client');
-                  socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:avatar', {});
-                });
-            }
+          console.log('update connection in database');
+          socketUtil.updateConnection(clientPersistedData)
+            .then(function (updatedConnection) {
+              if (updatedConnection.following) {
+                console.log('we are following connection');
+                console.log('sync data with connection');
+                console.log('TODO: notify local-client sync is taking place.');
+                socketUtil.getUserSyncedData(updatedConnection)
+                  .then(function (data) {
+                    console.log('base data queried to compare against.');
+                    console.log('emit:: request:updates  to:: external-client');
+                    socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:updates', data);
+                    console.log("requesting avatar.... ");
+                    console.log('emit:: request:avatar  to:: external-client');
+                    socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:avatar', {});
+                  });
+              }
 
           console.log('emit:: update:connection  to:: local-client');
           socketUtil.emitToLocalClient(io, localClient, 'update:connection', {connection: updatedConnection});

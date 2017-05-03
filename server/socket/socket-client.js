@@ -73,7 +73,7 @@ module.exports = {
               };
 
               mediaPromises.push(socketUtil.writeMediaFile(imageMediaObject));
-              // delete dataChanges.update.imageBuffer;
+              delete dataChanges.update.imageBuffer;
             }
 
             if (dataChanges.update.audioBuffer) {
@@ -84,7 +84,7 @@ module.exports = {
               };
 
               mediaPromises.push(socketUtil.writeMediaFile(audioMediaObject));
-              // delete dataChanges.update.audioBuffer;
+              delete dataChanges.update.audioBuffer;
             }
 
             Promise.all(mediaPromises)

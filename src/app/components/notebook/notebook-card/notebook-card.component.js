@@ -5,7 +5,9 @@ export const notebookCardComponent = {
   bindings: {
     notebook: '<',
     onViewDetails: '&',
+    onViewPreview: '&',
     onDisconnectNotebook: '&',
+    currentUser: '<'
   },
   templateUrl,
   controller: class NotebookCardComponent {
@@ -38,6 +40,14 @@ export const notebookCardComponent = {
 
     viewDetails() {
       this.onViewDetails({
+        $event: {
+          notebook: this.notebook
+        }
+      })
+    }
+
+    viewPreview() {
+      this.onViewPreview({
         $event: {
           notebook: this.notebook
         }

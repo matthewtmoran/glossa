@@ -31,7 +31,8 @@
 	<md-card-actions flex=10 layout="row" layout-align="end bottom">
 		<md-button ng-if="$ctrl.isCorpus" ng-click="$ctrl.disconnect({notebook: $ctrl.notebook})">Disconnect</md-button>
 
-		<md-button ng-click="$ctrl.viewDetails()">View Details</md-button>
+		<md-button ng-if="$ctrl.notebook.createdBy._id === $ctrl.currentUser._id" ng-click="$ctrl.viewDetails()">View Details</md-button>
+		<md-button ng-if="$ctrl.notebook.createdBy._id !== $ctrl.currentUser._id" ng-click="$ctrl.viewPreview()">View Preview</md-button>
 
 		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
 	</md-card-actions>

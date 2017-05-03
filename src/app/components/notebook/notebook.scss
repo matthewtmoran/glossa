@@ -476,3 +476,25 @@ button.md-fab.md-mini {
 	max-width: 100%;
 	display: block;
 }
+
+.simplemde-wrapper {
+	position: relative;
+
+	.CodeMirror {
+		transition: .3s;
+	}
+
+	.editor-preview-active {
+		transition: .3s;
+	}
+
+	.simplemde-loader {
+		position: absolute;
+		margin: auto;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		z-index: 1;
+	}
+}

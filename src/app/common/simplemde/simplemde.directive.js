@@ -8,6 +8,7 @@ export class SimplemdeDirective {
     this.require = {
       ngModel: 'ngModel',
     };
+    this.transclude = true;
     // this.scope ={
     //   updateFunction: '&'
     // };
@@ -25,6 +26,9 @@ export class SimplemdeDirective {
     let cm = mde.myCodeMirror;
     let editor = mde.codemirror;
     let hashtagList = [];
+
+
+
 
     //This is the actual instance that we can use to call
     //this is the specific instance - much more limited
@@ -50,21 +54,29 @@ export class SimplemdeDirective {
 
 
     //I have to watch for this blur event to make changes.
-    // TODO:I dont like that this is called initially
 
     //basic rendering of data from model value
     this.render = () => {
+      let simpleLoader = angular.element('.simplemde-loader');
+
       let val = ctrl.ngModel.$modelValue || options["default"];
+
       //val is undefined if there is no description leaving simplemde/codemirror value keep the previous value.
       if (!val) {
         val = '';
       }
+
       //I put a delay on this because in dialogs, it does not show content, and If it is any less than 300 the cursor is misplaced
       this.$timeout(() => {
         mde.value(val);
-      }, 300);
+        if (options.autoPreview){
+          mde.togglePreview();
+          simpleLoader.fadeOut();
+        }
+      }, 250);
 
       if (mde.isPreviewActive()) {
+        console.log('isPreviewActive');
         this.rerenderPreview(val);
       }
     };

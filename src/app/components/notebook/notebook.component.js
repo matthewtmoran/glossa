@@ -1,5 +1,6 @@
 import templateUrl from './notebook.html';
 import AttachmentTemplate from '../../common/dialog/dialog-notebook/dialog.notebook-normal.html';
+import NotebookPreview from './notebook-dialogs/notebook-dialog-preview.html';
 
 export const notebookComponent = {
   bindings: {
@@ -196,6 +197,43 @@ export const notebookComponent = {
         });
     }
 
+    viewPreview(event) {
+      console.log('viewPreview in notebook component', event);
+      // event.simplemde = {
+      //   toolbar: false,
+      //   status: false,
+      //   spellChecker: false,
+      //   autoDownloadFontAwesome: false,
+      //   autoPreview: true
+      // };
+
+      this.notebook = event.notebook;
+      this.editorOptions = {
+        toolbar: false,
+        status: false,
+        spellChecker: false,
+        autoDownloadFontAwesome: false,
+        autoPreview: true
+      };
+
+      this.$mdDialog.show({
+        templateUrl: NotebookPreview,
+        targetEvent: event,
+        clickOutsideToClose: true,
+        controller: () => this,
+        controllerAs: '$ctrl',
+      }).then((data) => {
+        console.log('dialog closed',data);
+        delete this.notebook;
+      }).catch(() => {
+        delete this.notebook;
+        console.log('negative');
+      })
+
+    }
+
+
+
     // viewDetails(event) {
     //
     //   event.postOptions = this.notebookService.postOptions(event);
@@ -223,7 +261,6 @@ export const notebookComponent = {
     // }
 
     cancel() {
-      console.log('cancel happening');
       this.$mdDialog.cancel();
     }
 

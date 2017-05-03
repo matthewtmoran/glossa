@@ -54,7 +54,9 @@
 
 				<notebook-card unique-users="$ctrl.uniqueUsers"
 				               notebook="notebook"
+				               current-user="$ctrl.currentUser"
 				               on-view-details="$ctrl.viewDetails($event)"
+				               on-view-preview="$ctrl.viewPreview($event)"
 				               flex
 				               layout-fill></notebook-card>
 				               <!--ng-if="$ctrl.selected.indexOf(notebook.createdBy._id) > -1"-->
