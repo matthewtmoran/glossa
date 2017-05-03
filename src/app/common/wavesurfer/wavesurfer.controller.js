@@ -30,6 +30,7 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
+    console.log('$onChanges(changes)', changes);
     if (changes.urlSrc) {
       this.initWaveSurfer();
     }
@@ -80,6 +81,8 @@ export class WaveSurferController {
     this.wavesurferProgress = 0;
     this.isReady = false;
     this.currentTime = 0;
+
+
     if (!this.surfer) {
 
       this.surfer = Object.create(WaveSurfer);
@@ -87,6 +90,19 @@ export class WaveSurferController {
       let options = {
         container: angular.element('.waveSurferWave')[0]
       };
+
+      if (this.imageSrc) {
+        console.log('there is an image');
+        let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g,"/");
+        console.log('fixPath', fixPath);
+
+
+        angular.element('.waveSurferWave').css({
+          'background-image': 'url(' + fixPath + ')',
+          'background-size' : 'cover',
+          'background-position' : 'center center'
+        });
+      }
 
       let defaults = {
         skipLength: this.userSettings.skipLength,

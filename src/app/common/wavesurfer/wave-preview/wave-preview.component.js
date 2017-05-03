@@ -4,6 +4,7 @@ import { WaveSurferController }from '../wavesurfer.controller';
 export const wavePreviewComponent = {
   bindings: {
     urlSrc: '<',
+    imageSrc: '<',
     title: '<',
     extraButtons: '=',
     toolbarClass: '@',

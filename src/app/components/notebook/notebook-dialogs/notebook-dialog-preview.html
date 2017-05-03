@@ -6,7 +6,7 @@
 				     flex
 				     layout-align="center center"
 				     class=" top-actions">
-					<img ng-show="$ctrl.notebook.image" ngf-src="imagePath" class="thumb image-preview">
+					<img ng-show="$ctrl.notebook.image" ngf-src="$ctrl.notebook.image.path" class="thumb image-preview">
 					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.notebook.image}" layout="row" layout-align="start center">
 					</div>
 					<div flex class="audio-container" ng-if="$ctrl.notebook.audio">
@@ -16,6 +16,7 @@
 								url-src="$ctrl.notebook.audio.path"
 								auto-play="false">
 						</wave-surfer-preview>
+								<!--image-src="$ctrl.notebook.image.path"-->
 					</div>
 				</div>
 			</div>
