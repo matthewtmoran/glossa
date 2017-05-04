@@ -34,11 +34,15 @@ export class WaveSurferController {
     if (changes.urlSrc) {
       this.initWaveSurfer();
     }
+    if (changes.imageSrc) {
+      console.log('imageSrc changed');
+      this.imageSrc = changes.imageSrc.currentValue;
+      console.log('this.imageSrc', this.imageSrc);
+    }
     this.playbackSpeed = this.speed[0];
   }
 
   $onInit() {
-
 
   }
 
@@ -54,6 +58,7 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
+    console.log('initWaveSurfer')
     this.cfpLoadingBar.start();
     this.timeInterval;
     this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects
@@ -91,18 +96,6 @@ export class WaveSurferController {
         container: angular.element('.waveSurferWave')[0]
       };
 
-      if (this.imageSrc) {
-        console.log('there is an image');
-        let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g,"/");
-        console.log('fixPath', fixPath);
-
-
-        angular.element('.waveSurferWave').css({
-          'background-image': 'url(' + fixPath + ')',
-          'background-size' : 'cover',
-          'background-position' : 'center center'
-        });
-      }
 
       let defaults = {
         skipLength: this.userSettings.skipLength,
@@ -144,6 +137,26 @@ export class WaveSurferController {
     this.surfer.on('finish', this.finish.bind(this));
 
     // this.title = this.title || this.urlSrc.split('/').pop();
+
+    if (this.imageSrc) {
+      console.log('there is an image');
+      let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g,"/");
+      console.log('fixPath', fixPath);
+
+
+      angular.element('.waveSurferWave').css({
+        'background-image': 'url(' + fixPath + ')',
+        'background-size' : 'cover',
+        'background-position' : 'center center'
+      });
+
+    } else {
+      angular.element('.waveSurferWave').css({
+        'background-image': 'none',
+        'background-size' : 'unset',
+        'background-position' : 'unset'
+      });
+    }
 
     this.surfer.load(this.urlSrc);
 

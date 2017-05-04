@@ -4,45 +4,45 @@ export const metaComponent = {
   bindings: {
     notebookAttached: '<',
     selectedFile: '<',
+    editorOptions: '<',
     onUpdate: '&',
     onAttachment: '&',
     onRemoveMedia: '&',
     onDeleteMarkdown: '&',
-    onViewDetailsTop: '&'
+    onViewDetailsTop: '&',
+    onUpdateModel: '&'
   },
   templateUrl,
   controller: class MetaComponent {
     constructor() {
       'ngInject';
-
-      //expose so we can call it from simplmde directive.
-      this.update = (field, file) => {
-        this.onUpdate({$event: {file: this.currentFile}});
-      };
-
     }
 
     $onChanges(changes) {
-      console.log('changes in meta componenet', changes);
       if (changes.selectedFile) {
-        console.log('selected file changed...', this.selectedFile);
         this.currentFile = angular.copy(this.selectedFile);
       }
-      this.editorOptions = {
-        toolbar: false,
-        status: false,
-        spellChecker: false,
-        autoDownloadFontAwesome: false,
-        forceSync: true,
-        placeholder: 'Description...',
-        updateFunction: this.update.bind(this)
-      };
     }
 
     $onInit() {
-      this.isOpen = false;
+      this.editorOptions.updateFunction = this.update.bind(this)
     }
 
+    update(event) {
+      this.onUpdate({
+        $event: {
+          file: this.currentFile
+        }
+      })
+    }
+
+    //I update the model here because we are not necessarily saving the model.
+    //I'm essentially binding it manually that way I can send the file opject as a whole on the blur event.
+    updateModel(event) {
+      this.currentFile.description = event.value;
+    }
+
+    //passes event up
     addAttachment() {
       this.onAttachment({
         $event: {
@@ -51,6 +51,7 @@ export const metaComponent = {
       })
     }
 
+    //passes event up
     removeMedia(event, media, type) {
       this.onRemoveMedia({
         $event: {
@@ -61,6 +62,7 @@ export const metaComponent = {
       });
     }
 
+    //passes event up
     deleteMarkdown() {
       this.onDeleteMarkdown({
         $event: {
@@ -69,23 +71,20 @@ export const metaComponent = {
       })
     }
 
-    $onInit() {
-      // this.selectedFile = this.corpusCtrl.selectedFile;
-
-    }
-
-    goToContact(event) {
-
-    }
-
+    //passes event up
     viewDetailsMid(event) {
       this.onViewDetailsTop({
         $event: event
       });
     }
 
-    actionItem() {
-      this.func();
-    }
+    //
+    // goToContact(event) {
+    //
+    // }
+    //
+    // actionItem() {
+    //   this.func();
+    // }
   },
 };

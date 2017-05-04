@@ -52,24 +52,37 @@ export const baselineComponent = {
 
     // TODO: move to resolve
     getMediaData(file) {
+      console.log('getMediaData');
       if (file.notebookId) {
+        console.log('there is a notebook attached')
         this.cfpLoadingBar.start();
         this.notebookService.findNotebook(file.notebookId)
           .then((notebook) => {
             this.audioPath = notebook.audio.path || '';
             this.imagePath = notebook.image.path || '';
+            console.log('imagePath', this.imagePath);
             this.cfpLoadingBar.complete();
           });
       } else if (this.currentFile.audio || this.currentFile.image) {
+        console.log('there is independent media');
         if (this.currentFile.audio) {
+          console.log('there is audio');
             this.audioPath = this.currentFile.audio.path || '';
+        } else {
+          console.log(' no audio');
+          this.audioPath = null;
         }
         if (this.currentFile.image) {
+          console.log('there is image');
           this.imagePath = this.currentFile.image.path || '';
+        } else {
+          console.log(' no image');
+          this.imagePath = null;
         }
       } else {
         this.audioPath = null;
         this.imagePath = null;
+        console.log('this.imagePath (should be null)', this.imagePath);
       }
 
     }

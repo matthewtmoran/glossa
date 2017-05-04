@@ -10,16 +10,24 @@
 			       value="$ctrl.currentFile.displayName">
 		</md-input-container>
 		<md-input-container class="md-block">
-			<textarea aria-label="textarea"
-			          simplemde="$ctrl.editorOptions"
-			          update-function="$ctrl.updateMarkdown($ctrl.currentFile)"
-			          file-binding="$ctrl.currentFile"
-			          ng-model="$ctrl.currentFile.description"
-			          ng-trim="false"
-			          autocomplete="off"
-			          id="meta-description"
-			          rows="5">
-			</textarea>
+
+			<simplemde
+				editor-options="$ctrl.editorOptions"
+				update-function="$ctrl.update($event)"
+				value-binding="$ctrl.currentFile.description"
+				update-model="$ctrl.updateModel($event)">
+			</simplemde>
+
+			<!--<textarea aria-label="textarea"-->
+			          <!--simplemde="$ctrl.editorOptions"-->
+			          <!--update-function="$ctrl.updateMarkdown($ctrl.currentFile)"-->
+			          <!--file-binding="$ctrl.currentFile"-->
+			          <!--ng-model="$ctrl.currentFile.description"-->
+			          <!--ng-trim="false"-->
+			          <!--autocomplete="off"-->
+			          <!--id="meta-description"-->
+			          <!--rows="5">-->
+			<!--</textarea>-->
 		</md-input-container>
 	</form>
 	<div ng-if="$ctrl.currentFile._id" layout="row" layout-align="space-between center">

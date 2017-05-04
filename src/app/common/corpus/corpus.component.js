@@ -18,6 +18,14 @@ export const corpusComponent = {
       this.filteredFiles = [];
       // this.selectedFile = {};
       this.markDownFiles = [];
+      this.editorOptions = {
+        toolbar: false,
+        status: false,
+        spellChecker: false,
+        autoDownloadFontAwesome: false,
+        forceSync: true,
+        placeholder: 'Description...',
+      };
 
       this.$scope = $scope;
 

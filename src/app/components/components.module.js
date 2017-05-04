@@ -1,12 +1,13 @@
-import { corpus } from './corpus/courpus.module';
-import { notebook } from './notebook/notebook.module';
-import { settings } from './settings/settings.module';
+import { waveSurfer } from './wavesurfer/wavesurfer.module';
+import { dialogs } from './dialog/dialog.module';
+import { simplemde } from './simplemde/simplemde.module';
+import { ParseService } from './parse/parse.service';
 
 export const components = angular
   .module('components', [
-    corpus,
-    notebook,
-    settings
-    // contact,
+    waveSurfer,
+    dialogs,
+    simplemde
   ])
+  .service('ParseService', ParseService)
   .name;

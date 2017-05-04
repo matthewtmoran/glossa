@@ -1,14 +1,13 @@
 import uiRouter from 'angular-ui-router';
 import { appComponent } from './app.component';
-import { ParseService } from './parse/parse.service';
+
 // import { attachmentComponent } from './dialog/dialog-attahcment/dialog-attachment.controller';
 import { appNav } from './app-nav/app-nav.module';
 import { appDrawer } from './app-drawer/app-drawer.module';
 import { appSidebar } from './app-sidebar/app-sidebar.module';
-import { waveSurfer } from './wavesurfer/wavesurfer.module';
-import { dialogs } from './dialog/dialog.module';
-
-import {simplemdeComponent} from './simplemde/simplemde.component';
+import { corpus } from './corpus/courpus.module'
+import { notebook } from './notebook/notebook.module'
+import { settings } from './settings/settings.module'
 
 import './app.scss';
 
@@ -19,12 +18,11 @@ export const app = angular
     appNav,
     appSidebar,
     appDrawer,
-    waveSurfer,
-    dialogs
+    corpus,
+    notebook,
+    settings
   ])
   .component('app', appComponent)
-  .component('simplemdeComponent', simplemdeComponent)
-  .service('ParseService', ParseService)
   .config(($stateProvider) => {
     'ngInject';
 

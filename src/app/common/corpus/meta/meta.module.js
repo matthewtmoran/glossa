@@ -1,6 +1,6 @@
 import uiRouter from 'angular-ui-router';
 import { metaComponent } from './meta.component';
-import {SimplemdeDirective} from '../../../common/simplemde/simplemde.directive';
+import { SimplemdeDirective } from '../../../components/simplemde/simplemde.directive';
 import './meta.scss';
 
 export const meta = angular

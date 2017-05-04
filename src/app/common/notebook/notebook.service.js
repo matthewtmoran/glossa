@@ -1,5 +1,5 @@
 import SimpleMDE from 'simplemde';
-import NotebookNormalTemplate from '../../common/dialog/dialog-notebook/dialog.notebook-normal.html';
+import NotebookNormalTemplate from '../../components/dialog/dialog-notebook/dialog.notebook-normal.html';
 
 export class NotebookService {
   constructor($http, $q, ParseService, Upload, RootService, __user) {

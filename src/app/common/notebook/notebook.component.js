@@ -1,5 +1,5 @@
 import templateUrl from './notebook.html';
-import AttachmentTemplate from '../../common/dialog/dialog-notebook/dialog.notebook-normal.html';
+import AttachmentTemplate from '../../components/dialog/dialog-notebook/dialog.notebook-normal.html';
 import NotebookPreview from './notebook-dialogs/notebook-dialog-preview.html';
 
 export const notebookComponent = {
