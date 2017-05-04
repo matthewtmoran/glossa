@@ -48,6 +48,10 @@ export const corpusComponent = {
         // this.searchText = changes.searchText;
         console.log('change in search Text');
       }
+      if (changes.notebookAttachment) {
+        console.log('changes in notebookAttachment');
+        this.notebookAttachment = Object.assign({}, changes.notebookAttachment.currentValue)
+      }
     }
 
     $onInit() {
@@ -159,7 +163,7 @@ export const corpusComponent = {
 
     getAttchachedNotebook(notebookId) {
       if (!notebookId) {
-        delete this.notebookAttachment
+        this.notebookAttachment = null;
         return;
       }
       this.notebookService.findNotebook(notebookId)
@@ -173,13 +177,13 @@ export const corpusComponent = {
       this.corpusService.updateFile(event.file)
         .then((data) => {
           this.cfpLoadingBar.complete();
-          this.selectedFile = data;
+          this.selectedFile = Object.assign({}, data);
+          this.getAttchachedNotebook(this.selectedFile.notebookId);
           this.markDownFiles.map((file, index) => {
             if (file._id === this.selectedFile._id) {
               this.markDownFiles[index] = this.selectedFile;
             }
           });
-
         })
         .catch((data) => {
           console.log('there was an issue', data)
@@ -238,12 +242,15 @@ export const corpusComponent = {
             return;
           }
           delete event.file.notebookId;
-          this.corpusService.updateFile(event.file)
-            .then((data) => {
-            console.log('data resolve in dialogServcie');
-              this.selectedFile = Object.assign({}, data);
-              this.getAttchachedNotebook(this.selectedFile.notebookId);
-            })
+
+          this.updateMarkdown(event);
+
+          // this.corpusService.updateFile(event.file)
+          //   .then((data) => {
+          //   console.log('data resolve in dialogServcie');
+          //     this.selectedFile = Object.assign({}, data);
+          //     this.getAttchachedNotebook(this.selectedFile.notebookId);
+          //   })
         })
     }
   },

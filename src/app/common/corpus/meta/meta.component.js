@@ -23,6 +23,13 @@ export const metaComponent = {
       if (changes.selectedFile) {
         this.currentFile = angular.copy(this.selectedFile);
       }
+      if (changes.notebookAttached) {
+        console.log('changes.notebookAttached', changes.notebookAttached);
+        if (angular.isUndefined(changes.notebookAttached.currentValue)) {
+          console.log('it is undefined.....');
+          // delete this.notebookAttached;
+        }
+      }
     }
 
     //add update function if editorOptions come through meta
