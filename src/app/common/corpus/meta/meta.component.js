@@ -10,7 +10,8 @@ export const metaComponent = {
     onRemoveMedia: '&',
     onDeleteMarkdown: '&',
     onViewDetailsTop: '&',
-    onUpdateModel: '&'
+    onUpdateModel: '&',
+    onDisconnectNotebook: '&'
   },
   templateUrl,
   controller: class MetaComponent {
@@ -70,8 +71,18 @@ export const metaComponent = {
       })
     }
 
+    disconnectNotebook(event) {
+      console.log('disconnectNotebook in meta.component');
+      this.onDisconnectNotebook({
+        $event: {
+          file: this.currentFile
+        }
+      })
+    }
+
     //passes event up
     viewDetailsMid(event) {
+      console.log('viewDetailsMid')
       this.onViewDetailsTop({
         $event: event
       });

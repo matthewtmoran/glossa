@@ -21,13 +21,15 @@ export class CorpusService {
 
   //update md file
   updateFile(file) {
+    console.log('updateFile in corpus.service', file);
     let options = {
       url:`/api/transcription/${file._id}`,
       method: 'PUT'
     };
 
-    return this.uploadReq(file, options).then((data) => {
-      return data;
+    return this.uploadReq(file, options)
+      .then((data) => {
+        return data;
     });
   }
 

@@ -8,7 +8,7 @@ export const simplemdeComponent = {
     valueBinding: "<",
     updateModel: '&'
   },
-  template:`<textarea aria-label="hidden simplede text area node"></textarea>`,
+  template:`<textarea id="theText" aria-label="hidden simplede text area node"></textarea>`,
   controller: class SimplemdeComponent {
     constructor($parse, $timeout) {
       'ngInject';
@@ -16,9 +16,9 @@ export const simplemdeComponent = {
     }
 
     $onChanges(changes) {
-      if (changes.valueBinding && !changes.valueBinding.isFirstChange()) {
-        this.render();
-      }
+        if (changes.valueBinding && !changes.valueBinding.isFirstChange()) {
+          this.render();
+        }
     }
 
     $onInit() {
@@ -28,6 +28,7 @@ export const simplemdeComponent = {
 
       this.editor.on('change', this.changeEvent.bind(this));
       this.editor.on('blur', this.blurEvent.bind(this));
+      console.log('calling render');
       this.render();
     }
 

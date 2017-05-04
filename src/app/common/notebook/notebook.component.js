@@ -4,6 +4,7 @@ import NotebookPreview from './notebook-dialogs/notebook-dialog-preview.html';
 
 export const notebookComponent = {
   bindings: {
+    notebooksData: '<',
     searchText: '<',
     currentUser: '<'
   },
@@ -40,6 +41,7 @@ export const notebookComponent = {
     }
 
     $onInit() {
+      console.log('this.notebooks', this.notebooks);
       this.isLoading = true;
       this.hidden = false;
       this.isOpen = false;
@@ -52,6 +54,7 @@ export const notebookComponent = {
         {name: "Create Image Post", icon: "camera_alt", direction: "left", type: 'image'},
         {name: "Create Normal Post", icon: "create", direction: "left", type: 'normal'}
       ];
+
       this.notebooks = [];
       this.externalNotebooks = [];
       this.commonTags = [];
@@ -63,32 +66,27 @@ export const notebookComponent = {
         this.connections = data;
       });
 
-
-
     }
 
-    exists(user, list) {
-        return list.indexOf(user._id) > -1;
-    };
-
-    toggle(user, list) {
-      let idx = list.indexOf(user._id);
-      if (idx > -1) {
-        list.splice(idx, 1);
-      }
-      else {
-        list.push(user._id);
-      }
-    };
+    // exists(user, list) {
+    //     return list.indexOf(user._id) > -1;
+    // };
+    //
+    // toggle(user, list) {
+    //   let idx = list.indexOf(user._id);
+    //   if (idx > -1) {
+    //     list.splice(idx, 1);
+    //   }
+    //   else {
+    //     list.push(user._id);
+    //   }
+    // };
 
     queryNotebooks() {
       this.notebookService.getNotebooks()
         .then((data) => {
           this.notebooks = data;
           this.isLoading = false;
-        })
-        .catch((data) => {
-          console.log('There was an error', data);
         })
     }
 
@@ -232,34 +230,6 @@ export const notebookComponent = {
 
     }
 
-
-
-    // viewDetails(event) {
-    //
-    //   event.postOptions = this.notebookService.postOptions(event);
-    //   console.log('event.postOptions', event.postOptions);
-    //   this.simplemdeOptions = event.postOptions.simplemde;
-    //   this.$mdDialog.show({
-    //     templateUrl: AttachmentTemplate,
-    //     targetEvent: event,
-    //     clickOutsideToClose: false,
-    //     controller: () => this,
-    //     controllerAs: '$ctrl'
-    //     // parent: angular.element(document.body),
-    //     // bindToController: true,
-    //     // locals: {
-    //     //   simplemdeOptions: options.simplemde,
-    //     //   notebook: event.notebook,
-    //     //   onDeleteNotebook: event.deleteNotebook
-    //     // }
-    //   }).then((data) => {
-    //
-    //     return data;
-    //   }).catch((data) => {
-    //     return data;
-    //   });
-    // }
-
     cancel() {
       this.$mdDialog.cancel();
     }
@@ -342,7 +312,6 @@ export const notebookComponent = {
         }
       }
     }
-
 
     normalizeNnotebooks(event, data) {
       this.notebooks.forEach((notebook) => {

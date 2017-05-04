@@ -1,6 +1,7 @@
 import SimpleMDE from 'simplemde';
 import  templateUrl from './notebook-card.html';
 
+    // isCorpus: '<',
 export const notebookCardComponent = {
   bindings: {
     notebook: '<',
@@ -24,6 +25,7 @@ export const notebookCardComponent = {
     }
 
     $onChanges() {
+      console.log('$onChanges in notebook-card');
       this.previewText = this.$sce.trustAsHtml(SimpleMDE.markdown(this.notebook.description));
 
       if (this.notebook.isNew) {
@@ -32,8 +34,9 @@ export const notebookCardComponent = {
           this.$element.removeClass('new-data');
         }, 5000)
       }
-
-      if (this.$state.current.name.indexOf('corpus') > -1) {
+      console.log('this.$state', this.$state);
+      if (this.$state.current.parent.indexOf('corpus') > -1) {
+        console.log('corpus is true');
         this.isCorpus = true;
       }
     }
@@ -55,11 +58,8 @@ export const notebookCardComponent = {
     }
 
     disconnectNotebook() {
-      this.onDisconnectNotebook({
-        $event: {
-          notebook: this.notebook
-        }
-      })
+      console.log('disconnectNotebook in notebook-card');
+      this.onDisconnectNotebook()
     }
 
   }

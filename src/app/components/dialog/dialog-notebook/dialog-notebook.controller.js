@@ -9,8 +9,10 @@ export class NotebookDialogController {
     this.simplemdeOptions = simplemdeOptions; 
     this.notebookService = NotebookService;
     this.currentNotebook = angular.copy(notebook);
+    this.valueBinding = notebook.description;
     this.removedMedia = [];
-    
+
+
     this.dialogObject = {
       dataChanged: false,
       event: 'hide',
@@ -52,6 +54,10 @@ export class NotebookDialogController {
     this.dialogService.hide(this.currentNotebook);
   }
 
+  updateModel(event) {
+    console.log('updateModel being called', event);
+    this.currentNotebook.description = event.value;
+  }
     //precludes setDynamicItems
   findDetailType() {
     if (!this.currentNotebook._id) {

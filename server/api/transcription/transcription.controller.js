@@ -52,6 +52,8 @@ exports.create = function(req, res) {
 
 // Updates an existing thing in the DB.
 exports.update = function(req, res) {
+    console.log('req.body', req.body);
+    console.log('req.params', req.params);
     if(req.body._id) { delete req.body._id; }
     Transcription.findOne({_id:req.params.id}, function (err, file) {
         if (err) { return handleError(res, err); }

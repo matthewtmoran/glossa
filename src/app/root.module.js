@@ -13,8 +13,8 @@ import ngCodeMirror from 'ngCodemirror'
 import { rootComponent } from './root.component';
 import { common } from './common/common.module';
 import { RootService } from './root.service';
-import { SocketService } from './common/socket/socket.service';
-import { NotificationService } from './common/notification/notification.service';
+import { SocketService } from './components/socket/socket.service';
+import { NotificationService } from './components/notification/notification.service';
 // import { config } from '../config';
 import { components } from './components/components.module';
 import './root.scss';

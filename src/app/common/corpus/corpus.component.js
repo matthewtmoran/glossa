@@ -36,6 +36,7 @@ export const corpusComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in corpus.componentn', changes);
       if (changes.markDownFiles) {
         this.markDownFiles = changes.markDownFiles.currentValue;
 
@@ -157,6 +158,10 @@ export const corpusComponent = {
     }
 
     getAttchachedNotebook(notebookId) {
+      if (!notebookId) {
+        delete this.notebookAttachment
+        return;
+      }
       this.notebookService.findNotebook(notebookId)
         .then((data) => {
           this.notebookAttachment = data;
@@ -219,6 +224,27 @@ export const corpusComponent = {
     viewDetailsTop(event) {
       let postOptions = this.notebookService.postOptions(event);
       this.dialogService.viewDetails(event, postOptions);
+    }
+
+    disconnectNotebook(event) {
+      console.log('disconnectNotebook in corpus.component');
+      let options = {
+        title: 'Are you sure you want to disconnect this notebooks?',
+        textContent: 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.'
+      };
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+          delete event.file.notebookId;
+          this.corpusService.updateFile(event.file)
+            .then((data) => {
+            console.log('data resolve in dialogServcie');
+              this.selectedFile = Object.assign({}, data);
+              this.getAttchachedNotebook(this.selectedFile.notebookId);
+            })
+        })
     }
   },
 };

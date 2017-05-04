@@ -38,31 +38,16 @@
 			<md-icon class="">update</md-icon>
 		</md-button>
 
-		<md-grid-list
-				md-cols="1" md-cols-lt-md="1" md-cols-md="2" md-cols-lg="2" md-cols-gt-lg="3"
-				md-row-height="500"
-				md-gutter="16px" md-gutter-gt-sm="24px">
-			<md-grid-tile
-					ng-show="$ctrl.notebooks.length"
-					class="grid-tile mdl-shadow--2dp fade-in"
-					ng-repeat="notebook in $ctrl.notebooks | filter: $ctrl.searchText | exists: $ctrl.selected | orderBy: '-createdAt' "
-					md-colspan="1">
-				<!--filter: $ctrl.exists(notebook.createdBy, $ctrl.selected) |-->
-				<!--{{notebook.createdBy}}-->
 
-				<!--filter: $ctrl.searchText |-->
+		<notebook-list layout="column"
+           current-user="$ctrl.currentUser"
+           notebooks="$ctrl.notebooks"
+           search-text="$ctrl.searchText"
+           on-view-details="$ctrl.viewDetails($event)"
+           on-view-preview="$ctrl.viewPreview($event)">
+		</notebook-list>
 
-				<notebook-card unique-users="$ctrl.uniqueUsers"
-				               notebook="notebook"
-				               current-user="$ctrl.currentUser"
-				               on-view-details="$ctrl.viewDetails($event)"
-				               on-view-preview="$ctrl.viewPreview($event)"
-				               flex
-				               layout-fill></notebook-card>
-				               <!--ng-if="$ctrl.selected.indexOf(notebook.createdBy._id) > -1"-->
 
-			</md-grid-tile>
-		</md-grid-list>
 	</md-content>
 	<md-fab-speed-dial
 			ng-hide="$ctrl.hidden"

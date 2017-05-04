@@ -1,12 +1,14 @@
 import { NotebookService } from './notebook.service';
 import { notebookComponent } from './notebook.component';
 import { notebookCard } from './notebook-card/notebook-card.module';
+import { notebookList } from './notebook-list/notebook-list.module';
 import Exists from './notebook.filter';
 import './notebook.scss';
 
 export const notebook = angular
   .module('components.notebook', [
-    notebookCard
+    notebookCard,
+    notebookList
   ])
   .component('notebook', notebookComponent)
   .config(($stateProvider) => {
@@ -25,7 +27,8 @@ export const notebook = angular
         resolve: {
           currentState: ($transition$) => {
             // return $transition$.
-          }
+          },
+          // notebooksData: NotebookService => NotebookService.getNotebooks()
         }
       })
   })

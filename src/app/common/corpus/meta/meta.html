@@ -18,16 +18,6 @@
 				update-model="$ctrl.updateModel($event)">
 			</simplemde>
 
-			<!--<textarea aria-label="textarea"-->
-			          <!--simplemde="$ctrl.editorOptions"-->
-			          <!--update-function="$ctrl.updateMarkdown($ctrl.currentFile)"-->
-			          <!--file-binding="$ctrl.currentFile"-->
-			          <!--ng-model="$ctrl.currentFile.description"-->
-			          <!--ng-trim="false"-->
-			          <!--autocomplete="off"-->
-			          <!--id="meta-description"-->
-			          <!--rows="5">-->
-			<!--</textarea>-->
 		</md-input-container>
 	</form>
 	<div ng-if="$ctrl.currentFile._id" layout="row" layout-align="space-between center">
@@ -79,13 +69,13 @@
 							<span class="md-subhead">Independent Media File</span>
 						</md-card-title-text>
 					</md-card-title>
-					<div>
-						<wave-surfer-preview
-								flex
-								url-src="$ctrl.currentFile.audio.path"
-								auto-play="false">
-						</wave-surfer-preview>
-					</div>
+					<!--<div>-->
+					<wave-surfer-preview
+							flex
+							url-src="$ctrl.currentFile.audio.path"
+							auto-play="false">
+					</wave-surfer-preview>
+					<!--</div>-->
 				</md-card-content>
 
 				<span flex></span>
@@ -101,10 +91,13 @@
 
 			<!--Notebook Attachment-->
 			<notebook-card flex="50"
+			               is-corpus="$ctrl.isCorpus"
 			               ng-if="$ctrl.notebookAttached"
 			               notebook="$ctrl.notebookAttached"
-			               disconnect-notebook="$ctrl.disconnectNotebook(notebook)"
-			               on-view-details="$ctrl.viewDetailsMid($event)"></notebook-card>
+			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
+			               on-view-details="$ctrl.viewDetailsMid($event)"
+			               on-view-preview="$ctrl.viewDetailsMid($event)">
+			</notebook-card>
 		</md-content>
 	</div>
 </div>

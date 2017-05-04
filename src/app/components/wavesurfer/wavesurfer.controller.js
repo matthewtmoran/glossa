@@ -30,14 +30,11 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
-    console.log('$onChanges(changes)', changes);
     if (changes.urlSrc) {
       this.initWaveSurfer();
     }
     if (changes.imageSrc) {
-      console.log('imageSrc changed');
       this.imageSrc = changes.imageSrc.currentValue;
-      console.log('this.imageSrc', this.imageSrc);
     }
     this.playbackSpeed = this.speed[0];
   }
@@ -139,7 +136,6 @@ export class WaveSurferController {
     // this.title = this.title || this.urlSrc.split('/').pop();
 
     if (this.imageSrc) {
-      console.log('there is an image');
       let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g,"/");
       console.log('fixPath', fixPath);
 
