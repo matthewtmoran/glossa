@@ -58,10 +58,6 @@ export const corpusComponent = {
       }
     }
 
-    goToContact(event) {
-
-    }
-
     newAttachment(event) {
       this.dialogService.mediaAttachment(event, this.selectedFile)
         .then((result) => {

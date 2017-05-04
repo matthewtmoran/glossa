@@ -4,14 +4,21 @@
 	</div>
 	<div ng-if="$ctrl.currentFile._id" layout="row">
 		<!--get-time-stamp="blVm.getTimeStamp"-->
+		<!--<wave-surfer-full-->
+				<!--ng-if="$ctrl.audioPath"-->
+				<!--flex-->
+				<!--image-src="$ctrl.imagePath"-->
+				<!--url-src="$ctrl.audioPath"-->
+				<!--auto-play="false"-->
+		<!--</wave-surfer-full>-->
+
 		<wave-surfer-full
-				ng-if="$ctrl.audioPath"
+				ng-if="$ctrl.currentFile.audio.path || $ctrl.notebookAttached.audio.path"
 				flex
-				image-src="$ctrl.imagePath"
-				url-src="$ctrl.audioPath"
+				image-src="$ctrl.currentFile.image.path || $ctrl.notebookAttached.image.path"
+				url-src="$ctrl.currentFile.audio.path || $ctrl.notebookAttached.audio.path"
 				auto-play="false"
 		</wave-surfer-full>
-				<!--back-img="{{$ctrl.imagePath}}">-->
 	</div>
 	<div ng-if="$ctrl.currentFile._id" ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
 	     ng-model="$ctrl.currentFile.content"

@@ -24,22 +24,21 @@ export const metaComponent = {
       }
     }
 
+    //add update function if editorOptions come through meta
+    //this enables us to bind this.currentFile and pass that up to corpus to do the save
+    //we do this because we are manually binding the simplemde/codemirror value to the this.currentFile.description model property
+    //this way from here we pass the complete object back up to corpus on updates.
     $onInit() {
       this.editorOptions.updateFunction = this.update.bind(this)
     }
 
+    //passes event up
     update(event) {
       this.onUpdate({
         $event: {
           file: this.currentFile
         }
       })
-    }
-
-    //I update the model here because we are not necessarily saving the model.
-    //I'm essentially binding it manually that way I can send the file opject as a whole on the blur event.
-    updateModel(event) {
-      this.currentFile.description = event.value;
     }
 
     //passes event up
@@ -78,13 +77,10 @@ export const metaComponent = {
       });
     }
 
-    //
-    // goToContact(event) {
-    //
-    // }
-    //
-    // actionItem() {
-    //   this.func();
-    // }
+    //I update the model here because we are not necessarily saving the model.
+    //I'm essentially binding it manually that way I can send the file opject as a whole on the blur event.
+    updateModel(event) {
+      this.currentFile.description = event.value;
+    }
   },
 };

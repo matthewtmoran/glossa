@@ -22,7 +22,6 @@ export const baselineComponent = {
 
 
       this.codemirrorLoaded = this.codemirrorLoaded.bind(this);
-
       this.enterEvent = this.enterEvent.bind(this);
       this.clockFormat = this.clockFormat.bind(this);
 
@@ -34,9 +33,18 @@ export const baselineComponent = {
     $onChanges(changes) {
       if (changes.selectedFile) {
         this.currentFile = angular.copy(this.selectedFile);
-        this.getMediaData(this.currentFile);
       }
     }
+
+    //passes event up
+    saveContent() {
+      this.onUpdate({$event: {file: this.currentFile}});
+    }
+
+    //TODO: move to separate component
+    //////////////////////
+    //CodeMirrro functions//
+
 
     codemirrorLoaded(_editor) {
       this._doc = _editor.getDoc();
@@ -48,43 +56,6 @@ export const baselineComponent = {
       });
       console.log('_editor',_editor);
       this.timestampOverlay(_editor);
-    }
-
-    // TODO: move to resolve
-    getMediaData(file) {
-      console.log('getMediaData');
-      if (file.notebookId) {
-        console.log('there is a notebook attached')
-        this.cfpLoadingBar.start();
-        this.notebookService.findNotebook(file.notebookId)
-          .then((notebook) => {
-            this.audioPath = notebook.audio.path || '';
-            this.imagePath = notebook.image.path || '';
-            console.log('imagePath', this.imagePath);
-            this.cfpLoadingBar.complete();
-          });
-      } else if (this.currentFile.audio || this.currentFile.image) {
-        console.log('there is independent media');
-        if (this.currentFile.audio) {
-          console.log('there is audio');
-            this.audioPath = this.currentFile.audio.path || '';
-        } else {
-          console.log(' no audio');
-          this.audioPath = null;
-        }
-        if (this.currentFile.image) {
-          console.log('there is image');
-          this.imagePath = this.currentFile.image.path || '';
-        } else {
-          console.log(' no image');
-          this.imagePath = null;
-        }
-      } else {
-        this.audioPath = null;
-        this.imagePath = null;
-        console.log('this.imagePath (should be null)', this.imagePath);
-      }
-
     }
 
     hoverWidgetOnOverlay(cm, overlayClass) {
@@ -145,10 +116,6 @@ export const baselineComponent = {
     insertTimestamp(event, seconds) {
       let string = " <!--" + this.clockFormat(seconds, 1) + "--> ";
       this._doc.replaceSelection(string, 'end');
-    }
-
-    saveContent() {
-      this.onUpdate({$event: {file: this.currentFile}});
     }
 
     clockFormat(seconds, decimals) {
