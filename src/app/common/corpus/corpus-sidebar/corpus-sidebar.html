@@ -4,17 +4,12 @@
         class="md-whiteframe-4dp"
         layout-column>
   <md-content layout-fill role="navigation">
-
     <md-button id="uploadButton"
                class="md-button md-fab md-grey-fab md-fab-bottom-left"
                ng-click="$ctrl.createNewMarkdown()"
                aria-label="attach_file">
       <md-icon class="material-icons">add</md-icon>
     </md-button>
-
-               <!--ng-if="!$ctrl.filteredFiles.length">Create New File</md-button>-->
-
-
     <md-list>
 
       <md-list-item ng-if="!$ctrl.markDownFiles.length" class="md-2-line" ng-click="$ctrl.createNewMarkdown()">
@@ -24,12 +19,11 @@
            </div>
          </md-item-content>
       </md-list-item>
+        <!--ng-repeat="file in $ctrl.markDownFiles | filter: $ctrl.searchText"-->
 
-              <!--ng-repeat="file in $ctrl.markDownFiles"-->
-              <!--ng-repeat="file in $ctrl.markDownFiles | filter:$ctrl.searchText"-->
       <md-list-item
         ui-sref-active="fileSelected"
-        ng-repeat="file in $ctrl.filteredFiles = ($ctrl.markDownFiles | filter: $ctrl.searchText)"
+        ng-repeat="file in $ctrl.markDownFiles | filter: $ctrl.searchText"
         ng-class="{'active': $ctrl.selectedFile._id === file._id}"
         ng-click="$ctrl.onSelection(file._id)"
         class="md-2-line">

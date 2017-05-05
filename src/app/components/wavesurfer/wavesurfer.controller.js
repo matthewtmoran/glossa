@@ -30,11 +30,15 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
+    console.log('$onChanges in wavesurfer.controller', changes);
     if (changes.urlSrc) {
+      console.log('changes in urlSrc');
+      this.urlSrc = angular.copy(changes.urlSrc.currentValue);
       this.initWaveSurfer();
     }
     if (changes.imageSrc) {
-      this.imageSrc = changes.imageSrc.currentValue;
+      console.log('changes in imageSrc');
+      this.imageSrc = angular.copy(changes.imageSrc.currentValue);
     }
     this.playbackSpeed = this.speed[0];
   }

@@ -2,9 +2,11 @@ import templateUrl from './app-nav.html';
 
 export const navComponent = {
   bindings: {
+    searchText: '<',
     onSearchSubmit: '&',
     onCreateNewMarkdown: '&',
-    onClearSearch: '&'
+    onClearSearch: '&',
+    onCreate: '&'
   },
   templateUrl,
   controller: class NavComponent {
@@ -24,8 +26,12 @@ export const navComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in app-nav.component', changes);
       if (changes.searchText) {
-        this.searchSubmit();
+        if (!!changes.searchText.currentValue){
+          console.log('filtering.....');
+          this.searchSubmit();
+        }
       }
     }
     toggleDrawer(event) {
@@ -43,8 +49,12 @@ export const navComponent = {
     create() {
       if (this.$state.current.parent === 'corpus') {
         this.rootService.tunnelEvent('createNamedMarkdown', {name: this.searchText});
-        this.onClearSearch();
       }
+      this.onClearSearch({
+        $event: {
+          text: ''
+        }
+      });
     }
   }
 };

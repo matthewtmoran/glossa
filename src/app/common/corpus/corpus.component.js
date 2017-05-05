@@ -36,21 +36,26 @@ export const corpusComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in corpus.componentn', changes);
+      console.log('$onChanges in corpus.component', changes);
       if (changes.markDownFiles) {
-        this.markDownFiles = changes.markDownFiles.currentValue;
+        console.log('changes in markDownFiles');
+        this.markDownFiles = angular.copy(changes.markDownFiles.currentValue);
+
+        console.log('this.markDownFiles', this.markDownFiles);
 
         if (this.markDownFiles.length < 1) {
           this.selectedFile = null;
         }
       }
       if (changes.searchText) {
+        console.log('changes in searchText');
+        this.searchText = angular.copy(changes.searchText.currentValue);
         // this.searchText = changes.searchText;
         console.log('change in search Text');
       }
       if (changes.notebookAttachment) {
         console.log('changes in notebookAttachment');
-        this.notebookAttachment = Object.assign({}, changes.notebookAttachment.currentValue)
+        this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue)
       }
     }
 
@@ -109,6 +114,8 @@ export const corpusComponent = {
         .then((data) => {
           this.cfpLoadingBar.complete();
           this.markDownFiles.push(data);
+          //copy data so reference is updated.
+          this.markDownFiles = angular.copy(this.markDownFiles);
           this.selectedFile = data;
           this.notebookAttachment = null;
         })
@@ -214,10 +221,12 @@ export const corpusComponent = {
                 }
               });
 
+              //copy reference to trigger $onChanges in child components
+              this.markDownFiles = angular.copy(this.markDownFiles);
+
               if (this.markDownFiles.length > 0) {
-                this.fileSelection(this.markDownFiles[0]._id)
+                this.fileSelection({fileId:this.markDownFiles[0]._id})
               } else {
-                console.log("no more files exist....");
                 this.selectedFile = null;
               }
               this.cfpLoadingBar.complete();
@@ -242,15 +251,7 @@ export const corpusComponent = {
             return;
           }
           delete event.file.notebookId;
-
           this.updateMarkdown(event);
-
-          // this.corpusService.updateFile(event.file)
-          //   .then((data) => {
-          //   console.log('data resolve in dialogServcie');
-          //     this.selectedFile = Object.assign({}, data);
-          //     this.getAttchachedNotebook(this.selectedFile.notebookId);
-          //   })
         })
     }
   },

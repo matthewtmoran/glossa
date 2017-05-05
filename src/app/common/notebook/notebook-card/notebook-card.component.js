@@ -5,10 +5,10 @@ import  templateUrl from './notebook-card.html';
 export const notebookCardComponent = {
   bindings: {
     notebook: '<',
+    currentUser: '<',
     onViewDetails: '&',
     onViewPreview: '&',
-    onDisconnectNotebook: '&',
-    currentUser: '<'
+    onDisconnectNotebook: '&'
   },
   templateUrl,
   controller: class NotebookCardComponent {
@@ -24,8 +24,21 @@ export const notebookCardComponent = {
 
     }
 
-    $onChanges() {
-      console.log('$onChanges in notebook-card');
+    $onChanges(changes) {
+      console.log('$onChanges in notebook-card.component', changes);
+      if (changes.notebook) {
+        console.log("changes in notebook");
+        this.notebook = angular.copy(changes.notebook.currentValue);
+        this.renderNotebookPreview();
+      }
+      if (changes.currentUser) {
+        console.log("changes in currentUser");
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
+    }
+
+    renderNotebookPreview() {
+      console.log('this.notebook.description', this.notebook.description);
       this.previewText = this.$sce.trustAsHtml(SimpleMDE.markdown(this.notebook.description));
 
       if (this.notebook.isNew) {
@@ -34,9 +47,7 @@ export const notebookCardComponent = {
           this.$element.removeClass('new-data');
         }, 5000)
       }
-      console.log('this.$state', this.$state);
       if (this.$state.current.parent.indexOf('corpus') > -1) {
-        console.log('corpus is true');
         this.isCorpus = true;
       }
     }
@@ -58,7 +69,6 @@ export const notebookCardComponent = {
     }
 
     disconnectNotebook() {
-      console.log('disconnectNotebook in notebook-card');
       this.onDisconnectNotebook()
     }
 

@@ -9,7 +9,6 @@ export const appComponent = {
       // this.authService = AuthService;
       this.rootService = RootService;
       this.$state = $state;
-      this.searchText = '';
       this.$scope = $scope;
       this.notificationService = NotificationService;
       // this.user = AuthService.getUser();
@@ -23,6 +22,7 @@ export const appComponent = {
       this.onlineConnections = [];
 
     }
+
 
     updateConnection(event, data) {
 
@@ -114,7 +114,8 @@ export const appComponent = {
     }
 
     clearSearch(event) {
-      this.searchText = '';
+      console.log('clearSearch',event);
+      this.searchText = angular.copy(event.text);
     }
 
   },

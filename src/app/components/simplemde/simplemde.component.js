@@ -3,9 +3,9 @@ import SimpleMDE from 'simplemde';
 export const simplemdeComponent = {
   bindings: {
     editorOptions: "<",
-    updateFunction: "&",
     fileBinding: "<",
     valueBinding: "<",
+    updateFunction: "&",
     updateModel: '&'
   },
   template:`<textarea id="theText" aria-label="hidden simplede text area node"></textarea>`,
@@ -16,9 +16,23 @@ export const simplemdeComponent = {
     }
 
     $onChanges(changes) {
-        if (changes.valueBinding && !changes.valueBinding.isFirstChange()) {
-          this.render();
-        }
+      console.log('$onChanges in simplemde.component', changes);
+      if (changes.editorOptions) {
+        console.log('changes in this.editorOptions');
+        this.editorOptions = angular.copy(changes.editorOptions.currentValue);
+      }
+      if (changes.fileBinding) {
+        console.log('changes in this.fileBinding');
+        this.fileBinding = angular.copy(changes.fileBinding.currentValue);
+      }
+      if (changes.valueBinding) {
+        console.log('changes in this.valueBinding');
+        this.valueBinding = angular.copy(changes.valueBinding.currentValue);
+      }
+      if (changes.valueBinding && !changes.valueBinding.isFirstChange()) {
+        this.render();
+      }
+
     }
 
     $onInit() {

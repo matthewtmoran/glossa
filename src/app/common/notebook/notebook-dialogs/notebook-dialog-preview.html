@@ -23,22 +23,22 @@
 			<div class=" no-padding" flex layout-fill>
 				<md-input-container class="simplemde-wrapper" flex layout-fill>
 
-					<simplemde
-							id="theText"
-							editor-options="$ctrl.editorOptions"
-							value-binding="$ctrl.notebook.description"
-							update-model="$ctrl.updateModel($event)">
+					<!--<simplemde-->
+							<!--id="theText"-->
+							<!--editor-options="$ctrl.editorOptions"-->
+							<!--value-binding="$ctrl.notebook.description"-->
+							<!--update-model="$ctrl.updateModel($event)">-->
 
-					</simplemde>
+					<!--</simplemde>-->
 
-					<!--<textarea-->
-					          <!--id="theText"-->
-					          <!--aria-label="text area"-->
-					          <!--class="simplemde-textarea"-->
-					          <!--ng-model="$ctrl.notebook.description"-->
-					          <!--simplemde="$ctrl.editorOptions"-->
-					          <!--required >-->
-					<!--</textarea>-->
+					<textarea
+					          id="theText"
+					          aria-label="text area"
+					          class="simplemde-textarea"
+					          ng-model="$ctrl.notebook.description"
+					          simplemde="$ctrl.editorOptions"
+					          required >
+					</textarea>
 					<md-progress-circular class="simplemde-loader fade-out" md-diameter="50"></md-progress-circular>
 				</md-input-container>
 			</div>

@@ -1,6 +1,7 @@
 <div class="root" layout="column" flex>
   <app-nav ng-if="!('settings' | includedByState)"
-    on-create-new-markdown=""
+     search-text="$ctrl.searchText"
+    on-create="$ctrl.createMarkdown($event)"
     on-search-submit="$ctrl.searchSubmit($event)"
     on-clear-search="$ctrl.clearSearch($event)"></app-nav><!--global -->
   <!--<app-nav ng-if="$state.includes('**.settings')"></app-nav>&lt;!&ndash;global &ndash;&gt;-->

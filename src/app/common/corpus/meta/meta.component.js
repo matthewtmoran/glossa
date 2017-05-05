@@ -20,15 +20,14 @@ export const metaComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges meta.component', changes);
       if (changes.selectedFile) {
-        this.currentFile = angular.copy(this.selectedFile);
+        console.log('changes in selectedFile');
+        this.currentFile = angular.copy(changes.selectedFile.currentValue);
       }
       if (changes.notebookAttached) {
-        console.log('changes.notebookAttached', changes.notebookAttached);
-        if (angular.isUndefined(changes.notebookAttached.currentValue)) {
-          console.log('it is undefined.....');
-          // delete this.notebookAttached;
-        }
+        console.log('changes in notebookAttached');
+        this.notebookAttached = angular.copy(changes.notebookAttached.currentValue);
       }
     }
 
@@ -79,7 +78,6 @@ export const metaComponent = {
     }
 
     disconnectNotebook(event) {
-      console.log('disconnectNotebook in meta.component');
       this.onDisconnectNotebook({
         $event: {
           file: this.currentFile
