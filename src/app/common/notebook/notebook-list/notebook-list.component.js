@@ -5,6 +5,7 @@ export const notebookListComponent = {
     currentUser: '<',
     searchText: '<',
     notebooks: '<',
+    selected: '<',
     onViewDetails: '&',
     onViewPreview: '&',
   },
@@ -16,14 +17,14 @@ export const notebookListComponent = {
     }
 
     $onChanges(changes) {
-      console.log('onChanges in notebook-list componenet');
+      console.log('onChanges in notebook-list componenet', changes);
       // if (changes.notebooks) {
       //   this.notebooks = changes.notebooks.currentValue;
       // }
     }
 
     $onInit() {
-      this.selected = [];
+      // this.selected = [];
     }
 
     exists(user, list) {

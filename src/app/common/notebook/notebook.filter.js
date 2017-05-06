@@ -1,6 +1,4 @@
 export default function () {
-  // console.log('users 1', users);
-  // console.log('list1', list);
   return (notebooks, list) => {
     return notebooks.filter((notebook) => {
       if (list.indexOf(notebook.createdBy._id) != -1) {

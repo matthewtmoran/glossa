@@ -33,6 +33,16 @@ export const app = angular
         data: {
           requiredAuth: false,
         },
+        resolve: {
+          // allConnections: (RootService) => {
+          //   console.log('resolve in app.module');
+          //   return RootService.getConnections()
+          //     .then((data) => {
+          //     console.log('data', data);
+          //       return data;
+          //     });
+          // },
+        },
         component: 'app',
       });
   })

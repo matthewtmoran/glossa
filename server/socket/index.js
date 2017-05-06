@@ -113,6 +113,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
       socketUtil.getConnections()
         .then(function(data) {
           console.log('emit:: send:connections to:: local-client');
+          console.log('localClient.socketId', localClient.socketId);
           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
         })
     });

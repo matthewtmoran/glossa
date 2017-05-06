@@ -4,6 +4,7 @@ import NotebookPreview from './notebook-dialogs/notebook-dialog-preview.html';
 
 export const notebookComponent = {
   bindings: {
+    allConnections: '<',
     notebooksData: '<',
     searchText: '<',
     currentUser: '<'
@@ -35,8 +36,13 @@ export const notebookComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in notebook.component', changes);
       if (changes.searchText) {
         console.log('this.searchText', this.searchText)
+      }
+      if (changes.allConnections) {
+        console.log('changes in allConnections');
+        this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
     }
 
@@ -62,13 +68,29 @@ export const notebookComponent = {
 
       this.queryNotebooks();
 
-      this.rootService.getConnectionsCB((data) => {
-        this.connections = data;
-      });
+      // this.rootService.getConnectionsCB((data) => {
+      //   this.connections = data;
+      // });
 
     }
 
+
+    toggle(event) {
+      let idx = event.list.indexOf(event.user._id);
+      if (idx > -1) {
+        this.selected.splice(idx, 1);
+        this.selected = angular.copy(this.selected);
+      }
+      else {
+        this.selected.push(event.user._id);
+        this.selected = angular.copy(this.selected);
+      }
+    };
+
     // exists(user, list) {
+    //   console.log('user', user);
+    //   console.log('list', list);
+    //   // console.log('list.indexOf(user._id) > -1', list.indexOf(user._id) > -1);
     //     return list.indexOf(user._id) > -1;
     // };
     //

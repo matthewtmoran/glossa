@@ -1,6 +1,9 @@
 import templateUrl from './app.html';
 
 export const appComponent = {
+  binding: {
+    allConnections: '<',
+  },
   templateUrl,
   controller: class AppComponent {
     constructor($state, RootService, $scope, NotificationService) {
@@ -15,12 +18,21 @@ export const appComponent = {
 
       this.currentUser = this.rootService.getUser();
 
+      console.log('this.allConnections', this.allConnections);
+
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
 
-      this.allConnections = [];
       this.onlineConnections = [];
 
+    }
+
+    $onChanges(changes) {
+      console.log('$onChanges in app.component', changes);
+      if (changes.allConnections) {
+        console.log('changes in allConnections');
+        this.allConnections = angular.copy(changes.allConnections.currentValue);
+      }
     }
 
 
@@ -51,7 +63,6 @@ export const appComponent = {
 
     updateConnections(event, data) {
 
-
       this.allConnections.map((existing, index) => {
         if (data.connections.indexOf(existing) < 0) {
           console.log('if the existing is not in the new array - remove it');
@@ -77,34 +88,39 @@ export const appComponent = {
         }
       });
 
-      this.allConnections.map((existing) => {
-        data.connections.forEach((potential) => {
-        })
-      });
+      this.allConnections = angular.copy(this.allConnections);
+
+      // this.allConnections.map((existing) => {
+      //   data.connections.forEach((potential) => {
+      //   })
+      // });
 
 
-      this.allConnections = data.connections;
-      data.connections.forEach((connection) => {
-        if (connection.online && this.onlineConnections.indexOf(connection) < 0) {
-          console.log('connections is online and does not exist in online array');
-          this.onlineConnections.push(connection);
-        }
-        if (!connection.online && this.onlineConnections.indexOf(connection) > -1) {
-          console.log('connection is offline and exists in connection array');
-          this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
-        }
-      });
-
-      this.onlineConnections.forEach((connection) => {
-        if (data.connections.indexOf(connection) < 0) {
-          console.log('connection is no longer online so remove from online array');
-          this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
-        }
-      });
+      // this.allConnections = data.connections;
+      // data.connections.forEach((connection) => {
+      //   if (connection.online && this.onlineConnections.indexOf(connection) < 0) {
+      //     console.log('connections is online and does not exist in online array');
+      //     this.onlineConnections.push(connection);
+      //   }
+      //   if (!connection.online && this.onlineConnections.indexOf(connection) > -1) {
+      //     console.log('connection is offline and exists in connection array');
+      //     this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
+      //   }
+      // });
+      //
+      // this.onlineConnections.forEach((connection) => {
+      //   if (data.connections.indexOf(connection) < 0) {
+      //     console.log('connection is no longer online so remove from online array');
+      //     this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
+      //   }
+      // });
     }
 
     $onInit() {
-      this.rootService.getConnections();
+      this.rootService.getConnections()
+        .then((data) => {
+          this.allConnections = angular.copy(data);
+      });
     }
 
 

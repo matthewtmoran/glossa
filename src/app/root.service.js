@@ -68,9 +68,9 @@ export class RootService {
     return this.__user.settings;
   }
 
-  getConnections() {
-    this.socketService.emit('get:connections')
-  }
+  // getConnections() {
+  //   this.socketService.emit('request:connections')
+  // }
 
   tunnelEvent(name, data) {
     this.$rootScope.$broadcast(name, data);
@@ -86,6 +86,18 @@ export class RootService {
     return this.$http.get('/api/project/')
       .then((response) => {
         return response.data[0];
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
+  }
+
+  getConnections() {
+    console.log('getConnections');
+    return this.$http.get('/api/connections/')
+      .then((response) => {
+        return response.data;
       })
       .catch((response) => {
         console.log('There was an error', response);
@@ -179,10 +191,6 @@ export class RootService {
 
   getOnlineUsersSE() {
     this.socketFactory.emit('get:networkUsers')
-  }
-
-  getConnections() {
-    this.socketService.emit('request:connections');
   }
 
   //look for all updates from users that are being followed

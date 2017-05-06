@@ -10,97 +10,99 @@ export class DrawerService {
       },
       {
         name: 'Notebooks',
-        type: 'toggle',
-        pages: [
-          {
-            name: 'My Notebook',
-            type: 'link',
-            state: 'notebook',
-            icon: 'fa fa-group'
-          },
-          {
-            name: '@matthewtmoran',
-            state: 'munchies.bananachips',
-            type: 'link',
-            icon: 'fa fa-map-marker',
-            disabled: true
-          },
-          {
-            name: '@justin_rees',
-            state: 'munchies.donuts',
-            type: 'link',
-            icon: 'fa fa-map-marker',
-            disabled: true
-          }
-        ],
+        type: 'link',
+        state: 'notebook',
+        // pages: [
+        //   {
+        //     name: 'My Notebook',
+        //     type: 'link',
+        //     state: 'notebook',
+        //     icon: 'fa fa-group'
+        //   },
+        //   {
+        //     name: '@matthewtmoran',
+        //     state: 'munchies.bananachips',
+        //     type: 'link',
+        //     icon: 'fa fa-map-marker',
+        //     disabled: true
+        //   },
+        //   {
+        //     name: '@justin_rees',
+        //     state: 'munchies.donuts',
+        //     type: 'link',
+        //     icon: 'fa fa-map-marker',
+        //     disabled: true
+        //   }
+        // ],
         orderNum: 2
       },
       {
         name: 'Corpora',
-        type: 'toggle',
-        pages: [
-          {
-            name: 'Corpus',
-            type: 'link',
-            state: 'corpus',
-            params: {
-              user: 'Moran',
-              corpus: 'default'
-            },
-            settings: [
-              {
-                name: 'Sub Option1',
-                type: ''
-              },
-              {
-                name: 'Sub Option2',
-                type: ''
-              },
-              {
-                name: 'Sub Option3',
-                type: ''
-              }
-            ]
-          }
-        ],
-        settings: [
-          {
-            name: 'View All',
-            type: ''
-          },
-          {
-            name: 'Add Corpus',
-            type: '',
-            action: 'corpusDialog'
-          },
-          {
-            // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
-            name: 'Duplicate',
-            type: '',
-            disabled: true
-          },
-          {
-            name: 'Bulk-Edit Word Forms',
-            type: '',
-            disabled: true
-          },
-          {
-            name: 'Phonology Assistant',
-            type: '',
-            disabled: true
-          },
-          {
-            name: 'Primer Assistant',
-            type: '',
-            disabled: true
-          },
-          {
-            name: 'Export',
-            type: '',
-            disabled: true
-          }
-        ],
-        orderNum: 3
+        type: 'link',
+        state: 'corpus'
+        // pages: [
+        //   {
+        //     name: 'Corpus',
+        //     type: 'link',
+        //     state: 'corpus',
+        //     params: {
+        //       user: 'Moran',
+        //       corpus: 'default'
+        //     },
+        //     settings: [
+        //       {
+        //         name: 'Sub Option1',
+        //         type: ''
+        //       },
+        //       {
+        //         name: 'Sub Option2',
+        //         type: ''
+        //       },
+        //       {
+        //         name: 'Sub Option3',
+        //         type: ''
+        //       }
+        //     ]
+        //   }
+        // ],
+        // settings: [
+        //   {
+        //     name: 'View All',
+        //     type: ''
+        //   },
+        //   {
+        //     name: 'Add Corpus',
+        //     type: '',
+        //     action: 'corpusDialog'
+        //   },
+        //   {
+        //     // THIS OPTION BELONGS ON A CHILD ELEMENT... BUT IT IS HERE TO GIVE AN IDEA.
+        //     name: 'Duplicate',
+        //     type: '',
+        //     disabled: true
+        //   },
+        //   {
+        //     name: 'Bulk-Edit Word Forms',
+        //     type: '',
+        //     disabled: true
+        //   },
+        //   {
+        //     name: 'Phonology Assistant',
+        //     type: '',
+        //     disabled: true
+        //   },
+        //   {
+        //     name: 'Primer Assistant',
+        //     type: '',
+        //     disabled: true
+        //   },
+        //   {
+        //     name: 'Export',
+        //     type: '',
+        //     disabled: true
+        //   }
+        // ],
+        // orderNum: 3
       },
       {
         name: 'Lexicon',

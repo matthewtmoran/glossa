@@ -1,0 +1,12 @@
+<h3>Users</h3>
+<md-list>
+	<md-list-item ng-repeat="user in $ctrl.allConnections  | filter: { following: true } ">
+
+		<md-checkbox aria-label="{{user.name}} Checkbox" ng-checked="$ctrl.exists(user, $ctrl.selected)" ng-click="$ctrl.toggle(user, $ctrl.selected)">
+			{{ user.name }}
+
+			<!--<span ng-if="$ctrl.exists(user, $ctrl.selected)">selected</span>-->
+		</md-checkbox>
+
+	</md-list-item>
+</md-list>
