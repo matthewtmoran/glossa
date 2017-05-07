@@ -1,26 +1,15 @@
 <md-content id="notebook-container" layout="row" flex ng-cloak>
-
 	<md-content flex="25" layout-padding class="left-side">
+
 		<user-list
 			all-connections="$ctrl.allConnections"
 			selected="$ctrl.selected"
 			on-exists="$ctrl.exists($event)"
 			on-toggle="$ctrl.toggle($event)">
-
 		</user-list>
-		<!--<h3>Users</h3>-->
-		<!--<md-list>-->
-			<!--<md-list-item ng-repeat="user in $ctrl.allConnections  | filter: { following: true } ">-->
 
-				<!--<md-checkbox aria-label="{{user.name}} Checkbox" ng-checked="$ctrl.exists(user, $ctrl.selected)" ng-click="$ctrl.toggle(user, $ctrl.selected)">-->
-					<!--{{ user.name }}-->
-
-					<!--&lt;!&ndash;<span ng-if="$ctrl.exists(user, $ctrl.selected)">selected</span>&ndash;&gt;-->
-				<!--</md-checkbox>-->
-
-			<!--</md-list-item>-->
-		<!--</md-list>-->
 		<md-divider></md-divider>
+
 		<h3>Common Tags</h3>
 		<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
 		<md-list>
@@ -33,19 +22,16 @@
 				</md-chip>
 			</md-list-item>
 		</md-list>
+
 	</md-content>
 
 	<md-content flex="75" class="notebook-list" layout-padding>
-
 		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>
-
 		<md-button class="md-raised update-btn" ng-if="$ctrl.externalNotebooks.length" ng-click="$ctrl.showNewUpdates()">
 			<span>{{$ctrl.externalNotebooks.length}} updates are available.</span>
 			<span>View changes</span>
 			<md-icon class="">update</md-icon>
 		</md-button>
-
-
 		<notebook-list layout="column"
 		               selected="$ctrl.selected"
 			           current-user="$ctrl.currentUser"
@@ -54,8 +40,8 @@
 			           on-view-details="$ctrl.viewDetails($event)"
 			           on-view-preview="$ctrl.viewPreview($event)">
 		</notebook-list>
-
 	</md-content>
+
 	<md-fab-speed-dial
 			ng-hide="$ctrl.hidden"
 			md-direction="up"

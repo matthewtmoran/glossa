@@ -306,6 +306,10 @@ notebook {
 }
 
 .post-dialog {
+	form {
+		width: 100%;
+	}
+
 	.audio-container {
 		background: transparent;
 		height: 200px;
