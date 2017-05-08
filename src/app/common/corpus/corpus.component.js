@@ -1,4 +1,5 @@
 import templateUrl from './corpus.html';
+import NotebookPreviewTemplate from '../notebook/notebook-dialog/notebook-dialog-preview.html';
 
 export const corpusComponent = {
   bindings: {
@@ -7,7 +8,7 @@ export const corpusComponent = {
   },
   templateUrl,
   controller: class CorpusComponent {
-    constructor($scope, $state, $filter, CorpusService, cfpLoadingBar, DialogService, NotebookService) {
+    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService) {
       'ngInject';
       this.cfpLoadingBar = cfpLoadingBar;
       // this.$state = $state;
@@ -28,6 +29,7 @@ export const corpusComponent = {
       };
 
       this.$scope = $scope;
+      this.$mdDialog = $mdDialog;
 
       this.$scope.$on('createNamedMarkdown', this.namedMarkdown.bind(this));
 
@@ -238,8 +240,32 @@ export const corpusComponent = {
     }
 
     viewDetailsTop(event) {
-      let postOptions = this.notebookService.postOptions(event);
-      this.dialogService.viewDetails(event, postOptions);
+      this.notebook = event.notebook;
+      this.editorOptions = {
+        toolbar: false,
+        status: false,
+        spellChecker: false,
+        autoDownloadFontAwesome: false,
+        autoPreview: true
+      };
+
+      this.$mdDialog.show({
+        templateUrl: NotebookPreviewTemplate,
+        targetEvent: event,
+        clickOutsideToClose: true,
+        controller: () => this,
+        controllerAs: '$ctrl',
+      }).then((data) => {
+        console.log('dialog closed',data);
+        delete this.notebook;
+      }).catch(() => {
+        delete this.notebook;
+        console.log('negative');
+      })
+    }
+
+    cancel() {
+      this.$mdDialog.cancel();
     }
 
     disconnectNotebook(event) {

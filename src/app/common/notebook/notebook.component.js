@@ -5,6 +5,7 @@ import NotebookPreviewTemplate from './notebook-dialog/notebook-dialog-preview.h
 import NotebookImageTemplate from './notebook-dialog/notebook-dialog-image.html';
 import NotebookAudioTemplate from './notebook-dialog/notebook-dialog-audio.html';
 
+
 export const notebookComponent = {
   bindings: {
     allConnections: '<',
