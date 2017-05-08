@@ -22,7 +22,6 @@
 				</md-chip>
 			</md-list-item>
 		</md-list>
-
 	</md-content>
 
 	<md-content flex="75" class="notebook-list" layout-padding>
@@ -56,7 +55,7 @@
 			</md-button>
 		</md-fab-trigger>
 		<md-fab-actions>
-			<md-button ng-repeat="item in $ctrl.items" class="md-fab md-raised md-mini" ng-click="$ctrl.newPost($event, item.type)">
+			<md-button ng-repeat="item in $ctrl.items" class="md-fab md-raised md-mini" ng-click="$ctrl.viewDetails($event, item.type)">
 				<md-icon>{{item.icon}}</md-icon>
 			</md-button>
 		</md-fab-actions>

@@ -1,70 +1,75 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, $window, DialogService, simplemdeOptions,  NotebookService, notebook, onDeleteNotebook) {
+  constructor($scope, $timeout, $window, notebook, editorOptions, onCancel, onDeleteNotebook, onHide, onUpdate, onSave) {
     'ngInject';
+
     this.$scope = $scope;
     this.$timeout = $timeout;
     this.$window = $window;
 
-    this.dialogService = DialogService;
-    this.simplemdeOptions = simplemdeOptions;
-    this.notebookService = NotebookService;
     this.currentNotebook = angular.copy(notebook);
-    this.valueBinding = notebook.description;
-    this.removedMedia = [];
-
-
-    this.dialogObject = {
-      dataChanged: false,
-      event: 'hide',
-      // data: originalCopy
-    };
+    this.editorOptions = editorOptions;
+    this.onCancel = onCancel;
+    this.onHide = onHide;
+    this.onUpdate = onUpdate;
+    this.onSave = onSave
 
     this.onDeleteNotebook = onDeleteNotebook;
-
-    this.editorOptions = this.simplemdeOptions;
 
     this.$scope.$watch(() => this.currentNotebook.image, this.imageWatcher.bind(this));
     this.$scope.$watch(() => this.currentNotebook.audio, this.audioWatcher.bind(this));
 
-    this.init();
+    this.init()
 
   }
 
   init() {
+    this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();
   }
 
   cancel() {
-    this.dialogService.cancel(false)
+    console.log('cancel being called');
+    this.onCancel({
+      $event: {
+        notebook: false
+      }
+    })
   }
 
   hide() {
-    this.dialogService.hide(false)
+    this.onHide({
+      $event: {
+        notebook: false
+      }
+    })
   }
 
   save() {
-    this.dialogService.hide(this.currentNotebook);
+    this.onSave({
+      notebook: this.currentNotebook
+    })
   }
 
   update() {
-    if (this.removedMedia.length > 0) {
-      this.currentNotebook.removeItem = this.removedMedia;
-    }
-    this.dialogService.hide(this.currentNotebook);
+    console.log('update');
+    this.onUpdate({
+      notebook: this.currentNotebook,
+      removeItem: this.removedMedia
+    })
   }
 
   updateModel(event) {
-    console.log('updateModel being called', event);
+    console.log('updateing model');
     this.currentNotebook.description = event.value;
   }
-    //precludes setDynamicItems
+
   findDetailType() {
     if (!this.currentNotebook._id) {
       this.isNewPost = true;
     }
   }
-  //function to set at least some dynamic features... TODO: should be moved to service....
+
   setDynamicItems() {
     if (this.isNewPost) {
       this.postDetails = {
@@ -76,7 +81,7 @@ export class NotebookDialogController {
       }
     } else {
       this.postDetails = {
-        title: this.notebook.name + ' Details',
+        title: this.currentNotebook.name + ' Details',
         button: {
           action: this.update.bind(this),
           text: 'Update Post'
@@ -86,30 +91,15 @@ export class NotebookDialogController {
   }
 
   deleteNotebook() {
-    this.dialogService.hide('hideToConfirm');
+    this.hide('hideToConfirm');
     this.onDeleteNotebook({
-      $event: {
-        notebook: this.notebook
-      }
+      notebook: this.currentNotebook
     })
   }
-    //called if media is 'removed' saved to separate object to send with request to server
+
   removeMedia(media, selectedTile, otherTile) {
     if (media.createdAt) { //this tells us the media has been saved to the db before
       this.removedMedia.push(media);
-    }
-  }
-    //this is called on cancel and run if media was 'removed' but not saved...
-  restoreMedia() {
-    if (this.removedMedia) {
-      //replace the media if it was removed then details were canceled.
-      this.removedMedia.forEach((media) => {
-        if (media.mimetype.indexOf('audio') > -1) { //check if mimetype is an audio type...
-          this.currentNotebook.audio = media;
-        } else {
-          this.currentNotebook.image = media;
-        }
-      })
     }
   }
 
@@ -136,8 +126,4 @@ export class NotebookDialogController {
     }
   }
 
-  closeDetails() {
-    this.dialogService.cancel();
-  }
-
-};
+}

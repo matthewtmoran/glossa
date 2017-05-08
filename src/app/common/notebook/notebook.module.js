@@ -2,6 +2,7 @@ import { NotebookService } from './notebook.service';
 import { notebookComponent } from './notebook.component';
 import { notebookCard } from './notebook-card/notebook-card.module';
 import { notebookList } from './notebook-list/notebook-list.module';
+import { notebookDialog } from './notebook-dialog/notebook-dialog.module';
 import { userList } from './user-list/user-list.module';
 import Exists from './notebook.filter';
 import './notebook.scss';
@@ -10,7 +11,8 @@ export const notebook = angular
   .module('components.notebook', [
     notebookCard,
     notebookList,
-    userList
+    userList,
+    notebookDialog,
   ])
   .component('notebook', notebookComponent)
   .config(($stateProvider) => {

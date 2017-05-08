@@ -1,5 +1,4 @@
 import SimpleMDE from 'simplemde';
-import NotebookNormalTemplate from '../../components/dialog/dialog-notebook/dialog.notebook-normal.html';
 
 export class NotebookService {
   constructor($http, $q, ParseService, Upload, RootService, __user) {
@@ -114,7 +113,6 @@ export class NotebookService {
    */
 
   createNotebook(notebook) {
-    console.log('createNotebook');
     let user = this.rootService.getUser();
     notebook.name = this.parseService.title(notebook);
     // notebook.createdAt = Date.now();
@@ -147,6 +145,7 @@ export class NotebookService {
    * @returns {*}
    */
   updateNotebook(notebook) {
+    console.log('notebook ', notebook);
     //parse name of notebooks in case it was changed...
     notebook.name = this.parseService.title(notebook);
 
@@ -222,7 +221,7 @@ export class NotebookService {
 
       switch(event.notebook.postType) {
         case 'image':
-          options.template = 'app/notebooks/notebook-dialog/notebook-dialog-image.controller.html';
+          options.template = NotebookImageTemplate;
           options.simplemde = {
             toolbar: false,
             status: false,

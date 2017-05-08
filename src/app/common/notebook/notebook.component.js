@@ -1,6 +1,9 @@
 import templateUrl from './notebook.html';
-import AttachmentTemplate from '../../components/dialog/dialog-notebook/dialog.notebook-normal.html';
-import NotebookPreview from './notebook-dialogs/notebook-dialog-preview.html';
+import SimpleMDE from 'simplemde';
+import NotebookNormalTemplate from './notebook-dialog/notebook-dialog-normal.html';
+import NotebookPreviewTemplate from './notebook-dialog/notebook-dialog-preview.html';
+import NotebookImageTemplate from './notebook-dialog/notebook-dialog-image.html';
+import NotebookAudioTemplate from './notebook-dialog/notebook-dialog-audio.html';
 
 export const notebookComponent = {
   bindings: {
@@ -61,6 +64,67 @@ export const notebookComponent = {
         {name: "Create Normal Post", icon: "create", direction: "left", type: 'normal'}
       ];
 
+      this.simplemdeToolbar = [
+        {
+          name: "italic",
+          action: SimpleMDE.toggleItalic,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'format_italic',
+          title: "Italic",
+        },
+        {
+          name: "bold",
+          action: SimpleMDE.toggleBold,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_bold",
+          title: "Bold",
+        },
+        {
+          name: "header",
+          action: SimpleMDE.toggleHeading1,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "title",
+          title: "Header",
+        },
+        "|", // Separator
+        {
+          name: "Blockquote",
+          action: SimpleMDE.toggleBlockquote,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_quote",
+          title: "Blockquote",
+        },
+        {
+          name: "Bullet List",
+          action: SimpleMDE.toggleUnorderedList,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_list_bulleted",
+          title: "Bullet List",
+        },
+        {
+          name: "Ordered List",
+          action: SimpleMDE.toggleOrderedList,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'format_list_numbered',
+          title: "Numbered List",
+        },
+        "|",
+        {
+          name: "Toggle Preview",
+          action: SimpleMDE.togglePreview,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'visibility',
+          title: "Toggle Preview",
+        },
+        {
+          name: "Help",
+          action: this.test,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass:'help',
+          title: "Toggle Preview",
+        }
+      ];
+
       this.notebooks = [];
       this.externalNotebooks = [];
       this.commonTags = [];
@@ -86,23 +150,6 @@ export const notebookComponent = {
         this.selected = angular.copy(this.selected);
       }
     };
-
-    // exists(user, list) {
-    //   console.log('user', user);
-    //   console.log('list', list);
-    //   // console.log('list.indexOf(user._id) > -1', list.indexOf(user._id) > -1);
-    //     return list.indexOf(user._id) > -1;
-    // };
-    //
-    // toggle(user, list) {
-    //   let idx = list.indexOf(user._id);
-    //   if (idx > -1) {
-    //     list.splice(idx, 1);
-    //   }
-    //   else {
-    //     list.push(user._id);
-    //   }
-    // };
 
     queryNotebooks() {
       this.notebookService.getNotebooks()
@@ -130,92 +177,172 @@ export const notebookComponent = {
       this.externalNotebooks = [];
     }
 
-    update(notebook) {
-      this.notebookService.updateNotebook(notebook)
+    update(event) {
+      this.cfpLoadingBar.start();
+      this.notebookService.updateNotebook(event.notebook)
         .then((data) => {
+          this.$mdDialog.hide();
 
-      }).catch((data) => {
+          this.notebooks.map((notebook, index) => {
+            if (notebook._id === data._id) {
+              this.notebooks[index] = data;
+            }
+          });
+          this.cfpLoadingBar.complete();
+        })
+    }
 
-      })
+    save(event) {
+      this.$mdDialog.hide();
+      this.cfpLoadingBar.start();
+      this.notebookService.createNotebook(event.notebook)
+        .then((data) => {
+          this.notebooks.push(data);
+          this.cfpLoadingBar.complete();
+        })
+        .catch((data) => {
+          console.log('There was an error ', data);
+          this.cfpLoadingBar.complete();
+        });
     }
 
     deleteNotebook(event) {
-      console.log('delteNotebook in notebook component', event);
-    }
+      let options = {
+        title: "Are you sure you want to delete this post?",
+        textContent: "By deleting this post... it wont be here anymore..."
+      };
 
-    /**
-     * Calls the service method and waits for promise.  When promise returns, it means the data has been saved in the database and the file has been written to the filesystem then we push the created notebooks to the array
-     * @param event - the event
-     */
-    viewDetails(event) {
-      //get options depending on post type
-      let postOptions = this.notebookService.postOptions(event);
-      event.deleteNotebook = this.deleteNotebook;
-      //open post dialog
-      this.dialogService.notebookDetails(event, postOptions)
+      this.dialogService.confirmDialog(options)
         .then((result) => {
           if (!result) {
-            return;
-          }
-          if (result === 'hideToConfirm'){
-
-            let options = {
-              title: "Are you sure you want to delete this post?",
-              textContent: "By deleting this post... it wont be here anymore..."
-            };
-            this.dialogService.confirmDialog(options)
-              .then((result) => {
-                  if (!result) {
-                    this.viewDetails(event);
-                  } else {
-                    this.cfpLoadingBar.start();
-                    this.notebookService.deleteNotebook(event.notebook)
-                      .then((data) => {
-                        if(!data) {
-                          return;
-                        }
-                        if (data) {
-                          this.notebooks.map((notebook, index) => {
-                            if (notebook._id === event.notebook._id) {
-                              this.notebooks.splice(index, 1);
-                            }
-                          });
-                          this.cfpLoadingBar.complete();
-                        }
-                      });
-                  }
-              })
-          } else if (result._id) {
-          this.cfpLoadingBar.start();
-            this.notebookService.updateNotebook(result)
-              .then((data) => {
-                this.notebooks.map((notebook, index) => {
-                  if (notebook._id === data._id) {
-                    this.notebooks[index] = data;
-                  }
-                });
-                this.cfpLoadingBar.complete();
-              })
-              .catch((data) => {
-                this.cfpLoadingBar.complete();
-                console.log('There was an error ', data)
-              })
+            this.viewDetails(event);
           } else {
-            this.notebookService.createNotebook(result)
+            this.cfpLoadingBar.start();
+            this.notebookService.deleteNotebook(event.notebook)
               .then((data) => {
-                this.notebooks.push(data);
-                this.cfpLoadingBar.complete();
-              })
-              .catch((data) => {
-                console.log('There was an error ', data);
-                this.cfpLoadingBar.complete();
-              })
+                if(!data) {
+                  return;
+                }
+                if (data) {
+                  this.notebooks.map((notebook, index) => {
+                    if (notebook._id === event.notebook._id) {
+                      this.notebooks.splice(index, 1);
+                    }
+                  });
+                  this.cfpLoadingBar.complete();
+                }
+              });
           }
         })
-        .catch((result) => {
-          console.log('catch result', result);
-        });
+
     }
+
+    viewDetails(event, type) {
+
+      if (!event.notebook) {
+        event.notebook = {
+          postType: type
+        }
+      }
+
+      let state = {};
+      switch(event.notebook.postType) {
+        case 'image':
+          this.editorOptions = {
+            toolbar: false,
+            status: false,
+            spellChecker: false,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Image caption...',
+          };
+          state = {
+            templateUrl: NotebookImageTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: 'notebookDialogController',
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.update.bind(this),
+              onSave: this.save.bind(this)
+            }
+          };
+
+          break;
+        case 'audio':
+          this.editorOptions = {
+            toolbar: false,
+            status: false,
+            spellChecker: false,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Audio caption...',
+          };
+          state = {
+            templateUrl: NotebookAudioTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: 'notebookDialogController',
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.update.bind(this),
+              onSave: this.save.bind(this)
+            }
+          };
+          break;
+        case 'normal':
+          console.log('normal notebook');
+          this.editorOptions = {
+            toolbar: this.simplemdeToolbar,
+            spellChecker: false,
+            status: false,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Post description...',
+          };
+
+          state = {
+            templateUrl: NotebookNormalTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: 'notebookDialogController',
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.update.bind(this),
+              onSave: this.save.bind(this)
+            }
+          };
+
+          break;
+        case 'default':
+          console.log('error');
+      }
+
+      this.$mdDialog.show(state)
+        .then((data) => {
+          console.log('positive', data);
+          return data;
+        })
+        .catch((data) => {
+          console.log('negative', data);
+          return data;
+        });
+    };
 
     viewPreview(event) {
       console.log('viewPreview in notebook component', event);
@@ -237,7 +364,7 @@ export const notebookComponent = {
       };
 
       this.$mdDialog.show({
-        templateUrl: NotebookPreview,
+        templateUrl: NotebookPreviewTemplate,
         targetEvent: event,
         clickOutsideToClose: true,
         controller: () => this,
@@ -254,6 +381,10 @@ export const notebookComponent = {
 
     cancel() {
       this.$mdDialog.cancel();
+    }
+
+    hide() {
+      this.$mdDialog.hide();
     }
 
     tagManageDialog() {
@@ -284,7 +415,6 @@ export const notebookComponent = {
       event.notebook = {
         postType: type
       };
-
       this.viewDetails(event)
     }
 

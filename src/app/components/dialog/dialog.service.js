@@ -100,7 +100,6 @@ export class DialogService {
   }
 
   notebookDetails(event, options) {
-    console.log('event', event);
     return this.$mdDialog.show({
       controller: 'notebookDialogController',
       templateUrl: options.template,

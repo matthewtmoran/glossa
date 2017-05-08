@@ -1,6 +1,6 @@
 import WaveSurfer from 'wavesurferDev';
 export class WaveSurferController {
-  constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar ) {
+  constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element ) {
     'ngInject';
 
     this.$timeout = $timeout;
@@ -10,6 +10,7 @@ export class WaveSurferController {
     this.$interval = $interval;
     this.$scope = $scope;
     this.cfpLoadingBar = cfpLoadingBar;
+    this.$element = $element;
 
   // this.initWaveSurfer = this.initWaveSurfer.bind(this);
     this.setTimestamp = this.setTimestamp.bind(this);
@@ -44,7 +45,7 @@ export class WaveSurferController {
   }
 
   $onInit() {
-
+    console.log('this.$element ', this.$element );
   }
 
   resetWaveSurfer() {
@@ -94,7 +95,7 @@ export class WaveSurferController {
       this.surfer = Object.create(WaveSurfer);
 
       let options = {
-        container: angular.element('.waveSurferWave')[0]
+        container:  angular.element(this.$element[0].querySelector('.waveSurferWave'))[0]
       };
 
 

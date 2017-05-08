@@ -1,4 +1,4 @@
-<md-dialog class="post-dialog" flex-xs="90" flex-sm="75" flex-gt-sm="50">
+<md-dialog class="post-dialog" aria-label="notebook dialog" flex-xs="90" flex-sm="75" flex-gt-sm="50">
 	<form name="postForm" ng-cloak>
 		<md-dialog-content>
 			<div layout="row">
@@ -16,6 +16,7 @@
 							accept="image/*">
 						<span>Add Image</span>
 					</md-button>
+
 					<md-button
 							ng-if="!$ctrl.currentNotebook.audio"
 							ngf-select
@@ -48,26 +49,7 @@
 						</wave-surfer-preview>
 					</div>
 				</div>
-
-
-
-				<!--<div flex class="md-padding media-container" ng-if="$ctrl.currentNotebook.image" >-->
-				<!--</div>-->
 			</div>
-
-			<div flex class="upload-selection">
-				<!--<div layout="row" layout-align="center center">-->
-				<!--<md-button ngf-select-->
-				<!--name="audioUpload"-->
-				<!--class="md-icon-button"-->
-				<!--ng-model="$ctrl.currentNotebook.audio"-->
-				<!--accept="audio/*">-->
-				<!--<md-icon>volume_up</md-icon>-->
-				<!--</md-button>-->
-				<!--</div>-->
-
-			</div>
-
 
 			<div class=" no-padding" flex layout-fill>
 				<md-input-container class="simplemde-wrapper" flex layout-fill>
