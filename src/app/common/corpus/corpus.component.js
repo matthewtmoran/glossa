@@ -100,6 +100,7 @@ export const corpusComponent = {
         .then((data) => {
           this.cfpLoadingBar.complete();
           this.markDownFiles.push(data);
+          this.markDownFiles = angular.copy(this.markDownFiles);
           this.selectedFile = data;
           this.notebookAttachment = null;
         })
@@ -191,6 +192,8 @@ export const corpusComponent = {
               this.markDownFiles[index] = this.selectedFile;
             }
           });
+
+          this.markDownFiles = angular.copy(this.markDownFiles);
         })
         .catch((data) => {
           console.log('there was an issue', data)
