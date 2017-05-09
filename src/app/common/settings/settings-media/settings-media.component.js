@@ -38,28 +38,18 @@ export const settingsMediaComponent = {
       ];
     }
 
-    $onInit() {
-
+    $onChanges(changes) {
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue)
+      }
     }
 
     saveMediaSettings() {
-      console.log('UpdateProject TODO: pass function stuff');
       this.onSaveMediaSettings({
         $event: {
           settings: this.settings
         }
       })
     }
-
-    exportProject() {
-      console.log('exportProject TODO: pass function stuff');
-      this.onExportProject({
-        $event: {
-          media: this.project
-        }
-      })
-    }
-
-
   }
 };

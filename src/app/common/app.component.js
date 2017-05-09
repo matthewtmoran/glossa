@@ -6,7 +6,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($state, RootService, $scope, NotificationService) {
+    constructor($state, RootService, $scope, NotificationService, SettingsService, cfpLoadingBar, DialogService) {
       'ngInject';
 
       // this.authService = AuthService;
@@ -14,9 +14,11 @@ export const appComponent = {
       this.$state = $state;
       this.$scope = $scope;
       this.notificationService = NotificationService;
+      this.settingsService = SettingsService;
+      this.cfpLoadingBar = cfpLoadingBar;
+      this.dialogService = DialogService;
       // this.user = AuthService.getUser();
 
-      this.currentUser = this.rootService.getUser();
 
       console.log('this.allConnections', this.allConnections);
 
@@ -33,6 +35,62 @@ export const appComponent = {
         console.log('changes in allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
+    }
+
+
+    $onInit() {
+      //get all connections
+      this.rootService.getConnections().then((data) => {
+        this.allConnections = angular.copy(data);
+      });
+      //get project
+      this.settingsService.getProject().then((data) => {
+        this.project = angular.copy(data);
+      });
+      //get current user
+      this.currentUser = this.rootService.getUser();
+      //get settings
+      this.settings = this.rootService.getSettings();
+    }
+
+
+    //comes from settings.component
+
+    saveMediaSettings(event) {
+      this.rootService.saveSettings(event.settings)
+        .then((data) => {
+        console.log('data', data);
+          this.settings = angular.copy(data.settings);
+        })
+    }
+
+    exportProject(event) {
+      this.cfpLoadingBar.start();
+      let options = {};
+      options.title = "Are you sure you want to export all your project data?";
+      options.textContent = "This may take a few minutes...";
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+          this.settingsService.exportProject(event.project)
+            .then((data) => {
+              this.cfpLoadingBar.complete();
+            });
+        });
+    }
+
+    updateProject(event) {
+      this.cfpLoadingBar.start();
+      this.settingsService.updateProject(event.project)
+        .then((data) => {
+          this.project = angular.copy(data);
+
+          console.log('TODO: update project name in drawer in rt......');
+          // drawerMenu.updateProjectName(vm.project.name);
+          this.cfpLoadingBar.complete();
+        })
     }
 
 
@@ -71,7 +129,7 @@ export const appComponent = {
       });
 
       data.connections.forEach((potential) => {
-        if(this.allConnections.indexOf(potential) < 0) {
+        if (this.allConnections.indexOf(potential) < 0) {
           console.log('this connection does not exist in the allConnections array');
           this.allConnections.push(potential);
 
@@ -116,21 +174,13 @@ export const appComponent = {
       // });
     }
 
-    $onInit() {
-      this.rootService.getConnections()
-        .then((data) => {
-          this.allConnections = angular.copy(data);
-      });
-    }
-
-
 
     searchSubmit(event) {
       this.searchText = event.searchText;
     }
 
     clearSearch(event) {
-      console.log('clearSearch',event);
+      console.log('clearSearch', event);
       this.searchText = angular.copy(event.text);
     }
 

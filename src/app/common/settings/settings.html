@@ -25,13 +25,14 @@
 		            layout-fill
 		            ui-view
 		            flex
-		            all-connections="$ctrl.allConnections"
-		            online-connections="$ctrl.onlineConnections"
 		            project="$ctrl.project"
 		            settings="$ctrl.settings"
+		            current-user="$ctrl.currentUser"
+		            all-connections="$ctrl.allConnections"
+		            online-connections="$ctrl.onlineConnections"
 		            on-update-project="$ctrl.updateProject($event)"
 		            on-export-project="$ctrl.exportProject($event)"
-		            on-save-media-settings="$ctrl.saveMediaSettings">
+		            on-save-media-settings="$ctrl.saveMediaSettings($event)">
 		</md-content>
 
 	</md-content>

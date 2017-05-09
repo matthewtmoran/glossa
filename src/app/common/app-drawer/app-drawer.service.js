@@ -4,11 +4,6 @@ export class DrawerService {
     this.rootService = RootService;
     this.section = [
       {
-        name: 'Project',
-        type: 'heading',
-        orderNum: 0
-      },
-      {
         name: 'Notebooks',
         type: 'link',
         state: 'notebook',
@@ -34,7 +29,7 @@ export class DrawerService {
         //     disabled: true
         //   }
         // ],
-        orderNum: 2
+        orderNum: 0
       },
       {
         name: 'Corpora',
@@ -136,7 +131,7 @@ export class DrawerService {
             type: ''
           }
         ],
-        orderNum: 4
+        orderNum: 3
       },
       {
         name: 'Grammar',
@@ -162,12 +157,12 @@ export class DrawerService {
             icon: 'fa fa-plus'
           }
         ],
-        orderNum: 5
+        orderNum: 4
       },
       {
         name: 'Help',
         type: 'heading',
-        orderNum: 6,
+        orderNum: 5,
         disabled: true
       },
       {
@@ -194,26 +189,26 @@ export class DrawerService {
             icon: 'fa fa-map-marker'
           }
         ],
-        orderNum: 7
+        orderNum: 6
 
       },
       {
         name: 'Grammatical Helps',
         type: 'toggle',
         disabled: true,
-        orderNum: 8
+        orderNum: 7
       },
       {
         name: 'Phonology Helps',
         type: 'toggle',
         disabled: true,
-        orderNum: 9
+        orderNum: 8
       },
       {
         name: 'Dev',
         type: 'heading',
         disabled: true,
-        orderNum: 10
+        orderNum: 9
       },
       {
         name: 'Sandbox States',
@@ -236,14 +231,14 @@ export class DrawerService {
             state: 'main.meta'
           }
         ],
-        orderNum: 11
+        orderNum: 12
       },
       {
         name: 'Help',
         type: 'link',
         state:'help',
         disabled: true,
-        orderNum: 12
+        orderNum: 11
       },
     ];
     this.openedSection;
@@ -251,10 +246,6 @@ export class DrawerService {
   }
 
   init() {
-    this.rootService.getProject()
-      .then((data) => {
-        this.section[0].name = data.name;
-      });
     this.addCustomItems();
   }
 

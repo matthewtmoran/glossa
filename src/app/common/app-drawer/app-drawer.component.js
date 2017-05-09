@@ -1,6 +1,9 @@
 import templateUrl from './app-drawer.html';
 
 export const drawerComponent = {
+  bindings: {
+    project: '<'
+  },
   templateUrl,
   controller: class DrawerComponent {
     constructor(DrawerService, $mdSidenav) {

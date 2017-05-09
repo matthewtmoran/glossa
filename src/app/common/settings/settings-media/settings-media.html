@@ -1,16 +1,5 @@
 <md-content id="media-settings" class="md-padding">
-	<form name="mediaSettings" flex="50" flex-offset="25" ng-submit="$ctrl.saveMediaSettings($ctrl.settings)">
-		<div layout="row">
-			<!--<md-input-container class="md-block " flex="20">-->
-				<!--<label>Wave Color</label>-->
-				<!--<md-select class="select-input" ng-model="$ctrl.settings.waveColor" aria-label="select color">-->
-					<!--<md-optgroup label="Wave Color">-->
-						<!--<md-option ng-value="color.value" ng-repeat="color in $ctrl.waveColorOptions">{{color.name}}</md-option>-->
-					<!--</md-optgroup>-->
-				<!--</md-select>-->
-			<!--</md-input-container>-->
-		</div>
-
+	<form name="mediaSettings" flex="50" flex-offset="25" ng-submit="$ctrl.saveMediaSettings()">
 		<div layout="row">
 			<md-input-container class="md-block" flex="20">
 				<label>Scrub Length (in seconds)</label>

@@ -2,9 +2,15 @@ import templateUrl from './settings.html';
 
 export const settingsComponent = {
   bindings: {
-    previousState: '<',
+    project: '<',
+    settings: '<',
+    currentUser: '<',
     allConnections: '<',
     onlineConnections: '<',
+    previousState: '<',
+    onUpdateProject: '&',
+    onExportProject: '&',
+    onSaveMediaSettings: '&'
   },
   templateUrl,
   controller: class SettingsComponent {
@@ -28,6 +34,18 @@ export const settingsComponent = {
       if (changes.allConnections) {
         console.log('changes with allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
+      }
+      if (changes.settings) {
+        console.log('changes with settings');
+        this.settings = angular.copy(changes.settings.currentValue);
+      }
+      if (changes.project) {
+        console.log('changes with project');
+        this.project = angular.copy(changes.project.currentValue);
+      }
+      if (changes.currentUser) {
+        console.log('changes with currentUser');
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
     }
 
@@ -59,13 +77,6 @@ export const settingsComponent = {
           index: 4
         }
       ];
-      // this.getDefaultState();
-      //get user settings
-      this.settings = this.rootService.getSettings();
-      this.settingsService.getProject()
-        .then((data) => {
-          this.project = data;
-        });
     }
 
 
@@ -111,43 +122,29 @@ export const settingsComponent = {
       this.$state.go(this.previousState.Name, this.previousState.Params);
     }
 
-    exportProject(event) {
-      this.cfpLoadingBar.start();
-      let options = {};
-      options.title = "Are you sure you want to export all your project data?";
-      options.textContent = "This may take a few minutes...";
-      this.dialogService.confirmDialog(options)
-        .then((result) => {
-          if (!result) {
-            return;
-          }
-          console.log('User is sure export data');
-
-          this.settingsService.exportProject(event.project)
-            .then((data) => {
-              console.log('export project returned', data);
-              this.cfpLoadingBar.complete();
-            });
-        });
-    }
-
+    //passes event up to app.component
     updateProject(event) {
-      this.cfpLoadingBar.start();
-      this.settingsService.updateProject(event.project)
-        .then((data) => {
-          this.project = data;
-
-          console.log('TODO: update project name in drawer in rt......');
-          // drawerMenu.updateProjectName(vm.project.name);
-          this.cfpLoadingBar.complete();
-        })
+      this.onUpdateProject({
+        $event: {
+          project: event.project
+        }
+      });
     }
-
+    //passes event up to app.component
+    exportProject(event) {
+      this.onExportProject({
+        $event: {
+          project: event.project
+        }
+      });
+    }
+    //passes event up to app.component
     saveMediaSettings(event) {
-      this.rootService.saveSettings(event.settings)
-        .then((data) => {
-          this.settings = data.settings;
-        })
+      this.onSaveMediaSettings({
+        $event: {
+          settings: event.settings
+        }
+      });
     }
 
     removeAvatar(event) {
