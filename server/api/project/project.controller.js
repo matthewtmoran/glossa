@@ -165,8 +165,9 @@ exports.exportProject = function(req, res) {
         // console.log('Image buffer?', !!projectData.notebooks[0].imageBuffer);
         // console.log('Image buffer?', !!projectData.notebooks[1].imageBuffer);
 
+        var projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
 
-        res.set('Content-disposition', `attachment; filename=project-${projectData.project._id}.glossa`); //set header info / project name
+        res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
         res.set('Content-Type', 'application/zip');
 
 

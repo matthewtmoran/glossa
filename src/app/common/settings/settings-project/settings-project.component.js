@@ -12,12 +12,15 @@ export const settingsProjectComponent = {
       'ngInject';
     }
 
-    $onInit() {
-
+    $onChanges(changes) {
+      console.log("$onChanges in setting-projedct.component", changes);
+      if (changes.project) {
+        console.log('changes with project');
+        this.project = angular.copy(changes.project.currentValue);
+      }
     }
 
     updateProject() {
-      console.log('UpdateProject TODO: pass function stuff');
       this.onUpdateProject({
         $event: {
           project: this.project
@@ -26,7 +29,6 @@ export const settingsProjectComponent = {
     }
 
     exportProject() {
-      console.log('exportProject TODO: pass function stuff');
       this.onExportProject({
         $event: {
           project: this.project

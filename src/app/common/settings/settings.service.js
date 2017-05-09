@@ -30,7 +30,6 @@ export class SettingsService {
   }
 
   exportProject(project) {
-
     return this.$http.post(`/api/project/${project.createdBy}/${project._id}/export`, {}, {
       responseType: "arraybuffer",
       cache: false,

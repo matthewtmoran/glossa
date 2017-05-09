@@ -14,7 +14,7 @@ var url = require('url');
 var win;
 var forceQuit = false;
 var menuTemplate = [{
-    label: 'Sample',
+    label: 'File',
     submenu: [
         {label: 'About App', click: function(item, focusedWindow){
             focusedWindow.webContents.send('changeState', 'settings.about');
@@ -28,7 +28,7 @@ var menuTemplate = [{
                 if (focusedWindow) focusedWindow.webContents.toggleDevTools()
             }
         },
-        {label: 'Import Project', click: importProject},
+        {label: 'Load Project', click: importProject},
         {
             label: 'Prefs',
             click: function(item, focusedWindow){

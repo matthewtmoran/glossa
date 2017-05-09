@@ -21,12 +21,16 @@ export const settingsComponent = {
 
       // this.$scope.$watch(this.$scope.selectedTab, this.selectedIndexWatch);
     }
-    
-    
+
+
     $onChanges(changes) {
-      
+      console.log('changes in settings.component');
+      if (changes.allConnections) {
+        console.log('changes with allConnections');
+        this.allConnections = angular.copy(changes.allConnections.currentValue);
+      }
     }
-    
+
     $onInit() {
       this.tabs = [
         {
@@ -119,11 +123,11 @@ export const settingsComponent = {
           }
           console.log('User is sure export data');
 
-         this.settingsService.exportProject(event.project)
-           .then((data) => {
-            console.log('export project returned', data);
-            this.cfpLoadingBar.complete();
-          });
+          this.settingsService.exportProject(event.project)
+            .then((data) => {
+              console.log('export project returned', data);
+              this.cfpLoadingBar.complete();
+            });
         });
     }
 
@@ -131,10 +135,10 @@ export const settingsComponent = {
       this.cfpLoadingBar.start();
       this.settingsService.updateProject(event.project)
         .then((data) => {
-        this.project = data;
+          this.project = data;
 
-        console.log('TODO: update project name in drawer in rt......');
-        // drawerMenu.updateProjectName(vm.project.name);
+          console.log('TODO: update project name in drawer in rt......');
+          // drawerMenu.updateProjectName(vm.project.name);
           this.cfpLoadingBar.complete();
         })
     }
@@ -149,24 +153,31 @@ export const settingsComponent = {
     removeAvatar(event) {
 
     }
+
     uploadAvatar(event) {
 
     }
+
     updateUserProfile(event) {
 
     }
+
     toggleSharing(event) {
 
     }
+
     updateNetworkUsers(event) {
 
     }
+
     updateNetworkUsersDisconnect(event) {
 
     }
+
     updateConnection(event) {
 
     }
+
     updateConnections(event) {
 
     }
