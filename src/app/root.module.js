@@ -138,7 +138,12 @@ export const root = angular
 
     // console.log('going to state: ', __user.session.currentState);
 
-    $state.go(__user.session.currentState, __user.session.currentStateParams);
+    // RootService.getUser()
+    //   .then((data) => {
+    //     $state.go(data.session.currentState, data.session.currentStateParams);
+    //   });
+
+    // $state.go(__user.session.currentState, __user.session.currentStateParams);
   //   //if there is no $window.socket object and if the user has sharing enabled
     if (!$window.socket && __user.settings.isSharing) {
       SocketService.init();
@@ -150,15 +155,20 @@ export const root = angular
       // let fromState = $transitions.$from();
       // transition.$to()
 
-
-      __user.session.currentState = toState.name;
-      __user.session.currentStateParams = toState.params;
+      let session = {
+        currentState: toState.name,
+        currentStateParams: toState.params
+      };
+      // __user.session.currentState = toState.name;
+      // __user.session.currentStateParams = toState.params;
       //update session data in persistent storage every state change
       //TODO: might just be able to use localstorage
-      RootService.updateSession(__user.session).then((data) => {
-        //update the __user object in memory
-        __user.session = data.session;
-      });
+      // RootService.updateSession(session)
+      //   .then((data) => {
+      //     //update the __user object in memory
+      //     console.log('updatedSession');
+      //     // __user.session = data.session;
+      //   });
 
       //This keeps the state from redirecting away from the child state when that same child state is clicked.
       let redirect = toState.redirectTo;

@@ -2,25 +2,30 @@ import templateUrl from './app.html';
 
 export const appComponent = {
   binding: {
-    allConnections: '<',
+    // allConnections: '<',
+    // currentUser: '<',
+    // project: '<',
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($state, RootService, $scope, NotificationService, SettingsService, cfpLoadingBar, DialogService) {
+    constructor($state, RootService, $scope, $q, NotificationService, SettingsService, cfpLoadingBar, DialogService) {
       'ngInject';
-
-      // this.authService = AuthService;
       this.rootService = RootService;
       this.$state = $state;
       this.$scope = $scope;
+      this.$q = $q;
+
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.cfpLoadingBar = cfpLoadingBar;
       this.dialogService = DialogService;
-      // this.user = AuthService.getUser();
+
+      this.currentUser = this.$scope.$parent.$resolve.currentUser;
+      this.project = this.$scope.$parent.$resolve.project;
+      this.allConnections = this.$scope.$parent.$resolve.allConnections;
+      this.settings = this.$scope.$parent.$resolve.currentUser.settings;
 
 
-      console.log('this.allConnections', this.allConnections);
 
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
@@ -39,18 +44,24 @@ export const appComponent = {
 
 
     $onInit() {
+      console.log('$onInit in app.component');
       //get all connections
-      this.rootService.getConnections().then((data) => {
-        this.allConnections = angular.copy(data);
-      });
-      //get project
-      this.settingsService.getProject().then((data) => {
-        this.project = angular.copy(data);
-      });
-      //get current user
-      this.currentUser = this.rootService.getUser();
-      //get settings
-      this.settings = this.rootService.getSettings();
+      // this.rootService.getConnections()
+      //   .then((data) => {
+      //     this.allConnections = angular.copy(data);
+      //   });
+      // //get project
+      // this.settingsService.getProject()
+      //   .then((data) => {
+      //     this.project = angular.copy(data);
+      //   });
+      // //get current user
+      // this.rootService.getUser()
+      //   .then((data) => {
+      //     console.log('data', data);
+      //     this.currentUser = angular.copy(data);
+      //     this.settings = this.currentUser.settings;
+      //   });
     }
 
 
@@ -59,7 +70,7 @@ export const appComponent = {
     saveMediaSettings(event) {
       this.rootService.saveSettings(event.settings)
         .then((data) => {
-        console.log('data', data);
+          console.log('data', data);
           this.settings = angular.copy(data.settings);
         })
     }
@@ -116,6 +127,73 @@ export const appComponent = {
         }
       })
 
+    }
+
+
+    updloadAvatar(event) {
+      this.cfpLoadingBar.start();
+      this.$q.when(this.rootService.uploadAvatar(event.file))
+        .then((data) => {
+          this.currentUser = angular.copy(data);
+          this.settings = this.currentUser.settings;
+          this.cfpLoadingBar.complete();
+        });
+    }
+
+    //update 'profile' information.
+    updateUserInfo(event) {
+      this.cfpLoadingBar.start();
+      //http request
+      this.rootService.updateUserInfo(event.currentUser)
+        .then((data) => {
+          this.currentUser = angular.copy(data); //copy data to ensure $onchnages triggered across application
+          this.settings = this.currentUser.settings;
+          this.cfpLoadingBar.complete();
+          console.log('TODO: emit to external socket that user data has been updated?????? or bradcast when db is updated.....  ');
+        })
+    }
+
+    removeAvatar(event) {
+      this.cfpLoadingBar.start();
+      this.rootService.removeAvatar(event.file)
+        .then((data) => {
+          console.log('data returned from avatar removal', data);
+          this.currentUser = angular.copy(data);
+          this.settings = this.currentUser.settings;
+        })
+    }
+
+
+    toggleSharing(event) {
+      console.log('toggleSharing in app.component', event);
+      let options = {};
+      if (!this.settings.isSharing) {
+        options.title = 'Are you sure you want to turn OFF sharing?';
+        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
+      } else {
+        options.title = 'Are you sure you want to turn ON sharing?';
+        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
+      }
+
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+          if (this.settings.isSharing) {
+            this.socketService.init();
+            this.rootService.initListeners();
+            this.rootService.getOnlineUsersSE();
+          }
+          if (!this.settings.isSharing) {
+            this.socketService.disconnect();
+          }
+          console.log('TODO: refractor how settigns work');
+          this.rootService.saveSettings(this.settings)
+            .then((data) => {
+              console.log('TODO: this is where settings should vbe update across application', data);
+            })
+        })
     }
 
 

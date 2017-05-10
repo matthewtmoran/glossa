@@ -18,9 +18,13 @@
          online-connections="$ctrl.onlineConnections"
          project="$ctrl.project"
          settings="$ctrl.settings"
+         on-toggle-sharing="$ctrl.toggleSharing($event)"
+         on-upload-avatar="$ctrl.updloadAvatar($event)"
          on-export-project="$ctrl.exportProject($event)"
          on-save-media-settings="$ctrl.saveMediaSettings($event)"
-         on-update-project="$ctrl.updateProject($event)">
+         on-update-project="$ctrl.updateProject($event)"
+         on-remove-avatar="$ctrl.removeAvatar($event)"
+         on-update-user-info="$ctrl.updateUserInfo($event)">
     </div>
   </div>
 </div>

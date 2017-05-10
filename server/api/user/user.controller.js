@@ -20,8 +20,11 @@ var fs = require('fs');
 
 // Get list of things
 exports.index = function(req, res) {
+    console.log('get user called....');
     User.findOne({}, function (err, user) {
         if(err) { return handleError(res, err); }
+        console.log('user.name', user.name);
+        console.log('user.avatar', user.avatar);
         return res.status(200).json(user);
     });
 };
@@ -55,6 +58,7 @@ exports.update = function(req, res) {
         var updated = _.merge(user, req.body);
         User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
+            normalizeNotebooks(updatedDoc);
             User.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });

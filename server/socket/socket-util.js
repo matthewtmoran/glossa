@@ -1,5 +1,5 @@
 'use strict';
-
+var _ = require('lodash');
 var User = require('./../api/user/user.model.js');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 var Connection = require('./../api/connections/connection.model');
@@ -9,6 +9,7 @@ var config = require('./../config/environment/index');
 module.exports = {
 
     getUser: function() {
+        console.log('getUser in socket.util')
         return new Promise(function(resolve, reject) {
             User.findOne({}, function(err, user) {
                 if (err) {
@@ -245,15 +246,32 @@ module.exports = {
     updateUser: function(update) {
         var options = {returnUpdatedDocs: true};
         return new Promise(function(resolve, reject) {
-            User.update({_id: update._id}, update, options, function(err, updateCount, user) {
-                if (err) {
-                    console.log('There was an error updating the user', err);
-                    reject(err);
-                }
-                console.log('Persisted User Data Success');
-                User.persistence.compactDatafile();
-                resolve(user);
-            })
+          User.findOne({_id:req.params.id}, function (err, user) {
+            if (err) {
+                console.log('There was an error updating the user', err);
+                reject(err);
+            }
+            var options = {returnUpdatedDocs: true};
+            var updated = _.merge(user, update);
+            User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+              if (err) {
+                console.log('There was an error updating the user', err);
+                reject(err);
+              }
+              User.persistence.compactDatafile(); // concat db
+              resolve(user);
+            });
+          });
+
+            // User.update({_id: update._id}, update, options, function(err, updateCount, user) {
+            //     if (err) {
+            //         console.log('There was an error updating the user', err);
+            //         reject(err);
+            //     }
+            //     console.log('Persisted User Data Success');
+            //     User.persistence.compactDatafile();
+            //     resolve(user);
+            // })
         })
     },
 

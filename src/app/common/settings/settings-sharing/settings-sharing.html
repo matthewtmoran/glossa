@@ -13,16 +13,16 @@
 
 		<div class="image-container profile-image-container" >
 
-			<img ng-show="$ctrl.userProfile.avatar" ng-src="{{$ctrl.userProfile.avatar}}" class="thumb image-preview">
+			<img ng-show="$ctrl.currentUser.avatar" ng-src="{{$ctrl.currentUser.avatar}}" class="thumb image-preview">
 
 			<h2>Your Profile</h2>
 
 			<md-button
-					ng-if="!$ctrl.userProfile.avatar"
+					ng-if="!$ctrl.currentUser.avatar"
 					ngf-select="$ctrl.uploadAvatar($file)"
 					name="avatarUpload"
 					class="md-raised upload-button"
-					ng-model="$ctrl.userProfile.avatar"
+					ng-model="$ctrl.currentUser.avatar"
 					accept="image/*">
 				<!--ngf-max-size="5MB"-->
 				<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
@@ -31,48 +31,33 @@
 
 			<!--<md-button class="md-raised upload-button">Upload Photo</md-button>-->
 
-			<md-button ng-if="$ctrl.userProfile.avatar" class="md-icon-button options-button">
-				<md-icon ng-click="$ctrl.removeAvatar($ctrl.userProfile.avatar); $ctrl.userProfile.avatar = null">visibility_off</md-icon>
+			<md-button ng-if="$ctrl.currentUser.avatar" class="md-icon-button options-button">
+				<md-icon ng-click="$ctrl.removeAvatar($ctrl.currentUser.avatar); $ctrl.currentUser.avatar = null">visibility_off</md-icon>
 			</md-button>
 		</div>
 
-		<form name="userProfile" class="md-padding">
+		<form name="currentUser" class="md-padding">
 			<div class="" layout="row">
 				<div flex="20">
 					<md-icon class="md-36">person</md-icon>
 				</div>
 				<div flex="80">
 					<md-input-container>
-						<input type="text" placeholder="Name" ng-model="$ctrl.userProfile.name" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">
+						<input type="text" placeholder="Name" ng-model="$ctrl.currentUser.name" ng-blur="$ctrl.updateUserInfo()">
 					</md-input-container>
 				</div>
 			</div>
-			<!--<div class="" layout="row">-->
-				<!--<div flex="20" class="contact-section-left">-->
-					<!--<md-icon class="md-36">phone</md-icon>-->
-				<!--</div>-->
-				<!--<div flex="80">-->
-					<!--<md-input-container class="md-block">-->
-						<!--<input type="text" placeholder="Mobile" ng-model="$ctrl.userProfile.mobilePhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">-->
-					<!--</md-input-container>-->
-
-					<!--<md-input-container class="md-block">-->
-						<!--<input type="text" placeholder="Work" ng-model="$ctrl.userProfile.workPhone" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">-->
-					<!--</md-input-container>-->
-				<!--</div>-->
-
-			<!--</div>-->
 			<div class="" layout="row">
 				<div flex="20" class="contact-section-left">
 					<md-icon class="md-36">email</md-icon>
 				</div>
 				<div flex="80">
 					<md-input-container class="md-block">
-						<input type="email" placeholder="Personal" ng-model="$ctrl.userProfile.personalEmail" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">
+						<input type="email" placeholder="Personal" ng-model="$ctrl.currentUser.personalEmail" ng-blur="$ctrl.updateUserInfo($ctrl.currentUser)">
 					</md-input-container>
 
 					<md-input-container class="md-block">
-						<input type="email" placeholder="Work" ng-model="$ctrl.userProfile.workEmail" ng-blur="$ctrl.updateUserProfile($ctrl.userProfile)">
+						<input type="email" placeholder="Work" ng-model="$ctrl.currentUser.workEmail" ng-blur="$ctrl.updateUserInfo($ctrl.currentUser)">
 					</md-input-container>
 				</div>
 			</div>
@@ -102,14 +87,3 @@
 		</md-list>
 	</div>
 </div>
-
-
-
-
-<!--<md-content id="network-users" class="md-padding">-->
-
-<!--<md-button class="md-raised" ng-click="$ctrl.testEvent()">Test Socket Event</md-button>-->
-
-<!--<user-card ng-repeat="user in $ctrl.networkUsers" user="user"></user-card>-->
-
-<!--</md-content>-->

@@ -57,7 +57,16 @@ export class RootService {
   }
 
   getUser() {
-    return this.__user;
+    console.log('getUser (http request)');
+    return this.$http.get('/api/user/')
+      .then((response) => {
+        console.log('getUser response: ', response);
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
   }
 
   isSharing() {
@@ -94,7 +103,6 @@ export class RootService {
   }
 
   getConnections() {
-    console.log('getConnections');
     return this.$http.get('/api/connections/')
       .then((response) => {
         return response.data;
@@ -124,22 +132,14 @@ export class RootService {
       arrayKey: '',
       headers: {'Content-Type': undefined}
     }).then((resp) => {
-      console.log('TODO: consider not updating here becuase we set user avatar in other component....');
-
-      this.__user.avatar = resp.data.avatar;
-
       return resp.data;
     }).catch((resp) => {
       console.log('Error status: ' + resp.status);
     });
-    //   .then((evt) => {
-    //   console.log('TODO: fixe progress.... or not')
-    //   // let progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-    //   // console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
-    // });
   }
 
   removeAvatar(filePath) {
+    console.log('removeAvatar', filePath);
     let data = {filePath: filePath};
     return this.$http.put(`/api/user/${this.__user._id}/avatar`, data)
       .then((response) => {
@@ -151,10 +151,10 @@ export class RootService {
       });
   }
   
-
   saveSettings(settings) {
     return this.$http.put(`/api/user/${this.__user._id}/settings`, settings)
       .then((response) => {
+        console.log('saveSettings response', response);
         return response.data;
       })
       .catch((response) => {
@@ -176,9 +176,22 @@ export class RootService {
         return response.data;
       })
   }
+
+
+  updateUserInfo(user) {
+    return this.$http.put(`/api/user/${this.__user._id}/`, user)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      })
+  }
   
 
   updateUserProfile(userProfile) {
+    console.log('UpdateUserProfile');
     let userString = angular.toJson(userProfile);
     this.socketService.emit('update:userProfile', {userProfile: userString})
   }

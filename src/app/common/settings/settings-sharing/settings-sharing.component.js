@@ -4,105 +4,103 @@ export const settingsSharingComponent = {
   bindings: {
     settings: '<',
     allConnections: '<',
-    onlineConnections: '<'
+    onlineConnections: '<',
+    currentUser: '<',
+    onRemoveAvatar: '&',
+    onUploadAvatar: '&',
+    onUpdateUserInfo: '&',
+    onToggleSharing: '&',
+    onToggleFollow: '&',
   },
   templateUrl,
   controller: class SettingsSharingComponent {
-    constructor($scope, $q, RootService, SocketService, DialogService, cfpLoadingBar) {
+    constructor($q, RootService, SocketService, DialogService, cfpLoadingBar) {
       'ngInject';
 
-      this.$scope = $scope;
       this.$q = $q;
       this.rootService = RootService;
       this.socketService = SocketService;
       this.dialogService = DialogService;
       this.cfpLoadingBar = cfpLoadingBar;
 
-      this.$scope.$on('update:networkUsers', this.updateNetworkUsers.bind(this));
-      this.$scope.$on('update:networkUsers:disconnect', this.updateNetworkUsersDisconnect.bind(this));
-      this.$scope.$on('update:connection', this.updateConnection.bind(this));
-      this.$scope.$on('update:connections', this.updateConnections.bind(this));
+      // this.$scope.$on('update:networkUsers', this.updateNetworkUsers.bind(this));
+      // this.$scope.$on('update:networkUsers:disconnect', this.updateNetworkUsersDisconnect.bind(this));
+      // this.$scope.$on('update:connection', this.updateConnection.bind(this));
+      // this.$scope.$on('update:connections', this.updateConnections.bind(this));
 
-      this.networkUsers = [];
-      
+    }
+
+    $onChanges(changes) {
+      console.log('$onChanges in settings-sharing.component', changes);
+      if (changes.currentUser) {
+        console.log('changes with currentUser');
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
+      if (changes.allConnections) {
+        console.log('changes with allConnections');
+        this.allConnections = angular.copy(changes.allConnections.currentValue);
+      }
+      if (changes.settings) {
+        console.log('changes with settings');
+        this.settings = angular.copy(changes.settings.currentValue);
+      }
+      // if (changes.currentUser) {
+      //   console.log('changes with currentUser')
+      //   this.currentUser = angular.copy(changes.currentUser.currentValue);
+      // }
     }
 
     $onInit() {
-      this.networkUsers = [];
-      this.userProfile = this.rootService.getUser();
-      // this.rootService.getConnections();
+
     }
 
     removeAvatar(path) {
-      this.rootService.removeAvatar(path);
+      this.onRemoveAvatar({
+        $event: {
+          path: path
+        }
+      });
     }
 
     uploadAvatar(file) {
-      this.cfpLoadingBar.start();
-      this.$q.when(this.rootService.uploadAvatar(file))
-        .then((data) => {
-          console.log('data', data);
-          console.log('this.userProfile', this.userProfile);
-          this.userProfile.avatar = data.avatar;
-          this.cfpLoadingBar.complete();
-        });
+      this.onUploadAvatar({
+        $event: {
+          file: file
+        }
+      });
     }
 
-    updateUserProfile(userProfile) {
-      this.rootService.updateUserProfile(userProfile)
+    updateUserInfo() {
+      console.log('this.currentUser',this.currentUser);
+      this.onUpdateUserInfo({
+        $event: {
+          currentUser: this.currentUser
+        }
+      });
+
+
+      // this.rootService.updateUserProfile(userProfile)
     }
 
     toggleSharing() {
-      let options = {};
-      if (!this.settings.isSharing) {
-        options.title = 'Are you sure you want to turn OFF sharing?';
-        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
-      } else {
-        options.title = 'Are you sure you want to turn ON sharing?';
-        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
-      }
-
-      this.dialogService.confirmDialog(options)
-        .then((result) => {
-          if (!result) {
-            return;
-          }
-          if (this.settings.isSharing) {
-            this.socketService.init();
-            this.rootService.initListeners();
-            this.rootService.getOnlineUsersSE();
-          }
-          if (!this.settings.isSharing) {
-            this.socketService.disconnect();
-          }
-          this.rootService.saveSettings(this.settings);
-        })
-    }
-
-    updateNetworkUsers(event, data) {
-      this.networkUsers = data.onlineUsers;
-    }
-
-    updateNetworkUsersDisconnect(event, data) {
-      this.networkUsers.splice(this.networkUsers.indexOf(data), 1);
-    }
-    
-    updateConnection(event, data) {
-      for(let i = 0, len = this.networkUsers.length; i < len; i++) {
-        if (this.networkUsers[i]._id === data.connection._id) {
-          this.networkUsers[i] = data.connection;
+      this.onToggleSharing({
+        $event: {
+          isSharing: this.settings.isSharing
         }
-      }
-    }
-    
-    updateConnections(event, data) {
-      this.networkUsers = data.connections;
+      });
     }
 
     toggleFollow(event) {
-      console.log('toggleFollow in settings-sharing.componenetjs');
-      event.user.following = !event.user.following;
-      this.rootService.toggleFollow(event.user);
+
+      this.onToggleFollow({
+        $event: {
+          following: event.user.following
+        }
+      });
+
+      // console.log('toggleFollow in settings-sharing.componenetjs');
+      // event.user.following = !event.user.following;
+      // this.rootService.toggleFollow(event.user);
     }
   }
 };

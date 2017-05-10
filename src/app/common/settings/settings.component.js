@@ -10,15 +10,21 @@ export const settingsComponent = {
     previousState: '<',
     onUpdateProject: '&',
     onExportProject: '&',
-    onSaveMediaSettings: '&'
+    onSaveMediaSettings: '&',
+    onUploadAvatar: '&',
+    onUpdateUserInfo: '&',
+    onToggleSharing: '&',
+    onRemoveAvatar: '&'
   },
   templateUrl,
   controller: class SettingsComponent {
-    constructor($scope, $state, RootService, SettingsService, cfpLoadingBar, DialogService) {
+    constructor($scope, $state, $q, RootService, SettingsService, cfpLoadingBar, DialogService) {
       'ngInject';
 
       this.$scope = $scope;
       this.$state = $state;
+      this.$q = $q;
+
       this.rootService = RootService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
@@ -30,7 +36,7 @@ export const settingsComponent = {
 
 
     $onChanges(changes) {
-      console.log('changes in settings.component');
+      console.log('changes in settings.component', changes);
       if (changes.allConnections) {
         console.log('changes with allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
@@ -48,6 +54,7 @@ export const settingsComponent = {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
     }
+
 
     $onInit() {
       this.tabs = [
@@ -78,7 +85,6 @@ export const settingsComponent = {
         }
       ];
     }
-
 
     selectedIndexWatch(current, old) {
       console.log('index is changing');
@@ -146,29 +152,46 @@ export const settingsComponent = {
         }
       });
     }
-
+    //passes event up to app.component
     removeAvatar(event) {
-
+      console.log('removeAvatar in settings.component');
+      this.onRemoveAvatar({
+        $event: {
+          file: event.path
+        }
+      });
+      // this.rootService.removeAvatar(event.path)
     }
-
+    //passes event up to app.component
     uploadAvatar(event) {
-
+      this.onUploadAvatar({
+        $event: {
+          file: event.file
+        }
+      });
     }
-
-    updateUserProfile(event) {
-
+    //passes event up to app.component
+    updateUserInfo(event) {
+      this.onUpdateUserInfo({
+        $event: {
+          currentUser: event.currentUser
+        }
+      });
     }
-
+    //passes event up to app.component
     toggleSharing(event) {
-
+      console.log('toggleSharing in settings.component', event);
+      this.onToggleSharing({
+        $event: {
+          isSharing: event.isSharing
+        }
+      });
     }
 
-    updateNetworkUsers(event) {
-
-    }
-
-    updateNetworkUsersDisconnect(event) {
-
+    toggleFollow(event) {
+      console.log('toggleFollow in settings.component');
+      event.user.following = !event.user.following;
+      this.rootService.toggleFollow(event.user);
     }
 
     updateConnection(event) {

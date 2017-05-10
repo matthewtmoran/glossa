@@ -28,20 +28,15 @@ export const app = angular
 
     $stateProvider
       .state('app', {
-        redirectTo: 'corpus',
+        // redirectTo: 'corpus',
         url: '/app',
         data: {
           requiredAuth: false,
         },
         resolve: {
-          // allConnections: (RootService) => {
-          //   console.log('resolve in app.module');
-          //   return RootService.getConnections()
-          //     .then((data) => {
-          //     console.log('data', data);
-          //       return data;
-          //     });
-          // },
+          currentUser: (RootService) => RootService.getUser(),
+          project: (SettingsService) => SettingsService.getProject(),
+          allConnections: (RootService) => RootService.getConnections(),
         },
         component: 'app',
       });
