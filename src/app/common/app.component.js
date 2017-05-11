@@ -1,36 +1,27 @@
 import templateUrl from './app.html';
 
 export const appComponent = {
-  binding: {
-    // allConnections: '<',
-    // currentUser: '<',
-    // project: '<',
+  bindings: {
+    currentUser: '<',
+    project: '<',
+    allConnections: '<',
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($state, RootService, $scope, $q, NotificationService, SettingsService, cfpLoadingBar, DialogService) {
+    constructor($scope, $state, $q, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService) {
       'ngInject';
-      this.rootService = RootService;
-      this.$state = $state;
       this.$scope = $scope;
+      this.$state = $state;
       this.$q = $q;
+      this.cfpLoadingBar = cfpLoadingBar;
 
+      this.rootService = RootService;
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
-      this.cfpLoadingBar = cfpLoadingBar;
       this.dialogService = DialogService;
-
-      this.currentUser = this.$scope.$parent.$resolve.currentUser;
-      this.project = this.$scope.$parent.$resolve.project;
-      this.allConnections = this.$scope.$parent.$resolve.allConnections;
-      this.settings = this.$scope.$parent.$resolve.currentUser.settings;
-
-
 
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
-
-      this.onlineConnections = [];
 
     }
 
@@ -40,28 +31,18 @@ export const appComponent = {
         console.log('changes in allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
+      if (changes.currentUser) {
+        this.currentUser = angualr.copy(changes.currentUser.currentValue);
+        this.settings = angular.copy(this.currentUser.settings);
+      }
+      if (changes.project) {
+        this.project = angualr.copy(changes.project.currentValue);
+      }
     }
 
 
     $onInit() {
       console.log('$onInit in app.component');
-      //get all connections
-      // this.rootService.getConnections()
-      //   .then((data) => {
-      //     this.allConnections = angular.copy(data);
-      //   });
-      // //get project
-      // this.settingsService.getProject()
-      //   .then((data) => {
-      //     this.project = angular.copy(data);
-      //   });
-      // //get current user
-      // this.rootService.getUser()
-      //   .then((data) => {
-      //     console.log('data', data);
-      //     this.currentUser = angular.copy(data);
-      //     this.settings = this.currentUser.settings;
-      //   });
     }
 
 

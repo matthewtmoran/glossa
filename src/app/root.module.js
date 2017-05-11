@@ -72,10 +72,11 @@ export const root = angular
   .service('RootService', RootService)
   .service('SocketService', SocketService)
   .service('NotificationService', NotificationService)
-  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider) => {
+  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider) => {
     'ngInject';
     $locationProvider.html5Mode(true);
     $urlRouterProvider.otherwise('/app/corpus');
+    $compileProvider.preAssignBindingsEnabled(true);
 
     //material theme stuff...
     const customAccent = {
@@ -164,7 +165,7 @@ export const root = angular
       RootService.updateSession(session)
         .then((data) => {
           //update the __user object in memory
-          console.log('updatedSession');
+          // console.log('updatedSession');
           // __user.session = data.session;
         });
 
