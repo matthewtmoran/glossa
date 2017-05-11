@@ -235,7 +235,7 @@ module.exports = {
 
             fs.unlink(myPath, function(err) {
                 if (err) {
-                    console.log('There was an error trying to remove avatar image.');
+                    console.log('There was an error trying to remove avatar image.', err);
                     reject(err);
                 }
                 resolve('Success')

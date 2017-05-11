@@ -190,7 +190,7 @@ export const settingsComponent = {
 
     toggleFollow(event) {
       console.log('toggleFollow in settings.component');
-      event.user.following = !event.user.following;
+      // event.user.following = !event.user.following;
       this.rootService.toggleFollow(event.user);
     }
 

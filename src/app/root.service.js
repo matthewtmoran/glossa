@@ -198,6 +198,7 @@ export class RootService {
 
   toggleFollow(user) {
     let userString = angular.toJson(user);
+    console.log('emit:: update:following');
     this.socketService.emit('update:following', {connection: userString});
   }
 
@@ -328,16 +329,22 @@ export class RootService {
 
     //update dynamic data that connection may update manually
     this.socketService.on('update:connectionInfo', (data) => {
+      console.log('on:: update:connection', data);
 
-
+      console.log('angular broadcast:: update:connection');
       this.$rootScope.$broadcast('update:connection', data);
 
     });
 
     //update connection
     this.socketService.on('update:connection', (data) => {
+      console.log('');
+      console.log('');
+      console.log('');
       console.log('on:: update:connection - data', data);
+      console.log('angular event $broadcast:: update:connections');
       this.$rootScope.$broadcast('update:connection', data);
+      console.log('');
     });
 
     //Listen for connections list

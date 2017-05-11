@@ -107,25 +107,28 @@ export const appComponent = {
 
     updateConnection(event, data) {
 
+      console.log('ng-on:: update:connection', data);
+
       this.allConnections.map((connection, index) => {
         if (connection._id === data.connection._id) {
           if (!data.connection.online) {
             this.allConnections.splice(index, 1);
           } else {
-            this.allConnections[index] = connection;
+            this.allConnections[index] = data.connection;
+            this.allConnections = angular.copy(this.allConnections);
           }
         }
       });
 
-      this.onlineConnections.map((connection, index) => {
-        if (connection._id === data.connection._id) {
-          if (!data.connection.online) {
-            this.onlineConnections.splice(index, 1);
-          } else {
-            this.onlineConnections[index] = connection;
-          }
-        }
-      })
+      // this.onlineConnections.map((connection, index) => {
+      //   if (connection._id === data.connection._id) {
+      //     if (!data.connection.online) {
+      //       this.onlineConnections.splice(index, 1);
+      //     } else {
+      //       this.onlineConnections[index] = connection;
+      //     }
+      //   }
+      // })
 
     }
 

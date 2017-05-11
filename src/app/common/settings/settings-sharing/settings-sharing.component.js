@@ -94,7 +94,7 @@ export const settingsSharingComponent = {
 
       this.onToggleFollow({
         $event: {
-          following: event.user.following
+          user: event.user
         }
       });
 

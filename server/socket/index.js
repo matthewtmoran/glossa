@@ -9,14 +9,14 @@ const bonjourService = require('./bonjour-service');
 let localClient = {};
 
 module.exports = function (glossaUser, mySession, io, browser, bonjour) {
-  io.sockets.on('connection', function(socket) {
+  io.sockets.on('connection', function (socket) {
     console.log('new socket connection');
 
     //begin handshake
     console.log('emit:: request:socket-type');
     socket.emit('request:socket-type');
 
-    socket.on('return:socket-type', function(data) {
+    socket.on('return:socket-type', function (data) {
       console.log('on:: return:socket-type - :type', data.type);
 
       if (data.type === 'local-client') {
@@ -49,7 +49,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
         socketUtil.emitToLocalClient(io, localClient.localSocketId, 'notify:sync-begin');
 
         socketUtil.getConnection(data._id)
-          .then(function(persistedClientData) {
+          .then(function (persistedClientData) {
             if (!persistedClientData.following) {
               persistedClientData = {
                 name: data.name,
@@ -80,7 +80,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
 
               if (changesMade) {
                 socketUtil.normalizeNotebooks(persistedClientData).then(function (changeObject) {
-                console.log('emit:: normalize:notebooks to:: local-client');
+                  console.log('emit:: normalize:notebooks to:: local-client');
                   socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
                 });
               }
@@ -92,33 +92,33 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
             }
 
             socketUtil.updateConnection(persistedClientData)
-              .then(function(updatedClient) {
+              .then(function (updatedClient) {
                 console.log('emit:: update:connectionInfo to:: local-client');
                 socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
 
                 socketUtil.getConnections()
-                  .then(function(data) {
+                  .then(function (data) {
                     console.log('emit:: send:connections to:: local-client');
                     socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
                   })
               });
-              console.log('adding socket to externalClientsRoom');
-              socket.join('externalClientsRoom');
+            console.log('adding socket to externalClientsRoom');
+            socket.join('externalClientsRoom');
           })
       }
     });
 
-    socket.on('request:connections', function() {
+    socket.on('request:connections', function () {
       console.log('on:: request:connections');
       socketUtil.getConnections()
-        .then(function(data) {
+        .then(function (data) {
           console.log('emit:: send:connections to:: local-client');
           console.log('localClient.socketId', localClient.socketId);
           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
         })
     });
 
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function () {
       console.log('');
       console.log('on:: disconnect');
       if (socket.id === localClient.socketId) {
@@ -149,8 +149,8 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
                           console.log('amount of connections:', data.length);
                           console.log('emit:: send:connections to:: local-client');
                           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                      })
-                  })
+                        })
+                    })
                 } else {
                   console.log('we are following external-client');
 
@@ -168,62 +168,76 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
                           console.log('emit:: send:connections to:: local-client');
                           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
                         })
-                  });
+                    });
                 }
               }
             }, 3000);
-        });
+          });
       }
     });
 
-    socket.on('update:following', function (data) {
-      console.log('');
-      console.log('on:: update:following');
 
-      let client = JSON.parse(data.connection);
+    //TODO: refractor
+    function unfollowConnection(client) {
 
-      console.log('looking for connection in db');
-      socketUtil.getConnection(client._id)
-        .then(function(clientPersistedData) {
-          console.log('modify following status');
-          clientPersistedData.following = client.following;
+      if (client.avatar) {
+        socketUtil.removeAvatarImage(client.avatar)
+          .then(function () {
+            console.log('avatar removed');
+            client.avatar = null;
+            console.log('updateConnection in db');
+            updateConnection(client)
+          });
+      } else {
+        console.log('no avatar');
+        updateConnection(client);
+      }
+    }
 
-          if (!clientPersistedData.following) {
-            console.log('we are not following connection');
-            if (clientPersistedData.avatar) {
-              console.log('connections has avatar. need to remove from file system');
-              socketUtil.removeAvatarImage(clientPersistedData.avatar)
-                .then(function () {
-                  console.log('avatar removed');
-                  clientPersistedData.avatar = null;
-              });
-            }
-          }
+    //TODO: refractor
+    function followConnection(client) {
+      socketUtil.getUserSyncedData(client)
+        .then(function (data) {
+          console.log('emit:: request:updates  to:: external-client');
+          socketUtil.emitToExternalClient(io, client.socketId, 'request:updates', data);
+          console.log('emit:: request:avatar  to:: external-client');
+          socketUtil.emitToExternalClient(io, client.socketId, 'request:avatar', {});
+        });
+      updateConnection(client);
+    }
 
-          console.log('update connection in database');
-          socketUtil.updateConnection(clientPersistedData)
-            .then(function (updatedConnection) {
-              if (updatedConnection.following) {
-                console.log('we are following connection');
-                console.log('sync data with connection');
-                console.log('TODO: notify local-client sync is taking place.');
-                socketUtil.getUserSyncedData(updatedConnection)
-                  .then(function (data) {
-                    console.log('base data queried to compare against.');
-                    console.log('emit:: request:updates  to:: external-client');
-                    socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:updates', data);
-                    console.log("requesting avatar.... ");
-                    console.log('emit:: request:avatar  to:: external-client');
-                    socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:avatar', {});
-                  });
-              }
+    //TODO: refractor
+    function updateConnection(client) {
+      console.log('updating connection');
+      socketUtil.updateConnection(client)
+        .then(function (updatedConnection) {
 
           console.log('emit:: update:connection  to:: local-client');
-          socketUtil.emitToLocalClient(io, localClient, 'update:connection', {connection: updatedConnection});
+          socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', {connection: updatedConnection});
         })
-      });
+    }
+
+
+
+    //TODO: refractor
+    socket.on('update:following', function(data) {
+      console.log('');
+      console.log('on:: update:following');
+      let client = JSON.parse(data.connection);
+      socketUtil.getConnection(client._id)
+        .then(function(clientPersistedData) {
+          clientPersistedData.following = !client.following;
+          if (!clientPersistedData.following) {
+            console.log('we are NOT following connection');
+            unfollowConnection(clientPersistedData)
+          } else {
+            console.log('we are following connection');
+            followConnection(clientPersistedData);
+          }
+        })
     });
 
+    //TODO: refractor
     //data: {avatarString: Base64, imagePath: String, userData: object}
     socket.on('return:avatar', function (data) {
       console.log('on:: return:avatar ');
@@ -234,9 +248,10 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
       };
 
       socketUtil.writeMediaFile(avatarData)
-        .then(function() {
+        .then(function () {
+          console.log('TODO: consider what we actually need to do here if anything...');
           socketUtil.getConnection(data.userData._id)
-            .then(function(connection) {
+            .then(function (connection) {
               if (connection.name != data.userData.name) {
                 connection.name = data.userData.name
               }
@@ -244,11 +259,12 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
                 connection.avatar = data.userData.avatar
               }
               socketUtil.updateConnection(connection)
-                .then(function(updatedConnection) {
+                .then(function (updatedConnection) {
+
                   console.log('emit:: update:connection  to:: local-client');
                   socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', {connection: updatedConnection})
                 })
-          });
+            });
         });
     });
 
@@ -261,7 +277,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
       if (data.image) {
         mediaPromises.push(
           socketUtil.encodeBase64(data.image.path)
-            .then(function(imageString) {
+            .then(function (imageString) {
               data.imageBuffer = imageString;
             })
         )
@@ -302,7 +318,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
       //if there are updates...
       if (data.updates.length) {
 
-        data.updates.forEach(function(update) {
+        data.updates.forEach(function (update) {
           //if imageBuffer exists then an image exists
           if (update.imageBuffer) {
             //create an object  with the buffer and the path of the iamge
@@ -337,14 +353,14 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
             //made this into a promise because I need to all to resolve.....
             //TODO:Refractor this........ to many callbacks
             socketUtil.updateOrInsert(data.updates)
-              .then(function(updates) {
+              .then(function (updates) {
                 socketUtil.getConnectionBySocketId(socket.id)
                   .then((connection) => {
                     connection.lastSync = Date.now(); //modify lastSync for client/connection
                     //update connection
                     socketUtil.updateConnection(connection)
                       .then((updatedConnection) => {
-                      //emit changes to local-client
+                        //emit changes to local-client
                         console.log('emit:: notify:externalChanges to:: local-client');
                         socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {
                           connection: updatedConnection,
@@ -352,18 +368,16 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
                         });
                         console.log('emit:: notify:sync-end to:: local-client');
                         socketUtil.emitToLocalClient(io, localClient.localSocketId, 'notify:sync-end');
-                    })
-                });
-            });
-        });
+                      })
+                  });
+              });
+          });
 
       }
     });
 
 
-
   });
-
 
 
   function updatePersistedSocketConnection(socketId) {
