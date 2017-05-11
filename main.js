@@ -1,4 +1,5 @@
 var electron = require('electron'),
+    path = require('path'),
     app = electron.app,
     BrowserWindow = electron.BrowserWindow,
     Menu = electron.Menu,
@@ -40,7 +41,8 @@ var menuTemplate = [{
 
 
 var menu = Menu.buildFromTemplate(menuTemplate);
-
+var icon =  path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
+console.log('icon', icon);
 
 function importProject() {
     win.webContents.send('import:project');
@@ -54,7 +56,9 @@ function createWindow () {
         webPreferences: {
             webSecurity: false,
             zoomFactor: 1
-        }
+        },
+      icon: icon
+      // icon: path.join(__dirname, 'dist/img/app-icons/mac/glossa-logo.icns') //for dev for mac
     });
 
 
