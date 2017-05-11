@@ -34,7 +34,7 @@ export class DrawerService {
       {
         name: 'Corpora',
         type: 'link',
-        state: 'corpus'
+        state: 'meta'
         // pages: [
         //   {
         //     name: 'Corpus',

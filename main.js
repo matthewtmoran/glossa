@@ -51,6 +51,7 @@ function importProject() {
 function createWindow () {
     // Create the browser window.
     win = new BrowserWindow({
+        titleBarStyle: 'hidden',
         width: 1200,
         height: 750,
         webPreferences: {

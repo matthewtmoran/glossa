@@ -136,12 +136,10 @@ export const root = angular
   .run(($rootScope, $state, $injector, __user, $window, RootService, $transitions, SocketService) => {
     'ngInject';
 
-    // console.log('going to state: ', __user.session.currentState);
-
-    // RootService.getUser()
-    //   .then((data) => {
-    //     $state.go(data.session.currentState, data.session.currentStateParams);
-    //   });
+    RootService.getUser()
+      .then((data) => {
+        $state.go(data.session.currentState, data.session.currentStateParams);
+      });
 
     // $state.go(__user.session.currentState, __user.session.currentStateParams);
   //   //if there is no $window.socket object and if the user has sharing enabled
@@ -163,12 +161,12 @@ export const root = angular
       // __user.session.currentStateParams = toState.params;
       //update session data in persistent storage every state change
       //TODO: might just be able to use localstorage
-      // RootService.updateSession(session)
-      //   .then((data) => {
-      //     //update the __user object in memory
-      //     console.log('updatedSession');
-      //     // __user.session = data.session;
-      //   });
+      RootService.updateSession(session)
+        .then((data) => {
+          //update the __user object in memory
+          console.log('updatedSession');
+          // __user.session = data.session;
+        });
 
       //This keeps the state from redirecting away from the child state when that same child state is clicked.
       let redirect = toState.redirectTo;
