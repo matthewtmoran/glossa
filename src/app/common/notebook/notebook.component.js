@@ -4,6 +4,8 @@ import NotebookNormalTemplate from './notebook-dialog/notebook-dialog-normal.htm
 import NotebookPreviewTemplate from './notebook-dialog/notebook-dialog-preview.html';
 import NotebookImageTemplate from './notebook-dialog/notebook-dialog-image.html';
 import NotebookAudioTemplate from './notebook-dialog/notebook-dialog-audio.html';
+import { SettingsHashtagsComponent } from '../settings/settings-hashtags/settings-hashtags.controller';
+import SettingsHashtagsTemplate from '../settings/settings-hashtags/settings-hashtags.html';
 
 
 export const notebookComponent = {
@@ -11,7 +13,9 @@ export const notebookComponent = {
     allConnections: '<',
     notebooksData: '<',
     searchText: '<',
-    currentUser: '<'
+    currentUser: '<',
+    hashtags: '<',
+    onUpdateTag: '&'
   },
   templateUrl,
   controller: class NotebookComponent {
@@ -48,10 +52,13 @@ export const notebookComponent = {
         console.log('changes in allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
+      if (changes.hashtags) {
+        console.log('changes with hastags');
+        this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
     }
 
     $onInit() {
-      console.log('this.notebooks', this.notebooks);
       this.isLoading = true;
       this.hidden = false;
       this.isOpen = false;
@@ -389,12 +396,35 @@ export const notebookComponent = {
     }
 
     tagManageDialog() {
-      this.dialogService.manageTags()
-        .then((res) => {
-          if (res.dataChanged) {
-            this.queryNotebooks();
-          }
-        })
+      this.$mdDialog.show({
+        controller: () => this,
+        controllerAs: '$ctrl',
+        template: `<md-dialog class="hashtag-dialog" flex-xs="90" flex-sm="80" flex-gt-sm="80">
+                        <md-content>
+                            <settings-hashtags on-update-tag="$ctrl.updateTag($event)" hashtags="$ctrl.hashtags"></settings-hashtags>
+                        </md-content>
+                        <span flex></span>
+                        <md-dialog-actions>
+                            <md-button ng-click="$ctrl.cancel()">Close</md-button>
+                        </md-dialog-actions>
+                  </md-dialog>`,
+        // templateUrl: 'app/tagManagement/hashtags.dialog.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        // bindToController: true,
+      }).then((data) => {
+        return data;
+      }).catch((data) => {
+        return data;
+      })
+    }
+
+    updateTag(event) {
+      this.onUpdateTag({
+        $event: {
+          tag: event.tag
+        }
+      })
     }
 
     isOpenWatch(isOpen) {
