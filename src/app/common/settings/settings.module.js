@@ -2,6 +2,7 @@ import { settingsProject } from './settings-project/settings-project.module';
 import { settingsAbout } from './settings-about/settings-about.module';
 import { settingsSharing } from './settings-sharing/settings-sharing.module';
 import { settingsMedia } from './settings-media/settings-media.module';
+import { settingsHashtags } from './settings-hashtags/settings-hashtags.module';
 import { SettingsService } from './settings.service';
 import {settingsComponent} from './settings.component';
 import { SettingsTabIndex } from './settings-tabs.directive';
@@ -12,10 +13,8 @@ export const settings = angular
     settingsProject,
     settingsAbout,
     settingsSharing,
-    settingsMedia
-    // meta,
-    // baseline,
-    // corpusSidebar
+    settingsMedia,
+    settingsHashtags
   ])
   .component('settings', settingsComponent)
   .config(($stateProvider) => {

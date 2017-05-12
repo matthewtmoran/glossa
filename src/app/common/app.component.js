@@ -5,11 +5,13 @@ export const appComponent = {
     currentUser: '<',
     project: '<',
     allConnections: '<',
+    hashtags: '<'
   },
   templateUrl,
   controller: class AppComponent {
     constructor($scope, $state, $q, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService) {
       'ngInject';
+      console.log('AppComponent loaded............');
       this.$scope = $scope;
       this.$state = $state;
       this.$q = $q;
@@ -32,11 +34,14 @@ export const appComponent = {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.currentUser) {
-        this.currentUser = angualr.copy(changes.currentUser.currentValue);
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
         this.settings = angular.copy(this.currentUser.settings);
       }
       if (changes.project) {
-        this.project = angualr.copy(changes.project.currentValue);
+        this.project = angular.copy(changes.project.currentValue);
+      }
+      if (changes.hashtags) {
+        this.hashtags = angular.copy(changes.hashtags.currentValue);
       }
     }
 
@@ -234,6 +239,22 @@ export const appComponent = {
       //     this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
       //   }
       // });
+    }
+
+
+    updateTag(event) {
+      this.rootService.updateTag(event.tag)
+        .then((data) => {
+          this.hashtags.map((tag, index) => {
+            if (tag._id === data._id) {
+              this.hashtags[index] = data;
+            }
+          });
+          console.log('DOES THIS UPDATE TRIGGET HASHTAG CHANGES?????????');
+          // this.hashtags = angular.copy(this.hashtags);
+
+        })
+
     }
 
 

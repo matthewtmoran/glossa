@@ -37,6 +37,7 @@ export const app = angular
           currentUser: (RootService) => RootService.getUser(),
           project: (SettingsService) => SettingsService.getProject(),
           allConnections: (RootService) => RootService.getConnections(),
+          hashtags: (RootService) => RootService.getHashtags()
         },
         component: 'app',
       });

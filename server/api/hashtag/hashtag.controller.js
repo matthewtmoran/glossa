@@ -17,6 +17,7 @@ var Notebook = require('../notebook/notebook.model');
 
 // Get list of things
 exports.index = function(req, res) {
+  console.log('finding all hashtags');
     Hashtag.find({}, function (err, hashtags) {
     if(err) { return handleError(res, err); }
     return res.status(200).json(hashtags);

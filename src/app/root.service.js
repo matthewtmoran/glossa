@@ -1,4 +1,3 @@
-
 // import { remote, ipcRenderer } from 'electron';
 // const ipc = require('electron').ipcRenderer;
 // const dialog  = require('electron').remote.dialog;
@@ -23,16 +22,17 @@ export class RootService {
     this.cfpLoadingBar = cfpLoadingBar;
     this.currentOnlineList = [];
 
-  //TODO: move ipc listeners to their own service
-  //   ipc.on('changeState', this.ipcChangeState.bind(this));
-  //   ipc.on('import:project', this.ipcImportProject.bind(this));
+    //TODO: move ipc listeners to their own service
+    //   ipc.on('changeState', this.ipcChangeState.bind(this));
+    //   ipc.on('import:project', this.ipcImportProject.bind(this));
 
   }
 
 
+  //electron event
   ipcImportProject(event, message) {
     let options = {
-      filters: [{ name: 'Glossa File (.glossa)', extensions: ['glossa'] }]
+      filters: [{name: 'Glossa File (.glossa)', extensions: ['glossa']}]
     };
 
     dialog.showOpenDialog(options, (selectedFiles) => {
@@ -56,11 +56,25 @@ export class RootService {
     this.$state.go(state, {});
   }
 
+  //should only be called on stateChange and on every state change....
+  updateSession(session) {
+    return this.$http.put(`/api/user/${this.__user._id}/session`, session)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      })
+  }
+
+
+  //CORE
+
+  //get user object (settings is also extracted from this data)
   getUser() {
-    console.log('getUser (http request)');
     return this.$http.get('/api/user/')
       .then((response) => {
-        console.log('getUser response: ', response);
         return response.data;
       })
       .catch((response) => {
@@ -69,28 +83,7 @@ export class RootService {
       });
   }
 
-  isSharing() {
-    return this.__user.isSharing;
-  }
-
-  getSettings() {
-    return this.__user.settings;
-  }
-
-  // getConnections() {
-  //   this.socketService.emit('request:connections')
-  // }
-
-  tunnelEvent(name, data) {
-    this.$rootScope.$broadcast(name, data);
-  }
-
-  getConnectionsCB(callback) {
-    this.socketService.emit('get:ConnectionsCB', {}, (connections) => {
-      return callback(connections);
-    })
-  }
-
+  //get project data
   getProject() {
     return this.$http.get('/api/project/')
       .then((response) => {
@@ -102,9 +95,12 @@ export class RootService {
       });
   }
 
-  getConnections() {
-    return this.$http.get('/api/connections/')
+  //get hashtags
+  getHashtags() {
+    console.log('getHashtags called');
+    return this.$http.get('/api/hashtags/')
       .then((response) => {
+      console.log('response', response);
         return response.data;
       })
       .catch((response) => {
@@ -113,18 +109,9 @@ export class RootService {
       });
   }
 
-  getCorporia() {
-    return this.$http.get('/api/corporia')
-      .then((response) => {
-        return response.data;
-      })
-      .catch((response) => {
-        console.log('There was an error', response);
-        return response.data;
-      });
-  }
 
-  
+  //SETTINGS
+
   uploadAvatar(file) {
     return this.Upload.upload({
       url: 'api/user/avatar',
@@ -150,7 +137,7 @@ export class RootService {
         return response.data;
       });
   }
-  
+
   saveSettings(settings) {
     return this.$http.put(`/api/user/${this.__user._id}/settings`, settings)
       .then((response) => {
@@ -164,20 +151,6 @@ export class RootService {
 
   }
 
-
-  //should only be called on stateChange
-  updateSession(session) {
-    return this.$http.put(`/api/user/${this.__user._id}/session`, session)
-      .then((response) => {
-        return response.data;
-      })
-      .catch((response) => {
-        console.log('There was an error', response);
-        return response.data;
-      })
-  }
-
-
   updateUserInfo(user) {
     return this.$http.put(`/api/user/${this.__user._id}/`, user)
       .then((response) => {
@@ -188,36 +161,95 @@ export class RootService {
         return response.data;
       })
   }
-  
 
+  updateTag(tag) {
+    return this.$http.put(`/api/hashtags/${tag._id}/`, tag)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      })
+  }
+
+
+  // getConnections() {
+  //   this.socketService.emit('request:connections')
+  // }
+
+  //tunnels event to broadcast across application
+  tunnelEvent(name, data) {
+    this.$rootScope.$broadcast(name, data);
+  }
+
+  //TODO: consider deletion
+  getConnectionsCB(callback) {
+    this.socketService.emit('get:ConnectionsCB', {}, (connections) => {
+      return callback(connections);
+    })
+  }
+
+
+//TODO: consider deletion
+  getConnections() {
+    return this.$http.get('/api/connections/')
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
+  }
+
+//TODO: consider deletion
+  getCorporia() {
+    return this.$http.get('/api/corporia')
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
+  }
+
+
+//TODO: consider deletion
   updateUserProfile(userProfile) {
-    console.log('UpdateUserProfile');
+    console.log('updateUserProfile');
+    console.log('TODO: REFRACTOR');
     let userString = angular.toJson(userProfile);
     this.socketService.emit('update:userProfile', {userProfile: userString})
   }
 
+  //TODO: Refractor
   toggleFollow(user) {
     let userString = angular.toJson(user);
     console.log('emit:: update:following');
     this.socketService.emit('update:following', {connection: userString});
   }
 
-
+//TODO: consider deletion
   getOnlineUsersSE() {
     this.socketFactory.emit('get:networkUsers')
   }
 
+  //TODO: refractor or delete
   //look for all updates from users that are being followed
   getAllUserUpdates() {
     this.socketService.emit('request:AllUserUpdates')
   }
 
+  //TODO: refractor
   //broad cast updates to users that follow
   broadcastUpdates(data) {
     console.log('broadcastUpdates');
     this.socketService.emit('broadcast:Updates', data);
   }
 
+  //called when application is bootstrapped
   initListeners() {
     console.log('initListeners');
     // hand shake
@@ -392,28 +424,4 @@ export class RootService {
 
   }
 
-  //   ipcImportProject(event, message) {
-  //   var options = {
-  //     filters: [{ name: 'Glossa File (.glossa)', extensions: ['glossa'] }]
-  //   };
-  //
-  //   dialog.showOpenDialog(options, function(selectedFiles) {
-  //
-  //       if (selectedFiles) {
-  //
-  //         $http.post('/api/project/import', {projectPath: selectedFiles[0]})
-  //           .then(function successCallback(response) {
-  //             $window.location.reload();
-  //           }, function errorCallback(response) {
-  //             console.log('There was an error', response);
-  //             $window.location.reload();
-  //           });
-  //       }
-  //     }
-  //   );
-  // }
-  //
-  //   ipcChangeState(event, state) {
-  //   $state.go(state, {});
-  // }
 }

@@ -30,6 +30,7 @@
     "jquery": "^3.2.1",
     "lodash": "^4.16.2",
     "main-bower-files": "^2.13.1",
+    "md-data-table": "^2.2.0",
     "method-override": "~1.0.0",
     "morgan": "~1.0.0",
     "multer": "^1.2.1",
@@ -70,7 +71,7 @@
     "startdev": "node server/app",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=dist/img/app-icons/mac/glossa-logo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/img/app-icons/win/glossa-logo.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Electron Tutorial App\"",
-    "package-linux" : "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/app-icons/lin/glossa-logo.png --prune=true --out=release-builds"
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/app-icons/lin/glossa-logo.png --prune=true --out=release-builds"
   },
   "author": "",
   "license": "ISC"

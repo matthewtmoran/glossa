@@ -2,6 +2,9 @@ import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 import ngAria from 'angular-aria';
 import ngAnimate from 'angular-animate';
+import ngSanitize from 'angular-sanitize';
+import mdDataTable from 'angular-material-data-table';
+import * as _ from "lodash"
 import ngMaterial from 'angular-material';
 import ngFileUpload from 'ng-file-upload';
 import CodeMirror from 'codemirror';
@@ -9,16 +12,15 @@ import CodeMirror from 'codemirror';
 import ngCodeMirror from 'ngCodemirror'
 
 
-// import * as SimpleMDE from 'simplemde/src/js/simplemde';
 import { rootComponent } from './root.component';
 import { common } from './common/common.module';
 import { RootService } from './root.service';
 import { SocketService } from './components/socket/socket.service';
 import { NotificationService } from './components/notification/notification.service';
-// import { config } from '../config';
 import { components } from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
+// import 'md-data-table/dist/md-data-table-style.css';
 
 // var electron = window.require('electron');
 // console.log('electron: ', electron);
@@ -60,7 +62,9 @@ export const root = angular
   .module('root', [
     'config',
     'ui.codemirror',
+    mdDataTable,
     ngAria,
+    ngSanitize,
     ngAnimate,
     ngMaterial,
     uiRouter,

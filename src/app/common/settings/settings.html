@@ -30,6 +30,7 @@
 		            current-user="$ctrl.currentUser"
 		            all-connections="$ctrl.allConnections"
 		            online-connections="$ctrl.onlineConnections"
+		            hashtags="$ctrl.hashtags"
 		            on-update-project="$ctrl.updateProject($event)"
 		            on-export-project="$ctrl.exportProject($event)"
 		            on-save-media-settings="$ctrl.saveMediaSettings($event)"
@@ -37,7 +38,9 @@
 					on-upload-avatar="$ctrl.uploadAvatar($event)"
 					on-update-user-info="$ctrl.updateUserInfo($event)"
 					on-toggle-sharing="$ctrl.toggleSharing($event)"
-					on-toggle-follow="$ctrl.toggleFollow($event)">
+					on-toggle-follow="$ctrl.toggleFollow($event)"
+					on-update-tag="$ctrl.updateTag($event)"
+					ng-class="{'hide-overflow': ('hashtags' | includedByState)}">
 		</md-content>
 
 	</md-content>

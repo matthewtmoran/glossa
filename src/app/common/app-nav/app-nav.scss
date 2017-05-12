@@ -17,12 +17,14 @@
       }
 
     }
+    //TODO: change this with pallate settings
+    md-input-container .md-input {
+      color: rgba(255,255,255,0.87);
+    }
+
   }
 
-  //TODO: change this with pallate settings
-  md-input-container .md-input {
-    color: rgba(255,255,255,0.87);
-  }
+
 
   .md-nav-bar {
     border: none;

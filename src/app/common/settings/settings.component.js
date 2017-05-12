@@ -8,13 +8,15 @@ export const settingsComponent = {
     allConnections: '<',
     onlineConnections: '<',
     previousState: '<',
+    hashtags: '<',
     onUpdateProject: '&',
     onExportProject: '&',
     onSaveMediaSettings: '&',
     onUploadAvatar: '&',
     onUpdateUserInfo: '&',
     onToggleSharing: '&',
-    onRemoveAvatar: '&'
+    onRemoveAvatar: '&',
+    onUpdateTag: '&'
   },
   templateUrl,
   controller: class SettingsComponent {
@@ -52,6 +54,10 @@ export const settingsComponent = {
       if (changes.currentUser) {
         console.log('changes with currentUser');
         this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
+      if (changes.hashtags) {
+        console.log('changes with currentUser');
+        this.hashtags = angular.copy(changes.hashtags.currentValue);
       }
     }
 
@@ -192,6 +198,14 @@ export const settingsComponent = {
       console.log('toggleFollow in settings.component');
       // event.user.following = !event.user.following;
       this.rootService.toggleFollow(event.user);
+    }
+
+    updateTag(event) {
+      this.onUpdateTag({
+        $event: {
+          tag: event.tag
+        }
+      })
     }
 
     updateConnection(event) {
