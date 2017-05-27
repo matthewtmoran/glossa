@@ -105,7 +105,7 @@ export class WaveSurferController {
         waveColor: this.userSettings.waveColor,
         progressColor: '#757575',
         height: '200',
-        barHeight: 3,
+        barHeight: 1,
         barWidth: 1,
         cursorColor: '#FF5252'
       };

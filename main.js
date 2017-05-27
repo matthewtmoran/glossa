@@ -15,29 +15,38 @@ var url = require('url');
 var win;
 var forceQuit = false;
 var menuTemplate = [{
-    label: 'File',
+    label: "Application",
     submenu: [
-        {label: 'About App', click: function(item, focusedWindow){
-            focusedWindow.webContents.send('changeState', 'settings.about');
-        }},
-        {label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; app.quit();}},
-        {label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();}},
-        {
-            label: 'Toggle Developer Tools',
+        { label: "About", selector: "orderFrontStandardAboutPanel:" },
+        { type: "separator" },
+        { label: "Preferences", click: function(item, focusedWindow){focusedWindow.webContents.send('changeState', 'settings.project');}},
+        { type: "separator" },
+        { label: 'Toggle Developer Tools',
             accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
             click: function (item, focusedWindow) {
                 if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-            }
-        },
-        {label: 'Load Project', click: importProject},
-        {
-            label: 'Prefs',
-            click: function(item, focusedWindow){
-                focusedWindow.webContents.send('changeState', 'settings.project');
-            }
-        }
-    ]
-}];
+            } },
+        { label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function() {win.reload();} },
+        { type: "separator" },
+        { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function() {forceQuit=true; app.quit();}}
+    ]}, {
+    label: "File",
+    submenu: [
+        { label: 'Load Project', click: importProject},
+    ]}, {
+    label: "Edit",
+    submenu: [
+        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+        { type: "separator" },
+        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+    ]}
+];
+
+
 
 
 var menu = Menu.buildFromTemplate(menuTemplate);

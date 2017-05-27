@@ -6,9 +6,9 @@
             layout-align="space-between center">
 	<md-list>
 		<md-toolbar class="nav-header logo-container">
-			<img src="../../../img/glossa-logo.svg" alt="">
+			<img src="../../../img/glossa-logo.svg" alt="" height="96px" width="96px">
 		</md-toolbar>
-		<h2>{{$ctrl.project.name}}</h2>
+		<h2 style="padding-left:16px;">{{$ctrl.project.name}}</h2>
 		<md-content flex="" role="navigation" class="_md flex">
 			<ul class="side-menu">
 				<li ng-repeat="section in $ctrl.menu"
@@ -44,7 +44,7 @@
 			<ul class="side-menu">
 				<li class="parent-list-item">
 					<md-button class="md-button-toggle" ui-sref="project" ng-click="$ctrl.closeSideNav()">
-						<div flex layout="row" layout-align="center center">
+						<div flex layout="row" layout-align="center center" style="padding-left:16px;">
 							Settings
 							<span flex></span>
 
