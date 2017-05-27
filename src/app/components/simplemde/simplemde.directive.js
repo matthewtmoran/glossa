@@ -9,18 +9,22 @@ export class SimplemdeDirective {
       ngModel: 'ngModel',
     };
     this.transclude = true;
-    // this.scope ={
-    //   updateFunction: '&'
-    // };
+    this.scope ={
+      hashtags: '<'
+    };
     this.$parse = $parse;
     this.$timeout = $timeout;
   }
 
   link(scope, element, attrs, ctrl) {
 
+    console.log('scope', scope);
+    console.log('ctrl', ctrl);
+
     const hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
     let options;
     options = this.$parse(attrs.simplemde)(scope) || {};
+    console.log('attrs', attrs);
     options.element = element[0];
     let mde = new SimpleMDE(options);
     let cm = mde.myCodeMirror;

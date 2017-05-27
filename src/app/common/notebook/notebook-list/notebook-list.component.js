@@ -6,6 +6,7 @@ export const notebookListComponent = {
     searchText: '<',
     notebooks: '<',
     selected: '<',
+    hashtags: '<',
     onViewDetails: '&',
     onViewPreview: '&',
   },

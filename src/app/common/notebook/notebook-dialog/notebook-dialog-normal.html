@@ -1,6 +1,6 @@
-<md-dialog class="post-dialog" aria-label="notebook dialog" flex-xs="90" flex-sm="75" flex-gt-sm="50">
-	<form name="postForm" ng-cloak>
-		<md-dialog-content>
+<md-dialog class="post-dialog" aria-label="notebook dialog" flex-xs="90" flex-sm="75" flex-gt-sm="75">
+		<md-content>
+			<form name="postForm" ng-cloak>
 			<div layout="row">
 				<div layout="column"
 				     flex
@@ -53,18 +53,20 @@
 
 			<div class=" no-padding" flex layout-fill>
 				<md-input-container class="simplemde-wrapper" flex layout-fill>
-					<textarea id="theText"
-					          aria-label="text area"
-					          class="simplemde-textarea"
-					          ng-model="$ctrl.currentNotebook.description"
-					          simplemde="$ctrl.editorOptions"
-					          required >
-					</textarea>
+
+					<simplemde
+							hashtags="$ctrl.hashtags"
+							editor-options="$ctrl.editorOptions"
+							value-binding="$ctrl.currentNotebook"
+							update-model="$ctrl.updateModel($event)">
+					</simplemde>
+
 				</md-input-container>
 
 
 			</div>
-		</md-dialog-content>
+			</form>
+		</md-content>
 
 		<md-dialog-actions layout="row" class="top-border" >
 			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button"><md-icon>delete</md-icon></md-button>
@@ -76,5 +78,4 @@
 				</md-button>
 		</md-dialog-actions>
 
-	</form>
 </md-dialog>

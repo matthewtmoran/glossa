@@ -21,11 +21,12 @@
 
 	<!-- child state -->
 	<md-content ui-view
+	            hashtags="$ctrl.hashtags"
 	            editor-options="$ctrl.editorOptions"
 	            on-remove-media="$ctrl.removeMedia($event)"
 	            on-delete-markdown="$ctrl.deleteMarkdown($event)"
 	            on-attachment="$ctrl.newAttachment($event)"
-	            on-view-details-top="$ctrl.viewDetailsTop($event)"
+	            on-view-details="$ctrl.viewDetails($event)"
 	            on-update="$ctrl.updateMarkdown($event)"
 	            on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
 	            on-update-model="$ctrl.updateModel($event)"

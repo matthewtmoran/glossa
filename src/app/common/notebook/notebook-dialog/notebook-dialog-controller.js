@@ -1,5 +1,6 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, $window, notebook, editorOptions, onCancel, onDeleteNotebook, onHide, onUpdate, onSave) {
+  constructor($scope, $timeout, $window, notebook, editorOptions, hashtags, onCancel, onDeleteNotebook, onHide, onUpdate, onSave) {
+  // constructor($scope, $timeout, $window) {
     'ngInject';
 
     this.$scope = $scope;
@@ -11,8 +12,8 @@ export class NotebookDialogController {
     this.onCancel = onCancel;
     this.onHide = onHide;
     this.onUpdate = onUpdate;
-    this.onSave = onSave
-
+    this.onSave = onSave;
+    this.hashtags = hashtags;
     this.onDeleteNotebook = onDeleteNotebook;
 
     this.$scope.$watch(() => this.currentNotebook.image, this.imageWatcher.bind(this));
@@ -22,6 +23,22 @@ export class NotebookDialogController {
 
   }
 
+  $onChanges(changes) {
+    console.log('$onChanges in notebook-dialog-controller', changes);
+    if (changes.notebook) {
+      this.currentNotebook = angular.copy(changes.notebook.currentValue)
+    }
+    if (changes.hashtags) {
+      this.hashtags = angular.copy(changes.hashtags.currentValue);
+    }
+  }
+
+  $onInit() {
+    this.removedMedia = [];
+    this.findDetailType();
+    this.setDynamicItems();
+  }
+
   init() {
     this.removedMedia = [];
     this.findDetailType();
@@ -29,7 +46,6 @@ export class NotebookDialogController {
   }
 
   cancel() {
-    console.log('cancel being called');
     this.onCancel({
       $event: {
         notebook: false
@@ -47,21 +63,20 @@ export class NotebookDialogController {
 
   save() {
     this.onSave({
-      notebook: this.currentNotebook
+        notebook: this.currentNotebook
     })
   }
 
   update() {
-    console.log('update');
     this.onUpdate({
       notebook: this.currentNotebook,
       removeItem: this.removedMedia
     })
   }
 
+  //keep simplemde and ngmodel synced
   updateModel(event) {
-    console.log('updateing model');
-    this.currentNotebook.description = event.value;
+    this.currentNotebook.description = angular.copy(event.value);
   }
 
   findDetailType() {

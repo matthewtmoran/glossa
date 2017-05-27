@@ -5,58 +5,78 @@ export const simplemdeComponent = {
     editorOptions: "<",
     fileBinding: "<",
     valueBinding: "<",
+    hashtags: '<',
     updateFunction: "&",
     updateModel: '&'
   },
-  template:`<textarea id="theText" aria-label="hidden simplede text area node"></textarea>`,
+  transclude: true,
+  template: `<textarea id="theText"
+                ng-trim="false"
+			          autocomplete="off"
+			          aria-label="hidden simplede text area node">
+            </textarea>
+`,
   controller: class SimplemdeComponent {
     constructor($parse, $timeout) {
       'ngInject';
       this.$timeout = $timeout;
+      // this.valueBinding = '';
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in simplemde.component', changes);
       if (changes.editorOptions) {
-        console.log('changes in this.editorOptions');
         this.editorOptions = angular.copy(changes.editorOptions.currentValue);
       }
       if (changes.fileBinding) {
-        console.log('changes in this.fileBinding');
         this.fileBinding = angular.copy(changes.fileBinding.currentValue);
       }
+      if (changes.hashtags) {
+        this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
       if (changes.valueBinding) {
-        console.log('changes in this.valueBinding');
         this.valueBinding = angular.copy(changes.valueBinding.currentValue);
       }
       if (changes.valueBinding && !changes.valueBinding.isFirstChange()) {
-        this.render();
+        this.render(this.valueBinding.description);
       }
 
     }
 
     $onInit() {
-      this.mde = new SimpleMDE(this.editorOptions);
-      this.cm = this.mde.myCodeMirror;
-      this.editor = this.mde.codemirror;
+      this.isLoading = true;
+      this.hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
+      this.hashtagList = this.hashtags.map((tag) => {
+        tag.displayText = tag.tag;
+        tag.text = tag.tag;
+        return tag;
+      });
 
-      this.editor.on('change', this.changeEvent.bind(this));
-      this.editor.on('blur', this.blurEvent.bind(this));
-      console.log('calling render');
-      this.render();
+      //timeout here so angular digest cycle is valid
+      this.$timeout(() => {
+        console.log('this.editorOptions',this.editorOptions);
+        this.mde = new SimpleMDE(this.editorOptions);
+        this.cm = this.mde.myCodeMirror;
+        this.editor = this.mde.codemirror;
+
+        this.editor.on('change', this.changeEvent.bind(this));
+        this.editor.on('blur', this.blurEvent.bind(this));
+        this.render(this.valueBinding.description);
+      });
     }
 
 
-    render() {
-      this.$timeout(() => {
-        this.mde.value(this.valueBinding);
-        if (this.editorOptions.autoPreview) {
-          this.mde.togglePreview();
-        }
-      });
+    render(val) {
+      if (!val) {
+        val = '';
+      }
+      this.mde.value(val);
+      if (this.editorOptions.autoPreview) {
+        this.mde.togglePreview();
+      }
       if (this.mde.isPreviewActive()) {
         this.rerenderPreview(val);
       }
+      this.isLoading = false;
     }
 
     blurEvent() {
@@ -69,12 +89,13 @@ export const simplemdeComponent = {
       }
     }
 
-    changeEvent() {
+    changeEvent(instance, object) {
       this.updateModel({
         $event: {
           value: this.mde.value()
         }
-      })
+      });
+      this.showHashtagHints(instance, object);
     }
 
     rerenderPreview() {

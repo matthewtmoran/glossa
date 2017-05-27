@@ -10,14 +10,13 @@
 			       value="$ctrl.currentFile.displayName">
 		</md-input-container>
 		<md-input-container class="md-block">
-
 			<simplemde
+					hashtags="$ctrl.hashtags"
 					editor-options="$ctrl.editorOptions"
 					update-function="$ctrl.update($event)"
 					value-binding="$ctrl.currentFile.description"
 					update-model="$ctrl.updateModel($event)">
 			</simplemde>
-
 		</md-input-container>
 	</form>
 	<div ng-if="$ctrl.currentFile._id" layout="row" layout-align="space-between center">
@@ -31,7 +30,6 @@
 		<h3>Associated Media</h3>
 		<md-content layout="row">
 			<!--Independent Media-->
-
 			<!--image-->
 			<md-card flex="50"
 			         class="mdl-shadow--2dp attachment-card"
@@ -47,15 +45,11 @@
 						<img ng-src="{{$ctrl.currentFile.image.path}}" alt="">
 					</div>
 				</md-card-content>
-
 				<span flex></span>
-
 				<md-divider></md-divider>
-
 				<md-card-actions layout="row" layout-align="start center">
 					<md-button ng-click="$ctrl.removeMedia($event, $ctrl.currentFile.image, 'image')">Delete</md-button>
 				</md-card-actions>
-
 			</md-card>
 
 			<!--audio-->
@@ -69,25 +63,18 @@
 							<span class="md-subhead">Independent Media File</span>
 						</md-card-title-text>
 					</md-card-title>
-					<!--<div>-->
 					<wave-surfer-preview
 							flex
 							url-src="$ctrl.currentFile.audio.path"
 							auto-play="false">
 					</wave-surfer-preview>
-					<!--</div>-->
 				</md-card-content>
-
 				<span flex></span>
-
 				<md-divider></md-divider>
-
 				<md-card-actions layout="row" layout-align="start center">
 					<md-button ng-click="$ctrl.removeMedia($event, $ctrl.currentFile.audio, 'audio')">Delete</md-button>
 				</md-card-actions>
-
 			</md-card>
-
 
 			<!--Notebook Attachment-->
 			<notebook-card flex="50"
@@ -95,8 +82,8 @@
 			               ng-if="$ctrl.notebookAttached"
 			               notebook="$ctrl.notebookAttached"
 			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
-			               on-view-details="$ctrl.viewDetailsMid($event)"
-			               on-view-preview="$ctrl.viewDetailsMid($event)">
+			               on-view-details="$ctrl.viewDetails($event)"
+			               on-view-preview="$ctrl.viewDetails($event)">
 			</notebook-card>
 		</md-content>
 	</div>

@@ -4,7 +4,8 @@ import NotebookPreviewTemplate from '../notebook/notebook-dialog/notebook-dialog
 export const corpusComponent = {
   bindings: {
     markDownFiles: '<',
-    searchText: '<'
+    searchText: '<',
+    hashtags: '<'
   },
   templateUrl,
   controller: class CorpusComponent {
@@ -58,6 +59,10 @@ export const corpusComponent = {
       if (changes.notebookAttachment) {
         console.log('changes in notebookAttachment');
         this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue)
+      }
+      if (changes.hashtags) {
+        console.log('changes in hashtags');
+        this.hashtags = angular.copy(changes.hashtags.currentValue)
       }
     }
 
@@ -239,7 +244,7 @@ export const corpusComponent = {
         });
     }
 
-    viewDetailsTop(event) {
+    viewDetails(event) {
       this.notebook = event.notebook;
       this.editorOptions = {
         toolbar: false,

@@ -25,14 +25,11 @@ export const notebookCardComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in notebook-card.component', changes);
       if (changes.notebook) {
-        console.log("changes in notebook");
         this.notebook = angular.copy(changes.notebook.currentValue);
         this.renderNotebookPreview();
       }
       if (changes.currentUser) {
-        console.log("changes in currentUser");
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
     }

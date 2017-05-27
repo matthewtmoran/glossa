@@ -30,13 +30,12 @@
 
 			<div class=" no-padding" flex layout-fill>
 				<md-input-container class="simplemde-wrapper" flex layout-fill>
-					<textarea id="theText"
-					          aria-label="text area"
-					          class="simplemde-textarea"
-					          ng-model="$ctrl.currentNotebook.description"
-					          simplemde="$ctrl.editorOptions"
-					          required >
-					</textarea>
+					<simplemde
+							hashtags="$ctrl.hashtags"
+							editor-options="$ctrl.editorOptions"
+							value-binding="$ctrl.currentNotebook"
+							update-model="$ctrl.updateModel($event)">
+					</simplemde>
 				</md-input-container>
 
 			</div>

@@ -95,6 +95,17 @@ export class RootService {
       });
   }
 
+  getSettings() {
+    return this.$http.get('/api/user/')
+      .then((response) => {
+        return response.data.settings;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
+  }
+
   //get hashtags
   getHashtags() {
     console.log('getHashtags called');

@@ -4,6 +4,7 @@ import NotebookNormalTemplate from './notebook-dialog/notebook-dialog-normal.htm
 import NotebookPreviewTemplate from './notebook-dialog/notebook-dialog-preview.html';
 import NotebookImageTemplate from './notebook-dialog/notebook-dialog-image.html';
 import NotebookAudioTemplate from './notebook-dialog/notebook-dialog-audio.html';
+import { NotebookDialogController } from './notebook-dialog/notebook-dialog-controller';
 import { SettingsHashtagsComponent } from '../settings/settings-hashtags/settings-hashtags.controller';
 import SettingsHashtagsTemplate from '../settings/settings-hashtags/settings-hashtags.html';
 
@@ -49,12 +50,13 @@ export const notebookComponent = {
         console.log('this.searchText', this.searchText)
       }
       if (changes.allConnections) {
-        console.log('changes in allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.hashtags) {
-        console.log('changes with hastags');
         this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
+      if (changes.currentUser) {
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
     }
 
@@ -201,8 +203,18 @@ export const notebookComponent = {
     }
 
     save(event) {
+      console.log('save event', event);
       this.$mdDialog.hide();
       this.cfpLoadingBar.start();
+
+
+      event.notebook.createdBy = {
+        _id: this.currentUser._id,
+        avatar: this.currentUser.avatar || null,
+        name: this.currentUser.name
+      };
+      event.notebook.projectId = this.currentUser.session.projectId;
+
       this.notebookService.createNotebook(event.notebook)
         .then((data) => {
           this.notebooks.push(data);
@@ -256,6 +268,7 @@ export const notebookComponent = {
       let state = {};
       switch(event.notebook.postType) {
         case 'image':
+          this.notebook = event.notebook;
           this.editorOptions = {
             toolbar: false,
             status: false,
@@ -267,10 +280,11 @@ export const notebookComponent = {
             templateUrl: NotebookImageTemplate,
             parent: angular.element(document.body),
             targetEvent: event,
-            controller: 'notebookDialogController',
+            controller: NotebookDialogController,
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
               onCancel: this.cancel.bind(this),
@@ -283,6 +297,7 @@ export const notebookComponent = {
 
           break;
         case 'audio':
+          this.notebook = event.notebook;
           this.editorOptions = {
             toolbar: false,
             status: false,
@@ -294,10 +309,11 @@ export const notebookComponent = {
             templateUrl: NotebookAudioTemplate,
             parent: angular.element(document.body),
             targetEvent: event,
-            controller: 'notebookDialogController',
+            controller: NotebookDialogController,
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
               onCancel: this.cancel.bind(this),
@@ -309,11 +325,12 @@ export const notebookComponent = {
           };
           break;
         case 'normal':
-          console.log('normal notebook');
+          this.notebook = event.notebook;
           this.editorOptions = {
             toolbar: this.simplemdeToolbar,
             spellChecker: false,
             status: false,
+            forceSync: true,
             autoDownloadFontAwesome: false,
             placeholder: 'Post description...',
           };
@@ -322,10 +339,11 @@ export const notebookComponent = {
             templateUrl: NotebookNormalTemplate,
             parent: angular.element(document.body),
             targetEvent: event,
-            controller: 'notebookDialogController',
+            controller: NotebookDialogController,
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
               onCancel: this.cancel.bind(this),

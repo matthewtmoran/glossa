@@ -113,17 +113,7 @@ export class NotebookService {
    */
 
   createNotebook(notebook) {
-    let user = this.rootService.getUser();
     notebook.name = this.parseService.title(notebook);
-    // notebook.createdAt = Date.now();
-    notebook.createdBy = {
-      _id: user._id,
-      avatar: user.avatar || null,
-      name: user.name
-    };
-
-    notebook.projectId = this.__user.session.projectId;
-
     return this.$q.when(this.parseService.hashtags(notebook))
       .then((data) => {
         notebook.hashtags = data;
@@ -145,7 +135,6 @@ export class NotebookService {
    * @returns {*}
    */
   updateNotebook(notebook) {
-    console.log('notebook ', notebook);
     //parse name of notebooks in case it was changed...
     notebook.name = this.parseService.title(notebook);
 

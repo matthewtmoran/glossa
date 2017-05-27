@@ -26,10 +26,8 @@ export const navComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in app-nav.component', changes);
       if (changes.searchText) {
         if (!!changes.searchText.currentValue){
-          console.log('filtering.....');
           this.searchSubmit();
         }
       }

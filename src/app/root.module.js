@@ -41,6 +41,7 @@ window.onload = () => {
   let $timeout = initInjector.get('$timeout');
   let $animate = initInjector.get('$animate');
 
+
   $http({
     url : `${rootUrl}api/user`,
     method : 'GET'
@@ -53,6 +54,11 @@ window.onload = () => {
       console.log('error', res);
     }).then(() => {
       angular.bootstrap(document, [root]);
+
+      setTimeout(() => {
+        angular.element('.ghost').remove(); //removes the defualt elemnts so there is no box shadow double up (a hard line appears when the box shaodws overlay eachother
+      }, 100)
+
     });
 };
 //Not sure this only works if config is a string.  As a variable, it was failing hard.
@@ -80,7 +86,7 @@ export const root = angular
     'ngInject';
     $locationProvider.html5Mode(true);
     $urlRouterProvider.otherwise('/app/corpus');
-    $compileProvider.preAssignBindingsEnabled(true);
+    // $compileProvider.preAssignBindingsEnabled(true);
 
     //material theme stuff...
     const customAccent = {

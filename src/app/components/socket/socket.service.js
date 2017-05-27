@@ -14,9 +14,6 @@ export class SocketService {
   }
 
   on(eventName, callback) {
-    console.log('');
-    console.log('socket ON event');
-    console.log('eventName: ', eventName);
       this.$window.socket.on(eventName, (...args) => {
         this.$rootScope.$apply(() => {
           callback.apply(this.$window.socket, args);

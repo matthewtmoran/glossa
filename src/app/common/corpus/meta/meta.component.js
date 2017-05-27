@@ -5,11 +5,12 @@ export const metaComponent = {
     notebookAttached: '<',
     selectedFile: '<',
     editorOptions: '<',
+    hashtags: '<',
     onUpdate: '&',
     onAttachment: '&',
     onRemoveMedia: '&',
     onDeleteMarkdown: '&',
-    onViewDetailsTop: '&',
+    onViewDetails: '&',
     onUpdateModel: '&',
     onDisconnectNotebook: '&'
   },
@@ -86,9 +87,9 @@ export const metaComponent = {
     }
 
     //passes event up
-    viewDetailsMid(event) {
+    viewDetails(event) {
       console.log('viewDetailsMid')
-      this.onViewDetailsTop({
+      this.onViewDetails({
         $event: event
       });
     }
