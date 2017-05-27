@@ -1,0 +1,89 @@
+<md-toolbar class="light-toolbar">
+	<div class="md-toolbar-tools">
+		<h2>Turn Sharing {{$ctrl.settings.isSharing ?'OFF' : 'ON'}}</h2>
+		<p class="sub-text" ng-if="!$ctrl.settings.isSharing">Turning this on will allow you to share project data over the LAN</p>
+		<span flex></span>
+		<md-switch ng-model="$ctrl.settings.isSharing" ng-change="$ctrl.toggleSharing()" aria-label="Toggle sharing"></md-switch>
+	</div>
+	<md-divider></md-divider>
+</md-toolbar>
+<div layout="row" class="row-full-height" >
+	<!--<md-divider></md-divider>-->
+	<div flex="25" class="left-side" md-whiteframe="2" layout="column">
+
+		<div class="image-container profile-image-container" >
+
+			<img ng-show="$ctrl.currentUser.avatar" ng-src="{{$ctrl.currentUser.avatar}}" class="thumb image-preview">
+
+			<h2>Your Profile</h2>
+
+			<md-button
+					ng-if="!$ctrl.currentUser.avatar"
+					ngf-select="$ctrl.uploadAvatar($file)"
+					name="avatarUpload"
+					class="md-raised upload-button"
+					ng-model="$ctrl.currentUser.avatar"
+					accept="image/*">
+				<!--ngf-max-size="5MB"-->
+				<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
+				<span>Add Image</span>
+			</md-button>
+
+			<!--<md-button class="md-raised upload-button">Upload Photo</md-button>-->
+
+			<md-button ng-if="$ctrl.currentUser.avatar" class="md-icon-button options-button">
+				<md-icon ng-click="$ctrl.removeAvatar($ctrl.currentUser.avatar); $ctrl.currentUser.avatar = null">visibility_off</md-icon>
+			</md-button>
+		</div>
+
+		<form name="currentUser" class="md-padding">
+			<div class="" layout="row">
+				<div flex="20">
+					<md-icon class="md-36">person</md-icon>
+				</div>
+				<div flex="80">
+					<md-input-container>
+						<input type="text" placeholder="Name" ng-model="$ctrl.currentUser.name" ng-blur="$ctrl.updateUserInfo()">
+					</md-input-container>
+				</div>
+			</div>
+			<div class="" layout="row">
+				<div flex="20" class="contact-section-left">
+					<md-icon class="md-36">email</md-icon>
+				</div>
+				<div flex="80">
+					<md-input-container class="md-block">
+						<input type="email" placeholder="Personal" ng-model="$ctrl.currentUser.personalEmail" ng-blur="$ctrl.updateUserInfo($ctrl.currentUser)">
+					</md-input-container>
+
+					<md-input-container class="md-block">
+						<input type="email" placeholder="Work" ng-model="$ctrl.currentUser.workEmail" ng-blur="$ctrl.updateUserInfo($ctrl.currentUser)">
+					</md-input-container>
+				</div>
+			</div>
+		</form>
+
+
+		<md-list>
+			<md-list-item ng-repeat="contact in $ctrl.contributers" class="md-3-line contact-item">
+				<img ng-src="{{contact.avatar}}" class="md-avatar" alt="" />
+				<div class="md-list-item-text compact">
+					<h3>{{contact.name}}</h3>
+					<h4>{{contact.title}}</h4>
+					<p>{{contact.url}}</p>
+				</div>
+			</md-list-item>
+		</md-list>
+	</div>
+	<div flex="75"  layout="column" >
+		<md-list class="user-list">
+
+			<user-card ng-repeat="user in $ctrl.allConnections"
+			           user="user"
+			           on-toggle-follow="$ctrl.toggleFollow($event)"
+			           ng-class="{'bottom-border':$last}">
+			</user-card>
+
+		</md-list>
+	</div>
+</div>

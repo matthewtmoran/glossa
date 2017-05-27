@@ -1,0 +1,110 @@
+<div layout-gt-xs="row">
+	<!--oreder-->
+
+	<md-card class="md-padding" flex>
+		<div layout="row" >
+			<md-input-container  md-no-float class="md-block md-padding search-text-container" flex-gt-sm>
+				<md-icon class="material-icons">search</md-icon>
+				<input ng-model="$ctrl.searchText" type="text"  placeholder="Search hashtags...">
+			</md-input-container>
+		</div>
+		<div layout="row" layout-wrap class="checkboxes">
+			<md-checkbox ng-click="$ctrl.toggleFilter({name: 'userTags', value: $ctrl.filterOptions.userTags})"
+			             ng-model="$ctrl.filterOptions.userTags">
+				User Tags
+			</md-checkbox>
+			<md-checkbox ng-click="$ctrl.toggleFilter({name: 'systemTags', value: $ctrl.filterOptions.systemTags})"
+			             ng-model="$ctrl.filterOptions.systemTags">
+				System Tags
+			</md-checkbox>
+			<md-checkbox ng-click="$ctrl.toggleFilter({name: 'usedTags', value: $ctrl.filterOptions.usedTags})"
+			             ng-model="$ctrl.filterOptions.usedTags">
+				Used Tags
+			</md-checkbox>
+			<md-checkbox ng-click="$ctrl.toggleFilter({name: 'unusedTags', value: $ctrl.filterOptions.unusedTags})"
+			             ng-model="$ctrl.filterOptions.unusedTags">
+				Unused Tags
+			</md-checkbox>
+
+			<!--<md-checkbox ng-model="$ctrl.filterOptions.userTags">User Tags</md-checkbox>-->
+			<!--<md-checkbox ng-model="$ctrl.filterOptions.systemTags">System Tags</md-checkbox>-->
+			<!--<md-checkbox ng-model="$ctrl.filterOptions.usedTags">Used Tags</md-checkbox>-->
+			<!--<md-checkbox ng-model="$ctrl.filterOptions.unusedTags">Unused Tags</md-checkbox>-->
+		</div>
+		<div ng-hide="true">
+			{{($ctrl.filteredItems = ($ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}
+		</div>
+	</md-card>
+
+	<!--<pre>{{$ctrl | json}}</pre>-->
+</div>
+<md-divider></md-divider>
+
+<md-content class="table-container" >
+	<md-table-container flex layout-fill>
+		<table md-table
+		       md-row-select="$ctrl.tableOptions.rowSelection"
+		       multiple="{{$ctrl.tableOptions.multiSelect}}"
+		       ng-model="$ctrl.selected"
+		       md-progress="promise">
+			<thead md-head md-order="query.order" md-on-reorder="getDesserts">
+			<tr md-row>
+				<th md-column >Tag</th>
+				<th md-column >Description</th>
+				<th md-column >Real Title</th>
+				<th md-column >Delete</th>
+				<th md-column >Occurrence</th>
+			</tr>
+			</thead>
+			<tbody md-body>
+			<tr md-row
+			    md-select="item"
+			    md-select-id="name"
+			    md-auto-select
+			    ng-diabled="!item.canEdit"
+			    class="table-row"
+			    ng-class="{'disabled-row': !item.canEdit }"
+			    ng-repeat="item in $ctrl.filteredItems | orderBy: '-canEdit'">
+			    <!--md-virtual-repeat="item in $ctrl.filteredItems | orderBy: '-canEdit'">-->
+			    <!--ng-repeat="item in $ctrl.filteredItems | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions">-->
+				<td md-cell
+				    class="table-cell"
+				    ng-click="!item.canEdit || $ctrl.editField($event, item, item.tag, 'tag');"
+				    ng-class="{'md-placeholder': !item.tag, 'disabled-cell': !item.canEdit}">{{item.tag || 'Add tag'}}
+				</td>
+
+				<td md-cell
+				    class="table-cell"
+				    ng-click="!item.canEdit || $ctrl.editField($event, item, item.tagDescription || '', 'tagDescription');"
+				    ng-class="{'md-placeholder': !item.tagDescription, 'disabled-cell': !item.canEdit}">{{item.tagDescription || 'Add description'}}
+				</td>
+
+				<td md-cell
+				    class="table-cell"
+				    ng-click="!item.canEdit || $ctrl.editField($event, item, item.realTitle, 'realTitle');"
+				    ng-class="{'md-placeholder': !item.realTitle, 'disabled-cell': !item.canEdit}">
+					{{item.realTitle || 'Add realTitle'}}
+				</td>
+
+				<td md-cell
+				    class="table-cell"
+				    ng-class="{'md-placeholder': !item.realTitle, 'disabled-cell': !item.canEdit}">
+					<md-button  md-no-ink
+					            aria-label="delete button"
+					            ng-disabled="!item.canEdit"
+					            ng-click="!item.canEdit || $ctrl.removeTag($event, item)"
+					            class="md-icon-button remove-row">
+						<i ng-if="item.canEdit" class="material-icons">delete_forever</i>
+						<i ng-if="!item.canEdit" class="material-icons">not_interested</i>
+					</md-button>
+				</td>
+
+				<td md-cell
+				    class="table-cell"
+				    ng-class="{'md-placeholder': !item.occurrence, 'disabled-cell': true}">{{item.occurrence}}
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

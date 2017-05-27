@@ -1,0 +1,8 @@
+node_modules
+.idea/
+dist/
+
+server/data/audio/*
+server/data/database/*
+server/data/image/*
+server/data/tmp/*
