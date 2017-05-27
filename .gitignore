@@ -1,6 +1,7 @@
 node_modules
 .idea/
 dist/
+release-builds/
 
 server/data/audio/*
 server/data/database/*
