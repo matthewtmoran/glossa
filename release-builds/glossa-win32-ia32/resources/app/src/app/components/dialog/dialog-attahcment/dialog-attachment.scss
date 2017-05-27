@@ -1,0 +1,116 @@
+@import 'colors';
+
+#attach-file-dialog {
+	.md-chips {
+		box-shadow: none !important;
+	}
+
+	.md-dialog-content {
+		padding: 0;
+
+		.upload-buttons {
+			padding: 25px;
+
+			.md-large-btn {
+				//color: black;
+				font-weight: bold;
+			}
+		}
+
+		.notebook {
+			input {
+				color: black;
+			}
+		}
+
+		.search-result-wrapper {
+			min-height: 300px;
+			max-height: 300px;
+
+			.notebook-item {
+				//min-height: 65px;
+				//max-height: 65px;
+				p {
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis
+				}
+			}
+
+			.md-list-item-image {
+				padding-right: 0;
+
+				.image-wrapper {
+					height: 60px;
+					width: 60px;
+					overflow: hidden;
+					border-radius: 100px;
+				}
+				img {
+
+				}
+			}
+
+			.md-list-item-text {
+				padding-left: 0;
+			}
+		}
+	}
+}
+
+.dialog-section-title {
+	color: $lBlack;
+	font-size: 1.2em;
+}
+
+.animate-show {
+	height: 0;
+	background: white;
+	overflow: hidden;
+	transition: all 0.5s;
+}
+
+.animate-show.ng-hide-add, .animate-show.ng-hide-remove {
+	transition: all 0.5s;
+}
+
+.animate-show:not(.ng-hide) {
+	height: 60px;
+}
+
+.nb-active {
+	background: lightgreen;
+}
+
+.sm-padding {
+	padding: 12px;
+}
+
+.upload-selection {
+	max-height: 200px;
+	overflow: hidden;
+
+	.remove-preview {
+		color: white;
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		z-index: 82;
+
+		md-icon{
+			color: $red;
+		}
+	}
+
+	.wave-container {
+
+	}
+	.media-container {
+		position: relative;
+
+		img {
+			max-width: 100%;
+			display: block;
+		}
+	}
+}

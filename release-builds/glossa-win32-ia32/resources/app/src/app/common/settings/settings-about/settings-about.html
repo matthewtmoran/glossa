@@ -1,0 +1,37 @@
+<div flex="25" class="left-side" md-whiteframe="2" layout="column" layout-fill>
+	<div class="image-container">
+		<img class="settings-image logo md-padding" layout-align="center center" src="../../../../img/logo_basic.svg" alt="">
+	</div>
+
+	<h1>Glossa<span> v.0.0.0</span></h1>
+	<h1 style="font-family: Roboto">Glossa<span> v.0.0.0</span></h1>
+
+	<md-list>
+		<md-list-item ng-repeat="contact in $ctrl.contributers" class="md-3-line contact-item">
+			<img ng-src="{{contact.avatar}}" class="md-avatar" alt="" />
+			<div class="md-list-item-text compact">
+				<h3>{{contact.name}}</h3>
+				<h4>{{contact.title}}</h4>
+				<p>{{contact.url}}</p>
+			</div>
+		</md-list-item>
+	</md-list>
+
+	<md-button class="md-raised license-button" ng-click="$ctrl.viewLicense()">View License Agreement</md-button>
+
+</div>
+<div flex="75"  layout="column" >
+	<h2 class="md-padding">Glossa made possible by these amazing softwares</h2>
+
+	<md-list >
+		<md-list-item class="md-3-line" ng-repeat="software in $ctrl.softwares">
+			<div class="md-list-item-text compact">
+				<h3>{{software.name}}</h3>
+				<h4>{{software.url}}</h4>
+			</div>
+			<md-divider></md-divider>
+		</md-list-item>
+	</md-list>
+
+</div>
+

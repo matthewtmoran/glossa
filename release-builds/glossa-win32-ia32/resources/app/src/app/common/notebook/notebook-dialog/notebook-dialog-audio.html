@@ -1,0 +1,62 @@
+<md-dialog class="post-dialog" flex-xs="90" flex-sm="75" flex-gt-sm="50">
+	<form name="postForm" ng-cloak>
+		<md-dialog-content>
+			<div layout="row">
+				<div layout="column"
+				     flex
+				     layout-align="center center"
+				     class=" top-actions">
+					<md-button
+							ng-if="!$ctrl.currentNotebook.audio"
+							ngf-select
+							name="audioUpload"
+							class="md-raised add-button"
+							ng-model="$ctrl.currentNotebook.audio"
+							accept="audio/*">
+						<span>Add Audio</span>
+					</md-button>
+					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.currentNotebook.image}" layout="row" layout-align="start center">
+						<md-button ng-if="$ctrl.currentNotebook.audio" class="md-icon-button remove-button" aria-label="Remove Button"
+						           ng-click="$ctrl.removeMedia($ctrl.currentNotebook.audio); $ctrl.currentNotebook.audio = null" >
+							<!--<md-icon>cancel</md-icon>-->
+							<md-icon>volume_off</md-icon>
+						</md-button>
+					</div>
+
+					<div flex class="audio-container" ng-if="$ctrl.currentNotebook.audio">
+						<wave-surfer-preview
+								ng-if="$ctrl.currentNotebook.audio"
+								flex
+								url-src="$ctrl.audioPath"
+								auto-play="false">
+						</wave-surfer-preview>
+					</div>
+
+				</div>
+			</div>
+
+			<div class=" no-padding" flex layout-fill>
+				<md-input-container class="simplemde-wrapper" flex layout-fill>
+					<simplemde
+							hashtags="$ctrl.hashtags"
+							editor-options="$ctrl.editorOptions"
+							value-binding="$ctrl.currentNotebook"
+							update-model="$ctrl.updateModel($event)">
+					</simplemde>
+				</md-input-container>
+
+			</div>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" class="top-border" >
+			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button"><md-icon>delete</md-icon></md-button>
+			<span flex></span>
+			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
+			<md-button ng-disabled="postForm.$invalid"
+			           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
+				{{$ctrl.postDetails.button.text}}
+			</md-button>
+		</md-dialog-actions>
+
+	</form>
+</md-dialog>

@@ -1,0 +1,14 @@
+<md-content id="media-settings" class="md-padding">
+	<form name="mediaSettings" flex="50" flex-offset="25" ng-submit="$ctrl.saveMediaSettings()">
+		<div layout="row">
+			<md-input-container class="md-block" flex="20">
+				<label>Scrub Length (in seconds)</label>
+				<input ng-model="$ctrl.settings.skipLength" min="1" max="99" type="number">
+			</md-input-container>
+		</div>
+		<div>
+			<md-button type="submit" class="md-raised">Save Changes</md-button>
+			<md-button ng-click="$ctrl.restoreDefaults()" class="md-raised">Restore Defaults</md-button>
+		</div>
+	</form>
+</md-content>

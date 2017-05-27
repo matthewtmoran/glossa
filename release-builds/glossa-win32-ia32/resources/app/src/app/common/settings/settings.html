@@ -1,0 +1,50 @@
+<md-content class="settings-component" ng-cloak layout="column" layout-fill>
+
+	<md-toolbar class="light-toolbar">
+		<div class="md-toolbar-tools">
+			<h2>Settings<md-icon>keyboard_arrow_right</md-icon> {{$ctrl.selectedTab.label}}</h2>
+		</div>
+		<md-button class="close-button md-icon-button" ng-click="$ctrl.back()">
+			<md-icon>close</md-icon>
+		</md-button>
+	</md-toolbar>
+
+	<md-divider></md-divider>
+
+	<md-content layout="column" flex>
+		<md-tabs md-dynamic-height=""
+		         md-border-bottom=""
+		         md-selected="selectedIndex"
+		         settings-tab-index="selectedIndex"
+		         md-stretch-tabs="always" >
+			<md-tab ng-repeat="tab in $ctrl.tabs" label="{{tab.label}}"></md-tab>
+		</md-tabs>
+		<!-- child state -->
+		<md-content layout="column"
+		            id="tab-body"
+		            layout-fill
+		            ui-view
+		            flex
+		            project="$ctrl.project"
+		            settings="$ctrl.settings"
+		            current-user="$ctrl.currentUser"
+		            all-connections="$ctrl.allConnections"
+		            online-connections="$ctrl.onlineConnections"
+		            hashtags="$ctrl.hashtags"
+		            on-update-project="$ctrl.updateProject($event)"
+		            on-export-project="$ctrl.exportProject($event)"
+		            on-save-media-settings="$ctrl.saveMediaSettings($event)"
+					on-remove-avatar="$ctrl.removeAvatar($event)"
+					on-upload-avatar="$ctrl.uploadAvatar($event)"
+					on-update-user-info="$ctrl.updateUserInfo($event)"
+					on-toggle-sharing="$ctrl.toggleSharing($event)"
+					on-toggle-follow="$ctrl.toggleFollow($event)"
+					on-update-tag="$ctrl.updateTag($event)"
+					ng-class="{'hide-overflow': ('hashtags' | includedByState)}">
+		</md-content>
+
+	</md-content>
+
+
+</md-content>
+
