@@ -17,7 +17,6 @@ var Notebook = require('../notebook/notebook.model');
 
 // Get list of things
 exports.index = function(req, res) {
-  console.log('finding all hashtags');
     Hashtag.find({}, function (err, hashtags) {
     if(err) { return handleError(res, err); }
     return res.status(200).json(hashtags);
@@ -74,7 +73,6 @@ exports.showTerm = function(req, res) {
         if(err) { return handleError(res, err); }
         //if there is no tag, create a new one...
         if(!tag) {
-
             var newTag = {
                 tag: tagName,
                 tagColor: '#4285f4',
@@ -85,13 +83,13 @@ exports.showTerm = function(req, res) {
             };
             return Hashtag.insert(newTag, function(err, createdTag) {
                 if(err) { return handleError(res, err); }
-                return res.json(createdTag);
+                return res.status(200).json(createdTag);
             });
         }
         var options = {returnUpdatedDocs: true};
         Hashtag.update({"_id": tag._id}, tag, options, function(err, updatedCount, updatedTag) {
             if(err) { return handleError(res, err); }
-            return res.json(updatedTag);
+            return res.status(200).json(updatedTag);
         })
     });
 };

@@ -1,8 +1,11 @@
 export class ParseService {
-  constructor($q) {
+  constructor($q, $http) {
     'ngInject';
 
     this.$q = $q;
+    this.$http = $http;
+
+    this.termQuery = this.termQuery.bind(this);
   }
 
     //get title
@@ -65,7 +68,7 @@ export class ParseService {
     let promises = [];
     tagsInText.forEach((tag, index) => {
       //push this query to promises array
-      promises.push(HashtagService.termQuery(tag)
+      promises.push(this.termQuery(tag)
         .then((data)=> {
         //update the notebooks model property
           tagsInText[index] = data;
@@ -98,5 +101,15 @@ export class ParseService {
       });
       return hashtags
     }
+  }
+
+  termQuery(term) {
+    return this.$http.get('/api/hashtags/search/' + term)
+      .then((response) => {
+        return response.data;
+      }).catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
   }
 }
