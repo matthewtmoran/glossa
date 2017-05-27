@@ -389,17 +389,27 @@ export const notebookComponent = {
         autoPreview: true
       };
 
+
       this.$mdDialog.show({
         templateUrl: NotebookPreviewTemplate,
         targetEvent: event,
         clickOutsideToClose: true,
-        controller: () => this,
+        controller: NotebookDialogController,
         controllerAs: '$ctrl',
+        bindToController: true,
+        locals: {
+          hashtags: this.hashtags,
+          notebook: event.notebook || {},
+          editorOptions: this.editorOptions,
+          onCancel: this.cancel.bind(this),
+          onDeleteNotebook: this.deleteNotebook.bind(this),
+          onHide: this.hide.bind(this),
+          onUpdate: this.update.bind(this),
+          onSave: this.save.bind(this)
+        }
       }).then((data) => {
         console.log('dialog closed',data);
-        delete this.notebook;
       }).catch(() => {
-        delete this.notebook;
         console.log('negative');
       })
 

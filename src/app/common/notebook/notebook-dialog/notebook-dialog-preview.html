@@ -23,23 +23,13 @@
 			<div class=" no-padding" flex layout-fill>
 				<md-input-container class="simplemde-wrapper" flex layout-fill>
 
-					<!--<simplemde-->
-							<!--id="theText"-->
-							<!--editor-options="$ctrl.editorOptions"-->
-							<!--value-binding="$ctrl.notebook.description"-->
-							<!--update-model="$ctrl.updateModel($event)">-->
-
-					<!--</simplemde>-->
-
-					<textarea
-					          id="theText"
-					          aria-label="text area"
-					          class="simplemde-textarea"
-					          ng-model="$ctrl.notebook.description"
-					          simplemde="$ctrl.editorOptions"
-					          required >
-					</textarea>
-					<md-progress-circular class="simplemde-loader fade-out" md-diameter="50"></md-progress-circular>
+					<simplemde
+							hashtags="$ctrl.hashtags"
+							editor-options="$ctrl.editorOptions"
+							value-binding="$ctrl.currentNotebook"
+							update-model="$ctrl.updateModel($event)">
+					</simplemde>
+					<!--<md-progress-circular class="simplemde-loader fade-out" md-diameter="50"></md-progress-circular>-->
 				</md-input-container>
 			</div>
 		</md-dialog-content>
@@ -47,4 +37,4 @@
 			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
 		</md-dialog-actions>
 	</form>
-</md-dialog>
+</md-dialog>git

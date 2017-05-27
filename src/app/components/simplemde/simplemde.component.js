@@ -71,9 +71,11 @@ export const simplemdeComponent = {
       }
       this.mde.value(val);
       if (this.editorOptions.autoPreview) {
+        console.log('is preview');
         this.mde.togglePreview();
       }
       if (this.mde.isPreviewActive()) {
+        console.log('preview is active');
         this.rerenderPreview(val);
       }
       this.isLoading = false;
