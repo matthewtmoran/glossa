@@ -95,8 +95,8 @@ export const notebookComponent = {
         {
           name: "header",
           action: SimpleMDE.toggleHeading1,
-          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
-          iconClass: "title",
+          className: "md-icon-button material-icons toolbar-icon md-button md-ink-ripple",
+          iconClass: "text_fields",
           title: "Header",
         },
         "|", // Separator
@@ -129,13 +129,13 @@ export const notebookComponent = {
           iconClass: 'visibility',
           title: "Toggle Preview",
         },
-        {
-          name: "Help",
-          action: this.test,
-          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
-          iconClass:'help',
-          title: "Toggle Preview",
-        }
+        // {
+        //   name: "Help",
+        //   action: this.test,
+        //   className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+        //   iconClass:'help',
+        //   title: "Toggle Preview",
+        // }
       ];
 
       this.notebooks = [];

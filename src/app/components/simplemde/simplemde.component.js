@@ -53,7 +53,6 @@ export const simplemdeComponent = {
 
       //timeout here so angular digest cycle is valid
       this.$timeout(() => {
-        console.log('this.editorOptions',this.editorOptions);
         this.mde = new SimpleMDE(this.editorOptions);
         this.cm = this.mde.myCodeMirror;
         this.editor = this.mde.codemirror;
