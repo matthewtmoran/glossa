@@ -93,7 +93,6 @@ export const settingsComponent = {
     }
 
     selectedIndexWatch(current, old) {
-      console.log('index is changing');
       switch (current) {
         case 0:
           this.selectedTab = this.tabs[0];
@@ -123,7 +122,6 @@ export const settingsComponent = {
     getDefaultState() {
       this.tabs.forEach((tab, index) => {
         if (tab.state === this.$state.current.name) {
-          console.log('match');
           this.selectedTab = tab;
           this.$scope.selectedIndex = index;
         }
@@ -186,7 +184,6 @@ export const settingsComponent = {
     }
     //passes event up to app.component
     toggleSharing(event) {
-      console.log('toggleSharing in settings.component', event);
       this.onToggleSharing({
         $event: {
           isSharing: event.isSharing
@@ -195,7 +192,6 @@ export const settingsComponent = {
     }
 
     toggleFollow(event) {
-      console.log('toggleFollow in settings.component');
       // event.user.following = !event.user.following;
       this.rootService.toggleFollow(event.user);
     }

@@ -43,16 +43,19 @@ exports.create = function(req, res) {
 // Updates an existing thing in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
-    Hashtag.findById(req.params.id, function (err, thing) {
+    Hashtag.findOne({_id: req.params.id}, function (err, tag) {
     if (err) { return handleError(res, err); }
-    if(!thing) { return res.status(404).send('Not Found'); }
-    var updated = _.merge(thing, req.body);
-    updated.save(function (err) {
+    if(!tag) { return res.status(404).send('Not Found'); }
+    var updated = _.merge(tag, req.body);
+    var options = {returnUpdatedDocs: true};
+    Hashtag.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) { return handleError(res, err); }
-      return res.status(200).json(thing);
+      Hashtag.persistence.compactDatafile();
+      return res.status(200).json(updatedDoc);
     });
   });
 };
+
 
 // Deletes a thing from the DB.
 exports.destroy = function(req, res) {

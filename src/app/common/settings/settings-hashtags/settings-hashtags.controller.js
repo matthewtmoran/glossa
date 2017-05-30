@@ -52,41 +52,6 @@ export class SettingsHashtagsComponent {
       unusedTags: false
     };
 
-    // this.hashtags = [
-    //   {
-    //     "tag": "790-ECCLESIASTICAL-ORGANIZATION",
-    //     "realTitle": "790 Ecclesiastical Organization",
-    //     "tagColor": "#9e9e9e",
-    //     "tagDescription": "General statements dealing with several aspects of t he organization of religion, i.e., specialists, cult groups, and systematized ceremonial.",
-    //     "canEdit": false,
-    //     "_id": "018w92sSOPqH5RGy"
-    //   },
-    //   {
-    //     "tag": "435-PRICE-AND-VALUE",
-    //     "realTitle": "435 Price And Value",
-    //     "tagColor": "#9e9e9e",
-    //     "tagDescription": "Relation of economic values to other systems of value; factors determinative of price and value (e.g., abundance and scarcity, utility, cost of production, precedent); customary prices and conventional values; competitive prices; monopoly prices; price fixing; black market prices; price levels; prices of particular goods (e.g., in money, in purchasing power); etc.",
-    //     "canEdit": false,
-    //     "_id": "03ftzhVTpzmLhIxQ"
-    //   },
-    //   {
-    //     "tag": "216-AUDIOVISUAL-RECORDS-AND-EQUIPMENT",
-    //     "realTitle": "216 Audiovisual Records And Equipment",
-    //     "tagColor": "#9e9e9e",
-    //     "tagDescription": "Techniques of audiovisual recording; appliances used (e.g., phonographs, tape and wire recorders); uses; products; specialists; etc.",
-    //     "canEdit": false,
-    //     "_id": "0BV3onwqMpae3sMB"
-    //   },
-    //   {
-    //     "tag": "My Custom Tag",
-    //     "realTitle": "MyCustomTag",
-    //     "tagColor": "#9e9e9e",
-    //     "tagDescription": "This is a special custom tag for stuff",
-    //     "canEdit": true,
-    //     "_id": "0BV3oasdffe3sMB"
-    //   },
-    // ];
-
   }
 
   selectedRowCallback(rows) {

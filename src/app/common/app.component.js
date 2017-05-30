@@ -155,7 +155,6 @@ export const appComponent = {
 
 
     toggleSharing(event) {
-      console.log('toggleSharing in app.component', event);
       let options = {};
       if (!this.settings.isSharing) {
         options.title = 'Are you sure you want to turn OFF sharing?';
