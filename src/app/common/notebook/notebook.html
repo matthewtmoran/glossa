@@ -13,7 +13,7 @@
 		<h3>Common Tags</h3>
 		<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
 		<md-list>
-			<md-list-item class="chip-item" ng-repeat="tag in $ctrl.commonTags | orderBy: tag.occurrence">
+			<md-list-item class="chip-item" ng-repeat="tag in $ctrl.commonTags | orderBy: '-occurrence'">
 				<md-chip class="chip-container">
 					<span>
 						<span class="chip-icon">#</span>

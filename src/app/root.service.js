@@ -111,7 +111,6 @@ export class RootService {
     console.log('getHashtags called');
     return this.$http.get('/api/hashtags/')
       .then((response) => {
-      console.log('response', response);
         return response.data;
       })
       .catch((response) => {
@@ -120,6 +119,16 @@ export class RootService {
       });
   }
 
+  getCommonHashtags() {
+    return this.$http.get('/api/hashtags/common/123')
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      });
+  }
 
   //SETTINGS
 

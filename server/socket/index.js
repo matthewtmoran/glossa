@@ -38,7 +38,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
 
         bonjourService.publish(glossaUser, browser, bonjour, function (err) {
           if (err) {
-            return console.log('There was an error publishing bonjour service...');
+            return console.log('There was an error publishing bonjour service...', err);
           }
         });
       }

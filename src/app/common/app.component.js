@@ -5,7 +5,8 @@ export const appComponent = {
     currentUser: '<',
     project: '<',
     allConnections: '<',
-    hashtags: '<'
+    hashtags: '<',
+    commonTags: '<'
   },
   templateUrl,
   controller: class AppComponent {

@@ -16,6 +16,7 @@ export const notebookComponent = {
     searchText: '<',
     currentUser: '<',
     hashtags: '<',
+    commonTags: '<',
     onUpdateTag: '&'
   },
   templateUrl,
@@ -54,6 +55,9 @@ export const notebookComponent = {
       }
       if (changes.hashtags) {
         this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
+      if (changes.commonTags) {
+        this.commonTags = angular.copy(changes.commonTags.currentValue);
       }
       if (changes.currentUser) {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
@@ -137,7 +141,6 @@ export const notebookComponent = {
 
       this.notebooks = [];
       this.externalNotebooks = [];
-      this.commonTags = [];
       this.uniqueUsers = {};
 
       this.queryNotebooks();
