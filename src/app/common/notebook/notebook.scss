@@ -164,9 +164,7 @@ notebook {
 		width: 100% !important;
 	}
 }
-.chip-item {
-	padding: 0 8px !important;
-}
+
 .chip-container {
 	height: 32px;
 	font-family: "Roboto","Helvetica","Arial",sans-serif;
@@ -182,6 +180,10 @@ notebook {
 	white-space: nowrap;
 	padding-left: 0;
 	overflow: hidden;
+
+	&:hover {
+		cursor: pointer;
+	}
 
 	.chip-icon {
 		height: 32px;
@@ -203,6 +205,16 @@ notebook {
 		font-size: 13px;
 		vertical-align: middle;
 		display: inline-block;
+	}
+}
+
+.chip-item {
+	padding: 0 8px !important;
+
+	&.active-chip {
+		.chip-icon {
+			background: $red !important;
+		}
 	}
 }
 

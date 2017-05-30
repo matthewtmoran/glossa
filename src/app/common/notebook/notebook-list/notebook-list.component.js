@@ -6,6 +6,7 @@ export const notebookListComponent = {
     searchText: '<',
     notebooks: '<',
     selected: '<',
+    selectedHashtags: '<',
     hashtags: '<',
     onViewDetails: '&',
     onViewPreview: '&',
@@ -19,9 +20,6 @@ export const notebookListComponent = {
 
     $onChanges(changes) {
       console.log('onChanges in notebook-list componenet', changes);
-      // if (changes.notebooks) {
-      //   this.notebooks = changes.notebooks.currentValue;
-      // }
     }
 
     $onInit() {

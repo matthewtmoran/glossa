@@ -5,6 +5,7 @@ import { notebookList } from './notebook-list/notebook-list.module';
 import { notebookDialog } from './notebook-dialog/notebook-dialog.module';
 import { userList } from './user-list/user-list.module';
 import Exists from './notebook.filter';
+import HashtagFilter from './hashtag-filter.filter';
 import './notebook.scss';
 
 export const notebook = angular
@@ -37,5 +38,6 @@ export const notebook = angular
       })
   })
   .filter('exists', Exists)
+  .filter('hashtagFilter', HashtagFilter)
   .service('NotebookService', NotebookService)
   .name;

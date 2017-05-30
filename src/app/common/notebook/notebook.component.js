@@ -69,15 +69,14 @@ export const notebookComponent = {
       this.hidden = false;
       this.isOpen = false;
       this.hover = false;
-
       this.selected = [];
+      this.selectedHashtags = [];
 
       this.items = [
         {name: "Create Audio Post", icon: "volume_up", direction: "left", type: 'audio'},
         {name: "Create Image Post", icon: "camera_alt", direction: "left", type: 'image'},
         {name: "Create Normal Post", icon: "create", direction: "left", type: 'normal'}
       ];
-
       this.simplemdeToolbar = [
         {
           name: "italic",
@@ -145,9 +144,19 @@ export const notebookComponent = {
 
       this.queryNotebooks();
 
-      // this.rootService.getConnectionsCB((data) => {
-      //   this.connections = data;
-      // });
+    }
+
+    toggleHashtags(tag) {
+      console.log('toggleHashtags', tag);
+      let idx = this.selectedHashtags.indexOf(tag._id);
+
+      if (idx > -1) {
+        this.selectedHashtags.splice(idx, 1);
+        this.selectedHashtags = angular.copy(this.selectedHashtags);
+      } else {
+        this.selectedHashtags.push(tag._id);
+        this.selectedHashtags = angular.copy(this.selectedHashtags);
+      }
 
     }
 
@@ -157,12 +166,12 @@ export const notebookComponent = {
       if (idx > -1) {
         this.selected.splice(idx, 1);
         this.selected = angular.copy(this.selected);
-      }
-      else {
+      } else {
         this.selected.push(event.user._id);
         this.selected = angular.copy(this.selected);
       }
     };
+
 
     queryNotebooks() {
       this.notebookService.getNotebooks()
@@ -171,13 +180,6 @@ export const notebookComponent = {
           this.isLoading = false;
         })
     }
-
-    queryCommonTags() {
-      HashtagService.getCommonTags().then(function (data) {
-        this.commonTags = data
-      })
-    }
-
 
     //TODO: deal with updating notebooks
     showNewUpdates() {
@@ -206,7 +208,6 @@ export const notebookComponent = {
     }
 
     save(event) {
-      console.log('save event', event);
       this.$mdDialog.hide();
       this.cfpLoadingBar.start();
 
@@ -374,7 +375,6 @@ export const notebookComponent = {
     };
 
     viewPreview(event) {
-      console.log('viewPreview in notebook component', event);
       // event.simplemde = {
       //   toolbar: false,
       //   status: false,
