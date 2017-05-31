@@ -15,11 +15,10 @@ export const notebookListComponent = {
   controller: class NotebookListComponent {
     constructor() {
       'ngInject';
-      console.log('notebooklistcomponentn');
     }
 
     $onChanges(changes) {
-      console.log('onChanges in notebook-list componenet', changes);
+
     }
 
     $onInit() {

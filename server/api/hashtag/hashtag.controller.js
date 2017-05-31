@@ -50,8 +50,16 @@ exports.update = function(req, res) {
     var options = {returnUpdatedDocs: true};
     Hashtag.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) { return handleError(res, err); }
-      Hashtag.persistence.compactDatafile();
-      return res.status(200).json(updatedDoc);
+
+      normalizeNotebooks(updatedDoc)
+        .then(function() {
+          Hashtag.persistence.compactDatafile();
+          return res.status(200).json(updatedDoc);
+        })
+        .catch(function() {
+          console.log('there was an error');
+        })
+
     });
   });
 };
@@ -144,6 +152,37 @@ exports.findCommonTags = function(req, res) {
     return res.status(200).json(tags);
   })
 };
+
+function normalizeNotebooks(modifiedTag) {
+  return new Promise(function(resolve, reject) {
+    var query = {"hashtags._id": modifiedTag._id};
+
+    Notebook.find(query, function(err, notebooks) {
+      if (err) {reject(err)};
+
+
+      notebooks.forEach(function(notebook) {
+        var oldTagText = '';
+
+        notebook.hashtags.map(function(oldTag, index) {
+          if (oldTag._id === modifiedTag._id) {
+            console.log('match found');
+            oldTagText = '#' + oldTag.tag;
+            notebook.hashtags[index] = modifiedTag;
+          }
+        });
+
+        notebook.description = notebook.description.replace(oldTagText, '#' + modifiedTag.tag);
+
+        Notebook.update({_id: notebook._id}, notebook, function(err, updatedNum) {
+          if (err) { reject(err) }
+          resolve()
+        })
+
+      })
+    })
+  });
+}
 
 function findNotebooksWithTags() {
   return new Promise(function(resolve, reject) {

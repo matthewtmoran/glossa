@@ -14,13 +14,10 @@ export const userListComponent = {
     }
 
     $onChanges(changes) {
-      console.log('onChanges in user-list component', changes);
       if (changes.allConnections) {
-        console.log('changes in all connections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.selected) {
-        console.log('changes in selected');
         this.selected = angular.copy(changes.selected.currentValue);
       }
     }

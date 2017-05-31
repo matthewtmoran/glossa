@@ -46,9 +46,8 @@ export const notebookComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in notebook.component', changes);
       if (changes.searchText) {
-        console.log('this.searchText', this.searchText)
+
       }
       if (changes.allConnections) {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
@@ -147,7 +146,6 @@ export const notebookComponent = {
     }
 
     toggleHashtags(tag) {
-      console.log('toggleHashtags', tag);
       let idx = this.selectedHashtags.indexOf(tag._id);
 
       if (idx > -1) {

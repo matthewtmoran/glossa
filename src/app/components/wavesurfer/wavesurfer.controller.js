@@ -31,21 +31,18 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
-    console.log('$onChanges in wavesurfer.controller', changes);
     if (changes.urlSrc) {
-      console.log('changes in urlSrc');
       this.urlSrc = angular.copy(changes.urlSrc.currentValue);
       this.initWaveSurfer();
     }
     if (changes.imageSrc) {
-      console.log('changes in imageSrc');
       this.imageSrc = angular.copy(changes.imageSrc.currentValue);
     }
     this.playbackSpeed = this.speed[0];
   }
 
   $onInit() {
-    console.log('this.$element ', this.$element );
+
   }
 
   resetWaveSurfer() {
@@ -60,7 +57,6 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
-    console.log('initWaveSurfer')
     this.cfpLoadingBar.start();
     this.timeInterval;
     this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects
@@ -142,7 +138,6 @@ export class WaveSurferController {
 
     if (this.imageSrc) {
       let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g,"/");
-      console.log('fixPath', fixPath);
 
 
       angular.element('.waveSurferWave').css({
