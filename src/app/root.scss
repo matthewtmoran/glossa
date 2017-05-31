@@ -123,3 +123,31 @@ li.CodeMirror-hint-active {
     line-height: 1.8em;
   }
 }
+
+//main spinner position and color
+md-progress-circular {
+  &#loading-spinner {
+    position: absolute;
+    z-index: 999;
+    top: 12px;
+    right: 12px;
+    margin: auto;
+
+    svg path { stroke: white; }
+  }
+
+}
+
+//TODO: Change to angular material loading bar template
+#loading-bar {
+  .bar {
+    background: $red;
+  }
+
+  .peg {
+    -webkit-box-shadow: $red 1px 0 6px 1px;
+    -moz-box-shadow: $red 1px 0 6px 1px;
+    -ms-box-shadow: $red 1px 0 6px 1px;
+    box-shadow: $red 1px 0 6px 1px;
+  }
+}

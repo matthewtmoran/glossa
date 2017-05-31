@@ -82,7 +82,7 @@ export const root = angular
   .service('RootService', RootService)
   .service('SocketService', SocketService)
   .service('NotificationService', NotificationService)
-  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider) => {
+  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider) => {
     'ngInject';
     $locationProvider.html5Mode(true);
     $urlRouterProvider.otherwise('/app/corpus');
@@ -138,14 +138,19 @@ export const root = angular
       .primaryPalette('glossaPalette')
       .accentPalette('customAccent');
 
+    cfpLoadingBarProvider.spinnerTemplate = `<md-progress-circular id="loading-spinner"  md-diameter="30"></md-progress-circular>`;
 
     // $urlRouterProvider.otherwise(function($injector, $location){
     //   var state = $injector.get('$state');
     //   state.go("corpus");
     // });
   })
-  .run(($rootScope, $state, $injector, __user, $window, RootService, $transitions, SocketService) => {
+  .run(($rootScope, $state, $injector, __user, $window, RootService, $transitions, SocketService, $mdUtil, $compile) => {
     'ngInject';
+
+    $rootScope.$on('cfpLoadingBar:started', event => {
+      $mdUtil.nextTick( () => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
+    });
 
     RootService.getUser()
       .then((data) => {
