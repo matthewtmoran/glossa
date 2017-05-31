@@ -6,6 +6,7 @@ export const settingsSharingComponent = {
     allConnections: '<',
     onlineConnections: '<',
     currentUser: '<',
+    pageTitle: '<',
     onRemoveAvatar: '&',
     onUploadAvatar: '&',
     onUpdateUserInfo: '&',

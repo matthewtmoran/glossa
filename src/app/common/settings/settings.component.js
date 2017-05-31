@@ -33,30 +33,24 @@ export const settingsComponent = {
       this.cfpLoadingBar = cfpLoadingBar;
       this.hideNav = true;
 
-      // this.$scope.$watch(this.$scope.selectedTab, this.selectedIndexWatch);
+      this.$scope.$watch('this.selectedTab', this.selectedIndexWatch.bind(this));
     }
 
 
     $onChanges(changes) {
-      console.log('changes in settings.component', changes);
       if (changes.allConnections) {
-        console.log('changes with allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.settings) {
-        console.log('changes with settings');
         this.settings = angular.copy(changes.settings.currentValue);
       }
       if (changes.project) {
-        console.log('changes with project');
         this.project = angular.copy(changes.project.currentValue);
       }
       if (changes.currentUser) {
-        console.log('changes with currentUser');
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
       if (changes.hashtags) {
-        console.log('changes with currentUser');
         this.hashtags = angular.copy(changes.hashtags.currentValue);
       }
     }
@@ -96,24 +90,23 @@ export const settingsComponent = {
       switch (current) {
         case 0:
           this.selectedTab = this.tabs[0];
-          $state.go(this.tabs[0].state);
-          // $location.url("/meta");
+          this.$state.go(this.tabs[0].state);
           break;
         case 1:
           this.selectedTab = this.tabs[1];
-          $state.go(this.tabs[1].state);
-          // $state.go('settings.about');
-          // $location.url("/main.baseline");
+          this.$state.go(this.tabs[1].state);
           break;
         case 2:
           this.selectedTab = this.tabs[2];
-          $state.go(this.tabs[2].state);
-          // $location.url("/view3");
+          this.$state.go(this.tabs[2].state);
           break;
         case 3:
           this.selectedTab = this.tabs[3];
-          $state.go(this.tabs[3].state);
-          // $location.url("/view3");
+          this.$state.go(this.tabs[3].state);
+          break;
+        case 4:
+          this.selectedTab = this.tabs[4];
+          this.$state.go(this.tabs[4].state);
           break;
       }
     }
@@ -158,7 +151,6 @@ export const settingsComponent = {
     }
     //passes event up to app.component
     removeAvatar(event) {
-      console.log('removeAvatar in settings.component');
       this.onRemoveAvatar({
         $event: {
           file: event.path
