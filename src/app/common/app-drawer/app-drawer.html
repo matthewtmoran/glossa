@@ -5,10 +5,10 @@
             layout="column"
             layout-align="space-between center">
 	<md-list>
-		<md-toolbar class="nav-header logo-container">
-			<img src="../../../img/glossa-logo.svg" alt="" height="96px" width="96px">
+		<md-toolbar class="nav-header logo-container md-padding">
+			<img src="../../../img/glossa-logo.svg" alt="">
 		</md-toolbar>
-		<h2 style="padding-left:16px;">{{$ctrl.project.name}}</h2>
+		<h2 class="md-padding">{{$ctrl.project.name}}</h2>
 		<md-content flex="" role="navigation" class="_md flex">
 			<ul class="side-menu">
 				<li ng-repeat="section in $ctrl.menu"
