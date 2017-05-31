@@ -82,7 +82,7 @@ module.exports = {
                 }
             }
 
-            console.log('my service is not published');
+            console.log('service check done');
 
             //if local service is not published publish service
             if (!localServicePublished) {
