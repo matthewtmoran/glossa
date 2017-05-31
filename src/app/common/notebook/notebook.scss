@@ -185,6 +185,10 @@ notebook {
 		cursor: pointer;
 	}
 
+	&:focus {
+		outline: unset !important;
+	}
+
 	.chip-icon {
 		height: 32px;
 		width: 32px;

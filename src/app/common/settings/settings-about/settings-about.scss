@@ -3,4 +3,8 @@ settings-about {
 	display: flex;
 	-webkit-box-flex: 1;
 	height: 100%;
+
+	h1 {
+		font-family: Roboto, "Helvetica Neue", sans-serif;
+	}
 }
