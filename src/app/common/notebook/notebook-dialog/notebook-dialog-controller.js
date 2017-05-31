@@ -24,7 +24,6 @@ export class NotebookDialogController {
   }
 
   $onChanges(changes) {
-    console.log('$onChanges in notebook-dialog-controller', changes);
     if (changes.notebook) {
       this.currentNotebook = angular.copy(changes.notebook.currentValue)
     }
@@ -40,6 +39,7 @@ export class NotebookDialogController {
   }
 
   init() {
+    console.log('init in notebook-dialog-controller');
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();

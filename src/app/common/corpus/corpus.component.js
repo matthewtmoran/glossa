@@ -1,5 +1,6 @@
 import templateUrl from './corpus.html';
 import NotebookPreviewTemplate from '../notebook/notebook-dialog/notebook-dialog-preview.html';
+import { NotebookDialogController } from '../notebook/notebook-dialog/notebook-dialog-controller';
 
 export const corpusComponent = {
   bindings: {
@@ -39,35 +40,27 @@ export const corpusComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in corpus.component', changes);
       if (changes.markDownFiles) {
-        console.log('changes in markDownFiles');
         this.markDownFiles = angular.copy(changes.markDownFiles.currentValue);
 
-        console.log('this.markDownFiles', this.markDownFiles);
 
         if (this.markDownFiles.length < 1) {
           this.selectedFile = null;
         }
       }
       if (changes.searchText) {
-        console.log('changes in searchText');
         this.searchText = angular.copy(changes.searchText.currentValue);
         // this.searchText = changes.searchText;
-        console.log('change in search Text');
       }
       if (changes.notebookAttachment) {
-        console.log('changes in notebookAttachment');
         this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue)
       }
       if (changes.hashtags) {
-        console.log('changes in hashtags');
         this.hashtags = angular.copy(changes.hashtags.currentValue)
       }
     }
 
     $onInit() {
-      console.log('$onInit in corpus component');
       if (this.markDownFiles.length > 0) {
         this.fileSelection({fileId: this.markDownFiles[0]._id});
       } else {
@@ -142,7 +135,6 @@ export const corpusComponent = {
           if (!result) {
             return;
           }
-
 
           this.cfpLoadingBar.start();
           this.selectedFile.removeItem = []; //create this temp property to send to server
@@ -245,7 +237,6 @@ export const corpusComponent = {
     }
 
     viewDetails(event) {
-      this.notebook = event.notebook;
       this.editorOptions = {
         toolbar: false,
         status: false,
@@ -254,17 +245,40 @@ export const corpusComponent = {
         autoPreview: true
       };
 
+      // this.$mdDialog.show({
+      //   templateUrl: NotebookPreviewTemplate,
+      //   targetEvent: event,
+      //   clickOutsideToClose: true,
+      //   controller: () => this,
+      //   controllerAs: '$ctrl',
+      // }).then((data) => {
+      //   console.log('dialog closed',data);
+      //   delete this.notebook;
+      // }).catch(() => {
+      //   delete this.notebook;
+      //   console.log('negative');
+      // })
+
       this.$mdDialog.show({
         templateUrl: NotebookPreviewTemplate,
         targetEvent: event,
         clickOutsideToClose: true,
-        controller: () => this,
+        controller: NotebookDialogController,
         controllerAs: '$ctrl',
+        bindToController: true,
+        locals: {
+          hashtags: this.hashtags,
+          notebook: event.notebook || {},
+          editorOptions: this.editorOptions,
+          onCancel: this.cancel.bind(this),
+          onDeleteNotebook: this.disconnectNotebook.bind(this),
+          onHide: this.hide.bind(this),
+          onUpdate: this.update.bind(this),
+          onSave: this.save.bind(this)
+        }
       }).then((data) => {
         console.log('dialog closed',data);
-        delete this.notebook;
       }).catch(() => {
-        delete this.notebook;
         console.log('negative');
       })
     }
@@ -273,8 +287,18 @@ export const corpusComponent = {
       this.$mdDialog.cancel();
     }
 
+    hide() {
+      this.$mdDialog.hide();
+    }
+
+    update() {
+      console.log('NOT USED');
+    }
+    save() {
+      console.log('NOT USED');
+    }
+
     disconnectNotebook(event) {
-      console.log('disconnectNotebook in corpus.component');
       let options = {
         title: 'Are you sure you want to disconnect this notebooks?',
         textContent: 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.'

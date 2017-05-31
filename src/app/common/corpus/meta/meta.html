@@ -14,7 +14,7 @@
 					hashtags="$ctrl.hashtags"
 					editor-options="$ctrl.editorOptions"
 					update-function="$ctrl.update($event)"
-					value-binding="$ctrl.currentFile.description"
+					value-binding="$ctrl.currentFile"
 					update-model="$ctrl.updateModel($event)">
 			</simplemde>
 		</md-input-container>
@@ -78,9 +78,10 @@
 
 			<!--Notebook Attachment-->
 			<notebook-card flex="50"
-			               is-corpus="$ctrl.isCorpus"
 			               ng-if="$ctrl.notebookAttached"
+			               is-corpus="$ctrl.isCorpus"
 			               notebook="$ctrl.notebookAttached"
+			               current-user="$ctrl.currentUser"
 			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
 			               on-view-details="$ctrl.viewDetails($event)"
 			               on-view-preview="$ctrl.viewDetails($event)">

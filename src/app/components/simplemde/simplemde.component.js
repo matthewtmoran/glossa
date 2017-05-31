@@ -1,4 +1,5 @@
 import SimpleMDE from 'simplemde';
+import templateUrl from './simplemde.html';
 
 export const simplemdeComponent = {
   bindings: {
@@ -10,22 +11,18 @@ export const simplemdeComponent = {
     updateModel: '&'
   },
   transclude: true,
-  template: `<textarea id="theText"
-                ng-trim="false"
-			          autocomplete="off"
-			          aria-label="hidden simplede text area node">
-            </textarea>
-`,
+  templateUrl: templateUrl,
   controller: class SimplemdeComponent {
-    constructor($parse, $timeout) {
+    constructor($parse, $timeout, $element) {
       'ngInject';
       this.$timeout = $timeout;
-      // this.valueBinding = '';
+      this.$element = $element;
     }
 
     $onChanges(changes) {
       if (changes.editorOptions) {
         this.editorOptions = angular.copy(changes.editorOptions.currentValue);
+        this.editorOptions.element = this.$element.find('textarea')[0]; //set the element to this instance. prevents issues with dialogs / multiple simplmde instances on a single page
       }
       if (changes.fileBinding) {
         this.fileBinding = angular.copy(changes.fileBinding.currentValue);
@@ -70,11 +67,9 @@ export const simplemdeComponent = {
       }
       this.mde.value(val);
       if (this.editorOptions.autoPreview) {
-        console.log('is preview');
         this.mde.togglePreview();
       }
       if (this.mde.isPreviewActive()) {
-        console.log('preview is active');
         this.rerenderPreview(val);
       }
       this.isLoading = false;
@@ -99,43 +94,7 @@ export const simplemdeComponent = {
       this.showHashtagHints(instance, object);
     }
 
-    rerenderPreview() {
 
-    }
-
-    // $onChanges(changes) {
-    //   console.log('changes', changes);
-    //   if (changes.valueBinding) {
-    //     console.log('changes.valueBinding', changes.valueBinding);
-    //   }
-    // }
-
-    // $onInit() {
-    //   this.hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
-    //   // this.options = {};
-    //   // this.options = this.$parse(attrs.simplemde)(scope) || {};
-    //   // this.options.element = element[0];
-    //   // this.mde = new SimpleMDE(this.options);
-    //   // this.cm = this.mde.myCodeMirror;
-    //   // this.editor = this.mde.codemirror;
-    //   this.hashtagList = [];
-    // }
-
-    // render() {
-    //   let val = ctrl.ngModel.$modelValue || options["default"];
-    //   //val is undefined if there is no description leaving simplemde/codemirror value keep the previous value.
-    //   if (!val) {
-    //     val = '';
-    //   }
-    //   //I put a delay on this because in dialogs, it does not show content, and If it is any less than 300 the cursor is misplaced
-    //   this.$timeout(() => {
-    //     this.mde.value(val);
-    //   }, 300);
-    //
-    //   if (this.mde.isPreviewActive()) {
-    //     this.rerenderPreview(val);
-    //   }
-    // };
 
     //hashtags and hints
     showHashtagHints(instance, object) {
@@ -160,26 +119,14 @@ export const simplemdeComponent = {
       }
     };
 
-    //just a gets all the tags and return promise.
-    getAllTags() {
-      // return HashtagService.getHashtags().then(function (data) {
-      //   return data
-      // });
-    }
-
     //I'm not sure we will use wave-preview at all
     rerenderPreview(val) {
       console.log("rendering wave-preview");
     };
 
+    rerenderPreview() {
 
-    // ctrl.ngModel.$render = this.render;
-
-    // scope.simplemde = {
-    //   instance: mde,
-    //   rerenderPreview: this.rerenderPreview
-    // };
-
+    }
   }
 
 

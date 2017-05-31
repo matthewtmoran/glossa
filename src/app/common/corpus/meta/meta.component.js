@@ -21,13 +21,10 @@ export const metaComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges meta.component', changes);
       if (changes.selectedFile) {
-        console.log('changes in selectedFile');
         this.currentFile = angular.copy(changes.selectedFile.currentValue);
       }
       if (changes.notebookAttached) {
-        console.log('changes in notebookAttached');
         this.notebookAttached = angular.copy(changes.notebookAttached.currentValue);
       }
     }
@@ -88,7 +85,6 @@ export const metaComponent = {
 
     //passes event up
     viewDetails(event) {
-      console.log('viewDetailsMid')
       this.onViewDetails({
         $event: event
       });
