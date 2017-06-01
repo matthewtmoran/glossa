@@ -32,7 +32,15 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
 
         glossaUser.localSocketId = socket.id;
         socketUtil.updateUser(glossaUser);
-        socketUtil.validateOnlineConnections();
+        // socketUtil.validateOnlineConnections();
+
+        socketUtil.getConnections()
+          .then(function (data) {
+            console.log('emit:: send:connections to:: local-client');
+            console.log('localClient.socketId', localClient.socketId);
+            socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
+        });
+
 
 
         // console.log('local data normalized time to publish service on network');
@@ -44,7 +52,9 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
         // });
       }
       if (data.type === 'external-client') {
-        console.log('this is an external client server');
+        console.log('external-socket connection');
+
+        console.log('..... this is where another device has discovered us and is now connecting to us...');
 
         console.log('emit:: notify:sync-begin to:: local-client');
         socketUtil.emitToLocalClient(io, localClient.localSocketId, 'notify:sync-begin');

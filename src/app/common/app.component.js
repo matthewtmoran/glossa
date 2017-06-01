@@ -189,7 +189,7 @@ export const appComponent = {
     updateConnections(event, data) {
 
       console.log('');
-      console.log('updateConnections');
+      console.log('*** updateConnections ', data);
 
 
       console.log('this.allConnections', this.allConnections);

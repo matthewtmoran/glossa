@@ -4,7 +4,7 @@
 
 'use strict';
 
-module.exports = function () {
+module.exports = function (bonjour) {
 
 
   var express = require('express');
@@ -20,10 +20,9 @@ module.exports = function () {
   var app = express();
   var server = require('http').createServer(app);
   var io = require('socket.io')(server);
-  var bonjour = require('bonjour')();
+  // var bonjour = require('bonjour')();
 
   var browser = null;
-  var myBonjourService = null;
   var bonjourService = require('./socket/bonjour-service');
   var externalSocketClient = require('./socket/socket-client');
 
@@ -46,17 +45,17 @@ module.exports = function () {
 
         bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
 
-        localService = bonjour.publish({
-            name:'glossaApp-' + glossaUser._id,
-            type: 'http',
-            port: config.port,
-            txt: {
-              userid: glossaUser._id
-            }
-        });
-
         browser = bonjour.find({type: 'http'});
         console.log('Bonjour is listening...');
+
+        localService = bonjour.publish({
+          name:'glossaApp-' + glossaUser._id,
+          type: 'http',
+          port: config.port,
+          txt: {
+            userid: glossaUser._id
+          }
+        });
 
         // localService.on('error', function(service) {
         //   console.log('localService - error publishing local serv ice');
@@ -78,6 +77,13 @@ module.exports = function () {
         browser.on('up', function (service) {
           console.log('');
           console.log('Service went/is live........', service.name);
+          if (service.name !== 'glossaApp-' + glossaUser._id) {
+            console.log('((not our service))');
+          }
+          if (service.name === 'glossaApp-' + glossaUser._id) {
+            console.log('((is our service))');
+          }
+
           console.log('Services on network:', browser.services.length);
           console.log('');
 
@@ -86,9 +92,14 @@ module.exports = function () {
             console.log('A glossa Application is online');
             if (service.name === 'glossaApp-' + glossaUser._id) {
               console.log('...Local service found IGNORE');
+
             } else if (service.name !== 'glossaApp-' + glossaUser._id) {
               console.log('...External service found CONNECT');
 
+              //this is where we connect to a serve as a client.
+              //On other devices, we will show up as a client
+              //they will see our data through this
+              //this is how we send out data
               externalSocketClient.initAsClient(service, glossaUser, io)
 
             }
@@ -113,14 +124,20 @@ module.exports = function () {
           // myBonjourService = bonjourService.getMyBonjourService();
 
           if (localService) {
+            console.log('bonjour', bonjour);
             console.log('Bonjour process exists');
 
-            // bonjour.destroy();
+            console.log('localService.name', localService.name);
+
 
             localService.stop(function () {
               console.log('Service Stop Success! called from app.js');
+              process.exit();
             });
+
           }
+
+          bonjour.destroy();
 
           console.log('browser.services.length', browser.services.length);
           console.log('cleaning done...');
@@ -135,7 +152,7 @@ module.exports = function () {
 
           setTimeout(function () {
             console.log('Delay over.  Exiting.');
-            process.exit();
+            // process.exit();
           }, 3000);
         }
 

@@ -1,16 +1,17 @@
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 export class SocketService {
   constructor($rootScope, $window) {
     'ngInject';
 
     this.$rootScope = $rootScope;
     this.$window = $window;
+    // console.log('this.$window.socket', this.$window.socket);
 
   }
 
   init() {
-    let ioRoom = this.$window.location.origin;
-    this.$window.socket = io(ioRoom);
+    // let ioRoom = this.$window.location.origin;
+    // this.$window.socket = io(ioRoom);
   }
 
   on(eventName, callback) {

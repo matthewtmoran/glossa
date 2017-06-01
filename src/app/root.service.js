@@ -272,6 +272,7 @@ export class RootService {
   //called when application is bootstrapped
   initListeners() {
     console.log('initListeners');
+
     // hand shake
     this.socketService.on('request:SocketType', (data) => {
       console.log("Heard 'request:SocketType' in rootService:", data);
@@ -403,7 +404,7 @@ export class RootService {
     //broadcast all connections to controllers that display connections
     //here we track the entire user list and add or remove users ids from an array.
     this.socketService.on('send:connections', (data) => {
-      console.log('on:: send:connections');
+      console.log('on:: send:connections', data);
       console.log('$broadcast:: update:connections');
       this.$rootScope.$broadcast('update:connections', data);
     });

@@ -29,6 +29,7 @@ module.exports = {
       };
 
       console.log('--- emit:: return:socket-type');
+      console.log('......This is where we send our data dn should show up in the other device...');
       nodeClientSocket.emit('return:socket-type', socketData);
     });
 

@@ -20,6 +20,11 @@ import { NotificationService } from './components/notification/notification.serv
 import { components } from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
+
+
+import io from 'socket.io-client';
+
+
 // import 'md-data-table/dist/md-data-table-style.css';
 
 // var electron = window.require('electron');
@@ -34,6 +39,20 @@ angular.module('config', []);
 window.CodeMirror = CodeMirror;
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
+
+  let ioRoom = window.location.origin;
+  window.socket = io(ioRoom);
+
+
+  window.socket.on('request:socket-type', ()=> {
+    console.log('request:SocketType');
+    window.socket.emit('return:socket-type', {type: 'local-client'})
+  });
+
+  // window.socket.on('send:connections', ()=> {
+  //   console.log('send:connections')
+  // });
+  // console.log('window.socket', window.socket);
 
   const rootUrl = 'http://localhost:9000/';
   let initInjector = angular.injector(['ng']);
@@ -159,8 +178,10 @@ export const root = angular
 
     // $state.go(__user.session.currentState, __user.session.currentStateParams);
   //   //if there is no $window.socket object and if the user has sharing enabled
-    if (!$window.socket && __user.settings.isSharing) {
+    if (__user.settings.isSharing) {
+    // if (!$window.socket && __user.settings.isSharing) {
       SocketService.init();
+    //   console.log('$window.socket', $window.socket);
       RootService.initListeners();
     }
 
