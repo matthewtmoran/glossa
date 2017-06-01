@@ -188,57 +188,82 @@ export const appComponent = {
 
     updateConnections(event, data) {
 
+      console.log('');
+      console.log('updateConnections');
+
+
+      console.log('this.allConnections', this.allConnections);
+      //remove users from data that are not online and we are not following
       this.allConnections.map((existing, index) => {
-        if (data.connections.indexOf(existing) < 0) {
-          console.log('if the existing is not in the new array - remove it');
+        let stillExists = false; //flag to false
+        data.connections.forEach((con, i) => { //check new data array for the existing
+          if (existing._id === con._id) {
+            stillExists = true; //if there is a match the it exists
+          }
+        });
+        //if it doesnt exist and we ar not following, remove it.
+        if (!stillExists && !existing.following) {
           this.allConnections.splice(this.allConnections.indexOf(existing), 1)
         }
       });
 
-      data.connections.forEach((potential) => {
-        if (this.allConnections.indexOf(potential) < 0) {
-          console.log('this connection does not exist in the allConnections array');
-          this.allConnections.push(potential);
+      console.log('removed offline non-followed users');
+      console.log('this.allConnections', this.allConnections);
 
-          if (potential.following && potential.online) {
-            console.log('we are following this connection. ');
-            console.log('TODO: notify user connection has come online');
-            let msg = `${potential.name} is online.`;
-            let delay = 3000;
-            this.notificationService.show({
-              message: msg,
-              hideDelay: delay
-            });
+      let tempArr = [];
+      data.connections.forEach((potential) => {
+
+        let doesExist = false;
+
+        this.allConnections.forEach((cur) => {
+          if (potential._id === cur._id) {
+            doesExist = true;
           }
+        });
+
+        if (!doesExist) {
+          tempArr.push(potential);
+        }
+
+
+
+        // if (this.allConnections.indexOf(potential) < 0) {
+        //   console.log('this connection does not exist in the allConnections array');
+        //   this.allConnections.push(potential);
+        //
+        //   if (potential.following && potential.online) {
+        //     console.log('we are following this connection. ');
+        //     console.log('TODO: notify user connection has come online');
+        //     let msg = `${potential.name} is online.`;
+        //     let delay = 3000;
+        //     this.notificationService.show({
+        //       message: msg,
+        //       hideDelay: delay
+        //     });
+        //   }
+        // }
+      });
+
+
+      tempArr.forEach((n) => {
+        this.allConnections.push(n);
+        if (n.following && n.online) {
+          console.log('we are following this connection. ');
+          console.log('TODO: notify user connection has come online');
+          let msg = `${n.name} is online.`;
+          let delay = 3000;
+          this.notificationService.show({
+            message: msg,
+            hideDelay: delay
+          });
         }
       });
 
+      tempArr = [];
+
       this.allConnections = angular.copy(this.allConnections);
 
-      // this.allConnections.map((existing) => {
-      //   data.connections.forEach((potential) => {
-      //   })
-      // });
 
-
-      // this.allConnections = data.connections;
-      // data.connections.forEach((connection) => {
-      //   if (connection.online && this.onlineConnections.indexOf(connection) < 0) {
-      //     console.log('connections is online and does not exist in online array');
-      //     this.onlineConnections.push(connection);
-      //   }
-      //   if (!connection.online && this.onlineConnections.indexOf(connection) > -1) {
-      //     console.log('connection is offline and exists in connection array');
-      //     this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
-      //   }
-      // });
-      //
-      // this.onlineConnections.forEach((connection) => {
-      //   if (data.connections.indexOf(connection) < 0) {
-      //     console.log('connection is no longer online so remove from online array');
-      //     this.onlineConnections.splice(this.onlineConnections.indexOf(connection), 1);
-      //   }
-      // });
     }
 
 

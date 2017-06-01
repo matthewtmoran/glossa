@@ -22,6 +22,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
       if (data.type === 'local-client') {
 
         console.log('local socket connecting');
+
         localClient = {
           socketId: socket.id,
           name: glossaUser.name,
@@ -34,13 +35,13 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
         socketUtil.validateOnlineConnections();
 
 
-        console.log('local data normalized time to publish service on network');
+        // console.log('local data normalized time to publish service on network');
 
-        bonjourService.publish(glossaUser, browser, bonjour, function (err) {
-          if (err) {
-            return console.log('There was an error publishing bonjour service...', err);
-          }
-        });
+        // bonjourService.publish(glossaUser, browser, bonjour, function (err) {
+        //   if (err) {
+        //     return console.log('There was an error publishing bonjour service...', err);
+        //   }
+        // });
       }
       if (data.type === 'external-client') {
         console.log('this is an external client server');
@@ -74,7 +75,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
               if (data.avatar && data.avatar !== persistedClientData.avatar) {
                 persistedClientData.avatar = data.avatar;
                 console.log('emit:: request:avatar to:: local-client');
-                socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:avatar', {});
+                socketUtil.emitToLocalClient(io, persistedClientData.socketId, 'request:avatar', {});
                 changesMade = true;
               }
 
@@ -93,8 +94,8 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
 
             socketUtil.updateConnection(persistedClientData)
               .then(function (updatedClient) {
-                console.log('emit:: update:connectionInfo to:: local-client');
-                socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
+                // console.log('emit:: update:connectionInfo to:: local-client');
+                // socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
 
                 socketUtil.getConnections()
                   .then(function (data) {

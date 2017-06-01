@@ -35,6 +35,7 @@
     "method-override": "~1.0.0",
     "morgan": "~1.0.0",
     "multer": "^1.2.1",
+    "multicast-dns": "git+https://github.com/resin-io-modules/multicast-dns.git#listen-on-all-interfaces",
     "nedb": "^1.8.0",
     "ng-annotate-webpack-plugin": "^0.1.3",
     "ng-file-upload": "^12.2.13",

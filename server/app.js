@@ -36,12 +36,15 @@ module.exports = function () {
 
       var bonjourSocket;
       var glossaUser = appData[0];
+      console.log('glossaUser', glossaUser)
       var mySession = appData[0].session;
 
       var localService;
 
       server.listen(config.port, config.ip, function () {
         console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+
+        bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
 
         localService = bonjour.publish({
             name:'glossaApp-' + glossaUser._id,
@@ -53,17 +56,17 @@ module.exports = function () {
         });
 
         browser = bonjour.find({type: 'http'});
+        console.log('Bonjour is listening...');
 
-        localService.on('error', function(service) {
-          console.log('localService - error publishing local serv ice');
-        });
+        // localService.on('error', function(service) {
+        //   console.log('localService - error publishing local serv ice');
+        // });
 
 
         browser.on('error', function(service) {
           console.log('browser - Here is an error', service);
         });
 
-        console.log('Bonjour is listening...');
 
         browser.on('down', function (service)   {
           console.log('');
@@ -78,7 +81,7 @@ module.exports = function () {
           console.log('Services on network:', browser.services.length);
           console.log('');
 
-          //make sure network service is a glossa instance....
+          // make sure network service is a glossa instance....
           if (service.name.indexOf('glossaApp') > -1) {
             console.log('A glossa Application is online');
             if (service.name === 'glossaApp-' + glossaUser._id) {
@@ -95,7 +98,7 @@ module.exports = function () {
 
 
 
-        // bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
+
 
       });
 
@@ -111,6 +114,9 @@ module.exports = function () {
 
           if (localService) {
             console.log('Bonjour process exists');
+
+            // bonjour.destroy();
+
             localService.stop(function () {
               console.log('Service Stop Success! called from app.js');
             });
