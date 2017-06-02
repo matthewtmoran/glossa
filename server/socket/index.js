@@ -373,7 +373,8 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
                       .then((updatedConnection) => {
                         //emit changes to local-client
                         console.log('emit:: notify:externalChanges to:: local-client');
-                        socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {
+
+                        socketUtil.emitToLocalClient(io, localClient.localSocketId, 'notify:externalChanges', {
                           connection: updatedConnection,
                           updatedData: updates
                         });

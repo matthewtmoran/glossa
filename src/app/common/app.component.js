@@ -198,6 +198,7 @@ export const appComponent = {
         let stillExists = false; //flag to false
         data.connections.forEach((con, i) => { //check new data array for the existing
           if (existing._id === con._id) {
+            this.allConnections[index] = con; //update the existing record with the most up-to-date record
             stillExists = true; //if there is a match the it exists
           }
         });

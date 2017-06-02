@@ -66,7 +66,11 @@ module.exports = {
         });
     });
 
-    //not sure this is used
+    //Triggered when an external-server broadcasts to external-clients
+    //^^beofre that, it is emitted from the local-client to the respective server.
+    //The server gets the event makes the changes locally then broadcasts to clients that are following
+    //((currently only used for avatar))
+    //the broadcast this event.
     nodeClientSocket.on('rt:updates', function(dataChanges) {
       console.log('--- on:: rt:updates');
       console.log("--- emit:: notify:sync-begin to:: local-client");
@@ -118,9 +122,9 @@ module.exports = {
                   socketUtil.getUser()
                     .then(function(user) {
                       console.log('--- emit:: notify:externalChanges to:: local-client');
-                      socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
+                      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
                       console.log('--- emit:: notify:sync-end to:: local-client');
-                      socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:sync-end');
+                      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-end');
                     });
 
 
