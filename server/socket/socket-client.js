@@ -1,15 +1,19 @@
-var ioClient = require('socket.io-client');
+// var ioClient = require('socket.io-client');
 var socketUtil = require('./socket-util');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 var nodeClientSocket = '';
 
 module.exports = {
+  //this occurs when bonjour discovers an external server.
+  //we are going to connect to the server as a client so the server can interact with us
   initAsClient: function(service, me, io) {
 
     console.log('--- initAsClient called');
 
     var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-    nodeClientSocket = ioClient.connect(externalPath);
+    nodeClientSocket = require('socket.io-client')(externalPath);
+
+    console.log('nodeClientSocket', nodeClientSocket);
 
     //initial connection to another server
     nodeClientSocket.on('connect', function() {
@@ -17,6 +21,10 @@ module.exports = {
     });
 
     //handshake
+    //this event is emitted from servers we are connected to.
+    //we send the servers our own data (return:socket-type)
+    //the servers will then update the list of clients that are connected to them
+    //the servers will then send that list to it's local-client
     nodeClientSocket.on('request:socket-type', function() {
       console.log('--- on:: request:socket-type heard in server as a client');
 
@@ -33,7 +41,12 @@ module.exports = {
       nodeClientSocket.emit('return:socket-type', socketData);
     });
 
+
+
     //when user follows
+    //triggered from an external-client (which was triggered by it's local-client) when the user decides to follow the respective client
+    //this client the fetches it's avatar image to send to the server that requested the image
+    //once the server recieves the image, it updates the local-client data in the view
     nodeClientSocket.on('request:avatar', function() {
       console.log('--- on:: request:avatar');
       socketUtil.getUser()
@@ -53,6 +66,7 @@ module.exports = {
         });
     });
 
+    //not sure this is used
     nodeClientSocket.on('rt:updates', function(dataChanges) {
       console.log('--- on:: rt:updates');
       console.log("--- emit:: notify:sync-begin to:: local-client");
@@ -117,6 +131,13 @@ module.exports = {
       });
     });
 
+    //when a server requests updates
+    //after we connect to a server and the handshake is complete
+    //the server will request up-to-date data from each client
+    //first the external server queries the data he already has from each client and sends that list to each respective client
+    //here we immediately notify our local-client that an external-client is syncing data (so we know not to quit or understand why cpu my be strained)
+    //we take the data that the external-server sent us and compare for changes and new data based on timestamps to send back to the external-server
+    //we end this saga by sending an event to the local-client ending the syncing status.
     nodeClientSocket.on('request:updates', function(data) {
       console.log('--- on:: request:updates');
       console.log('--- emit:: notify:sync-begin to:: local-client');
