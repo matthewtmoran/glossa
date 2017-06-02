@@ -40,19 +40,17 @@ window.CodeMirror = CodeMirror;
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
 
+  //I moved this here so that the socket can complete the handshake before angular is ready.
+  //I believe this should help to ensure that we receive connection data
+
   let ioRoom = window.location.origin;
   window.socket = io(ioRoom);
-
 
   window.socket.on('request:socket-type', ()=> {
     console.log('request:SocketType');
     window.socket.emit('return:socket-type', {type: 'local-client'})
   });
 
-  // window.socket.on('send:connections', ()=> {
-  //   console.log('send:connections')
-  // });
-  // console.log('window.socket', window.socket);
 
   const rootUrl = 'http://localhost:9000/';
   let initInjector = angular.injector(['ng']);
@@ -74,9 +72,9 @@ window.onload = () => {
     }).then(() => {
       angular.bootstrap(document, [root]);
 
-      setTimeout(() => {
-        angular.element('.ghost').remove(); //removes the defualt elemnts so there is no box shadow double up (a hard line appears when the box shaodws overlay eachother
-      }, 100)
+      // setTimeout(() => {
+        // angular.element('.ghost').remove(); //removes the defualt elemnts so there is no box shadow double up (a hard line appears when the box shaodws overlay eachother
+      // }, 100)
 
     });
 };

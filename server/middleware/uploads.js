@@ -38,7 +38,7 @@ function validateFilename(req, res, next) {
 
     files.forEach(function(file) {
         file = MediaObject(file);
-        if (file.mimetype === 'image/jpeg') {
+        if (file.mimetype.indexOf('image') > -1) {
             console.log('file.filename', file.filename);
             var imagePromise = copyAndWrite(file.path, path.join(config.root, config.imagePath, file.filename))
                 .then(function(response) {

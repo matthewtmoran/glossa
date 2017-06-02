@@ -24,6 +24,7 @@ module.exports = {
 
     encodeBase64: function(mediaPath) {
         console.log('encoding into base64....');
+        console.log('mediaPath', mediaPath);
         var myPath = path.join(config.root, '/server/data/', mediaPath);
         console.log('myPath', myPath);
         return new Promise(function(resolve, reject){
