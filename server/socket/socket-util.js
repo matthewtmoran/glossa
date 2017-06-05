@@ -173,24 +173,7 @@ module.exports = {
     });
   },
 
-  normalizeNotebooks: function (client) {
-    console.log('normalizeNotebooks - client:', client);
-    return new Promise(function (resolve, reject) {
-
-      var query = {"createdBy._id": client._id};
-      var options = {returnUpdatedDocs: true, multi: true};
-      var update = {$set: {"createdBy.name": client.name, "createdBy.avatar": client.avatar}};
-
-      Notebooks.update(query, update, options, function (err, updatedCount, updatedDocs) {
-        if (err) {
-          console.log('Error normalizing notebook data', err);
-          reject(err);
-        }
-        Notebooks.persistence.compactDatafile();
-        resolve({_id: client._id, name: client.name, avatar: client.avatar});
-      });
-    });
-  },
+  normalizeNotebooks: normalizeNotebooks,
 
   removeConnection: function (client) {
     return new Promise(function (resolve, reject) {
@@ -367,4 +350,23 @@ function updateConnectionsOnClose() {
       resolve('success update on close');
     });
   })
+}
+
+function normalizeNotebooks(client) {
+  console.log('normalizeNotebooks - client:', client);
+  return new Promise(function (resolve, reject) {
+
+    var query = {"createdBy._id": client._id};
+    var options = {returnUpdatedDocs: true, multi: true};
+    var update = {$set: {"createdBy.name": client.name, "createdBy.avatar": client.avatar}};
+
+    Notebooks.update(query, update, options, function (err, updatedCount, updatedDocs) {
+      if (err) {
+        console.log('Error normalizing notebook data', err);
+        reject(err);
+      }
+      Notebooks.persistence.compactDatafile();
+      resolve({_id: client._id, name: client.name, avatar: client.avatar});
+    });
+  });
 }

@@ -19,7 +19,7 @@ export const settingsAboutComponent = {
         {
           name: 'Matthew Moran',
           title: 'Software Engineer',
-          url: 'http:........',
+          url: '',
           avatar: ''
         },
         {
@@ -39,8 +39,32 @@ export const settingsAboutComponent = {
       this.softwares = [
         {
           name: 'Angular Material',
-          url: 'http://............'
-        }
+          url: 'https://material.angularjs.org/'
+        },
+        {
+          name: 'Node',
+          url: 'https://nodejs.org/en/'
+        },
+        {
+          name: 'Electron',
+          url: 'https://electron.atom.io/'
+        },
+        {
+          name: 'NeDB',
+          url: 'https://github.com/louischatriot/nedb'
+        },
+        {
+          name: 'Bonjour',
+          url: 'https://www.npmjs.com/package/bonjour'
+        },
+        {
+          name: 'Socket.io',
+          url: 'https://socket.io/'
+        },
+        {
+          name: 'SimpleMDE',
+          url: 'https://simplemde.com/'
+        },
       ]
 
     }
