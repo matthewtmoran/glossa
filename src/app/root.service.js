@@ -171,9 +171,11 @@ export class RootService {
 
   }
 
+  //this api updates the user AND normalizes notebooks.
   updateUserInfo(user) {
     return this.$http.put(`/api/user/${this.__user._id}/`, user)
       .then((response) => {
+        this.socketService.emit('broadcast:profile-updates', response.data);
         return response.data;
       })
       .catch((response) => {

@@ -76,18 +76,14 @@ function importProject() {
 }
 
 function startExpress() {
-    console.log('startExpress called...')
-    Promise.all([require('./server/config/init').checkForApplicationData()])
-        .then(function (appData) {
-            express = require('./server/app')(bonjour, appData);
-        });
+  Promise.all([require('./server/config/init').checkForApplicationData()])
+    .then(function (appData) {
+      express = require('./server/app')(bonjour, appData);
+  });
 }
-
 startExpress();
 
 function createWindow() {
-  console.log('');
-  console.log('createWindow');
   // Create the browser window.
   win = new BrowserWindow({
     // titleBarStyle: 'hidden',
@@ -100,11 +96,6 @@ function createWindow() {
     icon: icon
     // icon: path.join(__dirname, 'dist/img/app-icons/mac/glossa-logo.icns') //for dev for mac
   });
-
-
-
-
-
 
 
   // var express = ;
@@ -151,17 +142,13 @@ function createWindow() {
 app.on('before-quit', function (e) {
   console.log('');
   console.log('before-quit');
-  console.log('before-quit');
 
-  console.log('bonjour', bonjour);
-
-  bonjour.unpublishAll(function(val) {
+  bonjour.unpublishAll(function (val) {
     console.log('bonjour.unpublishAll');
     console.log('val', val)
   });
 
   bonjour.destroy();
-  console.log('bonjour', bonjour);
 
   //if force quite is false (not cmd+Q) aka the 'x'
   if (!forceQuit) {

@@ -141,7 +141,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
           }
         }, 2000)
       } else {
-        console.log('disconnect if from external-client');
+       //disconnect if from external-client
         socketUtil.getConnectionBySocketId(socket.id)
           .then(function (currentClient) {
             console.log('client disconnecting name:', currentClient.name);
@@ -150,32 +150,32 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
               if (currentClient.disconnect) {
                 console.log('external-socket did not reconnecting in time');
                 if (!currentClient.following) {
-                  console.log('we are not following external-client');
-                  console.log('removing connection from db.');
+                 //we are not following external-client
+                  //removing connection from db
                   socketUtil.removeConnection(currentClient)
                     .then(function () {
-                      console.log('get updated list of connections');
+                      //get updated list of connections
                       socketUtil.getConnections()
                         .then(function (data) {
-                          console.log('amount of connections:', data.length);
+                          // console.log('amount of connections:', data.length);
                           console.log('emit:: send:connections to:: local-client');
                           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
                         })
                     })
                 } else {
-                  console.log('we are following external-client');
+                 //we are following external-client'
 
                   currentClient.online = false;
                   delete currentClient.socketId;
 
-                  console.log('update connections in db');
+                //update connections in db
                   socketUtil.updateConnection(currentClient)
                     .then(function (data) {
-                      console.log("data from update: ", data);
-                      console.log('get updated list of connections');
+                      // console.log("data from update: ", data);
+                      //get updated list of connections
                       socketUtil.getConnections()
                         .then(function (data) {
-                          console.log('amount of connections:', data.length);
+                          // console.log('amount of connections:', data.length);
                           console.log('emit:: send:connections to:: local-client');
                           socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
                         })
@@ -185,6 +185,14 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour) {
             }, 3000);
           });
       }
+    });
+
+    //local-client profile updated
+    //(used http post to update database and data received here is the response data on success
+    //now we need to broadcast the changes to all connected clients
+    //broadcast to all users changes in profile
+    socket.on('broadcast:profile-updates', function(data) {
+      socketUtil.broadcastToExternalClients(io, 'profile-updates', data);
     });
 
 

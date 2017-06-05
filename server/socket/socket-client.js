@@ -242,5 +242,24 @@ module.exports = {
       });
     });
 
+    //when user updates profile data
+    //a server emits event with updated data
+    //we recieve the data and update the data we have stored and normalize notebooks
+    nodeClientSocket.on('profile-updates', function(data) {
+      //update user in connections db
+      //normalize notebooks
+      //normalize any other data
+
+
+      socketUtil.getConnection(data._id).then(function(user) {
+        user = data;
+        socketUtil.updateConnection(user)
+          .then(function(updatedUser) {
+            //update local-client view with new data
+            socketUtil.emitToLocalClient(io, me.localSocketId, 'update:connection', updatedUser);
+          })
+      })
+
+    })
   }
 };
