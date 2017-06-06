@@ -4,12 +4,16 @@
 
 'use strict';
 
-module.exports = function (bonjour) {
 
+var express = require('express');
+var config = require('./config/environment');
+var path = require('path');
 
-  var express = require('express');
-  var config = require('./config/environment');
-  var path = require('path');
+module.exports = function (bonjour, appData) {
+  console.log('');
+  console.log('app.js init');
+  console.log('');
+
 
   // Populate DB with sample data
   if (config.seedDB) {
@@ -30,14 +34,13 @@ module.exports = function (bonjour) {
   require('./routes')(app);
 
 
-  Promise.all([require('./config/init').checkForApplicationData()])
-    .then(function (appData) {
+  // Promise.all([require('./config/init').checkForApplicationData()])
+  //   .then(function (appData) {
 
       var bonjourSocket;
       var glossaUser = appData[0];
       console.log('glossaUser', glossaUser)
       var mySession = appData[0].session;
-
       var localService;
 
       server.listen(config.port, config.ip, function () {
@@ -170,5 +173,5 @@ module.exports = function (bonjour) {
       //catches uncaught exceptions
       // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
 
-    });
+    // });
 };

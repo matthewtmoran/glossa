@@ -4,6 +4,7 @@ var electron = require('electron'),
   BrowserWindow = electron.BrowserWindow,
   Menu = electron.Menu,
   ipcMain = electron.ipcMain,
+  express,
   bonjour = require('bonjour')();
 
 
@@ -68,16 +69,28 @@ var menuTemplate = [{
 
 var menu = Menu.buildFromTemplate(menuTemplate);
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-console.log('icon', icon);
+
 
 function importProject() {
   win.webContents.send('import:project');
 }
 
+function startExpress() {
+    console.log('startExpress called...')
+    Promise.all([require('./server/config/init').checkForApplicationData()])
+        .then(function (appData) {
+            express = require('./server/app')(bonjour, appData);
+        });
+}
+
+startExpress();
+
 function createWindow() {
+  console.log('');
+  console.log('createWindow');
   // Create the browser window.
   win = new BrowserWindow({
-    titleBarStyle: 'hidden',
+    // titleBarStyle: 'hidden',
     width: 1200,
     height: 750,
     webPreferences: {
@@ -89,7 +102,12 @@ function createWindow() {
   });
 
 
-  var express = require('./server/app')(bonjour);
+
+
+
+
+
+  // var express = ;
 
   // and load the index.html of the app.
   win.loadURL(url.format({
@@ -197,6 +215,7 @@ app.on('window-all-closed', function () {
 });
 
 app.on('activate', function () {
+  console.log('activate called');
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
