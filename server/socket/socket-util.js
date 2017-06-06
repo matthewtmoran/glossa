@@ -187,6 +187,8 @@ module.exports = {
     })
   },
 
+  //updates client in persisted data with the object we pass to it
+  //normalizes notebooks
   updateConnection: function (client) {
     return new Promise(function (resolve, reject) {
       var options = {returnUpdatedDocs: true, upsert: true};
@@ -195,11 +197,12 @@ module.exports = {
           console.log('There eas an error updating connection');
           reject(err);
         }
+        console.log('TODO: verify no avatar if no longer following.  Avatar?:', !!updatedDoc.avatar);
         normalizeNotebooks(updatedDoc)
           .then(function (err, val) {
             resolve(updatedDoc);
+            Connection.persistence.compactDatafile();
         });
-        Connection.persistence.compactDatafile();
       })
     })
   },
@@ -216,6 +219,8 @@ module.exports = {
     })
   },
 
+  //remove avatar from file system
+  //TODO: refractor path
   removeAvatarImage: function (imagePath) {
     return new Promise(function (resolve, reject) {
       var myPath = path.join(config.root, '/server/data/', imagePath);
@@ -277,6 +282,7 @@ module.exports = {
     })
   },
 
+  //check whether document should be updated or inserted as new
   updateOrInsert: (array) => {
     return new Promise((resolve, reject) => {
       let options = {returnUpdatedDocs: true, upsert: true};
@@ -292,8 +298,6 @@ module.exports = {
           update = updatedDoc;
         });
       });
-
-      console.log('array map is done. resolving.....');
 
       resolve(array);
     });
@@ -353,7 +357,7 @@ function updateConnectionsOnClose() {
 }
 
 function normalizeNotebooks(client) {
-  console.log('normalizeNotebooks - client:', client);
+  console.log('normalizeNotebooks - client:', client.name);
   return new Promise(function (resolve, reject) {
 
     var query = {"createdBy._id": client._id};

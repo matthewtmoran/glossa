@@ -92,36 +92,25 @@ export const appComponent = {
     }
 
 
+    /**
+     * called when a single connection is updated
+     * angular event listener
+     * called from socket event
+     * @param event = angular event object
+     * @param data = {connection: object}
+     */
     updateConnection(event, data) {
       console.log('ng-on:: update:connection', data);
-      console.log('this.allConnections', this.allConnections);
 
-      // this.allConnections.map((connection, index) => {
-      //   if (connection._id === data._id) {
-      //     this.allConnections[index] = data;
-      //   }
-      // });
+      //connection should already exist in array
+      this.allConnections.map((connection, index) => {
+        if (connection._id === data.connection._id) {
+          this.allConnections[index] = data.connection;
+        }
+      });
 
-      // this.allConnections.map((connection, index) => {
-      //   if (connection._id === data.connection._id) {
-      //     if (!data.connection.online) {
-      //       this.allConnections.splice(index, 1);
-      //     } else {
-      //       this.allConnections[index] = data.connection;
-      //       this.allConnections = angular.copy(this.allConnections);
-      //     }
-      //   }
-      // });
-
-      // this.onlineConnections.map((connection, index) => {
-      //   if (connection._id === data.connection._id) {
-      //     if (!data.connection.online) {
-      //       this.onlineConnections.splice(index, 1);
-      //     } else {
-      //       this.onlineConnections[index] = connection;
-      //     }
-      //   }
-      // })
+      //copy to trigger changes
+      this.allConnections = angular.copy(this.allConnections);
 
     }
 

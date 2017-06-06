@@ -384,7 +384,7 @@ export class RootService {
 
     //update dynamic data that connection may update manually
     this.socketService.on('update:connectionInfo', (data) => {
-      console.log('on:: update:connection', data);
+      console.log('on:: update:connectionInfo', data);
 
       console.log('angular broadcast:: update:connection');
       this.$rootScope.$broadcast('update:connection', data);
@@ -394,10 +394,8 @@ export class RootService {
     //update connection
     this.socketService.on('update:connection', (data) => {
       console.log('');
-      console.log('');
-      console.log('');
-      console.log('on:: update:connection - data', data);
-      console.log('angular event $broadcast:: update:connections');
+      console.log('on:: update:connection - data');
+      console.log('angular event $broadcast:: update:connection');
       this.$rootScope.$broadcast('update:connection', data);
       console.log('');
     });

@@ -101,9 +101,7 @@ module.exports = function (bonjour, appData) {
       console.log('browser.services.length', browser.services.length);
 
       if (localService) {
-        console.log('bonjour', bonjour);
         console.log('Bonjour process exists');
-        console.log('localService.name', localService.name);
 
         localService.stop(function () {
           console.log('Service Stop Success! called from app.js');
