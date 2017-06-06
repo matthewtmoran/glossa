@@ -37,7 +37,8 @@ module.exports = function (glossaUser, mySession, io) {
 
     socket.on('return:avatar', onReturnAvatar);
     socket.on('return:updates', onReturnUpdates);
-    socket.on('disconnect', onDisconnect)
+
+    socket.on('disconnect', onDisconnect);
 
 
 
@@ -172,8 +173,20 @@ module.exports = function (glossaUser, mySession, io) {
      * now we need to broadcast the changes to all connected clients
      * broadcast to all users changes in profile
      */
-    function onBroadcastProfileUpdates(data) {
-      socketUtil.broadcastToExternalClients(io, 'profile-updates', data);
+    function onBroadcastProfileUpdates() {
+      console.log('');
+      console.log('on:: broadcast:profile-updates');
+      console.log('TODO: update to include phone numbers');
+      console.log('TODO: update to include avatar');
+
+      socketUtil.getUser().then(function(user) {
+        let limitedUser = {};
+        limitedUser._id = user._id;
+        limitedUser.name = user.name;
+        limitedUser.socketId = user.socketId;
+        socketUtil.broadcastToExternalClients(io, 'rt:profile-updates', limitedUser);
+      });
+
     }
 
     /**

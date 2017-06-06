@@ -175,7 +175,7 @@ export class RootService {
   updateUserInfo(user) {
     return this.$http.put(`/api/user/${this.__user._id}/`, user)
       .then((response) => {
-        this.socketService.emit('broadcast:profile-updates', response.data);
+        this.socketService.emit('broadcast:profile-updates');
         return response.data;
       })
       .catch((response) => {
@@ -418,11 +418,15 @@ export class RootService {
     //Newer Methods//
     /////////////////
 
+    /**
+     * Socket handshake
+     */
     this.socketService.on('request:socket-type', () => {
       console.log('on:: request:socket-type');
       console.log('emit:: return:socket-type');
       this.socketService.emit('return:socket-type', {type: 'local-client'});
     });
+
 
     this.socketService.on('notify:sync-begin', () => {
       console.log('on:: notify:sync-begin');
