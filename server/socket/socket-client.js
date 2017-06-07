@@ -13,7 +13,6 @@ module.exports = {
     var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
     nodeClientSocket = require('socket.io-client')(externalPath);
 
-    console.log('nodeClientSocket', nodeClientSocket);
 
     //initial connection to another server
     nodeClientSocket.on('connect', function() {
@@ -256,7 +255,7 @@ module.exports = {
           if (connection.name !== data.name) {
             connection.name = data.name;
           }
-          socketUtil.updateConnection(connection, io, me.socketId)
+          socketUtil.updateConnection(connection, io, me)
           // socketUtil.getUser()
           //   .then(function(user) {
           //   });

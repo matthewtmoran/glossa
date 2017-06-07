@@ -176,8 +176,10 @@ module.exports = {
 
         getConnections()
           .then(function(connections) {
-            console.log('emit:: send:connections to:: local-client');
-            io.to(localClient.socketId).emit('send:connections', { connections: connections });
+            getLocalSocketId()
+              .then(function(socketId) {
+                io.to(socketId).emit('send:connections', { connections: connections });
+              });
           });
 
         console.log('TODO: verify no avatar if no longer following.  Avatar?:', !!updatedDoc.avatar);
@@ -355,6 +357,17 @@ function updateConnectionsOnClose() {
   })
 }
 
+function getLocalSocketId() {
+  return new Promise(function(resolve, reject) {
+   User.findOne({}, function(err, user) {
+      if (err) {
+        reject(err);
+      }
+      resolve(user.socketId);
+    })
+  });
+}
+
 function normalizeNotebooks(client, io, localClient) {
   console.log('normalizeNotebooks - client:', client.name);
   return new Promise(function (resolve, reject) {
@@ -381,4 +394,6 @@ function normalizeNotebooks(client, io, localClient) {
 function emitToLocalClient(io, socketId, eventName, data) {
   io.to(socketId).emit(eventName, data);
 };
+
+
 
