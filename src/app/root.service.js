@@ -355,6 +355,7 @@ export class RootService {
 
     //when external-client makes changes
     this.socketService.on('notify:externalChanges', (data) => {
+      console.log('');
       console.log('on:: notify:externalChanges', data);
       // let msg = `Data synced with ${data.connection.name}`;
       // let delay = 3000;
@@ -369,6 +370,7 @@ export class RootService {
     });
 
     this.socketService.on('update:external-client', (data) => {
+      console.log('');
       console.log("Heard : update:external-client in app.service");
 
       let msg = `User ${data.createdBy._id}`;
@@ -384,6 +386,7 @@ export class RootService {
 
     //update dynamic data that connection may update manually
     this.socketService.on('update:connectionInfo', (data) => {
+      console.log('');
       console.log('on:: update:connectionInfo', data);
 
       console.log('angular broadcast:: update:connection');
@@ -404,7 +407,8 @@ export class RootService {
     //broadcast all connections to controllers that display connections
     //here we track the entire user list and add or remove users ids from an array.
     this.socketService.on('send:connections', (data) => {
-      console.log('on:: send:connections', data);
+      console.log('');
+      console.log('on:: send:connections');
       console.log('$broadcast:: update:connections');
       this.$rootScope.$broadcast('update:connections', data);
     });
@@ -439,11 +443,13 @@ export class RootService {
         hideDelay: delay
       });
 
+      console.log('***this.cfpLoadingBar.start doess it end???')
       this.cfpLoadingBar.start();
     });
 
     this.socketService.on('notify:sync-end', () => {
       console.log('on:: notify:sync-end');
+      console.log('***this.cfpLoadingBar.complete:: it ends!!!')
       this.cfpLoadingBar.complete();
     })
 

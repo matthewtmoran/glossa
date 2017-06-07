@@ -316,6 +316,12 @@ module.exports = {
   //event to all external socket connections
   broadcastToExternalClients: function (io, eventName, data) {
     io.to('externalClientsRoom').emit(eventName, data)
+  },
+
+  emitToLocalClientWithQuery: function(io, eventName, data) {
+    getLocalSocketId().then(function(socketId) {
+      io.to(socketId).emit(eventName, data)
+    })
   }
 
 };

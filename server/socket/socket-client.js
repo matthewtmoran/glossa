@@ -6,7 +6,7 @@ var nodeClientSocket = '';
 module.exports = {
   //this occurs when bonjour discovers an external server.
   //we are going to connect to the server as a client so the server can interact with us
-  initAsClient: function(service, me, io) {
+  initAsClient: function (service, me, io) {
 
     console.log('--- initAsClient called');
 
@@ -15,7 +15,7 @@ module.exports = {
 
 
     //initial connection to another server
-    nodeClientSocket.on('connect', function() {
+    nodeClientSocket.on('connect', function () {
       console.log('--- on:: connected to a external server as a client');
     });
 
@@ -24,16 +24,16 @@ module.exports = {
     //we send the servers our own data (return:socket-type)
     //the servers will then update the list of clients that are connected to them
     //the servers will then send that list to it's local-client
-    nodeClientSocket.on('request:socket-type', function() {
+    nodeClientSocket.on('request:socket-type', function () {
       console.log('--- on:: request:socket-type heard in server as a client');
 
 
       socketUtil.getUser()
-        .then(function(user) {
+        .then(function (user) {
           var socketData = {
             name: user.name,
             _id: user._id,
-            type:'external-client',
+            type: 'external-client',
             socketId: nodeClientSocket.id,
             avatar: user.avatar
           };
@@ -45,17 +45,16 @@ module.exports = {
     });
 
 
-
     //when user follows
     //triggered from an external-client (which was triggered by it's local-client) when the user decides to follow the respective client
     //this client the fetches it's avatar image to send to the server that requested the image
     //once the server recieves the image, it updates the local-client data in the view
-    nodeClientSocket.on('request:avatar', function() {
+    nodeClientSocket.on('request:avatar', function () {
       console.log('--- on:: request:avatar');
       socketUtil.getUser()
-        .then(function(user) {
+        .then(function (user) {
           socketUtil.encodeBase64(user.avatar)
-            .then(function(data) {
+            .then(function (data) {
 
               var persistedData = {
                 name: user.name,
@@ -64,7 +63,11 @@ module.exports = {
               };
 
               console.log('--- emit:: return:avatar');
-              nodeClientSocket.emit('return:avatar', {avatarString: data, imagePath: user.avatar, userData: persistedData});
+              nodeClientSocket.emit('return:avatar', {
+                avatarString: data,
+                imagePath: user.avatar,
+                userData: persistedData
+              });
             });
         });
     });
@@ -74,16 +77,16 @@ module.exports = {
     //The server gets the event makes the changes locally then broadcasts to clients that are following
     //((currently only used for avatar))
     //the broadcast this event.
-    nodeClientSocket.on('rt:updates', function(dataChanges) {
+    nodeClientSocket.on('rt:updates', function (dataChanges) {
       console.log('--- on:: rt:updates');
       console.log("--- emit:: notify:sync-begin to:: local-client");
 
-      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-begin');
+      socketUtil.emitToLocalClientWithQuery(io, 'notify:sync-begin', {});
 
       var externalUser = dataChanges.user;
 
       socketUtil.getConnection(externalUser._id)
-        .then(function(connection) {
+        .then(function (connection) {
           if (connection.following) {
             var mediaPromises = [];
 
@@ -110,32 +113,31 @@ module.exports = {
             }
 
             Promise.all(mediaPromises)
-              .then(function(result) {
+              .then(function (result) {
 
                 var options = {returnUpdatedDocs: true, upsert: true};
                 var query = {_id: dataChanges.update._id};
 
-                Notebooks.update(query, dataChanges.update, options, function(err, updatedCount, updatedDocs) {
+                Notebooks.update(query, dataChanges.update, options, function (err, updatedCount, updatedDocs) {
                   if (err) {
                     return console.log('Error inserting external Updates');
                   }
-                  console.log('--- Inserted notebook success');
+
+                  console.log('--- emit:: notify:externalChanges to:: local-client');
+                  socketUtil.emitToLocalClientWithQuery(io, 'notify:externalChanges', {
+                    connection: connection,
+                    updatedData: updatedDocs
+                  });
+
+                  console.log('--- emit:: notify:sync-end to:: local-client');
+                  socketUtil.emitToLocalClientWithQuery(io, 'notify:sync-end', {});
+
                   Notebooks.persistence.compactDatafile();
-                  //TODO: do i need to query user here?
-                  socketUtil.getUser()
-                    .then(function(user) {
-                      console.log('--- emit:: notify:externalChanges to:: local-client');
-                      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
-                      console.log('--- emit:: notify:sync-end to:: local-client');
-                      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-end');
-                    });
-
-
                 });
 
-            });
+              });
           }
-      });
+        });
     });
 
     //when a server requests updates
@@ -145,17 +147,17 @@ module.exports = {
     //here we immediately notify our local-client that an external-client is syncing data (so we know not to quit or understand why cpu my be strained)
     //we take the data that the external-server sent us and compare for changes and new data based on timestamps to send back to the external-server
     //we end this saga by sending an event to the local-client ending the syncing status.
-    nodeClientSocket.on('request:updates', function(data) {
+    nodeClientSocket.on('request:updates', function (data) {
       console.log('--- on:: request:updates');
       console.log('--- emit:: notify:sync-begin to:: local-client');
       socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-begin');
 
       //get me
       socketUtil.getUser()
-        .then(function(user) {
+        .then(function (user) {
           return user._id;
         })
-        .then(function(userId) {
+        .then(function (userId) {
           var newNotebookEntries = [];
           var mediaPromises = [];
 
@@ -192,11 +194,11 @@ module.exports = {
               console.log('--- some data sent to compare against: ', data.length);
               //if there is data compare so we can get updates to notebooks...
 
-              notebooks.forEach(function(notebook) {
+              notebooks.forEach(function (notebook) {
                 var exists = false;
                 var updates = false;
 
-                data.forEach(function(d) {
+                data.forEach(function (d) {
                   if (d._id === notebook._id) {
 
                     exists = true;
@@ -218,7 +220,7 @@ module.exports = {
                         .then(function (imageString) {
                           notebook.imageBuffer = imageString;
                         })
-                      );
+                    );
                   }
                   if (notebook.audio) {
                     mediaPromises.push(
@@ -239,22 +241,22 @@ module.exports = {
                 console.log('--- emit:: return:updates to:: external-client');
                 nodeClientSocket.emit('return:updates', {updates: newNotebookEntries});
                 console.log('--- emit:: notify:sync-end to:: local-client');
-                socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-end');
+                socketUtil.emitToLocalClientWithQuery(io, 'notify:sync-end', {});
               });
           });
-      });
+        });
     });
 
     //when user updates profile data
     //a server emits event with updated data
     //we recieve the data and update the data we have stored and normalize notebooks
-    nodeClientSocket.on('rt:profile-updates', function(data) {
+    nodeClientSocket.on('rt:profile-updates', function (data) {
       console.log('---on:: rt:profile-updates');
       //update user in connections db
       //normalize notebooks
 
       socketUtil.getConnection(data._id)
-        .then(function(connection) {
+        .then(function (connection) {
           if (connection.name !== data.name) {
             connection.name = data.name;
           }

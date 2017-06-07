@@ -84,8 +84,6 @@ module.exports = function (glossaUser, mySession, io) {
         console.log('external-socket connected');
         console.log('...this is where another device has discovered us and is now connecting to us...');
         console.log('TODO: consider adding another room for followed clients...');
-        console.log('emit:: notify:sync-begin to:: local-client');
-        socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:sync-begin');
 
         //query for external-client data in database
         //return either an empty object or client data
@@ -106,16 +104,16 @@ module.exports = function (glossaUser, mySession, io) {
               };
             } else {
 
-              var changesMade = false; //flag for changes check
+              console.log('emit:: notify:sync-begin to:: local-client');
+              socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:sync-begin');
+
               persistedClientData.online = true;
               persistedClientData.socketId = data.socketId;
               persistedClientData.disconnect = false; //for disconnect event handler
 
               //if client name has changes
               if (data.name !== persistedClientData.name) {
-                console.log('name is different');
                 persistedClientData.name = data.name;
-                changesMade = true;
               }
               //if new data has avatar and if avatar is not the same as the one we have stored...
               //TODO: need to check for avatar deletion....
@@ -124,22 +122,6 @@ module.exports = function (glossaUser, mySession, io) {
                 console.log('TODO: probably need to refractor for avatar discrepencies');
                 console.log('emit:: request:avatar to:: external-client');
                 socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:avatar', {});
-                changesMade = true;
-              }
-
-              //if changes have occurred
-              if (changesMade) {
-                console.log('');
-                console.log('TODO: changes have been made but when we update the connection, we also normalize notebooks.... for now we are not doing anything here ');
-                console.log('changes have been made...');
-                // //normalize local data with client's updates
-                // //this will
-                // //emit event to the local-client with normalized updates
-                // socketUtil.normalizeNotebooks(persistedClientData)
-                //   .then(function (changeObject) {
-                //     console.log('emit:: normalize:notebooks to:: local-client');
-                //     socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
-                //   });
               }
 
               //get all the client's data we have stroed
@@ -359,6 +341,9 @@ module.exports = function (glossaUser, mySession, io) {
             socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:sync-end');
           });
 
+      } else {
+        console.log('emit:: notify:sync-end to:: local-client');
+        socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:sync-end');
       }
     }
 
