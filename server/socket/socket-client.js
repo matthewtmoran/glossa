@@ -247,20 +247,19 @@ module.exports = {
     //we recieve the data and update the data we have stored and normalize notebooks
     nodeClientSocket.on('rt:profile-updates', function(data) {
       console.log('---on:: rt:profile-updates');
+      console.log('data: ', data);
       //update user in connections db
       //normalize notebooks
 
       socketUtil.getConnection(data._id)
-        .then(function(user) {
-          if (user.name !== data.name) {
-            user.name = data.name;
+        .then(function(connection) {
+          if (connection.name !== data.name) {
+            connection.name = data.name;
           }
-          socketUtil.updateConnection(user)
-            .then(function(updatedConnection) {
-              //update local-client view with new data
-              console.log('emit:: update:connection to:: local-client');
-              socketUtil.emitToLocalClient(io, me.localSocketId, 'update:connection', {connection: updatedConnection})
-            })
+          socketUtil.updateConnection(connection, io, me.socketId)
+          // socketUtil.getUser()
+          //   .then(function(user) {
+          //   });
         })
 
     })

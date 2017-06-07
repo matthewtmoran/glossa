@@ -69,7 +69,7 @@ module.exports = function (glossaUser, mySession, io) {
         //Why do we update the existing user here?
         //update existing user to store in persistent data the new socketID
         console.log('...updating user with current state changes (socketId)');
-        socketUtil.updateUser(glossaUser); //TODO: consider necessity
+        socketUtil.updateUser(localClient); //TODO: consider necessity .... I belive this is important because it allows us to call persisted data from socket client/util
         // socketUtil.validateOnlineConnections();
 
         //query connections and emit updated list to local-client
@@ -104,8 +104,7 @@ module.exports = function (glossaUser, mySession, io) {
                 socketId: socket.id,
                 online: true
               };
-            }
-            else {
+            } else {
 
               var changesMade = false; //flag for changes check
               persistedClientData.online = true;
@@ -113,7 +112,8 @@ module.exports = function (glossaUser, mySession, io) {
               persistedClientData.disconnect = false; //for disconnect event handler
 
               //if client name has changes
-              if (data.name != persistedClientData.name) {
+              if (data.name !== persistedClientData.name) {
+                console.log('name is different');
                 persistedClientData.name = data.name;
                 changesMade = true;
               }
@@ -129,15 +129,18 @@ module.exports = function (glossaUser, mySession, io) {
 
               //if changes have occurred
               if (changesMade) {
-                //normalize local data with client's updates
-                //emit event to the local-client with normalized updates
-                socketUtil.normalizeNotebooks(persistedClientData)
-                  .then(function (changeObject) {
-                    console.log('emit:: normalize:notebooks to:: local-client');
-                    socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
-                  });
+                console.log('');
+                console.log('TODO: changes have been made but when we update the connection, we also normalize notebooks.... for now we are not doing anything here ');
+                console.log('changes have been made...');
+                // //normalize local data with client's updates
+                // //this will
+                // //emit event to the local-client with normalized updates
+                // socketUtil.normalizeNotebooks(persistedClientData)
+                //   .then(function (changeObject) {
+                //     console.log('emit:: normalize:notebooks to:: local-client');
+                //     socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
+                //   });
               }
-
 
               //get all the client's data we have stroed
               // send a limited array of data to that client
@@ -151,13 +154,15 @@ module.exports = function (glossaUser, mySession, io) {
 
             //update persisted database whether or not we are following user
             //send entire list back to local-client
-            socketUtil.updateConnection(persistedClientData)
+            socketUtil.updateConnection(persistedClientData, io, localClient)
               .then(function (updatedClient) {
-                socketUtil.getConnections()
-                  .then(function (data) {
-                    console.log('emit:: send:connections to:: local-client');
-                    socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                  })
+                // console.log('TODO: consider just emitting single connection update event');
+                // socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', { connection:updatedClient} )
+                // socketUtil.getConnections()
+                //   .then(function (data) {
+                //     console.log('emit:: send:connections to:: local-client');
+                //     socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
+                //   })
               });
 
             console.log('external-client added to externalClientsRoom');
@@ -364,7 +369,6 @@ module.exports = function (glossaUser, mySession, io) {
                         console.log('emit:: notify:externalChanges to:: local-client');
                         //send local-client updated client data as well as the updated data
                         socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {
-                          connection: updatedConnection,
                           updatedData: updates
                         });
 
@@ -505,8 +509,8 @@ module.exports = function (glossaUser, mySession, io) {
     socketUtil.updateConnection(client)
       .then(function (updatedConnection) {
 
-        console.log('emit:: update:connection  to:: local-client');
-        socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', {connection: updatedConnection});
+        // console.log('emit:: update:connection  to:: local-client');
+        // socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', {connection: updatedConnection});
       })
   }
 

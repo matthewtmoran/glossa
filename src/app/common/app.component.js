@@ -102,12 +102,19 @@ export const appComponent = {
     updateConnection(event, data) {
       console.log('ng-on:: update:connection', data);
 
+      let doesExist = false;
       //connection should already exist in array
       this.allConnections.map((connection, index) => {
         if (connection._id === data.connection._id) {
+          doesExist = true;
           this.allConnections[index] = data.connection;
         }
       });
+
+      if (!doesExist) {
+        console.log('is a new connection coming online?');
+        this.allConnections.push(data.connection)
+      }
 
       //copy to trigger changes
       this.allConnections = angular.copy(this.allConnections);

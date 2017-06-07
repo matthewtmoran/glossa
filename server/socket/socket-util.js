@@ -23,17 +23,13 @@ module.exports = {
   },
 
   encodeBase64: function (mediaPath) {
-    console.log('encoding into base64....');
-    console.log('mediaPath', mediaPath);
     var myPath = path.join(config.root, '/server/data/', mediaPath);
-    console.log('myPath', myPath);
     return new Promise(function (resolve, reject) {
       fs.readFile(myPath, function (err, data) {
         if (err) {
           console.log('there was an error encoding media...');
           reject(err);
         }
-        console.log('read file:');
         resolve(data.toString('base64'));
       });
     });
@@ -48,7 +44,6 @@ module.exports = {
           console.log('issue decoding base64 data');
           reject(err);
         }
-        console.log('buffer created....');
       });
 
       fs.writeFile(mediaPath, buffer, function (err) {
@@ -56,38 +51,30 @@ module.exports = {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
         }
-        console.log('media file written to file system');
         resolve('success');
       })
     });
   },
 
   addExternalData: function (data) {
-
     console.log('');
     console.log('addExternalData');
-    console.log("Amount of data we are adding: ", data.length);
 
     data.forEach(function (notebook, index) {
-      //TODO: imagebuffer is not being deleted
       if (notebook.imageBuffer) {
         console.log('notebook ahs media buffer...');
         var imagePath = path.join(__dirname, config.dataRoot, notebook.image.path);
-
-        console.log('imagePath', imagePath);
 
         var buffer = new Buffer(notebook.imageBuffer, 'base64', function (err) {
           if (err) {
             return console.log('issue decoding base64 data');
           }
-          console.log('buffer created....');
         });
 
         fs.writeFile(imagePath, buffer, function (err) {
           if (err) {
             return console.log('There was an error writing file to filesystem', err);
           }
-          console.log('image written to file system');
           delete notebook.imageBuffer
         })
       }
@@ -99,7 +86,7 @@ module.exports = {
           console.log('There was an error inserting external Notebooks', err);
           reject(err);
         }
-        console.log('External Notebooks added to local database');
+        console.log('*TODO: emit event to local-client');
         resolve(notebook);
       })
 
@@ -127,19 +114,7 @@ module.exports = {
     });
   },
 
-  getConnections: function () {
-    console.log('getConnections called');
-    return new Promise(function (resolve, reject) {
-      Connection.find({}, function (err, connections) {
-        if (err) {
-          console.log('There was an error finding connections', err);
-          reject(err);
-        }
-        console.log('Connections were found. ', connections.length);
-        resolve(connections);
-      })
-    })
-  },
+  getConnections: getConnections,
 
   getConnection: function (clientId) {
     return new Promise(function (resolve, reject) {
@@ -189,7 +164,8 @@ module.exports = {
 
   //updates client in persisted data with the object we pass to it
   //normalizes notebooks
-  updateConnection: function (client) {
+  updateConnection: function (client, io, localClient) {
+    console.log('updateConnection called');
     return new Promise(function (resolve, reject) {
       var options = {returnUpdatedDocs: true, upsert: true};
       Connection.update({_id: client._id}, client, options, function (err, updatedCount, updatedDoc) {
@@ -197,8 +173,15 @@ module.exports = {
           console.log('There eas an error updating connection');
           reject(err);
         }
+
+        getConnections()
+          .then(function(connections) {
+            console.log('emit:: send:connections to:: local-client');
+            io.to(localClient.socketId).emit('send:connections', { connections: connections });
+          });
+
         console.log('TODO: verify no avatar if no longer following.  Avatar?:', !!updatedDoc.avatar);
-        normalizeNotebooks(updatedDoc)
+        normalizeNotebooks(updatedDoc, io, localClient)
           .then(function (err, val) {
             resolve(updatedDoc);
             Connection.persistence.compactDatafile();
@@ -235,10 +218,11 @@ module.exports = {
     })
   },
 
+  //updates our own user object
   updateUser: function (update) {
     var options = {returnUpdatedDocs: true};
     return new Promise(function (resolve, reject) {
-      User.findOne({_id: req.params.id}, function (err, user) {
+      User.findOne({_id: update._id}, function (err, user) {
         if (err) {
           console.log('There was an error updating the user', err);
           reject(err);
@@ -251,7 +235,8 @@ module.exports = {
             reject(err);
           }
           User.persistence.compactDatafile(); // concat db
-          resolve(user);
+          console.log('*TODO: emit event to local-client');
+          resolve(updatedDoc);
         });
       });
 
@@ -299,6 +284,7 @@ module.exports = {
         });
       });
 
+      console.log('*TODO: emit event to local-client');
       resolve(array);
     });
   },
@@ -314,9 +300,8 @@ module.exports = {
 
 
   //TODO: concat these function
-  emitToLocalClient: function (io, socketId, eventName, data) {
-    io.to(socketId).emit(eventName, data);
-  },
+  emitToLocalClient: emitToLocalClient,
+
   //emit to specific external client
   emitToExternalClient: function (io, socketId, eventName, data) {
     io.to(socketId).emit(eventName, data);
@@ -328,6 +313,20 @@ module.exports = {
   }
 
 };
+
+function getConnections () {
+  console.log('getConnections called');
+  return new Promise(function (resolve, reject) {
+    Connection.find({}, function (err, connections) {
+      if (err) {
+        console.log('There was an error finding connections', err);
+        reject(err);
+      }
+      console.log('Connections were found. ', connections.length);
+      resolve(connections);
+    })
+  })
+}
 
 function removeConnectionsOnClose() {
   return new Promise(function (resolve, reject) {
@@ -356,7 +355,7 @@ function updateConnectionsOnClose() {
   })
 }
 
-function normalizeNotebooks(client) {
+function normalizeNotebooks(client, io, localClient) {
   console.log('normalizeNotebooks - client:', client.name);
   return new Promise(function (resolve, reject) {
 
@@ -369,8 +368,17 @@ function normalizeNotebooks(client) {
         console.log('Error normalizing notebook data', err);
         reject(err);
       }
+
+      console.log('emit:: normalize:notebooks to:: local-client');
+      emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', updatedDocs);
       Notebooks.persistence.compactDatafile();
       resolve({_id: client._id, name: client.name, avatar: client.avatar});
     });
   });
+
+
 }
+function emitToLocalClient(io, socketId, eventName, data) {
+  io.to(socketId).emit(eventName, data);
+};
+
