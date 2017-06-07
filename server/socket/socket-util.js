@@ -164,8 +164,7 @@ module.exports = {
 
   //updates client in persisted data with the object we pass to it
   //normalizes notebooks
-  updateConnection: function (client, io, localClient) {
-    console.log('updateConnection called');
+  updateConnection: function (client, io) {
     return new Promise(function (resolve, reject) {
       var options = {returnUpdatedDocs: true, upsert: true};
       Connection.update({_id: client._id}, client, options, function (err, updatedCount, updatedDoc) {
@@ -174,20 +173,20 @@ module.exports = {
           reject(err);
         }
 
-        getConnections()
-          .then(function(connections) {
-            getLocalSocketId()
-              .then(function(socketId) {
-                io.to(socketId).emit('send:connections', { connections: connections });
+        getLocalSocketId()
+          .then(function (socketId) {
+
+            getConnections()
+              .then(function (connections) {
+                console.log('emit:: send:connections to:: local-client');
+                io.to(socketId).emit('send:connections', {connections: connections});
               });
+
+            normalizeNotebooks(updatedDoc, io, socketId);
+            resolve();
           });
 
-        console.log('TODO: verify no avatar if no longer following.  Avatar?:', !!updatedDoc.avatar);
-        normalizeNotebooks(updatedDoc, io, localClient)
-          .then(function (err, val) {
-            resolve(updatedDoc);
-            Connection.persistence.compactDatafile();
-        });
+        Connection.persistence.compactDatafile();
       })
     })
   },
@@ -270,7 +269,7 @@ module.exports = {
   },
 
   //check whether document should be updated or inserted as new
-  updateOrInsert: (array) => {
+  updateOrInsert: (array, io) => {
     return new Promise((resolve, reject) => {
       let options = {returnUpdatedDocs: true, upsert: true};
       array.map((update) => {
@@ -286,7 +285,12 @@ module.exports = {
         });
       });
 
-      console.log('*TODO: emit event to local-client');
+      getLocalSocketId()
+        .then(function(socketId) {
+          console.log('emit:: notify:externalChanges to:: local-client');
+          io.to(socketId).emit('notify:externalChanges', {updatedData: array});
+        });
+
       resolve(array);
     });
   },
@@ -316,7 +320,7 @@ module.exports = {
 
 };
 
-function getConnections () {
+function getConnections() {
   console.log('getConnections called');
   return new Promise(function (resolve, reject) {
     Connection.find({}, function (err, connections) {
@@ -358,8 +362,8 @@ function updateConnectionsOnClose() {
 }
 
 function getLocalSocketId() {
-  return new Promise(function(resolve, reject) {
-   User.findOne({}, function(err, user) {
+  return new Promise(function (resolve, reject) {
+    User.findOne({}, function (err, user) {
       if (err) {
         reject(err);
       }
@@ -368,7 +372,7 @@ function getLocalSocketId() {
   });
 }
 
-function normalizeNotebooks(client, io, localClient) {
+function normalizeNotebooks(client, io, socketId) {
   console.log('normalizeNotebooks - client:', client.name);
   return new Promise(function (resolve, reject) {
 
@@ -383,7 +387,7 @@ function normalizeNotebooks(client, io, localClient) {
       }
 
       console.log('emit:: normalize:notebooks to:: local-client');
-      emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', updatedDocs);
+      emitToLocalClient(io, socketId, 'normalize:notebooks', updatedDocs);
       Notebooks.persistence.compactDatafile();
       resolve({_id: client._id, name: client.name, avatar: client.avatar});
     });

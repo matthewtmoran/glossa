@@ -27,17 +27,21 @@ module.exports = {
     nodeClientSocket.on('request:socket-type', function() {
       console.log('--- on:: request:socket-type heard in server as a client');
 
-      var socketData = {
-        name: me.name,
-        _id: me._id,
-        type:'external-client',
-        socketId: nodeClientSocket.id,
-        avatar: me.avatar
-      };
 
-      console.log('--- emit:: return:socket-type');
-      console.log('......This is where we send our data dn should show up in the other device...');
-      nodeClientSocket.emit('return:socket-type', socketData);
+      socketUtil.getUser()
+        .then(function(user) {
+          var socketData = {
+            name: user.name,
+            _id: user._id,
+            type:'external-client',
+            socketId: nodeClientSocket.id,
+            avatar: user.avatar
+          };
+          console.log('......This is where we send our data dn should show up in the other device...');
+          console.log('--- emit:: return:socket-type');
+          nodeClientSocket.emit('return:socket-type', socketData);
+
+        });
     });
 
 
@@ -246,7 +250,6 @@ module.exports = {
     //we recieve the data and update the data we have stored and normalize notebooks
     nodeClientSocket.on('rt:profile-updates', function(data) {
       console.log('---on:: rt:profile-updates');
-      console.log('data: ', data);
       //update user in connections db
       //normalize notebooks
 
@@ -255,10 +258,7 @@ module.exports = {
           if (connection.name !== data.name) {
             connection.name = data.name;
           }
-          socketUtil.updateConnection(connection, io, me)
-          // socketUtil.getUser()
-          //   .then(function(user) {
-          //   });
+          socketUtil.updateConnection(connection, io);
         })
 
     })
