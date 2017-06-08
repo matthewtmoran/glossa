@@ -17,6 +17,7 @@
 		<div class="wave-container" ng-if="$ctrl.notebook.postType === 'audio'">
 			<wave-surfer-preview
 					flex
+					settings="$ctrl.settings"
 					url-src="$ctrl.notebook.audio.path"
 					auto-play="false">
 			</wave-surfer-preview>

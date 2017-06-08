@@ -5,6 +5,7 @@ export const metaComponent = {
     notebookAttached: '<',
     selectedFile: '<',
     editorOptions: '<',
+    settings: '<',
     hashtags: '<',
     onUpdate: '&',
     onAttachment: '&',
@@ -26,6 +27,9 @@ export const metaComponent = {
       }
       if (changes.notebookAttached) {
         this.notebookAttached = angular.copy(changes.notebookAttached.currentValue);
+      }
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
       }
     }
 

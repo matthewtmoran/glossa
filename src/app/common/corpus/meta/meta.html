@@ -65,6 +65,7 @@
 					</md-card-title>
 					<wave-surfer-preview
 							flex
+							settings="$ctrl.settings"
 							url-src="$ctrl.currentFile.audio.path"
 							auto-play="false">
 					</wave-surfer-preview>
@@ -81,6 +82,7 @@
 			               ng-if="$ctrl.notebookAttached"
 			               is-corpus="$ctrl.isCorpus"
 			               notebook="$ctrl.notebookAttached"
+			               settings="$ctrl.settings"
 			               current-user="$ctrl.currentUser"
 			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
 			               on-view-details="$ctrl.viewDetails($event)"

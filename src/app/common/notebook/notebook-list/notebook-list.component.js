@@ -6,6 +6,7 @@ export const notebookListComponent = {
     searchText: '<',
     notebooks: '<',
     selected: '<',
+    settings: '<',
     selectedHashtags: '<',
     hashtags: '<',
     onViewDetails: '&',
@@ -18,7 +19,9 @@ export const notebookListComponent = {
     }
 
     $onChanges(changes) {
-
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
+      }
     }
 
     $onInit() {

@@ -22,7 +22,7 @@ export const appComponent = {
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
-
+      this.settings = {};
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
 

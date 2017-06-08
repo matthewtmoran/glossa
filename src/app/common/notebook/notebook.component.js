@@ -13,6 +13,7 @@ export const notebookComponent = {
   bindings: {
     allConnections: '<',
     notebooksData: '<',
+    settings: '<',
     searchText: '<',
     currentUser: '<',
     hashtags: '<',
@@ -63,6 +64,10 @@ export const notebookComponent = {
       }
       if (changes.currentUser) {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
+      if (changes.settings) {
+        console.log('changes in settings in notebook.component', changes.settings);
+        this.settings = angular.copy(changes.settings.currentValue);
       }
     }
 

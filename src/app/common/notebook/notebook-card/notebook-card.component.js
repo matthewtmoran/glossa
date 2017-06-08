@@ -6,6 +6,7 @@ export const notebookCardComponent = {
   bindings: {
     notebook: '<',
     currentUser: '<',
+    settings: '<',
     onViewDetails: '&',
     onViewPreview: '&',
     onDisconnectNotebook: '&'
@@ -31,6 +32,9 @@ export const notebookCardComponent = {
       }
       if (changes.currentUser) {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
       }
     }
 

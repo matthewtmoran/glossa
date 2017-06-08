@@ -60,14 +60,13 @@ export class RootService {
       if (this.$state.current.parent.indexOf('corpus') > -1) {
         this.$rootScope.$broadcast('newMarkdown');
       }
-      if (this.$state.parent.name.indexOf('notebook') > -1) {
+      if (this.$state.current.name.indexOf('notebook') > -1) {
         this.$rootScope.$broadcast('newNotebook', 'normal');
       }
       return false
     });
 
     Mousetrap.bind(['command+right', 'ctrl+right'], () => {
-      console.log('ctrl+right');
       this.$rootScope.$broadcast('scrubRight');
       return false
     });
@@ -82,17 +81,14 @@ export class RootService {
     });
 
     Mousetrap.bind(['command+up', 'ctrl+up'], () => {
-      console.log('ctrl+up');
       this.$rootScope.$broadcast('adjustPlaySpeedUp');
       return false
     });
     Mousetrap.bind(['command+down', 'ctrl+down'], () => {
-      console.log('ctrl+down');
       this.$rootScope.$broadcast('adjustPlaySpeedDown');
       return false
     });
     Mousetrap.bind(['command+space', 'ctrl+space'], () => {
-      console.log('ctrl+space');
       this.$rootScope.$broadcast('playPause');
       return false
     });
@@ -183,7 +179,6 @@ export class RootService {
 
   //get hashtags
   getHashtags() {
-    console.log('getHashtags called');
     return this.$http.get('/api/hashtags/')
       .then((response) => {
         return response.data;
@@ -221,7 +216,6 @@ export class RootService {
   }
 
   removeAvatar(filePath) {
-    console.log('removeAvatar', filePath);
     let data = {filePath: filePath};
     return this.$http.put(`/api/user/${this.__user._id}/avatar`, data)
       .then((response) => {
@@ -236,7 +230,6 @@ export class RootService {
   saveSettings(settings) {
     return this.$http.put(`/api/user/${this.__user._id}/settings`, settings)
       .then((response) => {
-        console.log('saveSettings response', response);
         return response.data;
       })
       .catch((response) => {
@@ -315,7 +308,6 @@ export class RootService {
 
 //TODO: consider deletion
   updateUserProfile(userProfile) {
-    console.log('updateUserProfile');
     console.log('TODO: REFRACTOR');
     let userString = angular.toJson(userProfile);
     this.socketService.emit('update:userProfile', {userProfile: userString})
@@ -324,7 +316,6 @@ export class RootService {
   //TODO: Refractor
   toggleFollow(user) {
     let userString = angular.toJson(user);
-    console.log('emit:: update:following');
     this.socketService.emit('update:following', {connection: userString});
   }
 
@@ -342,7 +333,6 @@ export class RootService {
   //TODO: refractor
   //broad cast updates to users that follow
   broadcastUpdates(data) {
-    console.log('broadcastUpdates');
     this.socketService.emit('broadcast:Updates', data);
   }
 
@@ -430,7 +420,6 @@ export class RootService {
 
     //when external-client makes changes
     this.socketService.on('notify:externalChanges', (data) => {
-      console.log('');
       console.log('on:: notify:externalChanges', data);
       // let msg = `Data synced with ${data.connection.name}`;
       // let delay = 3000;
@@ -445,7 +434,6 @@ export class RootService {
     });
 
     this.socketService.on('update:external-client', (data) => {
-      console.log('');
       console.log("Heard : update:external-client in app.service");
 
       let msg = `User ${data.createdBy._id}`;
@@ -461,7 +449,6 @@ export class RootService {
 
     //update dynamic data that connection may update manually
     this.socketService.on('update:connectionInfo', (data) => {
-      console.log('');
       console.log('on:: update:connectionInfo', data);
 
       console.log('angular broadcast:: update:connection');
@@ -471,18 +458,15 @@ export class RootService {
 
     //update connection
     this.socketService.on('update:connection', (data) => {
-      console.log('');
       console.log('on:: update:connection - data');
       console.log('angular event $broadcast:: update:connection');
       this.$rootScope.$broadcast('update:connection', data);
-      console.log('');
     });
 
     //Listen for connections list
     //broadcast all connections to controllers that display connections
     //here we track the entire user list and add or remove users ids from an array.
     this.socketService.on('send:connections', (data) => {
-      console.log('');
       console.log('on:: send:connections');
       console.log('$broadcast:: update:connections');
       this.$rootScope.$broadcast('update:connections', data);
@@ -518,13 +502,11 @@ export class RootService {
         hideDelay: delay
       });
 
-      console.log('***this.cfpLoadingBar.start doess it end???')
       this.cfpLoadingBar.start();
     });
 
     this.socketService.on('notify:sync-end', () => {
       console.log('on:: notify:sync-end');
-      console.log('***this.cfpLoadingBar.complete:: it ends!!!')
       this.cfpLoadingBar.complete();
     })
 
