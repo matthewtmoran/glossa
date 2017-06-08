@@ -6,7 +6,8 @@ export const corpusComponent = {
   bindings: {
     markDownFiles: '<',
     searchText: '<',
-    hashtags: '<'
+    hashtags: '<',
+    settings: '<'
   },
   templateUrl,
   controller: class CorpusComponent {
@@ -34,6 +35,7 @@ export const corpusComponent = {
       this.$mdDialog = $mdDialog;
 
       this.$scope.$on('createNamedMarkdown', this.namedMarkdown.bind(this));
+      this.$scope.$on('newMarkdown', this.newMarkdown.bind(this));
 
       // this.newAttachment = this.newAttachment.bind(this);
 

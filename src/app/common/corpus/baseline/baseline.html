@@ -15,6 +15,7 @@
 		<wave-surfer-full
 				ng-if="$ctrl.currentFile.audio.path || $ctrl.notebookAttached.audio.path"
 				flex
+				settings="$ctrl.settings"
 				image-src="$ctrl.currentFile.image.path || $ctrl.notebookAttached.image.path"
 				url-src="$ctrl.currentFile.audio.path || $ctrl.notebookAttached.audio.path"
 				auto-play="false"

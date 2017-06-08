@@ -1,10 +1,11 @@
 // import { remote, ipcRenderer } from 'electron';
 // const ipc = require('electron').ipcRenderer;
 // const dialog  = require('electron').remote.dialog;
-
+import Mousetrap from 'mousetrap';
 // const remote = electron.remote;
 // var ipc = window.require('electron').ipcRenderer;
 // var dialog  = window.require('electron').remote.dialog;
+
 export class RootService {
   constructor($http, $rootScope, __user, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar) {
     'ngInject';
@@ -25,6 +26,80 @@ export class RootService {
     //TODO: move ipc listeners to their own service
     //   ipc.on('changeState', this.ipcChangeState.bind(this));
     //   ipc.on('import:project', this.ipcImportProject.bind(this));
+
+    //this overwrites events even if input/codemirror/siimplemde is focused...
+    Mousetrap.prototype.stopCallback = ((e, element, combo) => {
+      // console.log('e', e);
+      // console.log('element', element);
+      // console.log('combo', combo);
+
+      if (combo === 'ctrl+down' ||
+                    'command+down' ||
+                    'ctrl+up' ||
+                    'command+up' ||
+                    'ctrl+right' ||
+                    'command+right' ||
+                    'ctrl+left' ||
+                    'command+left' ||
+                    'ctrl+space' ||
+                    'command+space') {
+        e.preventDefault();
+      }
+
+    });
+
+    //focus search bar binding
+    Mousetrap.bind(['command+l', 'ctrl+l'], () => {
+      angular.element('#main-search').focus();
+      // return false to prevent default behavior and stop event from bubbling
+      return false
+    });
+
+    //create new text file or normal notebook...
+    Mousetrap.bind(['command+n', 'ctrl+n'], () => {
+      if (this.$state.current.parent.indexOf('corpus') > -1) {
+        this.$rootScope.$broadcast('newMarkdown');
+      }
+      if (this.$state.parent.name.indexOf('notebook') > -1) {
+        this.$rootScope.$broadcast('newNotebook', 'normal');
+      }
+      return false
+    });
+
+    Mousetrap.bind(['command+right', 'ctrl+right'], () => {
+      console.log('ctrl+right');
+      this.$rootScope.$broadcast('scrubRight');
+      return false
+    });
+
+    Mousetrap.bind(['command+left', 'ctrl+left'], () => {
+      this.$rootScope.$broadcast('scrubLeft');
+      return false
+    });
+    Mousetrap.bind(['command+t', 'ctrl+t'], () => {
+      this.$rootScope.$broadcast('addTimeStamp');
+      return false
+    });
+
+    Mousetrap.bind(['command+up', 'ctrl+up'], () => {
+      console.log('ctrl+up');
+      this.$rootScope.$broadcast('adjustPlaySpeedUp');
+      return false
+    });
+    Mousetrap.bind(['command+down', 'ctrl+down'], () => {
+      console.log('ctrl+down');
+      this.$rootScope.$broadcast('adjustPlaySpeedDown');
+      return false
+    });
+    Mousetrap.bind(['command+space', 'ctrl+space'], () => {
+      console.log('ctrl+space');
+      this.$rootScope.$broadcast('playPause');
+      return false
+    });
+
+
+
+
 
   }
 

@@ -4,6 +4,7 @@ export const baselineComponent = {
   bindings: {
     selectedFile: '<',
     notebookAttached: '<',
+    settings: '<',
     onUpdate: '&'
   },
   templateUrl,
@@ -33,6 +34,9 @@ export const baselineComponent = {
     $onChanges(changes) {
       if (changes.selectedFile) {
         this.currentFile = angular.copy(this.selectedFile);
+      }
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
       }
     }
 

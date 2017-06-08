@@ -12,12 +12,12 @@ import CodeMirror from 'codemirror';
 import ngCodeMirror from 'ngCodemirror'
 
 
-import { rootComponent } from './root.component';
-import { common } from './common/common.module';
-import { RootService } from './root.service';
-import { SocketService } from './components/socket/socket.service';
-import { NotificationService } from './components/notification/notification.service';
-import { components } from './components/components.module';
+import {rootComponent} from './root.component';
+import {common} from './common/common.module';
+import {RootService} from './root.service';
+import {SocketService} from './components/socket/socket.service';
+import {NotificationService} from './components/notification/notification.service';
+import {components} from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
 
@@ -45,8 +45,7 @@ window.onload = () => {
 
   let ioRoom = window.location.origin;
   window.socket = io(ioRoom);
-
-  window.socket.on('request:socket-type', ()=> {
+  window.socket.on('request:socket-type', () => {
     console.log('request:SocketType');
     window.socket.emit('return:socket-type', {type: 'local-client'})
   });
@@ -60,27 +59,24 @@ window.onload = () => {
 
 
   $http({
-    url : `${rootUrl}api/user`,
-    method : 'GET'
-  }).then((res) => {
-    //define some constant that we can inject through the application.
+    url: `${rootUrl}api/user`,
+    method: 'GET'
+  })
+    .then((res) => {
+      //define some constant that we can inject through the application.
       angular.module('config').constant('__user', res.data);
       angular.module('config').constant('__rootUrl', rootUrl);
     })
     .catch((res) => {
       console.log('error', res);
-    }).then(() => {
+    })
+    .then(() => {
       angular.bootstrap(document, [root]);
-
-      // setTimeout(() => {
-        // angular.element('.ghost').remove(); //removes the defualt elemnts so there is no box shadow double up (a hard line appears when the box shaodws overlay eachother
-      // }, 100)
-
     });
 };
 //Not sure this only works if config is a string.  As a variable, it was failing hard.
 //     SimpleMDE,
-    // 'ngSimple',
+// 'ngSimple',
 export const root = angular
   .module('root', [
     'config',
@@ -166,7 +162,7 @@ export const root = angular
     'ngInject';
 
     $rootScope.$on('cfpLoadingBar:started', event => {
-      $mdUtil.nextTick( () => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
+      $mdUtil.nextTick(() => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
     });
 
     RootService.getUser()
@@ -175,15 +171,15 @@ export const root = angular
       });
 
     // $state.go(__user.session.currentState, __user.session.currentStateParams);
-  //   //if there is no $window.socket object and if the user has sharing enabled
+    //   //if there is no $window.socket object and if the user has sharing enabled
     if (__user.settings.isSharing) {
-    // if (!$window.socket && __user.settings.isSharing) {
+      // if (!$window.socket && __user.settings.isSharing) {
       SocketService.init();
-    //   console.log('$window.socket', $window.socket);
+      //   console.log('$window.socket', $window.socket);
       RootService.initListeners();
     }
 
-    $transitions.onStart( {to: '*', from: '*' }, ($transitions) => {
+    $transitions.onStart({to: '*', from: '*'}, ($transitions) => {
       let toState = $transitions.$to();
       // let fromState = $transitions.$from();
       // transition.$to()

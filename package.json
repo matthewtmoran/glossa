@@ -34,6 +34,7 @@
     "md-data-table": "^2.2.0",
     "method-override": "~1.0.0",
     "morgan": "~1.0.0",
+    "mousetrap": "^1.6.1",
     "multer": "^1.2.1",
     "multicast-dns": "git+https://github.com/resin-io-modules/multicast-dns.git#listen-on-all-interfaces",
     "nedb": "^1.8.0",

@@ -9,6 +9,7 @@ export const wavePreviewComponent = {
     extraButtons: '=',
     toolbarClass: '@',
     autoPlay: '<',
+    settings: '<',
     properties: '='
   },
   templateUrl,

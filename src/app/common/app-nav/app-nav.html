@@ -18,8 +18,7 @@
       <!--<div class="search-wrapper" flex>-->
       <md-input-container md-no-float flex >
         <form ng-submit="$ctrl.create()">
-          <input ng-change="$ctrl.searchSubmit()" ng-model="$ctrl.searchText" placeholder="Search...">
-
+          <input id="main-search" ng-change="$ctrl.searchSubmit()" ng-model="$ctrl.searchText" placeholder="Search...">
         </form>
         <!--<input ng-show="$ctrl.showSearch" ng-model="searchInput" placeholder="Search...">-->
       </md-input-container>

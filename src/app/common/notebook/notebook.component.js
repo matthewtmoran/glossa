@@ -39,9 +39,12 @@ export const notebookComponent = {
       });
 
       this.$scope.$on('update:externalData', this.updateExternalData.bind(this));
-      this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this))
+      this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this));
+
+      this.$scope.$on('newNotebook', this.viewDetails.bind(this));
 
       this.deleteNotebook = this.deleteNotebook.bind(this);
+
 
     }
 
