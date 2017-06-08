@@ -24,6 +24,19 @@ import 'angular-material/angular-material.scss';
 
 import io from 'socket.io-client';
 
+if (window.navigator.userAgent.indexOf('Electron') < 0){
+  console.log('not electron...');
+  // window.alert('download glossa to view');
+  // window.location.replace('http://glossa.io')
+}
+
+if (window.process && window.process !== undefined) {
+  // Likely electron
+} else {
+  window.alert('download glossa to view');
+  window.location.replace('http://glossa.io')
+}
+
 
 // import 'md-data-table/dist/md-data-table-style.css';
 
