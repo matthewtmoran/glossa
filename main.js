@@ -30,7 +30,7 @@ startExpress();
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    titleBarStyle: 'hidden',
+    // titleBarStyle: 'hidden',
     show: false,
     center: true,
     frame: !isWin10,
