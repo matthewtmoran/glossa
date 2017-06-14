@@ -1,14 +1,19 @@
 import SimpleMDE from 'simplemde';
 
 export class NotebookService {
-  constructor($http, $q, ParseService, Upload, RootService, __user) {
+  constructor($http, $q, ParseService, Upload, RootService) {
     'ngInject';
     this.$http = $http;
     this.$q = $q;
     this.parseService = ParseService;
     this.upload = Upload;
     this.rootService = RootService;
-    this.__user = __user;
+
+    console.log('calling user api');
+    this.$http.get('api/user').then((response) => {
+      console.log('user api resolved');
+      this.__user = response.data
+    });
 
     this.test = this.test.bind(this);
 

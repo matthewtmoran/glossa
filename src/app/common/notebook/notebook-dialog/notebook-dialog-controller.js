@@ -1,5 +1,5 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, $window, notebook, editorOptions, hashtags, onCancel, onDeleteNotebook, onHide, onUpdate, onSave) {
+  constructor($scope, $timeout, $window, notebook, editorOptions, hashtags, onCancel, onDeleteNotebook, onHide, onUpdate, onSave, settings) {
   // constructor($scope, $timeout, $window) {
     'ngInject';
 
@@ -15,6 +15,7 @@ export class NotebookDialogController {
     this.onSave = onSave;
     this.hashtags = hashtags;
     this.onDeleteNotebook = onDeleteNotebook;
+    this.settings = settings;
 
     this.$scope.$watch(() => this.currentNotebook.image, this.imageWatcher.bind(this));
     this.$scope.$watch(() => this.currentNotebook.audio, this.audioWatcher.bind(this));

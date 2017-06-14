@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { contactEditComponent } from './contact-edit.component';
 
 export const contactEdit = angular

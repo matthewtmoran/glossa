@@ -60,6 +60,9 @@ export const corpusComponent = {
       if (changes.hashtags) {
         this.hashtags = angular.copy(changes.hashtags.currentValue)
       }
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
+      }
     }
 
     $onInit() {
@@ -269,6 +272,7 @@ export const corpusComponent = {
         controllerAs: '$ctrl',
         bindToController: true,
         locals: {
+          settings: this.settings,
           hashtags: this.hashtags,
           notebook: event.notebook || {},
           editorOptions: this.editorOptions,

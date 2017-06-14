@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { settingsHashtagsComponent } from './settings-hashtags.component';
 import TagFilter from './hashtag.filter';
 import './settings-hashtags.scss';

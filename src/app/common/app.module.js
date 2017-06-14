@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { appComponent } from './app.component';
 
 // import { attachmentComponent } from './dialog/dialog-attahcment/dialog-attachment.controller';
@@ -11,7 +11,6 @@ import { settings } from './settings/settings.module'
 
 import './app.scss';
 
-  // .component('attachmentComponent', attachmentComponent)
 export const app = angular
   .module('common.app', [
     uiRouter,

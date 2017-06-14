@@ -1,56 +1,29 @@
-  <md-toolbar
-          layout="row"
-          class="nav-content primary-bg "
-          md-whiteframe="1"
-          md-selected-nav-item="currentNavItem"
-          nav-bar-aria-label="navigation links"
-          style="-webkit-app-region: drag">
-    <span flex style="-webkit-app-region: drag"></span>
-    <div class="md-toolbar-tools">
-      <md-button aria-label="Open demo menu" class="md-icon-button " ng-click="$ctrl.toggleDrawer($event)">
-        <md-icon md-font-library="material-icons">menu</md-icon>
-      </md-button>
-
-      <md-button aria-label="Open Settings" class="md-icon-button" >
-        <md-icon class="material-icons">search</md-icon>
-      </md-button>
-
-      <!--<div class="search-wrapper" flex>-->
-      <md-input-container md-no-float flex >
-        <form ng-submit="$ctrl.create()">
-          <input id="main-search" ng-change="$ctrl.searchSubmit()" ng-model="$ctrl.searchText" placeholder="Search...">
-        </form>
-        <!--<input ng-show="$ctrl.showSearch" ng-model="searchInput" placeholder="Search...">-->
-      </md-input-container>
-
-        <div layout="row">
-            <div flex="50" ng-repeat="connection in $ctrl.allConnections">
-                {{connections.name}}
-            </div>
-            <div flex="50" ng-repeat="online in $ctrl.onlineConnections">
-                {{online.name}}
-            </div>
-        </div>
-      <!--</div>-->
-
-      <!-- ADD THE STUFF BELOW BACK IN LATER, WHEN I THINK THROUGH WHAT NEEDS TO GO IN THERE A BIT BETTER-->
-      <!-- <md-button aria-label="Open Settings" class="md-icon-button">
-          <md-icon md-font-library="material-icons">info_outline</md-icon>
-      </md-button>
-
-      <md-menu md-position-mode="target-right bottom">
-          <md-button aria-label="Open Settings" class="md-icon-button" ng-click="$ctrl.openMenu($mdOpenMenu, $event)">
-              <md-icon md-font-library="material-icons">more_vert</md-icon>
-          </md-button>
-          <md-menu-content width="3">
-              <md-menu-item ng-repeat="item in $ctrl.dropDownMenu" >
-                  <md-button ng-click="$ctrl.execute(item.action)">
-                      {{item.title}}
-                  </md-button>
-              </md-menu-item>
-          </md-menu-content>
-      </md-menu> -->
-
-    </div>
-  </md-toolbar>
-<!--</header>-->
+<md-toolbar
+		layout="row"
+		class="nav-content primary-bg "
+		md-whiteframe="1"
+		md-selected-nav-item="currentNavItem"
+		nav-bar-aria-label="navigation links">
+	<div class="md-toolbar-tools">
+		<md-button aria-label="Open demo menu" class="md-icon-button " ng-click="$ctrl.toggleDrawer($event)">
+			<md-icon md-font-library="material-icons">menu</md-icon>
+		</md-button>
+		<md-button aria-label="Open Settings" class="md-icon-button">
+			<md-icon class="material-icons">search</md-icon>
+		</md-button>
+		<md-input-container md-no-float flex>
+			<form ng-submit="$ctrl.create()">
+				<input id="main-search" ng-change="$ctrl.searchSubmit()" ng-model="$ctrl.searchText"
+				       placeholder="Search...">
+			</form>
+		</md-input-container>
+		<div layout="row">
+			<div flex="50" ng-repeat="connection in $ctrl.allConnections">
+				{{connections.name}}
+			</div>
+			<div flex="50" ng-repeat="online in $ctrl.onlineConnections">
+				{{online.name}}
+			</div>
+		</div>
+	</div>
+</md-toolbar>

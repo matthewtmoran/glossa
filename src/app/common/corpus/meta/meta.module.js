@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { metaComponent } from './meta.component';
 import { SimplemdeDirective } from '../../../components/simplemde/simplemde.directive';
 import './meta.scss';

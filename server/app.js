@@ -8,6 +8,7 @@ var express = require('express');
 var config = require('./config/environment');
 var path = require('path');
 
+
 module.exports = function (bonjour, appData) {
   // Populate DB with sample data
   if (config.seedDB) {
@@ -61,8 +62,9 @@ module.exports = function (bonjour, appData) {
 
     browser.on('up', function (service) {
       console.log('');
-      console.log('Service went/is live........', service.name);
+      console.log('Service went/is live........', service);
       if (service.name !== 'glossaApp-' + glossaUser._id) {
+
         console.log('((not our service))');
       }
       if (service.name === 'glossaApp-' + glossaUser._id) {

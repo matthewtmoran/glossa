@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { settingsProjectComponent } from './settings-project.component';
 import './settings-project.scss';
 

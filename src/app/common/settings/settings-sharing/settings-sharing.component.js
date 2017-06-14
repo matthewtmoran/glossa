@@ -32,17 +32,13 @@ export const settingsSharingComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in settings-sharing.component', changes);
       if (changes.currentUser) {
-        console.log('changes with currentUser');
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
       if (changes.allConnections) {
-        console.log('changes with allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.settings) {
-        console.log('changes with settings');
         this.settings = angular.copy(changes.settings.currentValue);
       }
       // if (changes.currentUser) {

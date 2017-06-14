@@ -66,7 +66,6 @@ export const notebookComponent = {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
       if (changes.settings) {
-        console.log('changes in settings in notebook.component', changes.settings);
         this.settings = angular.copy(changes.settings.currentValue);
       }
     }
@@ -294,6 +293,7 @@ export const notebookComponent = {
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              settings: this.settings,
               hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
@@ -323,6 +323,7 @@ export const notebookComponent = {
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              settings: this.settings,
               hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
@@ -353,6 +354,7 @@ export const notebookComponent = {
             controllerAs: '$ctrl',
             bindToController: true,
             locals: {
+              settings: this.settings,
               hashtags: this.hashtags,
               notebook: event.notebook || {},
               editorOptions: this.editorOptions,
@@ -371,11 +373,9 @@ export const notebookComponent = {
 
       this.$mdDialog.show(state)
         .then((data) => {
-          console.log('positive', data);
           return data;
         })
         .catch((data) => {
-          console.log('negative', data);
           return data;
         });
     };
@@ -407,6 +407,7 @@ export const notebookComponent = {
         controllerAs: '$ctrl',
         bindToController: true,
         locals: {
+          settings: this.settings,
           hashtags: this.hashtags,
           notebook: event.notebook || {},
           editorOptions: this.editorOptions,
@@ -417,9 +418,8 @@ export const notebookComponent = {
           onSave: this.save.bind(this)
         }
       }).then((data) => {
-        console.log('dialog closed',data);
       }).catch(() => {
-        console.log('negative');
+
       })
 
     }

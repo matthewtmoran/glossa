@@ -1,11 +1,17 @@
 export class CorpusService {
-  constructor($http, Upload, $stateParams, __user) {
+  constructor($http, Upload, $stateParams) {
     'ngInject';
     this.$http = $http;
     this.Upload = Upload;
     this.$stateParams = $stateParams;
+
+    console.log('calling user api');
+    this.$http.get('api/user').then((response) => {
+      console.log('user api resolved');
+      this.__user = response.data
+    });
+
     //TODO: refractor the use of __user constant
-    this.__user = __user;
   }
 
   //get all md files

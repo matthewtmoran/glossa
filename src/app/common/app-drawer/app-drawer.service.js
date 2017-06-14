@@ -242,23 +242,6 @@ export class DrawerService {
       },
     ];
     this.openedSection;
-    this.init();
-  }
-
-  init() {
-    this.addCustomItems();
-  }
-
-  addCustomItems() {
-    this.section.forEach((sec) => {
-      if (sec.name === 'Corpora') {
-        this.rootService.getCorporia().then((data) => {
-          data.forEach((corpus) => {
-            sec.pages.push(corpus);
-          });
-        });
-      }
-    });
   }
 
   toggleSelectSection(section) {

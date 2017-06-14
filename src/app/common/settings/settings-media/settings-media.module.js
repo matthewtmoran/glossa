@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { settingsMediaComponent } from './settings-media.component';
 import './settings-media.scss';
 

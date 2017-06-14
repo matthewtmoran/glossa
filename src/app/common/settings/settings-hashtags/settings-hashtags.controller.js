@@ -10,13 +10,10 @@ export class SettingsHashtagsComponent {
     this.cfpLoadingBar = cfpLoadingBar;
     this.$mdEditDialog = $mdEditDialog;
 
-    console.log('this.$scope', this.$scope);
-
 
   }
 
   $onChanges(changes) {
-    console.log('$onChanges in settings-hashtags.component', changes);
     if (changes.hashtags) {
       // this.hashtags = angular.copy(changes.hashtags.currentValue);
     }

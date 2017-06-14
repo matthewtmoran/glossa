@@ -1,20 +1,14 @@
-// import { remote, ipcRenderer } from 'electron';
-// const ipc = require('electron').ipcRenderer;
-// const dialog  = require('electron').remote.dialog;
 import Mousetrap from 'mousetrap';
-// const remote = electron.remote;
-// var ipc = window.require('electron').ipcRenderer;
-// var dialog  = window.require('electron').remote.dialog;
+
+var ipc = window.require('electron').ipcRenderer;
+var dialog = window.require('electron').remote.dialog;
 
 export class RootService {
-  constructor($http, $rootScope, __user, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar) {
+  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar) {
     'ngInject';
-    //Notification
-    //Upload
 
     this.$http = $http;
     this.$rootScope = $rootScope;
-    this.__user = __user;
     this.$state = $state;
     this.$window = $window;
     this.socketService = SocketService;
@@ -23,38 +17,38 @@ export class RootService {
     this.cfpLoadingBar = cfpLoadingBar;
     this.currentOnlineList = [];
 
+    this.$http.get('api/user').then((response) => {
+      this.__user = response.data
+    });
+
     //TODO: move ipc listeners to their own service
-    //   ipc.on('changeState', this.ipcChangeState.bind(this));
-    //   ipc.on('import:project', this.ipcImportProject.bind(this));
+    ipc.on('navigateToState', this.navigateToState.bind(this));
+    ipc.on('import:project', this.ipcImportProject.bind(this));
+    ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
 
     //this overwrites events even if input/codemirror/siimplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
-      // console.log('e', e);
-      // console.log('element', element);
-      // console.log('combo', combo);
 
       if (combo === 'ctrl+down' ||
-                    'command+down' ||
-                    'ctrl+up' ||
-                    'command+up' ||
-                    'ctrl+right' ||
-                    'command+right' ||
-                    'ctrl+left' ||
-                    'command+left' ||
-                    'ctrl+space' ||
-                    'command+space') {
+        'command+down' ||
+        'ctrl+up' ||
+        'command+up' ||
+        'ctrl+right' ||
+        'command+right' ||
+        'ctrl+left' ||
+        'command+left' ||
+        'ctrl+space' ||
+        'command+space') {
         e.preventDefault();
       }
 
     });
-
     //focus search bar binding
     Mousetrap.bind(['command+l', 'ctrl+l'], () => {
       angular.element('#main-search').focus();
       // return false to prevent default behavior and stop event from bubbling
       return false
     });
-
     //create new text file or normal notebook...
     Mousetrap.bind(['command+n', 'ctrl+n'], () => {
       if (this.$state.current.parent.indexOf('corpus') > -1) {
@@ -65,12 +59,10 @@ export class RootService {
       }
       return false
     });
-
     Mousetrap.bind(['command+right', 'ctrl+right'], () => {
       this.$rootScope.$broadcast('scrubRight');
       return false
     });
-
     Mousetrap.bind(['command+left', 'ctrl+left'], () => {
       this.$rootScope.$broadcast('scrubLeft');
       return false
@@ -79,7 +71,6 @@ export class RootService {
       this.$rootScope.$broadcast('addTimeStamp');
       return false
     });
-
     Mousetrap.bind(['command+up', 'ctrl+up'], () => {
       this.$rootScope.$broadcast('adjustPlaySpeedUp');
       return false
@@ -92,11 +83,6 @@ export class RootService {
       this.$rootScope.$broadcast('playPause');
       return false
     });
-
-
-
-
-
   }
 
 
@@ -123,8 +109,12 @@ export class RootService {
     );
   }
 
-  ipcChangeState(event, state) {
-    this.$state.go(state, {});
+  navigateToState(event, data) {
+    this.$state.go(data.state, {});
+  }
+
+  reloadCurrentState(event) {
+    this.$state.reload('app');
   }
 
   //should only be called on stateChange and on every state change....
@@ -263,39 +253,14 @@ export class RootService {
       })
   }
 
-
-  // getConnections() {
-  //   this.socketService.emit('request:connections')
-  // }
-
   //tunnels event to broadcast across application
   tunnelEvent(name, data) {
     this.$rootScope.$broadcast(name, data);
   }
 
-  //TODO: consider deletion
-  getConnectionsCB(callback) {
-    this.socketService.emit('get:ConnectionsCB', {}, (connections) => {
-      return callback(connections);
-    })
-  }
-
-
 //TODO: consider deletion
   getConnections() {
     return this.$http.get('/api/connections/')
-      .then((response) => {
-        return response.data;
-      })
-      .catch((response) => {
-        console.log('There was an error', response);
-        return response.data;
-      });
-  }
-
-//TODO: consider deletion
-  getCorporia() {
-    return this.$http.get('/api/corporia')
       .then((response) => {
         return response.data;
       })

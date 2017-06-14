@@ -7,13 +7,32 @@
     <base href="/">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
+
   </head>
-  <body layout="column">
-    <root layout="column" flex>
-      <div class="loader">
-        <img src="img/glossa-logo.svg" alt="">
-      </div>
-    </root>
+
+  <body class="glossa-app" layout="column" >
+
+  <script>
+    const electron = window.require('electron');
+    const appData = electron.remote.getGlobal('appData');
+
+    document.body.classList.add("platform-" + process.platform);
+
+    if (appData.isWindows) {
+      document.body.classList.add("fancy-frame");
+    }
+
+  </script>
+
+
+    <!--<div class="loader">-->
+      <!--<img src="img/glossa-logo.svg" alt="">-->
+    <!--</div>-->
+
+
+    <root layout="column" flex></root>
+
+
     <script src="js/app.bundle.js"></script>
   </body>
 </html>

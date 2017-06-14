@@ -25,13 +25,10 @@ export const appComponent = {
       this.settings = {};
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
-
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in app.component', changes);
       if (changes.allConnections) {
-        console.log('changes in allConnections');
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.currentUser) {
@@ -48,16 +45,17 @@ export const appComponent = {
 
 
     $onInit() {
-      console.log('$onInit in app.component');
+      // this.currentUser = this.rootService.getUser();
+      // this.project = this.settingsService.getProject();
+      // this.allConnections = this.rootService.getConnections();
+      // this.hashtags = this.rootService.getHashtags();
+      // this.commonTags = this.rootService.getCommonHashtags();
     }
 
-
-    //comes from settings.component
 
     saveMediaSettings(event) {
       this.rootService.saveSettings(event.settings)
         .then((data) => {
-          console.log('data', data);
           this.settings = angular.copy(data.settings);
         })
     }
@@ -84,9 +82,6 @@ export const appComponent = {
       this.settingsService.updateProject(event.project)
         .then((data) => {
           this.project = angular.copy(data);
-
-          console.log('TODO: update project name in drawer in rt......');
-          // drawerMenu.updateProjectName(vm.project.name);
           this.cfpLoadingBar.complete();
         })
     }
@@ -101,7 +96,6 @@ export const appComponent = {
      */
     updateConnection(event, data) {
       console.log('ng-on:: update:connection', data);
-
       let doesExist = false;
       //connection should already exist in array
       this.allConnections.map((connection, index) => {
@@ -120,7 +114,6 @@ export const appComponent = {
       this.allConnections = angular.copy(this.allConnections);
 
     }
-
 
     updloadAvatar(event) {
       this.cfpLoadingBar.start();
@@ -155,7 +148,6 @@ export const appComponent = {
         })
     }
 
-
     toggleSharing(event) {
       let options = {};
       if (!this.settings.isSharing) {
@@ -187,14 +179,7 @@ export const appComponent = {
         })
     }
 
-
     updateConnections(event, data) {
-
-      console.log('');
-      console.log('*** updateConnections ', data);
-
-
-      console.log('this.allConnections', this.allConnections);
       //remove users from data that are not online and we are not following
       this.allConnections.map((existing, index) => {
         let stillExists = false; //flag to false
@@ -210,9 +195,6 @@ export const appComponent = {
         }
       });
 
-      console.log('removed offline non-followed users');
-      console.log('this.allConnections', this.allConnections);
-
       let tempArr = [];
       data.connections.forEach((potential) => {
 
@@ -227,32 +209,11 @@ export const appComponent = {
         if (!doesExist) {
           tempArr.push(potential);
         }
-
-
-
-        // if (this.allConnections.indexOf(potential) < 0) {
-        //   console.log('this connection does not exist in the allConnections array');
-        //   this.allConnections.push(potential);
-        //
-        //   if (potential.following && potential.online) {
-        //     console.log('we are following this connection. ');
-        //     console.log('TODO: notify user connection has come online');
-        //     let msg = `${potential.name} is online.`;
-        //     let delay = 3000;
-        //     this.notificationService.show({
-        //       message: msg,
-        //       hideDelay: delay
-        //     });
-        //   }
-        // }
       });
-
 
       tempArr.forEach((n) => {
         this.allConnections.push(n);
         if (n.following && n.online) {
-          console.log('we are following this connection. ');
-          console.log('TODO: notify user connection has come online');
           let msg = `${n.name} is online.`;
           let delay = 3000;
           this.notificationService.show({
@@ -266,9 +227,7 @@ export const appComponent = {
 
       this.allConnections = angular.copy(this.allConnections);
 
-
     }
-
 
     updateTag(event) {
       this.rootService.updateTag(event.tag)
@@ -278,20 +237,14 @@ export const appComponent = {
               this.hashtags[index] = data;
             }
           });
-          console.log('DOES THIS UPDATE TRIGGET HASHTAG CHANGES?????????');
-          // this.hashtags = angular.copy(this.hashtags);
-
         })
-
     }
-
 
     searchSubmit(event) {
       this.searchText = event.searchText;
     }
 
     clearSearch(event) {
-      console.log('clearSearch', event);
       this.searchText = angular.copy(event.text);
     }
 

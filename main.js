@@ -7,6 +7,7 @@ var electron = require('electron'),
   express,
   bonjour = require('bonjour')();
 
+var AppMenu = require('./app-menu');
 
 
 var socketUtil = require('./server/socket/socket-util');
@@ -17,59 +18,59 @@ var url = require('url');
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var forceQuit = false;
-var menuTemplate = [{
-  label: "Application",
-  submenu: [
-    {label: "About", selector: "orderFrontStandardAboutPanel:"},
-    {type: "separator"},
-    {
-      label: "Preferences", click: function (item, focusedWindow) {
-      focusedWindow.webContents.send('changeState', 'settings.project');
-    }
-    },
-    {type: "separator"},
-    {
-      label: 'Toggle Developer Tools',
-      accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-      click: function (item, focusedWindow) {
-        if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-      }
-    },
-    {
-      label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function () {
-      win.reload();
-    }
-    },
-    {type: "separator"},
-    {
-      label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () {
-      forceQuit = true;
-      app.quit();
-    }
-    }
-  ]
-}, {
-  label: "File",
-  submenu: [
-    {label: 'Load Project', click: importProject},
-  ]
-}, {
-  label: "Edit",
-  submenu: [
-    {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
-    {label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
-    {type: "separator"},
-    {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
-    {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
-    {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
-    {label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
-  ]
-}
-];
+// var menuTemplate = [{
+//   label: "Application",
+//   submenu: [
+//     {label: "About", selector: "orderFrontStandardAboutPanel:"},
+//     {type: "separator"},
+//     {
+//       label: "Preferences", click: function (item, focusedWindow) {
+//       focusedWindow.webContents.send('changeState', 'settings.project');
+//     }
+//     },
+//     {type: "separator"},
+//     {
+//       label: 'Toggle Developer Tools',
+//       accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+//       click: function (item, focusedWindow) {
+//         if (focusedWindow) focusedWindow.webContents.toggleDevTools()
+//       }
+//     },
+//     {
+//       label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function () {
+//       win.reload();
+//     }
+//     },
+//     {type: "separator"},
+//     {
+//       label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () {
+//       forceQuit = true;
+//       app.quit();
+//     }
+//     }
+//   ]
+// }, {
+//   label: "File",
+//   submenu: [
+//     {label: 'Load Project', click: importProject},
+//   ]
+// }, {
+//   label: "Edit",
+//   submenu: [
+//     {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+//     {label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
+//     {type: "separator"},
+//     {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+//     {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+//     {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+//     {label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+//   ]
+// }];
 
 
-var menu = Menu.buildFromTemplate(menuTemplate);
+// var menu = Menu.buildFromTemplate(menuTemplate);
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
+
 
 
 function importProject() {
@@ -88,18 +89,31 @@ function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     // titleBarStyle: 'hidden',
+    show: false,
+    center: true,
+    frame: false,
+    customButtonsOnHover: true,
     width: 1200,
     height: 750,
+    minWidth: 400,
+    minHeight: 300,
+    backgroundColor: '#fff',
     webPreferences: {
       webSecurity: false,
       zoomFactor: 1
     },
-    icon: icon
+    acceptFirstMouse: true, //setting may need to be changed for macs...
+    title: 'Glossa',
+    icon: icon //this works for windows.. for mac this will need to be defined a different way
     // icon: path.join(__dirname, 'dist/img/app-icons/mac/glossa-logo.icns') //for dev for mac
   });
 
+  AppMenu.buildMenu(win);
 
-  // var express = ;
+  global.appData = {
+    isWindows: process.platform === 'win32'
+  };
+
 
   // and load the index.html of the app.
   win.loadURL(url.format({
@@ -108,6 +122,11 @@ function createWindow() {
 
   // Open the DevTools.
   win.webContents.openDevTools();
+
+  win.once('ready-to-show', () => {
+
+    win.show()
+  });
 
   // Emitted when the window is closed.
   win.on('closed', function (e) {
@@ -146,22 +165,10 @@ app.on('before-quit', function (e) {
 
   bonjour.unpublishAll(function (val) {
     console.log('bonjour.unpublishAll');
-    console.log('val', val)
   });
 
   bonjour.destroy();
-
-  //if force quite is false (not cmd+Q) aka the 'x'
-  if (!forceQuit) {
-    console.log('no force quit');
-    //prevent the default action.  What is the default action?
-    e.preventDefault();
-    //hide window.  does this dock it?  does the socket remain in tact when docked?
-    // win.hide();
-  } else {
-    console.log('yes force quit');
-    beforeQuitThenQuit();
-  }
+  beforeQuitThenQuit();
 });
 
 app.on('activate-with-no-open-windows', function () {
@@ -183,7 +190,6 @@ app.on('will-quit', function () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-  Menu.setApplicationMenu(menu);
   createWindow();
 });
 
@@ -196,8 +202,7 @@ app.on('window-all-closed', function () {
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     //this only happens when it's not a mac
-    console.log('quitting app now.');
-    forceQuit = true;
+    console.log('quitting app now from non-mac');
     app.quit();
   }
 });

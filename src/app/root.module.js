@@ -1,5 +1,5 @@
 import angular from 'angular';
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import ngAria from 'angular-aria';
 import ngAnimate from 'angular-animate';
 import ngSanitize from 'angular-sanitize';
@@ -11,7 +11,6 @@ import CodeMirror from 'codemirror';
 
 import ngCodeMirror from 'ngCodemirror'
 
-
 import {rootComponent} from './root.component';
 import {common} from './common/common.module';
 import {RootService} from './root.service';
@@ -20,49 +19,31 @@ import {NotificationService} from './components/notification/notification.servic
 import {components} from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
-
-
 import io from 'socket.io-client';
 
-if (window.navigator.userAgent.indexOf('Electron') < 0){
-  console.log('not electron...');
-  // window.alert('download glossa to view');
-  // window.location.replace('http://glossa.io')
-}
-
-if (window.process && window.process !== undefined) {
-  // Likely electron
-} else {
-  window.alert('download glossa to view');
-  window.location.replace('http://glossa.io')
-}
+const electron = window.require('electron');
 
 
-// import 'md-data-table/dist/md-data-table-style.css';
 
-// var electron = window.require('electron');
-// console.log('electron: ', electron);
-// console.log('electron.webFrame: ', electron.webFrame);
-// console.log('electron.webFrame.getZoomFactor(): ',electron.webFrame.getZoomFactor())
-// electron.webFrame.setZoomFactor(.75);
-// console.log('electron.webFrame.getZoomFactor(): ',electron.webFrame.getZoomFactor())
+// var webFrame = electron.webFrame;
+// console.log('webFrame', webFrame);
+// webFrame.setVisualZoomLevelLimits(1, 1);
+// webFrame.setLayoutZoomLevelLimits(0, 0);
+
 //TODO: figure out how to make this shit modular and WORK
 angular.module('config', []);
 //needed for ui-codemirror not sure this is the best way to bind to window objet
-window.CodeMirror = CodeMirror;
+window.CodeMirror = CodeMirror;let ioRoom = window.location.origin;
+window.socket = io(ioRoom);
+window.socket.on('request:socket-type', () => {
+  console.log('request:SocketType');
+  window.socket.emit('return:socket-type', {type: 'local-client'})
+});
+
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
 
-  //I moved this here so that the socket can complete the handshake before angular is ready.
-  //I believe this should help to ensure that we receive connection data
-
-  let ioRoom = window.location.origin;
-  window.socket = io(ioRoom);
-  window.socket.on('request:socket-type', () => {
-    console.log('request:SocketType');
-    window.socket.emit('return:socket-type', {type: 'local-client'})
-  });
-
+  console.log('window.onload event');
 
   const rootUrl = 'http://localhost:9000/';
   let initInjector = angular.injector(['ng']);
@@ -70,23 +51,30 @@ window.onload = () => {
   let $timeout = initInjector.get('$timeout');
   let $animate = initInjector.get('$animate');
 
+  angular.module('config').constant('__rootUrl', rootUrl);
+  // angular.module('config').constant('isWindows', isWindows);
 
-  $http({
-    url: `${rootUrl}api/user`,
-    method: 'GET'
-  })
-    .then((res) => {
-      //define some constant that we can inject through the application.
-      angular.module('config').constant('__user', res.data);
-      angular.module('config').constant('__rootUrl', rootUrl);
-    })
-    .catch((res) => {
-      console.log('error', res);
-    })
-    .then(() => {
-      angular.bootstrap(document, [root]);
-    });
+  const appData = electron.remote.getGlobal('appData');
+
+  console.log('appData', appData);
+  angular.module('config').constant('__appData', appData);
+
+  angular.bootstrap(document, [root]);
+
 };
+
+//   $http({
+//     url: `${rootUrl}api/user`,
+//     method: 'GET'
+//   }).then((res) => {
+//       //define some constant that we can inject through the application.
+//       // angular.module('config').constant('__user', res.data);
+//     }).catch((res) => {
+//       console.log('error', res);
+//     }).then(() => {
+//       angular.bootstrap(document, [root]);
+//     });
+// };
 //Not sure this only works if config is a string.  As a variable, it was failing hard.
 //     SimpleMDE,
 // 'ngSimple',
@@ -112,7 +100,6 @@ export const root = angular
     'ngInject';
     $locationProvider.html5Mode(true);
     $urlRouterProvider.otherwise('/app/corpus');
-    // $compileProvider.preAssignBindingsEnabled(true);
 
     //material theme stuff...
     const customAccent = {
@@ -157,21 +144,13 @@ export const root = angular
     $mdThemingProvider.definePalette('customAccent', customAccent);
     $mdThemingProvider.definePalette('glossaPalette', glossaPalette);
 
-    // $mdIconProvider
-    //   .defaultIconSet('../bower_components/material-design-icons/iconfont/MaterialIcons-Regular.svg', 24);
-
     $mdThemingProvider.theme('default')
       .primaryPalette('glossaPalette')
       .accentPalette('customAccent');
 
     cfpLoadingBarProvider.spinnerTemplate = `<md-progress-circular id="loading-spinner"  md-diameter="30"></md-progress-circular>`;
-
-    // $urlRouterProvider.otherwise(function($injector, $location){
-    //   var state = $injector.get('$state');
-    //   state.go("corpus");
-    // });
   })
-  .run(($rootScope, $state, $injector, __user, $window, RootService, $transitions, SocketService, $mdUtil, $compile) => {
+  .run(($rootScope, $state, $injector, $window, RootService, $transitions, SocketService, $mdUtil, $compile) => {
     'ngInject';
 
     $rootScope.$on('cfpLoadingBar:started', event => {
@@ -183,14 +162,9 @@ export const root = angular
         $state.go(data.session.currentState, data.session.currentStateParams);
       });
 
-    // $state.go(__user.session.currentState, __user.session.currentStateParams);
-    //   //if there is no $window.socket object and if the user has sharing enabled
-    if (__user.settings.isSharing) {
-      // if (!$window.socket && __user.settings.isSharing) {
+      //TODO: add check for sharing
       SocketService.init();
-      //   console.log('$window.socket', $window.socket);
       RootService.initListeners();
-    }
 
     $transitions.onStart({to: '*', from: '*'}, ($transitions) => {
       let toState = $transitions.$to();
@@ -205,12 +179,12 @@ export const root = angular
       // __user.session.currentStateParams = toState.params;
       //update session data in persistent storage every state change
       //TODO: might just be able to use localstorage
-      RootService.updateSession(session)
-        .then((data) => {
-          //update the __user object in memory
-          // console.log('updatedSession');
-          // __user.session = data.session;
-        });
+      // RootService.updateSession(session)
+      //   .then((data) => {
+      //     //update the __user object in memory
+      //     // console.log('updatedSession');
+      //     // __user.session = data.session;
+      //   });
 
       //This keeps the state from redirecting away from the child state when that same child state is clicked.
       let redirect = toState.redirectTo;
@@ -238,4 +212,3 @@ export const root = angular
   })
   .name;
 
-// angular.bootstrap(document, [root]);

@@ -1,4 +1,4 @@
-import uiRouter from 'angular-ui-router';
+import uiRouter from '@uirouter/angularjs';
 import { userCard } from './user-card/user-card.module';
 import { settingsSharingComponent } from './settings-sharing.component';
 import './settings-sharing.scss';

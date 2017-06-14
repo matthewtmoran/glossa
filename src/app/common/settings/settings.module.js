@@ -26,7 +26,6 @@ export const settings = angular
         component: 'settings',
         resolve: {
           previousState: ($state) => {
-            console.log('resolveing previous state', $state);
             return {
               Name: $state.current.name || 'meta',
               Params: $state.params,

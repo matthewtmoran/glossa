@@ -6,6 +6,25 @@
 @import "~simplemde/dist/simplemde.min.css";
 @import "~angular-material-data-table/dist/md-data-table.css";
 
+.glossa-app {
+
+  &.fancy-frame {
+    border: 1px solid #444444;
+  }
+
+  &.fancy-frame.isMaximized {
+    border: 0px;
+  }
+}
+
+
+h1, h2, h3, h4, h5, p, span {
+  -webkit-user-drag: element;
+}
+
+.img {
+  -webkit-user-drag: none !important;
+}
 
 .ghost {
   .ghost-nav {
@@ -33,19 +52,21 @@
   }
 }
 
+.loader {
+  position: absolute;
+  top: 40%;
+  left: 45%;
+  //font-size: 24px;
+  display: block;
+  text-align: center;
+  //font-weight: 900;
+}
+
 root {
   display: block;
 
 
-  .loader {
-    position: absolute;
-    top: 40%;
-    left: 45%;
-    //font-size: 24px;
-    display: block;
-    text-align: center;
-    //font-weight: 900;
-  }
+
 
   md-backdrop.md-sidenav-backdrop {
     z-index: 62 !important;
@@ -140,7 +161,11 @@ md-progress-circular {
 
 //TODO: Change to angular material loading bar template
 #loading-bar {
+  //z-index:5000;
+  //position: fixed;
+
   .bar {
+     top: 31px;
     background: $red;
   }
 
@@ -150,4 +175,110 @@ md-progress-circular {
     -ms-box-shadow: $red 1px 0 6px 1px;
     box-shadow: $red 1px 0 6px 1px;
   }
+}
+
+.windows-titlebar {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-app-region: drag;
+  app-region: drag;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  width: calc(100vw - 2px);
+  height: 31px;
+  display: flex;
+  z-index: 5000;
+  background: #232323;
+  color: #fff;
+  //position: fixed;
+
+  &-title {
+    line-height: 22px;
+    font-size: 12px;
+    font-family: "Segoe UI";
+    flex: 0 1 auto;
+    margin-bottom: 2px;
+    margin-left: 5px;
+  }
+
+  &-icon {
+    width: 10px;
+    height: 10px;
+  }
+
+  .button-reset {
+    background-color: inherit;
+    border: inherit;
+    outline: none;
+  }
+
+  &-spacer {
+    flex: 1 1 auto;
+  }
+
+  &-button {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-app-region: no-drag;
+    cursor: default;
+    width: 46px;
+    height: 100%;
+    line-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    //.button-reset;
+    background-color: inherit;
+    border: inherit;
+    outline: none;
+
+    &:hover {
+      background-color: inherit;
+      border: inherit;
+      outline: none;
+      //.button-reset;
+      transition: background-color 0.1s;
+      background-color: rgba(255, 255, 255, 0.15);
+
+    }
+
+    &:active {
+      background-color: inherit;
+      border: inherit;
+      outline: none;
+      //.button-reset;
+      transition: background-color 0.1s;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &:focus {
+      background-color: inherit;
+      border: inherit;
+      outline: none;
+      //.button-reset;
+    }
+
+  }
+
+  &-controls {
+    display: flex;
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  &-hamburger {
+    display: flex;
+    justify-content: flex-start;
+    height: 100%;
+
+    titlebar-button {
+      width: 40px;
+    }
+  }
+}
+
+.isMaximized .windows-titlebar {
+  width: 100%;
 }

@@ -13,9 +13,7 @@ export const settingsProjectComponent = {
     }
 
     $onChanges(changes) {
-      console.log("$onChanges in setting-projedct.component", changes);
       if (changes.project) {
-        console.log('changes with project');
         this.project = angular.copy(changes.project.currentValue);
       }
     }
