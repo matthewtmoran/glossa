@@ -6,76 +6,18 @@ var electron = require('electron'),
   ipcMain = electron.ipcMain,
   express,
   bonjour = require('bonjour')();
-
-var AppMenu = require('./app-menu');
-
-
-var socketUtil = require('./server/socket/socket-util');
 var url = require('url');
-// var config = require('./server/config/environment');
+var AppMenu = require('./app-menu');
+var socketUtil = require('./server/socket/socket-util');
+
+
+const isDarwin = process.platform === 'darwin';
+const isWin10 = process.platform === 'win32';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
-var forceQuit = false;
-// var menuTemplate = [{
-//   label: "Application",
-//   submenu: [
-//     {label: "About", selector: "orderFrontStandardAboutPanel:"},
-//     {type: "separator"},
-//     {
-//       label: "Preferences", click: function (item, focusedWindow) {
-//       focusedWindow.webContents.send('changeState', 'settings.project');
-//     }
-//     },
-//     {type: "separator"},
-//     {
-//       label: 'Toggle Developer Tools',
-//       accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-//       click: function (item, focusedWindow) {
-//         if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-//       }
-//     },
-//     {
-//       label: 'Reload', accelerator: 'CmdOrCtrl+R', click: function () {
-//       win.reload();
-//     }
-//     },
-//     {type: "separator"},
-//     {
-//       label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: function () {
-//       forceQuit = true;
-//       app.quit();
-//     }
-//     }
-//   ]
-// }, {
-//   label: "File",
-//   submenu: [
-//     {label: 'Load Project', click: importProject},
-//   ]
-// }, {
-//   label: "Edit",
-//   submenu: [
-//     {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
-//     {label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
-//     {type: "separator"},
-//     {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
-//     {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
-//     {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
-//     {label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
-//   ]
-// }];
-
-
-// var menu = Menu.buildFromTemplate(menuTemplate);
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-
-
-
-function importProject() {
-  win.webContents.send('import:project');
-}
 
 function startExpress() {
   Promise.all([require('./server/config/init').checkForApplicationData()])
@@ -88,10 +30,10 @@ startExpress();
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    // titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden',
     show: false,
     center: true,
-    frame: false,
+    frame: !isWin10,
     customButtonsOnHover: true,
     width: 1200,
     height: 750,

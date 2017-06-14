@@ -161,11 +161,7 @@ md-progress-circular {
 
 //TODO: Change to angular material loading bar template
 #loading-bar {
-  //z-index:5000;
-  //position: fixed;
-
   .bar {
-     top: 31px;
     background: $red;
   }
 
@@ -174,6 +170,15 @@ md-progress-circular {
     -moz-box-shadow: $red 1px 0 6px 1px;
     -ms-box-shadow: $red 1px 0 6px 1px;
     box-shadow: $red 1px 0 6px 1px;
+  }
+}
+
+.platform-win32 {
+  #loading-bar {
+    .bar {
+      top: 31px;
+
+    };
   }
 }
 
