@@ -26,7 +26,7 @@ function buildMenu(browserWindow) {
   if (!isDarwin) {
     browserWindow.setMenu(menu);
   } else {
-    Menu.setApplicationMenu(this.menu);
+    Menu.setApplicationMenu(menu);
   }
 }
 
