@@ -4,19 +4,15 @@
                 file-selection="$ctrl.fileSelection($event)"
                 search-text="$ctrl.searchText"
                 layout="column"></corpus-sidebar>
-
 <div layout="column" flex style="max-width:100%">
 
 	<md-tabs select-tab-index="selectedIndex"
-			md-dynamic-height=""
+	         md-dynamic-height=""
 	         md-border-bottom=""
 	         md-selected="selectedIndex"
 	         md-stretch-tabs="always">
 		<md-tab label="Meta"></md-tab>
 		<md-tab label="Baseline"></md-tab>
-		<!--<md-tab label="Analyze"></md-tab>-->
-		<!--<md-tab label="Text Chart"></md-tab>-->
-		<!--<md-tab label="Preview"></md-tab>-->
 	</md-tabs>
 
 	<!-- child state -->
@@ -35,6 +31,7 @@
 	            settings="$ctrl.settings"
 	            layout="column"
 	            id="tab-body"
-	            flex ></md-content>
+	            flex>
+	</md-content>
 
 </div>

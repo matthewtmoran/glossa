@@ -11,7 +11,7 @@ export const corpusComponent = {
   },
   templateUrl,
   controller: class CorpusComponent {
-    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService) {
+    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService, $mdToast) {
       'ngInject';
       this.cfpLoadingBar = cfpLoadingBar;
       // this.$state = $state;
@@ -33,6 +33,7 @@ export const corpusComponent = {
 
       this.$scope = $scope;
       this.$mdDialog = $mdDialog;
+      this.$mdToast = $mdToast;
 
       this.$scope.$on('createNamedMarkdown', this.namedMarkdown.bind(this));
       this.$scope.$on('newMarkdown', this.newMarkdown.bind(this));

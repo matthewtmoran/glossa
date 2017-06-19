@@ -30,7 +30,6 @@ startExpress();
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    // titleBarStyle: 'hidden',
     show: false,
     center: true,
     frame: !isWin10,
@@ -63,7 +62,7 @@ function createWindow() {
   }));
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   win.once('ready-to-show', () => {
 
