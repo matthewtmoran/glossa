@@ -6,6 +6,8 @@ var Connection = require('./../api/connections/connection.model');
 var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
+
+var ipcUtil = require('../../ipc/util');
 module.exports = {
 
   getUser: function () {
@@ -178,8 +180,11 @@ module.exports = {
 
             getConnections()
               .then(function (connections) {
-                console.log('emit:: send:connections to:: local-client');
-                io.to(socketId).emit('send:connections', {connections: connections});
+                // console.log('emit:: send:connections to:: local-client');
+
+                console.log('send:: send:connections ipc');
+                ipcUtil.send('send:connections', {connections: connections})
+                // io.to(socketId).emit('send:connections', {connections: connections});
               });
 
             normalizeNotebooks(updatedDoc, io, socketId);
@@ -392,8 +397,12 @@ function normalizeNotebooks(client, io, socketId) {
         reject(err);
       }
 
-      console.log('emit:: normalize:notebooks to:: local-client');
-      emitToLocalClient(io, socketId, 'normalize:notebooks', updatedDocs);
+      console.log('send:: normalize:notebooks ipc');
+      // console.log('emit:: normalize:notebooks to:: local-client');
+
+      ipcUtil.send('normalize:notebooks', updatedDocs);
+
+      // emitToLocalClient(io, socketId, 'normalize:notebooks', updatedDocs);
       Notebooks.persistence.compactDatafile();
       resolve({_id: client._id, name: client.name, avatar: client.avatar});
     });

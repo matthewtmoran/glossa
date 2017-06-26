@@ -10,13 +10,13 @@ var express = require('express');
 module.exports = function(app) {
 
   // Insert routes below
-  app.use('/api/user', require('./api/user'));
   app.use('/api/project', require('./api/project'));
+  app.use('/api/user', require('./api/user'));
   app.use('/api/notebooks', require('./api/notebook'));
   app.use('/api/connections', require('./api/connections'));
   app.use('/api/transcription', require('./api/transcription'));
   app.use('/api/hashtags', require('./api/hashtag'));
-  app.use('/api/corporia', require('./api/corpus'));
+  // app.use('/api/corporia', require('./api/corpus'));
   // app.use('/api/session', require('./api/session'));
   // app.use('/api/settings', require('./api/settings'));
 

@@ -1,5 +1,5 @@
 export class AttachmentController {
-  constructor($scope, DialogService, currentFile, $window, NotebookService, CorpusService, $q) {
+  constructor($scope, DialogService, currentFile, $window, NotebookService, CorpusService, $q, settings) {
     'ngInject';
     this.$scope = $scope;
     this.dialogService = DialogService;
@@ -8,6 +8,8 @@ export class AttachmentController {
     this.notebookService = NotebookService;
     this.corpusService = CorpusService;
     this.$q = $q;
+
+    this.settings = settings;
 
     this.notebooksFiltered = [];
     this.searchText = '';

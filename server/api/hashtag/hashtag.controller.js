@@ -130,9 +130,12 @@ exports.findOccurrence = function(req, res, next) {
   findNotebooksWithTags()
     .then(function(data) {
 
-      data.uniqueHashtags.forEach(function(tag) {
-        promises.push(updateExistingOccurrence(data.allHashtags, tag))
-      });
+      if(data.uniqueHashtags) {
+        data.uniqueHashtags.forEach(function(tag) {
+          promises.push(updateExistingOccurrence(data.allHashtags, tag))
+        });
+      }
+
 
 
       Promise.all(promises)
@@ -196,14 +199,18 @@ function findNotebooksWithTags() {
 
       //look for all notebooks
       notebooks.forEach(function (notebook) {
-        notebook.hashtags.forEach(function (hashtag) {
-          //push one of each hastag to array
-          if (uniqueHashtags.indexOf(hashtag) < 0) {
-            uniqueHashtags.push(hashtag);
-          }
-          //push each hashtag to array
-          allHashtags.push(hashtag);
-        });
+
+        if (notebook.hashtags) {
+          notebook.hashtags.forEach(function (hashtag) {
+            //push one of each hastag to array
+            if (uniqueHashtags.indexOf(hashtag) < 0) {
+              uniqueHashtags.push(hashtag);
+            }
+            //push each hashtag to array
+            allHashtags.push(hashtag);
+          });
+        }
+
       });
 
       var data = {allHashtags: allHashtags, uniqueHashtags: uniqueHashtags};

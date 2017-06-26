@@ -3,10 +3,11 @@ var multer = require('multer');
 var fs = require('fs');
 var path = require('path');
 var q = require('q');
+var app = require('electron').app;
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(config.root, 'server/data/tmp/'))
+        cb(null, path.join(app.getPath('userData'), 'temp'))
     },
     filename: function (req, file, cb) {
         var name = file.originalname;
@@ -34,24 +35,22 @@ function validateFilename(req, res, next) {
         delete dataObj.removeItem;
     }
 
-    console.log('files that are attemping to be uploaded....', files);
 
     files.forEach(function(file) {
         file = MediaObject(file);
         if (file.mimetype.indexOf('image') > -1) {
-            console.log('file.filename', file.filename);
-            var imagePromise = copyAndWrite(file.path, path.join(config.root, config.imagePath, file.filename))
+            var imagePromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'image', file.filename))
                 .then(function(response) {
-                    file.path = path.join('image',file.filename);
+                    file.path = path.join(app.getPath('userData'),  'image',file.filename);
                     dataObj.image = file;
                     return file;
                 });
             promises.push(imagePromise);
         } else if (file.mimetype.indexOf('audio') > -1) {
             file = MediaObject(file);
-            var audioPromise = copyAndWrite(file.path, path.join(config.root, config.audioPath, file.filename))
+            var audioPromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'audio', file.filename))
                 .then(function(response) {
-                    file.path = path.join('audio', file.filename);
+                    file.path = path.join(app.getPath('userData'), 'audio', file.filename);
                     dataObj.audio = file;
                     return file;
                 });
@@ -100,9 +99,9 @@ function copyAndWrite(from, to){
 function removeMedia(media) {
     var mediaPath;
     if (media.mimetype.indexOf('image')> -1) {
-        mediaPath = path.join(config.root, config.imagePath, media.filename);
+        mediaPath = path.join(app.getPath('userData'), 'image', media.filename);
     } else if (media.mimetype.indexOf('audio') > -1) {
-        mediaPath = path.join(config.root, config.audioPath, media.filename);
+        mediaPath = path.join(app.getPath('userData'), 'audio', media.filename);
     }
     fs.unlink(mediaPath);
 }

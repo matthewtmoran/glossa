@@ -3,10 +3,11 @@ var multer = require('multer');
 var fs = require('fs');
 var path = require('path');
 var q = require('q');
+var app = require('electron').app;
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(config.root, 'server/data/tmp/'))
+        cb(null, path.join(app.getPath('userData'), 'temp'))
     },
     filename: function (req, file, cb) {
         var name = file.originalname;
@@ -31,9 +32,9 @@ function validateFilename(req, res, next) {
 
     files.forEach(function(file) {
         file = MediaObject(file);
-        var imagePromise = copyAndWrite(file.path, path.join(config.root, config.imagePath, file.filename))
+        var imagePromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'image', file.filename))
             .then(function(response) {
-                file.path = path.join('image',file.filename);
+                file.path = path.join(app.getPath('userData'), 'image', file.filename);
                 dataObj.image = file;
                 return file;
             });
@@ -47,8 +48,6 @@ function validateFilename(req, res, next) {
 }
 
 function MediaObject(file) {
-    console.log('file', file);
-
     var fileObj = {};
     fileObj.originalname = file.originalname;
     fileObj.mimetype = file.mimetype;
@@ -81,7 +80,7 @@ function copyAndWrite(from, to){
 
 function removeAvatar(req, res, next) {
     var mediaPath;
-    mediaPath = path.join(config.root, 'server/data/', req.body.filePath);
+    mediaPath = path.join(app.getPath('userData'), req.body.filePath);
     fs.unlink(mediaPath);
     next();
 }

@@ -5,6 +5,8 @@ const fs = require('fs');
 
 const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
+var ipcEvents = require('../../ipc-listeners');
+
 let localClient = {};
 
 module.exports = function (glossaUser, mySession, io) {
@@ -75,6 +77,9 @@ module.exports = function (glossaUser, mySession, io) {
         //query connections and emit updated list to local-client
         socketUtil.getConnections()
           .then(function (data) {
+
+            ipcEvents.sendToClient('send:connections', {})
+
             console.log('emit:: send:connections to:: local-client');
             socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
           });
@@ -408,53 +413,6 @@ module.exports = function (glossaUser, mySession, io) {
   //helpers//
   ///////////
 
-  //TODO: refractor....
-  /**
-   * removes avatar from file system
-   * deletes avatar data;
-   * normalizes notebooks
-   * @param client
-   */
-  function unfollowConnection(client) {
-    //if there is an avatar, remove avatar
-    if (client.avatar) {
-      socketUtil.removeAvatarImage(client.avatar)
-        .then(function () {
-          console.log('avatar removed from file system');
-          // client.avatar = null;
-          delete client.avatar;
-          socketUtil.updateConnection(client, io);
-        })
-        .catch(function(err) {
-          console.log('Error removing avatar from file system', err);
-          delete client.avatar;
-          socketUtil.updateConnection(client, io)
-        })
-    } else {
-      socketUtil.updateConnection(client, io)
-    }
-  }
 
-  /**
-   * called when user follows client
-   * get data we may already have for user
-   * emits to to external client request:updates with limited data objects
-   * emits to external client request:avatar
-   * updates client data
-   * @param client
-   */
-  function followConnection(client) {
-    socketUtil.getUserSyncedData(client)
-      .then(function (data) {
-        console.log('emit:: request:updates  to:: external-client');
-        socketUtil.emitToExternalClient(io, client.socketId, 'request:updates', data);
-        console.log('emit:: request:avatar  to:: external-client');
-        console.log('TODO: I dont believe this adequately updates avatar data.......');
-        socketUtil.emitToExternalClient(io, client.socketId, 'request:avatar', {});
-      });
-    console.log('TODO: consider if this overwrites data we need... or if it has the data we need...');
-    console.log('TODO: verify no avatar descrepencies here... Im assuming there are issues.');
-    socketUtil.updateConnection(client, io)
-  }
 
 };

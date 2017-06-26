@@ -9,20 +9,18 @@
 
 'use strict';
 
+
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 const AdmZip = require('adm-zip');
-
 const config = require('./../../config/environment/index');
-
 const Projects = require('./project.model');
 const User = require('./../user/user.model');
 const Notebooks = require('./../notebook/notebook.model');
 const Transcriptions = require('./../transcription/transcription.model');
 const Hashtags = require('./../hashtag/hashtag.model');
-const Corporia = require('./../corpus/corpus.model');
 const Connections = require('./../connections/connection.model');
 // let Connections = require('./../connections/connections.model');
 

@@ -10,6 +10,7 @@ var path = require('path');
 
 
 module.exports = function (bonjour, appData) {
+
   // Populate DB with sample data
   if (config.seedDB) {
     require('./config/seed');
@@ -17,15 +18,12 @@ module.exports = function (bonjour, appData) {
   // Setup server
   var app = express();
   var server = require('http').createServer(app);
-
   var io = require('socket.io')(server);
-
   var localService;
   var bonjourSocket;
   var browser = null;
   var glossaUser = appData[0];
   var mySession = appData[0].session;
-
   var externalSocketClient = require('./socket/socket-client');
 
   require('./config/express')(app); //configuration for express
@@ -62,7 +60,7 @@ module.exports = function (bonjour, appData) {
 
     browser.on('up', function (service) {
       console.log('');
-      console.log('Service went/is live........', service);
+      console.log('Service went/is live........', service.name);
       if (service.name !== 'glossaApp-' + glossaUser._id) {
 
         console.log('((not our service))');
@@ -100,7 +98,6 @@ module.exports = function (bonjour, appData) {
 
     if (options.cleanup) {
       console.log('cleaning...');
-      console.log('browser.services.length', browser.services.length);
 
       if (localService) {
         console.log('Bonjour process exists');
@@ -113,7 +110,6 @@ module.exports = function (bonjour, appData) {
 
       bonjour.destroy();
 
-      console.log('browser.services.length', browser.services.length);
       console.log('cleaning done...');
     }
     if (err) {

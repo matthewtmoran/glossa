@@ -1,28 +1,14 @@
 <md-content id="notebook-container" layout="row" flex ng-cloak>
-	<md-content flex="25" layout-padding class="left-side">
 
-		<user-list
-			all-connections="$ctrl.allConnections"
-			selected="$ctrl.selected"
-			on-exists="$ctrl.exists($event)"
-			on-toggle="$ctrl.toggle($event)">
-		</user-list>
-
-		<md-divider></md-divider>
-
-		<h3>Common Tags</h3>
-		<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
-		<md-list>
-			<md-list-item  class="chip-item" ng-repeat="tag in $ctrl.commonTags | orderBy: '-occurrence'" ng-class="{'active-chip': $ctrl.selectedHashtags.indexOf(tag._id) > -1}">
-					<md-chip class="chip-container" md-ink-ripple ng-click="$ctrl.toggleHashtags(tag)" >
-						<span>
-							<span class="chip-icon">#</span>
-							<span class="chip-text">{{tag.tag}}</span>
-						</span>
-					</md-chip>
-			</md-list-item>
-		</md-list>
-	</md-content>
+	<notebook-sidebar
+		all-connections="$ctrl.allConnections"
+		common-tags="$ctrl.commonTags"
+		selected-hashtags="$ctrl.selectedHashtags"
+		on-toggle-hashtags="$ctrl.toggleHashtags($event)"
+	    on-exists="$ctrl.exists($event)"
+	    on-toggle="$ctrl.toggle($event)"
+	    on-tag-manage="$ctrl.tagManageDialog()"
+	></notebook-sidebar>
 
 	<md-content flex="75" class="notebook-list" layout-padding>
 		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>

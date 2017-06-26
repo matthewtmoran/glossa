@@ -18,6 +18,7 @@ export const notebookComponent = {
     currentUser: '<',
     hashtags: '<',
     commonTags: '<',
+    project: '<',
     onUpdateTag: '&'
   },
   templateUrl,
@@ -222,7 +223,7 @@ export const notebookComponent = {
         avatar: this.currentUser.avatar || null,
         name: this.currentUser.name
       };
-      event.notebook.projectId = this.currentUser.session.projectId;
+      event.notebook.projectId = this.project._id;
 
       this.notebookService.createNotebook(event.notebook)
         .then((data) => {

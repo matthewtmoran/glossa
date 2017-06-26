@@ -4,7 +4,7 @@ var ipc = window.require('electron').ipcRenderer;
 var dialog = window.require('electron').remote.dialog;
 
 export class RootService {
-  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar) {
+  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar,IpcSerivce) {
     'ngInject';
 
     this.$http = $http;
@@ -15,6 +15,7 @@ export class RootService {
     this.NotificationService = NotificationService;
     this.Upload = Upload;
     this.cfpLoadingBar = cfpLoadingBar;
+    this.ipcSerivce = IpcSerivce;
     this.currentOnlineList = [];
 
     this.$http.get('api/user').then((response) => {
@@ -25,6 +26,8 @@ export class RootService {
     ipc.on('navigateToState', this.navigateToState.bind(this));
     ipc.on('import:project', this.ipcImportProject.bind(this));
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
+
+    ipc.send('test:event', 'ping');
 
     //this overwrites events even if input/codemirror/siimplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
@@ -144,6 +147,16 @@ export class RootService {
       });
   }
 
+  getUserIpc() {
+    console.log('getUserIpc');
+    this.ipcSerivce.send('get:user', (data) => {
+      console.log('get:userIpc callback', data);
+        return data;
+      }
+    )
+  }
+
+
   //get project data
   getProject() {
     return this.$http.get('/api/project/')
@@ -233,13 +246,22 @@ export class RootService {
   updateUserInfo(user) {
     return this.$http.put(`/api/user/${this.__user._id}/`, user)
       .then((response) => {
-        this.socketService.emit('broadcast:profile-updates');
+
+        this.ipcSerivce.send('broadcast:profile-updates');
+
+        // this.socketService.emit('broadcast:profile-updates');
+
+
         return response.data;
       })
       .catch((response) => {
         console.log('There was an error', response);
         return response.data;
       })
+  }
+
+  updateUserInfoIpc(user) {
+    // this.ipcSerivce
   }
 
   updateTag(tag) {
@@ -271,17 +293,13 @@ export class RootService {
   }
 
 
-//TODO: consider deletion
-  updateUserProfile(userProfile) {
-    console.log('TODO: REFRACTOR');
-    let userString = angular.toJson(userProfile);
-    this.socketService.emit('update:userProfile', {userProfile: userString})
-  }
-
   //TODO: Refractor
   toggleFollow(user) {
     let userString = angular.toJson(user);
-    this.socketService.emit('update:following', {connection: userString});
+
+    this.ipcSerivce.send('update:following', {connection: userString});
+
+    // this.socketService.emit('update:following', {connection: userString});
   }
 
 //TODO: consider deletion
@@ -289,17 +307,17 @@ export class RootService {
     this.socketFactory.emit('get:networkUsers')
   }
 
-  //TODO: refractor or delete
-  //look for all updates from users that are being followed
-  getAllUserUpdates() {
-    this.socketService.emit('request:AllUserUpdates')
-  }
 
   //TODO: refractor
-  //broad cast updates to users that follow
+  //broadcast updates to users that follow
   broadcastUpdates(data) {
-    this.socketService.emit('broadcast:Updates', data);
+
+    this.ipcSerivce.send('broadcast:Updates', data);
+
+
+    // this.socketService.emit('broadcast:Updates', data);
   }
+
 
   //called when application is bootstrapped
   initListeners() {
@@ -318,13 +336,13 @@ export class RootService {
       //   hideDelay: delay
       // });
 
-      let socketData = {
-        type: 'local-client',
-        socketId: data.socketId
-      };
+      // let socketData = {
+      //   type: 'local-client',
+      //   socketId: data.socketId
+      // };
 
-      console.log('Emitting: return:SocketType');
-      this.socketService.emit('return:SocketType', socketData);
+      // console.log('Emitting: return:SocketType');
+      // this.socketService.emit('return:SocketType', socketData);
 
     });
 
@@ -449,11 +467,11 @@ export class RootService {
     /**
      * Socket handshake
      */
-    this.socketService.on('request:socket-type', () => {
-      console.log('on:: request:socket-type');
-      console.log('emit:: return:socket-type');
-      this.socketService.emit('return:socket-type', {type: 'local-client'});
-    });
+    // this.socketService.on('request:socket-type', () => {
+    //   console.log('on:: request:socket-type');
+    //   console.log('emit:: return:socket-type');
+    //   this.socketService.emit('return:socket-type', {type: 'local-client'});
+    // });
 
 
     this.socketService.on('notify:sync-begin', () => {

@@ -2,9 +2,10 @@
 var Datastore = require('nedb'),
     path = require('path'),
     config = require('../../config/environment'),
+    app = require('electron').app,
 
     connectionsDb = new Datastore({
-        filename: path.join(config.root, config.dbPath, '/connections'),
+        filename: path.join(app.getPath('userData'), '/storage/glossa-connections'),
         autoload: true,
         timestampData: true
     });

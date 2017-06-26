@@ -22,6 +22,7 @@ import 'angular-material/angular-material.scss';
 import io from 'socket.io-client';
 
 const electron = window.require('electron');
+var ipcRenderer = window.require('electron').ipcRenderer;;
 
 
 
@@ -57,6 +58,11 @@ window.onload = () => {
   const appData = electron.remote.getGlobal('appData');
 
   console.log('appData', appData);
+
+  ipcRenderer.send('window:loaded', {someData: 'my data is here'});
+
+
+
   angular.module('config').constant('__appData', appData);
 
   angular.bootstrap(document, [root]);
@@ -150,21 +156,36 @@ export const root = angular
 
     cfpLoadingBarProvider.spinnerTemplate = `<md-progress-circular id="loading-spinner"  md-diameter="30"></md-progress-circular>`;
   })
-  .run(($rootScope, $state, $injector, $window, RootService, $transitions, SocketService, $mdUtil, $compile) => {
+  .run(($rootScope, $state, $injector, $window, RootService, $transitions, SocketService, $mdUtil, $compile, IpcSerivce, __appData) => {
     'ngInject';
 
     $rootScope.$on('cfpLoadingBar:started', event => {
       $mdUtil.nextTick(() => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
     });
 
-    RootService.getUser()
-      .then((data) => {
-        $state.go(data.session.currentState, data.session.currentStateParams);
-      });
+    $state.go(__appData.initialState.session.currentState, __appData.initialState.session.currentStateParams);
+
+    //request user to get first state
+    //TODO: iniiate app with call to electrons appData api instead of ipc request
+    // RootService.getUserIpc();
+    // IpcSerivce.on('return:user', (event, data) => {
+    //   console.log('return:user', data);
+    //   $state.go(data.session.currentState, data.session.currentStateParams);
+    // });
+
+
+
+    // let sessionData = RootService.getUserIpc().session;
+    //
+    // $state.go(sessionData.session.currentState, sessionData.currentStateParams);
+
+    // RootService.getUser()
+    //   .then((data) => {
+    //     $state.go(data.session.currentState, data.session.currentStateParams);
+    //   });
 
       //TODO: add check for sharing
-      SocketService.init();
-      RootService.initListeners();
+      // RootService.initListeners();
 
     $transitions.onStart({to: '*', from: '*'}, ($transitions) => {
       let toState = $transitions.$to();

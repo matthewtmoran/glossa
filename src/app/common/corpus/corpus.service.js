@@ -1,15 +1,16 @@
 export class CorpusService {
-  constructor($http, Upload, $stateParams) {
+  constructor($http, Upload, $stateParams, __appData) {
     'ngInject';
     this.$http = $http;
     this.Upload = Upload;
     this.$stateParams = $stateParams;
+    this.__appData = __appData;
 
-    console.log('calling user api');
-    this.$http.get('api/user').then((response) => {
-      console.log('user api resolved');
-      this.__user = response.data
-    });
+    // console.log('calling user api');
+    // this.$http.get('api/user').then((response) => {
+    //   console.log('user api resolved');
+    //   this.__user = response.data
+    // });
 
     //TODO: refractor the use of __user constant
   }
@@ -59,8 +60,8 @@ export class CorpusService {
       content: '',
       corpus: this.$stateParams.corpus,
       createdAt: Date.now(),
-      createdBy: this.__user._id,
-      projectId: this.__user.session.projectId
+      createdBy: this.__appData.initialState.user._id,
+      projectId: this.__appData.initialState.session.projectId
     };
 
     return this.$http.post('/api/transcription', file)

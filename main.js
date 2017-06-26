@@ -1,14 +1,16 @@
+var fs = require('fs');
 var electron = require('electron'),
   path = require('path'),
   app = electron.app,
   BrowserWindow = electron.BrowserWindow,
-  Menu = electron.Menu,
-  ipcMain = electron.ipcMain,
   express,
   bonjour = require('bonjour')();
 var url = require('url');
 var AppMenu = require('./app-menu');
 var socketUtil = require('./server/socket/socket-util');
+var ipc = require('./ipc')();
+var Notebook = require('./server/api/notebook/notebook.model');
+
 
 
 const isDarwin = process.platform === 'darwin';
@@ -18,14 +20,47 @@ const isWin10 = process.platform === 'win32';
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-
+app.setPath('userData', path.join(app.getPath('appData'), 'Glossa'));
 function startExpress() {
-  Promise.all([require('./server/config/init').checkForApplicationData()])
+  fsCheck();
+  Promise.all([require('./server/config/init').getInitialState()])
     .then(function (appData) {
+
+      global.appData = {
+        initialState: appData[0],
+        isWindows: process.platform === 'win32'
+      };
+
       express = require('./server/app')(bonjour, appData);
+
   });
 }
 startExpress();
+
+
+function fsCheck() {
+
+  var dataPaths = [
+    'Glossa',
+   'Glossa/storage',
+   'Glossa/image',
+   'Glossa/audio',
+   'Glossa/temp',
+  ];
+
+  dataPaths.forEach((p) => {
+    let storagePath = path.join(app.getPath('appData'), p);
+
+    if (!fs.statSyncNoException(storagePath)) {
+      console.log('path does not exist....');
+      fs.mkdirSync(storagePath);
+      console.log('path created...')
+    }
+  });
+
+  console.log('done fs check');
+
+}
 
 function createWindow() {
   // Create the browser window.
@@ -51,9 +86,7 @@ function createWindow() {
 
   AppMenu.buildMenu(win);
 
-  global.appData = {
-    isWindows: process.platform === 'win32'
-  };
+
 
 
   // and load the index.html of the app.
@@ -62,10 +95,10 @@ function createWindow() {
   }));
 
   // Open the DevTools.
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   win.once('ready-to-show', () => {
-
+    // ipcListeners.initIpcListeners();
     win.show()
   });
 

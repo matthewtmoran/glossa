@@ -40,6 +40,7 @@ export class DialogService {
       targetEvent: ev,
       clickOutsideToClose: false,
       locals: {
+        settings: ev.settings,
         currentFile: currentFile,
       }
       // bindToController: true,

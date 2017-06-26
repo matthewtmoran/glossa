@@ -75,6 +75,7 @@ export const corpusComponent = {
     }
 
     newAttachment(event) {
+      event.settings = this.settings;
       this.dialogService.mediaAttachment(event, this.selectedFile)
         .then((result) => {
           if (result) {
