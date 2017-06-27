@@ -41,9 +41,6 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-    console.log('req.body:  ', req.body);
-
-
     Transcription.insert(req.body, function(err, file) {
         if(err) { return handleError(res, err); }
         return res.status(201).json(file);
@@ -52,8 +49,6 @@ exports.create = function(req, res) {
 
 // Updates an existing thing in the DB.
 exports.update = function(req, res) {
-    console.log('req.body', req.body);
-    console.log('req.params', req.params);
     if(req.body._id) { delete req.body._id; }
     Transcription.findOne({_id:req.params.id}, function (err, file) {
         if (err) { return handleError(res, err); }

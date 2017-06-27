@@ -4,13 +4,14 @@ var socketUtil = require('../server/socket/socket-util');
 
 var User = require('../server/api/user/user.model');
 
+var dataSharing = require('../server/bonjour');
+
 module.exports = function() {
 
   ipcUtil.on('test:event', (event, data) => {
     console.log('');
     console.log('ipc event: test:event');
   });
-
   ipcUtil.on('window:loaded', (event, data) => {
     console.log('');
     console.log('ipc event: window:loaded');
@@ -19,7 +20,6 @@ module.exports = function() {
       event.sender.send('application:data', {test: 'test app data'});
     });
   });
-
   ipcUtil.on('get:user', (event, data) => {
     console.log('');
     console.log('ipc event: get:user');
@@ -30,13 +30,14 @@ module.exports = function() {
       })
   });
 
-
   ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
   ipcUtil.on('update:following', onUpdateFollowing);
   ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
+  ipcUtil.on('toggle:sharing', toggleSharing)
 
 
   function onBroadcastProfileUpdates() {
+
     console.log('');
     console.log('on:: broadcast:profile-updates ipc');
     console.log('TODO: update to include phone numbers');
@@ -90,7 +91,7 @@ module.exports = function() {
    */
   function onBroadcastUpdates(data) {
     console.log('');
-    console.log('on:: broadcast:Updates');
+    console.log('on:: broadcast:Updates ipc');
     let mediaPromises = [];
     //encode image
     if (data.image) {
@@ -135,6 +136,16 @@ module.exports = function() {
     });
   }
 
+  function toggleSharing(event, data) {
+    console.log('toggleSharing:', data);
+    if (data.isSharing) {
+      console.log('isSharing');
+      dataSharing.init();
+    } else {
+      dataSharing.disconnect();
+    }
+
+  }
 
 
 

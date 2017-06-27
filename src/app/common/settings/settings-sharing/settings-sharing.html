@@ -3,7 +3,11 @@
 		<h2>Turn Sharing {{$ctrl.settings.isSharing ?'OFF' : 'ON'}}</h2>
 		<p class="sub-text" ng-if="!$ctrl.settings.isSharing">Turning this on will allow you to share project data over the LAN</p>
 		<span flex></span>
-		<md-switch ng-model="$ctrl.settings.isSharing" ng-change="$ctrl.toggleSharing()" aria-label="Toggle sharing"></md-switch>
+		<div  class="toggle-sharing-click-overlay">
+			<md-switch ng-click="$ctrl.confirmToggleSharing($event)" ng-change="$ctrl.toggleSharingConfirmed()" ng-model="$ctrl.settings.isSharing" aria-label="Toggle sharing"></md-switch>
+			<!--<md-switch ng-click="$ctrl.confirmToggleSharing($event)" ng-change="$ctrl.toggleSharingConfirmed()" ng-model="$ctrl.settings.isSharing" aria-label="Toggle sharing"></md-switch>-->
+			<!--<md-switch ng-model="$ctrl.settings.isSharing" ng-change="$ctrl.toggleSharing($event)" aria-label="Toggle sharing"></md-switch>-->
+		</div>
 	</div>
 	<md-divider></md-divider>
 </md-toolbar>

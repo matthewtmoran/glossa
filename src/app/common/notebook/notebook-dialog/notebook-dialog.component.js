@@ -10,6 +10,7 @@ export const notebookDialogComponent = {
     currentUser: '<',
     hashtags: '<',
     notebook: '<',
+    settings: '<',
     editorOptions:'<',
     onUpdateTag: '&'
   },

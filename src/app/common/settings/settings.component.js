@@ -16,7 +16,8 @@ export const settingsComponent = {
     onUpdateUserInfo: '&',
     onToggleSharing: '&',
     onRemoveAvatar: '&',
-    onUpdateTag: '&'
+    onUpdateTag: '&',
+    onConfirmToggleSharing:'&'
   },
   templateUrl,
   controller: class SettingsComponent {
@@ -181,6 +182,12 @@ export const settingsComponent = {
           isSharing: event.isSharing
         }
       });
+    }
+
+    confirmToggleSharing(event) {
+      this.onConfirmToggleSharing({
+        $event: event
+      })
     }
 
     toggleFollow(event) {

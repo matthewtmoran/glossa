@@ -1,5 +1,5 @@
+//@electron-run
 var ipcRenderer = window.require('electron').ipcRenderer;
-
 export class IpcSerivce {
   constructor($rootScope, $window) {
     'ngInject';

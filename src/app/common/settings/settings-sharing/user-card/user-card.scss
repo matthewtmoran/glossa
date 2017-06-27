@@ -5,33 +5,35 @@ user-card {
 
 		.user-avatar-container {
 			position: relative;
+			
+			> div {
+				display: inline-block;
+				vertical-align: middle;
+			}
+
+			.online-status {
+				height:15px;
+				width: 15px;
+				border-radius: 50px;
+				//position: absolute;
+				//bottom: 0;
+				//top: 0;
+				//margin: auto;
+				z-index: 99;
+
+				&.offline-notification {
+					background: #FF5607;
+				}
+
+				&.online-notification {
+					background: #CDDE20;
+				}
+			}
 		}
 
-		.online-notification {
-			background: #CDDE20;
-			height:15px;
-			width: 15px;
-			border-radius: 50px;
-			position: absolute;
-			bottom: 0;
-			top: 0;
-			margin: auto;
-			left: 6px;
-			z-index: 9999;
-		}
 
-		.offline-notification {
-			background: #FF5607;
-			height:15px;
-			width: 15px;
-			border-radius: 50px;
-			position: absolute;
-			bottom: 0;
-			top: 0;
-			margin: auto;
-			left: 6px;
-			z-index: 9999;
-		}
+
+
 
 		.user-sync-containaer {
 			font-size: .9em;
@@ -43,9 +45,25 @@ user-card {
 			margin-left: 20px;
 		}
 
-		.letter {
-			color: white;
+		.md-avatar {
+			position: relative;
+
+			.letter {
+				display: block;
+				margin: auto;
+
+				line-height: 40px;
+				text-align: center;
+
+				top: 100%;
+				bottom:100%;
+				left: 100%;
+				right: 100%;
+
+				color: white;
+			}
 		}
+
 
 		.md-button {
 

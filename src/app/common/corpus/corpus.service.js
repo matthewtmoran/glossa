@@ -1,10 +1,12 @@
 export class CorpusService {
-  constructor($http, Upload, $stateParams, __appData) {
+  constructor($http, Upload, $stateParams, __appData, $q, ParseService) {
     'ngInject';
     this.$http = $http;
     this.Upload = Upload;
     this.$stateParams = $stateParams;
     this.__appData = __appData;
+    this.$q = $q;
+    this.parseService = ParseService;
 
     // console.log('calling user api');
     // this.$http.get('api/user').then((response) => {
@@ -28,15 +30,19 @@ export class CorpusService {
 
   //update md file
   updateFile(file) {
-    console.log('updateFile in corpus.service', file);
-    let options = {
-      url:`/api/transcription/${file._id}`,
-      method: 'PUT'
-    };
 
-    return this.uploadReq(file, options)
+    return this.$q.when(this.parseService.hashtags(file))
       .then((data) => {
-        return data;
+        file.hashtags = data;
+        let options = {
+          url:`/api/transcription/${file._id}`,
+          method: 'PUT'
+        };
+
+        return this.uploadReq(file, options)
+          .then((data) => {
+            return data;
+        })
     });
   }
 

@@ -5,7 +5,6 @@
 		</md-card-avatar>
 		<md-card-header-text class="title-text ">
 			<span class="md-title">{{$ctrl.notebook.createdBy.name}}</span>
-			<!--<span class="md-headline">{{notebook.updatedAt | date}}</span>-->
 		</md-card-header-text>
 		<md-divider></md-divider>
 	</md-card-header>
@@ -32,11 +31,9 @@
 	<md-card-actions flex=10 layout="row" layout-align="end bottom">
 		<md-button ng-if="$ctrl.isCorpus" ng-click="$ctrl.disconnectNotebook()">Disconnect</md-button>
 
-		<md-button ng-if="$ctrl.notebook.createdBy._id === $ctrl.currentUser._id" ng-click="$ctrl.viewDetails()">View Details</md-button>
-		<md-button ng-if="$ctrl.notebook.createdBy._id !== $ctrl.currentUser._id" ng-click="$ctrl.viewPreview()">View Preview</md-button>
+		<md-button ng-if="$ctrl.notebook.createdBy._id === $ctrl.currentUser._id" ng-click="$ctrl.viewDetails()">View</md-button>
+		<md-button ng-if="$ctrl.notebook.createdBy._id !== $ctrl.currentUser._id" ng-click="$ctrl.viewPreview()">View</md-button>
 
-		<!--<md-button ng-click="notebookDialog($event, notebooks.postType, notebooks)">Edit Post</md-button>-->
 	</md-card-actions>
 
-	<!--<pre>{{notebook | json}}</pre>-->
 </md-card>

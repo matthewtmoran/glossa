@@ -1,7 +1,6 @@
 import templateUrl from './root.html';
 
 var BrowserWindow = window.require('electron').remote.getCurrentWindow();
-
 export const rootComponent = {
   templateUrl,
   controller: class RootComponent {

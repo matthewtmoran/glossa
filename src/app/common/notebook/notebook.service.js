@@ -78,8 +78,6 @@ export class NotebookService {
       }
     ];
 
-    // this.postOptions = this.postOptions.bind(this);
-
   }
 
   /**

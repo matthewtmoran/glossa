@@ -12,7 +12,6 @@ var ipc = require('./ipc')();
 var Notebook = require('./server/api/notebook/notebook.model');
 
 
-
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 
@@ -25,14 +24,13 @@ function startExpress() {
   fsCheck();
   Promise.all([require('./server/config/init').getInitialState()])
     .then(function (appData) {
-
+      // here we set the global state for the entire app.
+      //we also pass this data to the express server
       global.appData = {
         initialState: appData[0],
         isWindows: process.platform === 'win32'
       };
-
-      express = require('./server/app')(bonjour, appData);
-
+      express = require('./server/app')(bonjour, appData[0]);
   });
 }
 startExpress();
@@ -84,6 +82,7 @@ function createWindow() {
     // icon: path.join(__dirname, 'dist/img/app-icons/mac/glossa-logo.icns') //for dev for mac
   });
 
+  //build the menu...
   AppMenu.buildMenu(win);
 
 

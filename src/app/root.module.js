@@ -22,7 +22,7 @@ import 'angular-material/angular-material.scss';
 import io from 'socket.io-client';
 
 const electron = window.require('electron');
-var ipcRenderer = window.require('electron').ipcRenderer;;
+var ipcRenderer = window.require('electron').ipcRenderer;
 
 
 
@@ -34,12 +34,13 @@ var ipcRenderer = window.require('electron').ipcRenderer;;
 //TODO: figure out how to make this shit modular and WORK
 angular.module('config', []);
 //needed for ui-codemirror not sure this is the best way to bind to window objet
-window.CodeMirror = CodeMirror;let ioRoom = window.location.origin;
-window.socket = io(ioRoom);
-window.socket.on('request:socket-type', () => {
-  console.log('request:SocketType');
-  window.socket.emit('return:socket-type', {type: 'local-client'})
-});
+window.CodeMirror = CodeMirror;
+// let ioRoom = window.location.origin;
+// window.socket = io(ioRoom);
+// window.socket.on('request:socket-type', () => {
+//   console.log('request:SocketType');
+//   window.socket.emit('return:socket-type', {type: 'local-client'})
+// });
 
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
@@ -58,9 +59,6 @@ window.onload = () => {
   const appData = electron.remote.getGlobal('appData');
 
   console.log('appData', appData);
-
-  ipcRenderer.send('window:loaded', {someData: 'my data is here'});
-
 
 
   angular.module('config').constant('__appData', appData);

@@ -1,10 +1,10 @@
 import Mousetrap from 'mousetrap';
-
+//@electron-run
 var ipc = window.require('electron').ipcRenderer;
 var dialog = window.require('electron').remote.dialog;
 
 export class RootService {
-  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar,IpcSerivce) {
+  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar, IpcSerivce) {
     'ngInject';
 
     this.$http = $http;
@@ -23,22 +23,18 @@ export class RootService {
     });
 
     //TODO: move ipc listeners to their own service
+    //@electron-run
     ipc.on('navigateToState', this.navigateToState.bind(this));
     ipc.on('import:project', this.ipcImportProject.bind(this));
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
 
-    ipc.send('test:event', 'ping');
-
     //this overwrites events even if input/codemirror/siimplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
 
-      if (combo === 'ctrl+down' ||
+      if (combo ===
         'command+down' ||
-        'ctrl+up' ||
         'command+up' ||
-        'ctrl+right' ||
         'command+right' ||
-        'ctrl+left' ||
         'command+left' ||
         'ctrl+space' ||
         'command+space') {
@@ -110,6 +106,21 @@ export class RootService {
         }
       }
     );
+  }
+
+  updateSettings(settings) {
+    return this.$http.put(`/api/settings/${this.__user._id}`, settings)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      })
+  }
+
+  toggleSharing(isSharing) {
+    this.ipcSerivce.send('toggle:sharing', {isSharing: isSharing})
   }
 
   navigateToState(event, data) {

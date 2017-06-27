@@ -2,6 +2,7 @@ import templateUrl from './app.html';
 
 export const appComponent = {
   bindings: {
+    settings: '<',
     currentUser: '<',
     project: '<',
     allConnections: '<',
@@ -10,7 +11,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $q, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService) {
+    constructor($scope, $state, $q, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData) {
       'ngInject';
       console.log('AppComponent loaded............');
       this.$scope = $scope;
@@ -18,11 +19,12 @@ export const appComponent = {
       this.$q = $q;
       this.cfpLoadingBar = cfpLoadingBar;
 
+      this.__appData = __appData;
+
       this.rootService = RootService;
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
-      this.settings = {};
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
     }
@@ -33,13 +35,15 @@ export const appComponent = {
       }
       if (changes.currentUser) {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
-        this.settings = angular.copy(this.currentUser.settings);
       }
       if (changes.project) {
         this.project = angular.copy(changes.project.currentValue);
       }
       if (changes.hashtags) {
         this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
+      if (changes.settings) {
+        this.settings = angular.copy(changes.settings.currentValue);
       }
     }
 
@@ -149,8 +153,9 @@ export const appComponent = {
     }
 
     toggleSharing(event) {
+      console.log('this.settings during toggleSharing', this.settings); //original
       let options = {};
-      if (!this.settings.isSharing) {
+      if (this.settings.isSharing) {
         options.title = 'Are you sure you want to turn OFF sharing?';
         options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
       } else {
@@ -161,21 +166,66 @@ export const appComponent = {
       this.dialogService.confirmDialog(options)
         .then((result) => {
           if (!result) {
+
+            this.settings = angular.copy(this.settings);
             return;
           }
+          console.log("result", result);
           if (this.settings.isSharing) {
-            this.socketService.init();
-            this.rootService.initListeners();
-            this.rootService.getOnlineUsersSE();
+            console.log('TODO: send ipc event to enable sharing')
+
+
+            // this.socketService.init();
+            // this.rootService.initListeners();
+            // this.rootService.getOnlineUsersSE();
           }
           if (!this.settings.isSharing) {
-            this.socketService.disconnect();
+
+            console.log('TODO: send ipc event to disable sharing...');
+
+            // this.socketService.disconnect();
           }
-          console.log('TODO: refractor how settigns work');
-          this.rootService.saveSettings(this.settings)
-            .then((data) => {
-              console.log('TODO: this is where settings should vbe update across application', data);
-            })
+
+          console.log('TODO: save sharing settings');
+
+        })
+    }
+
+    confirmToggleSharing(event) {
+      let options = {};
+      if (this.settings.isSharing) {
+        options.title = 'Are you sure you want to turn OFF sharing?';
+        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
+      } else {
+        options.title = 'Are you sure you want to turn ON sharing?';
+        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
+      }
+
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            console.log(result);
+            //trigger changes back down the child components
+            this.settings = angular.copy(this.settings)
+          } else {
+            //this updates the persisted data and the global.initialState object
+            this.rootService.updateSettings({isSharing:event.isSharing})
+              .then((data) => {
+                //data should be the correct object (unless there are errors), however, for consistency sake, becuase __appData is electron global object that we update with the put request on the api server, we can set it to the __appData object as we do in the resolve of the app route
+                //this ensures all our data is normalized for each session and persisted over multiple sessions and at each moment.
+                //essential our one source of truth will be from __appData which will be updated through express.
+                //this should be done with all api calls
+                //TODO: update all api routes to update global appData object
+                //TODO: update all setting of objects to reference global appData object
+                //on this copy specifically, it updates all child components twice, I belive this is because of md-switch's internal state
+                this.settings = angular.copy(this.__appData.initialState.settings);
+                this.rootService.toggleSharing(this.settings.isSharing)
+
+
+
+
+              })
+          }
         })
     }
 

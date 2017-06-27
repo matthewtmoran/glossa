@@ -39,6 +39,7 @@ export const app = angular
           project: (__appData) => __appData.initialState.project,
           allConnections: (__appData) => __appData.initialState.connections,
           hashtags: (__appData) => __appData.initialState.hashtags,
+
           commonTags: (RootService) => RootService.getCommonHashtags()
 
           // currentUser: (RootService) => RootService.getUser(),

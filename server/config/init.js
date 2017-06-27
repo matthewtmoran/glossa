@@ -115,12 +115,6 @@ function defaultAppData() {
     var user = {
         name: 'glossa user',
         createdAt: Date.now(),
-        settings: {
-            isSharing: true,
-            waveColor: "#BDBDBD",
-            skipLength: 2
-        },
-        session: {}
     };
 
    return createUserData(user)
@@ -468,56 +462,46 @@ function getInitialState() {
       getInitialUser()
         .then((data) => {
           initialState.user = data;
-          console.log('getInitalUser resolved', !!data)
         }),
 
       getInitialSession()
         .then((data) => {
           initialState.session = data;
-          console.log('getInitialSession resolved', !!data)
         }),
 
       getInitialProject()
         .then((data) => {
           initialState.project = data;
-          console.log('getInitialProject resolved', data)
         }),
       getInitialSettings()
         .then((data) => {
           initialState.settings = data
-          console.log('getInitialSettings resolved', !!data)
         }),
 
       getInitialNotebooks()
         .then((data) => {
           initialState.notebooks = data
-          console.log('getInitialNotebooks resolved', !!data)
         }),
 
       getInitialConnections()
         .then((data) => {
           initialState.connections = data
-          console.log('getInitialConnections resolved', !!data)
         }),
 
       getInitialTranscriptions()
         .then((data) => {
           initialState.transcriptions = data
-          console.log('getInitialTranscriptions resolved', !!data)
         }),
 
       getInitialHashtags()
         .then((data) => {
           initialState.hashtags = data
-          console.log('getInitialHashtags resolved', !!data)
         })
 
 
     );
 
 
-    console.log('statePromises', statePromises);
-    console.log('initialState', initialState);
 
     Promise.all(statePromises)
       .then((results) => {
@@ -576,12 +560,12 @@ function buildInitialUser() {
   const user = {
     name: 'glossa user',
     createdAt: Date.now(),
-    settings: {
-      isSharing: true,
-      waveColor: "#BDBDBD",
-      skipLength: 2
-    },
   };
+    // settings: {
+    //   isSharing: true,
+    //   waveColor: "#BDBDBD",
+    //   skipLength: 2
+    // },
 
   return new Promise((resolve, reject) => {
     User.insert(user, (err, user) => {
@@ -644,11 +628,9 @@ function getInitialProject() {
         reject(err)
       }
       if (!project) {
-        console.log('no project found')
         isFirstRun = true;
         resolve(buildInitialProject())
       }
-      console.log('project is found', project);
       resolve(project)
     })
   })
@@ -689,7 +671,10 @@ function buildInitialSettings() {
     media: {
       waveColor: '#BDBDBD',
       skipLength: 2
-    }
+    },
+    isSharing: true,
+    waveColor: "#BDBDBD",
+    skipLength: 2
   };
 
   return new Promise((resolve, reject) => {
@@ -711,7 +696,6 @@ function getInitialNotebooks() {
         console.log('Error getting initial notebooks', err);
         reject(err);
       }
-      console.log('do notebooks exist?', !!notebooks);
       resolve(notebooks);
     });
   });

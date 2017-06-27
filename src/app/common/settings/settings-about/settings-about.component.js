@@ -30,7 +30,7 @@ export const settingsAboutComponent = {
         },
         {
           name: 'Justin Rees',
-          title: '',
+          title: 'Project Manager',
           url: 'tribeordie.com',
           avatar: ''
         }

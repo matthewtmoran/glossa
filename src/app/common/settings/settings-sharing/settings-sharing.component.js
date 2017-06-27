@@ -12,6 +12,7 @@ export const settingsSharingComponent = {
     onUpdateUserInfo: '&',
     onToggleSharing: '&',
     onToggleFollow: '&',
+    onConfirmToggleSharing: '&'
   },
   templateUrl,
   controller: class SettingsSharingComponent {
@@ -24,11 +25,6 @@ export const settingsSharingComponent = {
       this.dialogService = DialogService;
       this.cfpLoadingBar = cfpLoadingBar;
 
-      // this.$scope.$on('update:networkUsers', this.updateNetworkUsers.bind(this));
-      // this.$scope.$on('update:networkUsers:disconnect', this.updateNetworkUsersDisconnect.bind(this));
-      // this.$scope.$on('update:connection', this.updateConnection.bind(this));
-      // this.$scope.$on('update:connections', this.updateConnections.bind(this));
-
     }
 
     $onChanges(changes) {
@@ -39,16 +35,31 @@ export const settingsSharingComponent = {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.settings) {
+        console.log('changes in settings', changes.settings);
         this.settings = angular.copy(changes.settings.currentValue);
       }
-      // if (changes.currentUser) {
-      //   console.log('changes with currentUser')
-      //   this.currentUser = angular.copy(changes.currentUser.currentValue);
-      // }
     }
 
     $onInit() {
 
+      // this.allConnections = [
+      //   {
+      //     online: false,
+      //     following: false,
+      //     avatar: null,
+      //     color: 'blue',
+      //     name: 'User 1',
+      //     _id: 1
+      //   },
+      //   {
+      //     online: true,
+      //     following: true,
+      //     avatar: `C:\\htdocs\\development\\sandbox\\glossaES6\\glossa\\server\\data\\image\\Adam-1497979068622.jpg`,
+      //     color: 'blue',
+      //     name: 'User 1',
+      //     _id: 1
+      //   }
+      // ]
     }
 
     removeAvatar(path) {
@@ -68,7 +79,6 @@ export const settingsSharingComponent = {
     }
 
     updateUserInfo() {
-      console.log('this.currentUser',this.currentUser);
       this.onUpdateUserInfo({
         $event: {
           currentUser: this.currentUser
@@ -79,12 +89,33 @@ export const settingsSharingComponent = {
       // this.rootService.updateUserProfile(userProfile)
     }
 
-    toggleSharing() {
-      this.onToggleSharing({
+    toggleSharingConfirmed(event) {
+      console.log('toggleSharing change event');
+    }
+
+    confirmToggleSharing(event) {
+      this.onConfirmToggleSharing({
         $event: {
-          isSharing: this.settings.isSharing
+          isSharing: !this.settings.isSharing
         }
-      });
+      })
+    }
+
+    toggleSharing(event) {
+      console.log('toggleSharing click event');
+      event.preventDefault();
+      event.stopPropagation();
+
+
+
+
+
+
+      // this.onToggleSharing({
+      //   $event: {
+      //     isSharing: this.settings.isSharing
+      //   }
+      // });
     }
 
     toggleFollow(event) {

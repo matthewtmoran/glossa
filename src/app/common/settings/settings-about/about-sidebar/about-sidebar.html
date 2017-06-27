@@ -1,0 +1,22 @@
+<md-content>
+	<div class="image-container">
+		<img class="settings-image logo" layout-align="center center" src="../../../../../img/glossa-logo.svg" alt="">
+	</div>
+
+	<h1>Glossa<span> v.0.0.0</span></h1>
+	<h1>Glossa<span> v.0.0.0</span></h1>
+
+	<md-list>
+		<md-list-item ng-repeat="contact in $ctrl.contributers" class="md-3-line contact-item">
+			<img ng-src="{{contact.avatar}}" class="md-avatar" alt="" />
+			<div class="md-list-item-text compact">
+				<h3>{{contact.name}}</h3>
+				<h4>{{contact.title}}</h4>
+				<p>{{contact.url}}</p>
+			</div>
+		</md-list-item>
+	</md-list>
+
+	<md-button class="md-raised license-button" ng-click="$ctrl.viewLicense()">View License Agreement</md-button>
+
+</md-content>

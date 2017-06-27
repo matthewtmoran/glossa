@@ -11,7 +11,7 @@ export const corpusComponent = {
   },
   templateUrl,
   controller: class CorpusComponent {
-    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService, $mdToast) {
+    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService, $mdToast, ParseService) {
       'ngInject';
       this.cfpLoadingBar = cfpLoadingBar;
       // this.$state = $state;
@@ -208,8 +208,8 @@ export const corpusComponent = {
 
     deleteMarkdown(event) {
       let options = {
-        title: 'Are you sure you want to delete this markdown file?',
-        textContent: 'By clicking yes, you confirm to delete all independently attached media files associated with this file?',
+        title: 'Are you sure you want to delete this text?',
+        textContent: ' ',
         okBtn: 'Yes, Delete',
         cancelBtn: 'No, cancel'
       };
