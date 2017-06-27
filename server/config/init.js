@@ -38,7 +38,7 @@ const initialState = {
     name: 'glossa user',
     createdAt: Date.now(),
     settings: {
-      isSharing: true,
+      isSharing: false,
       waveColor: "#BDBDBD",
       skipLength: 2
     },
@@ -672,7 +672,7 @@ function buildInitialSettings() {
       waveColor: '#BDBDBD',
       skipLength: 2
     },
-    isSharing: true,
+    isSharing: false,
     waveColor: "#BDBDBD",
     skipLength: 2
   };
