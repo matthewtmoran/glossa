@@ -10,7 +10,6 @@ export const settingsSharingComponent = {
     onRemoveAvatar: '&',
     onUploadAvatar: '&',
     onUpdateUserInfo: '&',
-    onToggleSharing: '&',
     onToggleFollow: '&',
     onConfirmToggleSharing: '&'
   },
@@ -35,7 +34,6 @@ export const settingsSharingComponent = {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.settings) {
-        console.log('changes in settings', changes.settings);
         this.settings = angular.copy(changes.settings.currentValue);
       }
     }
@@ -84,9 +82,6 @@ export const settingsSharingComponent = {
           currentUser: this.currentUser
         }
       });
-
-
-      // this.rootService.updateUserProfile(userProfile)
     }
 
     toggleSharingConfirmed(event) {
@@ -99,23 +94,6 @@ export const settingsSharingComponent = {
           isSharing: !this.settings.isSharing
         }
       })
-    }
-
-    toggleSharing(event) {
-      console.log('toggleSharing click event');
-      event.preventDefault();
-      event.stopPropagation();
-
-
-
-
-
-
-      // this.onToggleSharing({
-      //   $event: {
-      //     isSharing: this.settings.isSharing
-      //   }
-      // });
     }
 
     toggleFollow(event) {

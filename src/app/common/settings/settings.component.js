@@ -14,7 +14,6 @@ export const settingsComponent = {
     onSaveMediaSettings: '&',
     onUploadAvatar: '&',
     onUpdateUserInfo: '&',
-    onToggleSharing: '&',
     onRemoveAvatar: '&',
     onUpdateTag: '&',
     onConfirmToggleSharing:'&'
@@ -176,14 +175,6 @@ export const settingsComponent = {
       });
     }
     //passes event up to app.component
-    toggleSharing(event) {
-      this.onToggleSharing({
-        $event: {
-          isSharing: event.isSharing
-        }
-      });
-    }
-
     confirmToggleSharing(event) {
       this.onConfirmToggleSharing({
         $event: event
@@ -191,7 +182,6 @@ export const settingsComponent = {
     }
 
     toggleFollow(event) {
-      // event.user.following = !event.user.following;
       this.rootService.toggleFollow(event.user);
     }
 

@@ -12,6 +12,7 @@ import SettingsHashtagsTemplate from '../settings/settings-hashtags/settings-has
 export const notebookComponent = {
   bindings: {
     allConnections: '<',
+    notebooks: '<',
     notebooksData: '<',
     settings: '<',
     searchText: '<',
@@ -19,7 +20,8 @@ export const notebookComponent = {
     hashtags: '<',
     commonTags: '<',
     project: '<',
-    onUpdateTag: '&'
+    onUpdateTag: '&',
+    onSaveNotebook:'&'
   },
   templateUrl,
   controller: class NotebookComponent {
@@ -51,6 +53,9 @@ export const notebookComponent = {
     }
 
     $onChanges(changes) {
+      if (changes.notebooks) {
+        this.notebooks = angular.copy(changes.notebooks.currentValue);
+      }
       if (changes.searchText) {
 
       }
@@ -72,7 +77,7 @@ export const notebookComponent = {
     }
 
     $onInit() {
-      this.isLoading = true;
+      this.isLoading = false;
       this.hidden = false;
       this.isOpen = false;
       this.hover = false;
@@ -145,11 +150,10 @@ export const notebookComponent = {
         // }
       ];
 
-      this.notebooks = [];
       this.externalNotebooks = [];
       this.uniqueUsers = {};
 
-      this.queryNotebooks();
+      // this.queryNotebooks();
 
     }
 
@@ -179,13 +183,13 @@ export const notebookComponent = {
     };
 
 
-    queryNotebooks() {
-      this.notebookService.getNotebooks()
-        .then((data) => {
-          this.notebooks = data;
-          this.isLoading = false;
-        })
-    }
+    // queryNotebooks() {
+    //   this.notebookService.getNotebooks()
+    //     .then((data) => {
+    //       this.notebooks = data;
+    //       this.isLoading = false;
+    //     })
+    // }
 
     //TODO: deal with updating notebooks
     showNewUpdates() {
@@ -199,6 +203,7 @@ export const notebookComponent = {
     }
 
     update(event) {
+      console.log('update event');
       this.cfpLoadingBar.start();
       this.notebookService.updateNotebook(event.notebook)
         .then((data) => {
@@ -214,26 +219,9 @@ export const notebookComponent = {
     }
 
     save(event) {
-      this.$mdDialog.hide();
-      this.cfpLoadingBar.start();
-
-
-      event.notebook.createdBy = {
-        _id: this.currentUser._id,
-        avatar: this.currentUser.avatar || null,
-        name: this.currentUser.name
-      };
-      event.notebook.projectId = this.project._id;
-
-      this.notebookService.createNotebook(event.notebook)
-        .then((data) => {
-          this.notebooks.push(data);
-          this.cfpLoadingBar.complete();
-        })
-        .catch((data) => {
-          console.log('There was an error ', data);
-          this.cfpLoadingBar.complete();
-        });
+      this.onSaveNotebook({
+        $event: event
+      })
     }
 
     deleteNotebook(event) {

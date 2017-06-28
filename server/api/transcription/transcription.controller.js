@@ -13,83 +13,108 @@ var _ = require('lodash');
 var Transcription = require('./transcription.model');
 
 // Get list of things
-exports.index = function(req, res) {
-    Transcription.find(function (err, things) {
-        if(err) { return handleError(res, err); }
-        return res.status(200).json(things);
-    });
+exports.index = function (req, res) {
+  Transcription.find(function (err, things) {
+    if (err) {
+      return handleError(res, err);
+    }
+    return res.status(200).json(things);
+  });
 };
 
-exports.corpusIndex = function(req, res) {
-    var corpus = req.params.name;
-    Transcription.find({corpus: corpus}, function (err, files) {
-        if (err) {
-            return handleError(res, err);
-        }
-        return res.status(200).json(files);
-    });
+exports.corpusIndex = function (req, res) {
+  var corpus = req.params.name;
+  Transcription.find({corpus: corpus}, function (err, files) {
+    if (err) {
+      return handleError(res, err);
+    }
+    return res.status(200).json(files);
+  });
 };
 
 // Get a single thing
-exports.show = function(req, res) {
-    Transcription.findById(req.params.id, function (err, thing) {
-        if(err) { return handleError(res, err); }
-        if(!thing) { return res.status(404).send('Not Found'); }
-        return res.json(thing);
-    });
+exports.show = function (req, res) {
+  Transcription.findById(req.params.id, function (err, thing) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!thing) {
+      return res.status(404).send('Not Found');
+    }
+    return res.json(thing);
+  });
 };
 
 // Creates a new thing in the DB.
-exports.create = function(req, res) {
-    Transcription.insert(req.body, function(err, file) {
-        if(err) { return handleError(res, err); }
-        return res.status(201).json(file);
-    });
+exports.create = function (req, res) {
+  Transcription.insert(req.body, function (err, file) {
+    if (err) {
+      return handleError(res, err);
+    }
+    global.appData.initialState.transcriptions = [...global.appData.initialState.transcriptions, file];
+    return res.status(201).json(file);
+  });
 };
 
 // Updates an existing thing in the DB.
-exports.update = function(req, res) {
-    if(req.body._id) { delete req.body._id; }
-    Transcription.findOne({_id:req.params.id}, function (err, file) {
-        if (err) { return handleError(res, err); }
-        if(!file) { return res.status(404).send('Not Found'); }
-        var options = {returnUpdatedDocs: true};
-        var updated = _.merge(file, req.body.dataObj);
+exports.update = function (req, res) {
+  if (req.body._id) {
+    delete req.body._id;
+  }
+  Transcription.findOne({_id: req.params.id}, function (err, file) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!file) {
+      return res.status(404).send('Not Found');
+    }
+    var options = {returnUpdatedDocs: true};
+    var updated = _.merge(file, req.body.dataObj);
 
 
-        if (!req.body.dataObj.notebookId) {
-            delete updated.notebookId
-        }
+    if (!req.body.dataObj.notebookId) {
+      delete updated.notebookId
+    }
 
-        if (!req.body.dataObj.image) {
-            delete updated.image;
-        }
+    if (!req.body.dataObj.image) {
+      delete updated.image;
+    }
 
-        if (!req.body.dataObj.audio) {
-            delete updated.audio;
-        }
+    if (!req.body.dataObj.audio) {
+      delete updated.audio;
+    }
 
-        Transcription.update({_id:req.params.id}, updated, options, function (err, updatedNum, updatedDoc) {
-            if (err) { return handleError(res, err); }
-            Transcription.persistence.compactDatafile();
-            return res.status(200).json(updatedDoc);
-        });
+    Transcription.update({_id: req.params.id}, updated, options, function (err, updatedNum, updatedDoc) {
+      if (err) {
+        return handleError(res, err);
+      }
+      global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.map((transcription) => transcription._id === updatedDoc._id ? updatedDoc : transcription);
+      Transcription.persistence.compactDatafile();
+      return res.status(200).json(updatedDoc);
     });
+  });
 };
 
 // Deletes a thing from the DB.
-exports.destroy = function(req, res) {
-    Transcription.findOne({_id:req.params.id}, function (err, file) {
-        if(err) { return handleError(res, err); }
-        if(!file) { return res.status(404).send('Not Found'); }
+exports.destroy = function (req, res) {
+  Transcription.findOne({_id: req.params.id}, function (err, file) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!file) {
+      return res.status(404).send('Not Found');
+    }
 
-        Transcription.remove({_id: file._id}, function(err) {
-            if(err) { return handleError(res, err); }
-            return res.status(204).send(file);
-        });
+    Transcription.remove({_id: file._id}, function (err) {
+      if (err) {
+        return handleError(res, err);
+      }
+      global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(transcription => transcription._id !== transcription._id);
+      return res.status(204).send(file);
     });
+  });
 };
 
 function handleError(res, err) {
-    return res.status(500).send(err);
+  return res.status(500).send(err);
 }

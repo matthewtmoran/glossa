@@ -50,7 +50,7 @@ exports.update = function(req, res) {
         var updated = _.merge(settings, req.body);
         Settings.update({_id: settings._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
-            global.appData.initialState.settings = updatedDoc;
+            global.appData.initialState.settings = Object.assign({}, updatedDoc);
             Settings.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });

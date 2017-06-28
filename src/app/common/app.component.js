@@ -2,22 +2,25 @@ import templateUrl from './app.html';
 
 export const appComponent = {
   bindings: {
-    settings: '<',
-    currentUser: '<',
-    project: '<',
     allConnections: '<',
+    commonTags: '<',
+    currentUser: '<',
     hashtags: '<',
-    commonTags: '<'
+    notebooks: '<',
+    project: '<',
+    settings: '<',
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $q, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData) {
+    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService) {
       'ngInject';
       console.log('AppComponent loaded............');
       this.$scope = $scope;
       this.$state = $state;
       this.$q = $q;
       this.cfpLoadingBar = cfpLoadingBar;
+      this.$mdDialog = $mdDialog;
+      this.notebookService = NotebookService;
 
       this.__appData = __appData;
 
@@ -33,6 +36,9 @@ export const appComponent = {
       if (changes.allConnections) {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
+      if (changes.notebooks) {
+        this.notebooks = angular.copy(changes.notebooks.currentValue);
+      }
       if (changes.currentUser) {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
@@ -47,7 +53,6 @@ export const appComponent = {
       }
     }
 
-
     $onInit() {
       // this.currentUser = this.rootService.getUser();
       // this.project = this.settingsService.getProject();
@@ -56,11 +61,14 @@ export const appComponent = {
       // this.commonTags = this.rootService.getCommonHashtags();
     }
 
+    ////////////
+    //Settings//
+    ////////////
 
     saveMediaSettings(event) {
       this.rootService.saveSettings(event.settings)
         .then((data) => {
-          this.settings = angular.copy(data.settings);
+          this.settings = angular.copy(this.__appData.initialState.settings);
         })
     }
 
@@ -85,11 +93,50 @@ export const appComponent = {
       this.cfpLoadingBar.start();
       this.settingsService.updateProject(event.project)
         .then((data) => {
-          this.project = angular.copy(data);
+          this.project = angular.copy(this.__appData.initialState.project);
+          // this.project = angular.copy(data);
           this.cfpLoadingBar.complete();
         })
     }
 
+    updloadAvatar(event) {
+      this.cfpLoadingBar.start();
+      this.$q.when(this.rootService.uploadAvatar(event.file))
+        .then((data) => {
+          this.currentUser = angular.copy(this.__appData.initialState.user);
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          // this.currentUser = angular.copy(data);
+          // this.settings = this.currentUser.settings;
+          this.cfpLoadingBar.complete();
+        });
+    }
+
+    removeAvatar(event) {
+      this.cfpLoadingBar.start();
+      this.rootService.removeAvatar(event.file)
+        .then((data) => {
+          console.log('data returned from avatar removal', data);
+          this.currentUser = angular.copy(this.__appData.initialState.user);
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          // this.currentUser = angular.copy(data);
+          // this.settings = this.currentUser.settings;
+        })
+    }
+
+    //update 'profile' information.
+    updateUserInfo(event) {
+      this.cfpLoadingBar.start();
+      //http request
+      this.rootService.updateUserInfo(event.currentUser)
+        .then((data) => {
+          //copy new user data to update across application
+          this.currentUser = angular.copy(this.__appData.initialState.user); //copy data to ensure $onchnages triggered across application
+          //copy new notebook data to update across application
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.cfpLoadingBar.complete();
+          console.log('TODO: emit to external socket that user data has been updated?????? or bradcast when db is updated.....  ');
+        })
+    }
 
     /**
      * called when a single connection is updated
@@ -119,78 +166,7 @@ export const appComponent = {
 
     }
 
-    updloadAvatar(event) {
-      this.cfpLoadingBar.start();
-      this.$q.when(this.rootService.uploadAvatar(event.file))
-        .then((data) => {
-          this.currentUser = angular.copy(data);
-          this.settings = this.currentUser.settings;
-          this.cfpLoadingBar.complete();
-        });
-    }
-
-    //update 'profile' information.
-    updateUserInfo(event) {
-      this.cfpLoadingBar.start();
-      //http request
-      this.rootService.updateUserInfo(event.currentUser)
-        .then((data) => {
-          this.currentUser = angular.copy(data); //copy data to ensure $onchnages triggered across application
-          this.settings = this.currentUser.settings;
-          this.cfpLoadingBar.complete();
-          console.log('TODO: emit to external socket that user data has been updated?????? or bradcast when db is updated.....  ');
-        })
-    }
-
-    removeAvatar(event) {
-      this.cfpLoadingBar.start();
-      this.rootService.removeAvatar(event.file)
-        .then((data) => {
-          console.log('data returned from avatar removal', data);
-          this.currentUser = angular.copy(data);
-          this.settings = this.currentUser.settings;
-        })
-    }
-
-    toggleSharing(event) {
-      console.log('this.settings during toggleSharing', this.settings); //original
-      let options = {};
-      if (this.settings.isSharing) {
-        options.title = 'Are you sure you want to turn OFF sharing?';
-        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
-      } else {
-        options.title = 'Are you sure you want to turn ON sharing?';
-        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
-      }
-
-      this.dialogService.confirmDialog(options)
-        .then((result) => {
-          if (!result) {
-
-            this.settings = angular.copy(this.settings);
-            return;
-          }
-          console.log("result", result);
-          if (this.settings.isSharing) {
-            console.log('TODO: send ipc event to enable sharing')
-
-
-            // this.socketService.init();
-            // this.rootService.initListeners();
-            // this.rootService.getOnlineUsersSE();
-          }
-          if (!this.settings.isSharing) {
-
-            console.log('TODO: send ipc event to disable sharing...');
-
-            // this.socketService.disconnect();
-          }
-
-          console.log('TODO: save sharing settings');
-
-        })
-    }
-
+    //TODO: remove dialog service and just create it here for simplicity
     confirmToggleSharing(event) {
       let options = {};
       if (this.settings.isSharing) {
@@ -209,7 +185,7 @@ export const appComponent = {
             this.settings = angular.copy(this.settings)
           } else {
             //this updates the persisted data and the global.initialState object
-            this.rootService.updateSettings({isSharing:event.isSharing})
+            this.rootService.updateSettings({isSharing: event.isSharing})
               .then((data) => {
                 //data should be the correct object (unless there are errors), however, for consistency sake, becuase __appData is electron global object that we update with the put request on the api server, we can set it to the __appData object as we do in the resolve of the app route
                 //this ensures all our data is normalized for each session and persisted over multiple sessions and at each moment.
@@ -220,8 +196,6 @@ export const appComponent = {
                 //on this copy specifically, it updates all child components twice, I belive this is because of md-switch's internal state
                 this.settings = angular.copy(this.__appData.initialState.settings);
                 this.rootService.toggleSharing(this.settings.isSharing)
-
-
 
 
               })
@@ -279,6 +253,44 @@ export const appComponent = {
 
     }
 
+    saveNotebook(event) {
+      this.$mdDialog.hide();
+      this.cfpLoadingBar.start();
+      event.notebook.createdBy = {
+        _id: this.currentUser._id,
+        avatar: this.currentUser.avatar || null,
+        name: this.currentUser.name
+      };
+      event.notebook.projectId = this.project._id;
+
+      this.notebookService.createNotebook(event.notebook)
+        .then((data) => {
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.cfpLoadingBar.complete();
+        })
+        .catch((data) => {
+          console.log('There was an error ', data);
+          this.cfpLoadingBar.complete();
+        });
+    }
+
+
+    //////////
+    //Global//
+    //////////
+
+    searchSubmit(event) {
+      this.searchText = event.searchText;
+    }
+
+    clearSearch(event) {
+      this.searchText = angular.copy(event.text);
+    }
+
+
+    //need to sort//
+    ///////////////
+
     updateTag(event) {
       this.rootService.updateTag(event.tag)
         .then((data) => {
@@ -288,14 +300,6 @@ export const appComponent = {
             }
           });
         })
-    }
-
-    searchSubmit(event) {
-      this.searchText = event.searchText;
-    }
-
-    clearSearch(event) {
-      this.searchText = angular.copy(event.text);
     }
 
   },

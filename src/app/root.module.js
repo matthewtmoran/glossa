@@ -61,7 +61,6 @@ window.onload = () => {
 
   console.log('appData', appData);
 
-
   angular.module('config').constant('__appData', appData);
 
   angular.element(document).on('click', 'a[href^="http"]', function(event) {

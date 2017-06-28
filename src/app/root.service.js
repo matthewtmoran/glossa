@@ -242,7 +242,7 @@ export class RootService {
   }
 
   saveSettings(settings) {
-    return this.$http.put(`/api/user/${this.__user._id}/settings`, settings)
+    return this.$http.put(`/api/settings/${this.__user._id}`, settings)
       .then((response) => {
         return response.data;
       })

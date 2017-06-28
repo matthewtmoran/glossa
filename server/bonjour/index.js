@@ -83,11 +83,14 @@ exports.disconnect = function () {
 
   console.log('disconnect event (stopping sharing)');
 
+  if (localService) {
+    localService.stop(function (val) {
+      console.log('stopped local service... ');
+    })
+  }
+
   //stopping seems to work for publishing services
   //TODO: need to test to see if sockets remain open
   //TODO: on toggle event listeners are duplicated - not sure this has much impact if any considering user intentionality though it does exist.
-  localService.stop(function (val) {
-    console.log('stopped local service... ');
-  })
 
 };

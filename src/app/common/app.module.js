@@ -33,20 +33,13 @@ export const app = angular
           requiredAuth: false,
         },
         resolve: {
-
-          currentUser: (__appData) => __appData.initialState.user,
-          settings: (__appData) => __appData.initialState.settings,
-          project: (__appData) => __appData.initialState.project,
           allConnections: (__appData) => __appData.initialState.connections,
+          commonTags: (RootService) => RootService.getCommonHashtags(),
+          currentUser: (__appData) => __appData.initialState.user,
           hashtags: (__appData) => __appData.initialState.hashtags,
-
-          commonTags: (RootService) => RootService.getCommonHashtags()
-
-          // currentUser: (RootService) => RootService.getUser(),
-          // project: (SettingsService) => SettingsService.getProject(),
-          // allConnections: (RootService) => RootService.getConnections(),
-          // hashtags: (RootService) => RootService.getHashtags(),
-          // commonTags: (RootService) => RootService.getCommonHashtags()
+          project: (__appData) => __appData.initialState.project,
+          settings: (__appData) => __appData.initialState.settings,
+          notebooks: (__appData) => __appData.initialState.notebooks,
         },
         component: 'app',
       });
