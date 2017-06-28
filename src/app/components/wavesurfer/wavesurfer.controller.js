@@ -126,7 +126,6 @@ export class WaveSurferController {
 
       this.surfer.on('loading', (progress) => {
         this.wavesurferProgress = progress;
-        this.$scope.$apply();
       });
 
       this.surfer.on('ready', () => {
@@ -135,7 +134,6 @@ export class WaveSurferController {
         if (this.autoPlay) {
           this.surfer.play();
         }
-        this.$scope.$apply();
         this.cfpLoadingBar.complete();
       });
     }

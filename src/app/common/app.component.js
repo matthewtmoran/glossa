@@ -1,4 +1,10 @@
+import SimpleMDE from 'simplemde';
 import templateUrl from './app.html';
+import NotebookNormalTemplate from './notebook/notebook-dialog/notebook-dialog-normal.html';
+import NotebookPreviewTemplate from './notebook/notebook-dialog/notebook-dialog-preview.html';
+import NotebookImageTemplate from './notebook/notebook-dialog/notebook-dialog-image.html';
+import NotebookAudioTemplate from './notebook/notebook-dialog/notebook-dialog-audio.html';
+import { NotebookDialogController } from './notebook/notebook-dialog/notebook-dialog-controller';
 
 export const appComponent = {
   bindings: {
@@ -30,6 +36,12 @@ export const appComponent = {
       this.dialogService = DialogService;
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
+
+      this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this));
+      this.$scope.$on('update:externalData', this.updateExternalData.bind(this));
+
+      //broadcasted from hot-key event
+      this.$scope.$on('newNotebook', this.viewNotebookDetails.bind(this));
     }
 
     $onChanges(changes) {
@@ -54,11 +66,60 @@ export const appComponent = {
     }
 
     $onInit() {
-      // this.currentUser = this.rootService.getUser();
-      // this.project = this.settingsService.getProject();
-      // this.allConnections = this.rootService.getConnections();
-      // this.hashtags = this.rootService.getHashtags();
-      // this.commonTags = this.rootService.getCommonHashtags();
+
+      this.simplemdeToolbar = [
+        {
+          name: "italic",
+          action: SimpleMDE.toggleItalic,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'format_italic',
+          title: "Italic",
+        },
+        {
+          name: "bold",
+          action: SimpleMDE.toggleBold,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_bold",
+          title: "Bold",
+        },
+        {
+          name: "header",
+          action: SimpleMDE.toggleHeading1,
+          className: "md-icon-button material-icons toolbar-icon md-button md-ink-ripple",
+          iconClass: "text_fields",
+          title: "Header",
+        },
+        "|", // Separator
+        {
+          name: "Blockquote",
+          action: SimpleMDE.toggleBlockquote,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_quote",
+          title: "Blockquote",
+        },
+        {
+          name: "Bullet List",
+          action: SimpleMDE.toggleUnorderedList,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: "format_list_bulleted",
+          title: "Bullet List",
+        },
+        {
+          name: "Ordered List",
+          action: SimpleMDE.toggleOrderedList,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'format_list_numbered',
+          title: "Numbered List",
+        },
+        "|",
+        {
+          name: "Toggle Preview",
+          action: SimpleMDE.togglePreview,
+          className: "md-icon-button toolbar-icon md-button md-ink-ripple",
+          iconClass: 'visibility',
+          title: "Toggle Preview",
+        }
+      ];
     }
 
     ////////////
@@ -253,6 +314,14 @@ export const appComponent = {
 
     }
 
+
+    ////////////
+    //Notebook//
+    ////////////
+
+
+
+    //new notebook
     saveNotebook(event) {
       this.$mdDialog.hide();
       this.cfpLoadingBar.start();
@@ -274,6 +343,285 @@ export const appComponent = {
         });
     }
 
+    // update notebook
+    updateNotebook(event) {
+      console.log('update event');
+      this.cfpLoadingBar.start();
+      this.notebookService.updateNotebook(event.notebook)
+        .then((data) => {
+          this.$mdDialog.hide();
+
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+
+          // this.notebooks.map((notebook, index) => {
+          //   if (notebook._id === data._id) {
+          //     this.notebooks[index] = data;
+          //   }
+          // });
+          this.cfpLoadingBar.complete();
+        })
+    }
+
+    //remove notebook
+    deleteNotebook(event) {
+      let options = {
+        title: "Are you sure you want to delete this post?",
+        textContent: "By deleting this post... it wont be here anymore..."
+      };
+
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            this.viewDetails(event);
+          } else {
+            this.cfpLoadingBar.start();
+            this.notebookService.deleteNotebook(event.notebook)
+              .then((data) => {
+                if(!data) {
+                  return;
+                }
+                if (data) {
+
+                  this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+
+                  this.cfpLoadingBar.complete();
+                }
+              });
+          }
+        })
+    }
+
+    updateTag(event) {
+      this.rootService.updateTag(event.tag)
+        .then((data) => {
+          this.hashtags.map((tag, index) => {
+            if (tag._id === data._id) {
+              this.hashtags[index] = data;
+            }
+          });
+        })
+    }
+
+    //view notebook details
+    viewNotebookDetails(event) {
+
+      console.log('viewNotebookDetails', event);
+
+      if (!event.notebook) {
+        event.notebook = {
+          postType: event.type || 'normal'
+        }
+      }
+
+      let state = {};
+
+      switch(event.notebook.postType) {
+        case 'image':
+          this.editorOptions = {
+            toolbar: false,
+            status: false,
+            spellChecker: false,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Image caption...',
+          };
+          state = {
+            templateUrl: NotebookImageTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: NotebookDialogController,
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              settings: this.settings,
+              hashtags: this.hashtags,
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.updateNotebook.bind(this),
+              onSave: this.saveNotebook.bind(this)
+            }
+          };
+
+          break;
+        case 'audio':
+          this.notebook = event.notebook;
+          this.editorOptions = {
+            toolbar: false,
+            status: false,
+            spellChecker: false,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Audio caption...',
+          };
+          state = {
+            templateUrl: NotebookAudioTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: NotebookDialogController,
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              settings: this.settings,
+              hashtags: this.hashtags,
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.updateNotebook.bind(this),
+              onSave: this.saveNotebook.bind(this)
+            }
+          };
+          break;
+        case 'normal':
+          this.notebook = event.notebook;
+          this.editorOptions = {
+            toolbar: this.simplemdeToolbar,
+            spellChecker: false,
+            status: false,
+            forceSync: true,
+            autoDownloadFontAwesome: false,
+            placeholder: 'Post description...',
+          };
+
+          state = {
+            templateUrl: NotebookNormalTemplate,
+            parent: angular.element(document.body),
+            targetEvent: event,
+            controller: NotebookDialogController,
+            controllerAs: '$ctrl',
+            bindToController: true,
+            locals: {
+              settings: this.settings,
+              hashtags: this.hashtags,
+              notebook: event.notebook || {},
+              editorOptions: this.editorOptions,
+              onCancel: this.cancel.bind(this),
+              onDeleteNotebook: this.deleteNotebook.bind(this),
+              onHide: this.hide.bind(this),
+              onUpdate: this.updateNotebook.bind(this),
+              onSave: this.saveNotebook.bind(this)
+            }
+          };
+
+          break;
+        case 'default':
+          console.log('error');
+      }
+
+      this.$mdDialog.show(state)
+        .then((data) => {
+          return data;
+        })
+        .catch((data) => {
+          return data;
+        });
+    }
+
+    //manage hashtags with dialog at notebooks
+    tagManaageDialog() {
+      this.$mdDialog.show({
+        controller: () => this,
+        controllerAs: '$ctrl',
+        template: `<md-dialog class="hashtag-dialog" flex-xs="90" flex-sm="80" flex-gt-sm="80">
+                        <md-content>
+                            <settings-hashtags on-update-tag="$ctrl.updateTag($event)" hashtags="$ctrl.hashtags"></settings-hashtags>
+                        </md-content>
+                        <span flex></span>
+                        <md-dialog-actions>
+                            <md-button ng-click="$ctrl.cancel()">Close</md-button>
+                        </md-dialog-actions>
+                  </md-dialog>`,
+        // templateUrl: 'app/tagManagement/hashtags.dialog.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        // bindToController: true,
+      }).then((data) => {
+        return data;
+      }).catch((data) => {
+        return data;
+      })
+    }
+
+    //TODO: refractor to use global object
+    showNewNotebookUpdates() {
+      console.log('TODO: NEED TO REFRACTOR');
+      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
+      this.externalNotebooks.forEach((newNotebook) => {
+        newNotebook.isNew = true;
+        if (this.notebooks.indexOf(newNotebook) < 0) {
+          this.notebooks.push(newNotebook);
+        }
+      });
+      this.externalNotebooks = [];
+    }
+
+
+
+    //I believe this is called when connection connect and the data changes.
+    //TODO: refractor to use global object
+    normalizeNnotebooks(event, data) {
+      console.log('TODO: NEED TO REFRACTOR');
+      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
+      this.notebooks.forEach((notebook) => {
+        if (notebook.createdBy._id === data._id) {
+          notebook.createdBy.name = data.name;
+          notebook.createdBy.avatar = data.avatar;
+        }
+      })
+    }
+
+    //TODO: refractor to use global object
+    updateExternalData(event, data) {
+      console.log('TODO: NEED TO REFRACTOR');
+      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
+
+      if (Array.isArray(data.updatedData)) {
+
+        data.updatedData.forEach((notebook) => {
+
+          let isUpdate = false;
+
+          for(let i = 0, len = this.notebooks.length; i < len; i++) {
+            if (this.notebooks[i]._id === notebook._id) {
+              isUpdate = true;
+              this.notebooks[i] = notebook;
+              console.log("TODO: give user notification update was made.... ")
+            }
+          }
+          if (!isUpdate) {
+
+            let exists = false;
+            this.externalNotebooks.forEach((exNb) => {
+              if (exNb._id === notebook._id) {
+                exists = true;
+              }
+            });
+
+            if (!exists) {
+              this.externalNotebooks.push(notebook);
+            }
+
+          }
+        })
+      } else {
+
+        let isUpdate = false;
+        for(let i = 0, len = this.notebooks.length; i < len; i++) {
+          if (this.notebooks[i]._id === data.updatedData._id) {
+            isUpdate = true;
+            this.notebooks[i] = data.updatedData;
+            console.log("TODO: give user notification update was made.... ")
+          }
+        }
+
+        if (!isUpdate) {
+          this.externalNotebooks.push(data.updatedData);
+        }
+      }
+    }
+
 
     //////////
     //Global//
@@ -288,18 +636,19 @@ export const appComponent = {
     }
 
 
+
+
+
     //need to sort//
     ///////////////
 
-    updateTag(event) {
-      this.rootService.updateTag(event.tag)
-        .then((data) => {
-          this.hashtags.map((tag, index) => {
-            if (tag._id === data._id) {
-              this.hashtags[index] = data;
-            }
-          });
-        })
+
+    cancel() {
+      this.$mdDialog.cancel();
+    }
+
+    hide() {
+      this.$mdDialog.hide();
     }
 
   },

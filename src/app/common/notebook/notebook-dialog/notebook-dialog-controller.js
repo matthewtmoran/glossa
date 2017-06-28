@@ -40,7 +40,6 @@ export class NotebookDialogController {
   }
 
   init() {
-    console.log('init in notebook-dialog-controller');
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();

@@ -400,7 +400,7 @@ export class RootService {
 
     //normalize notebooks when data changes
     this.socketService.on('normalize:notebooks', (data) => {
-      console.log('Heard : normalize:notebooks in app.service', data);
+      console.log('Heard : normalize:notebooks in root.service', data);
 
       this.$rootScope.$broadcast('normalize:notebooks', data)
 
