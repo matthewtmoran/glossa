@@ -4,7 +4,7 @@ var ipc = window.require('electron').ipcRenderer;
 var dialog = window.require('electron').remote.dialog;
 
 export class RootService {
-  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar, IpcSerivce) {
+  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar, IpcSerivce, __appData) {
     'ngInject';
 
     this.$http = $http;
@@ -16,11 +16,7 @@ export class RootService {
     this.Upload = Upload;
     this.cfpLoadingBar = cfpLoadingBar;
     this.ipcSerivce = IpcSerivce;
-    this.currentOnlineList = [];
-
-    this.$http.get('api/user').then((response) => {
-      this.__user = response.data
-    });
+    this.__appData = __appData;
 
     //TODO: move ipc listeners to their own service
     //@electron-run
@@ -109,7 +105,7 @@ export class RootService {
   }
 
   updateSettings(settings) {
-    return this.$http.put(`/api/settings/${this.__user._id}`, settings)
+    return this.$http.put(`/api/settings/${this.__appData.initialState.user._id}`, settings)
       .then((response) => {
         return response.data;
       })
@@ -133,7 +129,7 @@ export class RootService {
 
   //should only be called on stateChange and on every state change....
   updateSession(session) {
-    return this.$http.put(`/api/user/${this.__user._id}/session`, session)
+    return this.$http.put(`/api/user/${this.__appData.initialState.user._id}/session`, session)
       .then((response) => {
         return response.data;
       })
@@ -148,6 +144,7 @@ export class RootService {
 
   //get user object (settings is also extracted from this data)
   getUser() {
+    console.log('user api called from getUser');
     return this.$http.get('/api/user/')
       .then((response) => {
         return response.data;
@@ -181,6 +178,7 @@ export class RootService {
   }
 
   getSettings() {
+    console.log('user api called from getSettings');
     return this.$http.get('/api/user/')
       .then((response) => {
         return response.data.settings;
@@ -231,7 +229,7 @@ export class RootService {
 
   removeAvatar(filePath) {
     let data = {filePath: filePath};
-    return this.$http.put(`/api/user/${this.__user._id}/avatar`, data)
+    return this.$http.put(`/api/user/${this.__appData.initialState.user._id}/avatar`, data)
       .then((response) => {
         return response.data;
       })
@@ -242,7 +240,7 @@ export class RootService {
   }
 
   saveSettings(settings) {
-    return this.$http.put(`/api/settings/${this.__user._id}`, settings)
+    return this.$http.put(`/api/settings/${this.__appData.initialState.user._id}`, settings)
       .then((response) => {
         return response.data;
       })
@@ -255,7 +253,7 @@ export class RootService {
 
   //this api updates the user AND normalizes notebooks.
   updateUserInfo(user) {
-    return this.$http.put(`/api/user/${this.__user._id}/`, user)
+    return this.$http.put(`/api/user/${this.__appData.initialState.user._id}/`, user)
       .then((response) => {
 
         this.ipcSerivce.send('broadcast:profile-updates');

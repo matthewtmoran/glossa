@@ -27,21 +27,19 @@ module.exports = {
     nodeClientSocket.on('request:socket-type', function () {
       console.log('--- on:: request:socket-type heard in server as a client');
 
+      var socketData = {
+        name: global.appData.initialState.user.name,
+        _id: global.appData.initialState.user._id,
+        type: 'external-client',
+        socketId: nodeClientSocket.id,
+        avatar: global.appData.initialState.user.avatar
+      };
 
-      socketUtil.getUser()
-        .then(function (user) {
-          var socketData = {
-            name: user.name,
-            _id: user._id,
-            type: 'external-client',
-            socketId: nodeClientSocket.id,
-            avatar: user.avatar
-          };
-          console.log('......This is where we send our data dn should show up in the other device...');
-          console.log('--- emit:: return:socket-type');
-          nodeClientSocket.emit('return:socket-type', socketData);
 
-        });
+      console.log('......This is where we send our data dn should show up in the other device...');
+      console.log('--- emit:: return:socket-type');
+      nodeClientSocket.emit('return:socket-type', socketData);
+
     });
 
 

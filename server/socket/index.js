@@ -56,35 +56,6 @@ module.exports = function (glossaUser, mySession, io) {
       console.log('');
       console.log('on:: return:socket-type');
 
-      if (data.type === 'local-client') {
-        console.log('local-client connected');
-
-        localClient = {
-          socketId: socket.id,
-          name: glossaUser.name,
-          _id: glossaUser._id,
-          disconnect: false
-        };
-
-        // glossaUser.localSocketId = socket.id; //TODO: consider deletion
-
-        //Why do we update the existing user here?
-        //update existing user to store in persistent data the new socketID
-        console.log('...updating user with current state changes (socketId)');
-        socketUtil.updateUser(localClient); //TODO: consider necessity .... I belive this is important because it allows us to call persisted data from socket client/util
-        // socketUtil.validateOnlineConnections();
-
-        //query connections and emit updated list to local-client
-        socketUtil.getConnections()
-          .then(function (data) {
-
-            ipcEvents.sendToClient('send:connections', {})
-
-            console.log('emit:: send:connections to:: local-client');
-            socketUtil.emitToLocalClient(io, localClient.socketId, 'send:connections', {connections: data});
-          });
-      }
-
       if (data.type === 'external-client') {
         console.log('external-socket connected');
         console.log('...this is where another device has discovered us and is now connecting to us...');
@@ -405,13 +376,6 @@ module.exports = function (glossaUser, mySession, io) {
     };
   });
 
-
-
-
-
-  ///////////
-  //helpers//
-  ///////////
 
 
 

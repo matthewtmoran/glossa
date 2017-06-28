@@ -6,51 +6,65 @@ var User = require('../server/api/user/user.model');
 
 var dataSharing = require('../server/bonjour');
 
+// var ipcMain = electron.ipcMain;
+
 module.exports = function() {
 
   ipcUtil.on('test:event', (event, data) => {
     console.log('');
     console.log('ipc event: test:event');
   });
+
+
+  // ipcMain.on('window:loaded', (event, arg) => {
+  //   console.log('window:loaded heard on server side ')
+  //   // event.sender.send('asynchronous-reply', 'pong');
+  // });
+
   ipcUtil.on('window:loaded', (event, data) => {
     console.log('');
     console.log('ipc event: window:loaded');
-    console.log('data', data);
-    ipcUtil.initBrowserWindow( () => {
-      event.sender.send('application:data', {test: 'test app data'});
-    });
+    // console.log('data', data);
+    //when the local client electron window loads, get the browser window
+    // ipcUtil.initBrowserWindow()
   });
+
+
   ipcUtil.on('get:user', (event, data) => {
     console.log('');
-    console.log('ipc event: get:user');
-    socketUtil.getUser()
-      .then((user) => {
-      console.log('!!user', !!user);
-        event.sender.send('return:user', user);
-      })
+    console.log('get:user ipc');
+    // socketUtil.getUser()
+    //   .then((user) => {
+    //   console.log('!!user', !!user);
+    //     event.sender.send('return:user', user);
+    //   })
   });
 
   ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
   ipcUtil.on('update:following', onUpdateFollowing);
   ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
-  ipcUtil.on('toggle:sharing', toggleSharing)
+  ipcUtil.on('toggle:sharing', toggleSharing);
 
 
   function onBroadcastProfileUpdates() {
-
     console.log('');
-    console.log('on:: broadcast:profile-updates ipc');
-    console.log('TODO: update to include phone numbers');
-    console.log('TODO: update to include avatar');
+    console.log('broadcast:profile-updates ipc');
 
-    socketUtil.getUser()
-      .then(function(user) {
-        let limitedUser = {};
-        limitedUser._id = user._id;
-        limitedUser.name = user.name;
-        limitedUser.socketId = user.socketId;
-        socketUtil.broadcastToExternalClients(io, 'rt:profile-updates', limitedUser);
-      });
+
+    //
+    // console.log('');
+    // console.log('on:: broadcast:profile-updates ipc');
+    // console.log('TODO: update to include phone numbers');
+    // console.log('TODO: update to include avatar');
+    //
+    // socketUtil.getUser()
+    //   .then(function(user) {
+    //     let limitedUser = {};
+    //     limitedUser._id = user._id;
+    //     limitedUser.name = user.name;
+    //     limitedUser.socketId = user.socketId;
+    //     socketUtil.broadcastToExternalClients(io, 'rt:profile-updates', limitedUser);
+    //   });
 
   }
 
@@ -61,24 +75,26 @@ module.exports = function() {
    */
   function onUpdateFollowing(data) {
     console.log('');
-    console.log('on:: update:following ipc');
-    console.log('data', data);
-    let client = JSON.parse(data.connection);
-    //qeury client
-    socketUtil.getConnection(client._id)
-      .then(function (clientPersistedData) {
-        //toggle follow
-        clientPersistedData.following = !client.following;
-        if (!clientPersistedData.following) {
-          console.log('we are NOT following connection');
-          //if we are no longer following client
-          unfollowConnection(clientPersistedData)
-        } else {
-          console.log('we are following connection');
-          //if we are following client
-          followConnection(clientPersistedData);
-        }
-      })
+    console.log('update:following ipc');
+    // console.log('');
+    // console.log('on:: update:following ipc');
+    // console.log('data', data);
+    // let client = JSON.parse(data.connection);
+    // //qeury client
+    // socketUtil.getConnection(client._id)
+    //   .then(function (clientPersistedData) {
+    //     //toggle follow
+    //     clientPersistedData.following = !client.following;
+    //     if (!clientPersistedData.following) {
+    //       console.log('we are NOT following connection');
+    //       //if we are no longer following client
+    //       unfollowConnection(clientPersistedData)
+    //     } else {
+    //       console.log('we are following connection');
+    //       //if we are following client
+    //       followConnection(clientPersistedData);
+    //     }
+    //   })
   }
 
   /**
@@ -91,59 +107,61 @@ module.exports = function() {
    */
   function onBroadcastUpdates(data) {
     console.log('');
-    console.log('on:: broadcast:Updates ipc');
-    let mediaPromises = [];
-    //encode image
-    if (data.image) {
-      mediaPromises.push(
-        socketUtil.encodeBase64(data.image.path)
-          .then(function (imageString) {
-            data.imageBuffer = imageString;
-          })
-      )
-    }
-    //encode audio
-    if (data.audio) {
-      mediaPromises.push(
-        socketUtil.encodeBase64(data.audio.path)
-          .then(function (audioString) {
-            data.audioBuffer = audioString;
-          })
-      )
-    }
-
-    //once image and audio has been encoded...
-    Promise.all(mediaPromises).then(function (result) {
-
-
-      socketUtil.getUser()
-        .then(function(user) {
-          let updateObject = {
-            update: data,
-            user: {
-              _id: user._id,
-              name: user.name
-            }
-          };
-
-          //send to clients
-          console.log('emit:: rt:updates to:: all external clients');
-          socketUtil.broadcastToExternalClients(io, 'rt:updates', updateObject);
-
-        });
-
-
-    });
+    console.log('broadcast:Updates ipc');
+    // let mediaPromises = [];
+    // //encode image
+    // if (data.image) {
+    //   mediaPromises.push(
+    //     socketUtil.encodeBase64(data.image.path)
+    //       .then(function (imageString) {
+    //         data.imageBuffer = imageString;
+    //       })
+    //   )
+    // }
+    // //encode audio
+    // if (data.audio) {
+    //   mediaPromises.push(
+    //     socketUtil.encodeBase64(data.audio.path)
+    //       .then(function (audioString) {
+    //         data.audioBuffer = audioString;
+    //       })
+    //   )
+    // }
+    //
+    // //once image and audio has been encoded...
+    // Promise.all(mediaPromises).then(function (result) {
+    //
+    //
+    //   socketUtil.getUser()
+    //     .then(function(user) {
+    //       let updateObject = {
+    //         update: data,
+    //         user: {
+    //           _id: user._id,
+    //           name: user.name
+    //         }
+    //       };
+    //
+    //       //send to clients
+    //       console.log('emit:: rt:updates to:: all external clients');
+    //       socketUtil.broadcastToExternalClients(io, 'rt:updates', updateObject);
+    //
+    //     });
+    //
+    //
+    // });
   }
 
   function toggleSharing(event, data) {
-    console.log('toggleSharing:', data);
-    if (data.isSharing) {
-      console.log('isSharing');
-      dataSharing.init();
-    } else {
-      dataSharing.disconnect();
-    }
+    console.log('');
+    console.log('toggle:sharing');
+
+    // if (data.isSharing) {
+    //   console.log('isSharing');
+    //   dataSharing.init();
+    // } else {
+    //   dataSharing.disconnect();
+    // }
 
   }
 

@@ -6,13 +6,10 @@ var mainBrowserWindow;
 
 module.exports = {
 
-  initBrowserWindow: (callback) => {
+  initBrowserWindow: () => {
+    console.log('initBrowserWindow called');
     mainBrowserWindow = BrowserWindow.getFocusedWindow();
-
-    if (mainBrowserWindow) {
-      callback();
-    }
-
+    console.log('does mainBrowserWindow exist?', !!mainBrowserWindow)
   },
 
   on: (eventName, callback) => {
@@ -21,12 +18,16 @@ module.exports = {
     })
   },
 
-  send:(eventName, data, callback) => {
-    mainBrowserWindow.send(eventName, data, (...args) => {
-      if (callback) {
-        callback.apply(ipcMain, args);
-      }
-    })
+  send:(eventName, data) => {
+    console.log('does mainBrowserWindow exist?', !!mainBrowserWindow);
+    mainBrowserWindow.send(eventName, data);
+
+
+    // mainBrowserWindow.send(eventName, data, (...args) => {
+    //   if (callback) {
+    //     callback.apply(ipcMain, args);
+    //   }
+    // })
   }
 
 

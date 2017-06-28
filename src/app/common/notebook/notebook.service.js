@@ -9,12 +9,6 @@ export class NotebookService {
     this.upload = Upload;
     this.rootService = RootService;
 
-    console.log('calling user api');
-    this.$http.get('api/user').then((response) => {
-      console.log('user api resolved');
-      this.__user = response.data
-    });
-
     this.test = this.test.bind(this);
 
     this.simplemdeToolbar = [

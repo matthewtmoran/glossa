@@ -47,6 +47,7 @@ window.CodeMirror = CodeMirror;
 window.onload = () => {
 
   console.log('window.onload event');
+  ipcRenderer.send('window:loaded', {someData: 'my data is here'});
 
   const rootUrl = 'http://localhost:9000/';
   let initInjector = angular.injector(['ng']);
