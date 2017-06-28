@@ -31,69 +31,9 @@ module.exports = function (bonjour, appData) {
 
       myBonjour.init(server);
 
-      // bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
-      //
-      // browser = bonjour.find({type: 'http'});
-      // console.log('Bonjour is listening...');
-      //
-      // localService = bonjour.publish({
-      //   name: 'glossaApp-' + glossaUser._id,
-      //   type: 'http',
-      //   port: config.port,
-      //   txt: {
-      //     userid: glossaUser._id
-      //   }
-      // });
-      //
-      //
-      // browser.on('error', function (service) {
-      //   console.log('browser - Here is an error', service);
-      // });
-      //
-      // browser.on('down', function (service) {
-      //   console.log('');
-      //   console.log('Service went down.......', service.name);
-      //   console.log('Service on network:', browser.services.length);
-      //   console.log('');
-      // });
-      //
-      // browser.on('up', function (service) {
-      //   console.log('');
-      //   console.log('Service went/is live........', service.name);
-      //   if (service.name !== 'glossaApp-' + glossaUser._id) {
-      //
-      //     console.log('((not our service))');
-      //   }
-      //   if (service.name === 'glossaApp-' + glossaUser._id) {
-      //     console.log('((is our service))');
-      //   }
-      //
-      //   console.log('Services on network:', browser.services.length);
-      //   console.log('');
-      //
-      //   // make sure network service is a glossa instance....
-      //   if (service.name.indexOf('glossaApp') > -1) {
-      //     console.log('A glossa Application is online');
-      //     if (service.name === 'glossaApp-' + glossaUser._id) {
-      //       console.log('...Local service found IGNORE');
-      //
-      //     } else if (service.name !== 'glossaApp-' + glossaUser._id) {
-      //       console.log('...External service found CONNECT');
-      //
-      //       //this is where we connect to a serve as a client.
-      //       //On other devices, we will show up as a client
-      //       //they will see our data through this
-      //       //this is how we send out data
-      //       externalSocketClient.initAsClient(service, glossaUser, io)
-      //
-      //     }
-      //   }
-      //   console.log('');
-      // });
     } else {
       console.log('we are not sharing so no broadcasting service or initiating socket server')
     }
-
 
   });
 

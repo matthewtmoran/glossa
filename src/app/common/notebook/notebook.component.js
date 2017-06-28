@@ -328,7 +328,6 @@ export const notebookComponent = {
     };
 
     isOpenWatch(isOpen) {
-      console.log('isOpenWatch running');
       if (isOpen) {
         this.$timeout(() => {
           this.$scope.tooltipVisible = this.isOpen;

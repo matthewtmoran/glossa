@@ -176,7 +176,6 @@ export const appComponent = {
       this.cfpLoadingBar.start();
       this.rootService.removeAvatar(event.file)
         .then((data) => {
-          console.log('data returned from avatar removal', data);
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
           // this.currentUser = angular.copy(data);
@@ -404,8 +403,6 @@ export const appComponent = {
 
     //view notebook details
     viewNotebookDetails(event) {
-
-      console.log('viewNotebookDetails', event);
 
       if (!event.notebook) {
         event.notebook = {

@@ -26,9 +26,6 @@ function startExpress() {
     .then(function (appData) {
       // here we set the global state for the entire app.
       //we also pass this data to the express server
-
-      console.log('appData[0].notebooks', appData[0].notebooks);
-
       global.appData = {
         initialState: appData[0],
         isWindows: process.platform === 'win32'
@@ -87,9 +84,6 @@ function createWindow() {
 
   //build the menu...
   AppMenu.buildMenu(win);
-
-
-
 
   // and load the index.html of the app.
   win.loadURL(url.format({

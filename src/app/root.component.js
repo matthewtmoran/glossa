@@ -1,6 +1,7 @@
 import templateUrl from './root.html';
 
 var BrowserWindow = window.require('electron').remote.getCurrentWindow();
+
 export const rootComponent = {
   templateUrl,
   controller: class RootComponent {
@@ -18,7 +19,6 @@ export const rootComponent = {
       });
 
       // this.$scope.$watch(() => this.appData.initialState, this.stateWatcher.bind(this))
-      this.$scope.$watch(() => this.appData.initialState, this.stateWatcher.bind(this))
 
     }
 
@@ -73,7 +73,6 @@ export const rootComponent = {
     }
 
     popupAppMenuEvent() {
-      console.log('popupAppMenuEvent')
       this.ipcSerivce.send('popupAppMenuEvent');
     }
 
