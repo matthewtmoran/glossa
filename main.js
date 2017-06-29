@@ -129,13 +129,6 @@ function createWindow() {
 app.on('before-quit', function (e) {
   console.log('');
   console.log('before-quit');
-
-  bonjour.unpublishAll(function (val) {
-    console.log('bonjour.unpublishAll');
-  });
-
-  bonjour.destroy();
-  beforeQuitThenQuit();
 });
 
 app.on('activate-with-no-open-windows', function () {
@@ -170,7 +163,10 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     //this only happens when it's not a mac
     console.log('quitting app now from non-mac');
-    app.quit();
+    setTimeout(() => {
+      app.quit();
+    }, 3000)
+
   }
 });
 
@@ -185,8 +181,8 @@ app.on('activate', function () {
 
 
 function beforeQuitThenQuit() {
-  socketUtil.resetClientData().then(function () {
-    console.log('resetClientData promise resolved');
-  });
+  // socketUtil.resetClientData().then(function () {
+  //   console.log('resetClientData promise resolved');
+  // });
 }
 

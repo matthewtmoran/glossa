@@ -5,12 +5,12 @@ const fs = require('fs');
 
 const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
-var ipcEvents = require('../../ipc-listeners');
-var ipcUtil = require('../../ipc/util');
+// var ipcEvents = require('../../ipc-listeners');
+let ipcUtil = require('../../ipc/util');
 
 let localClient = {};
 
-module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
+module.exports = function (glossaUser, mySession, io, bonjour, win) {
   console.log('socket index.js called');
   io.sockets.on('connection', function (socket) {
     console.log('');
@@ -31,7 +31,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
     socket.on('disconnect', disconnect);
 
 
-
+    socket.on('sync-data:return', syncDataReturn);
 
     // console.log('emit:: request:socket-type');
     // socket.emit('request:socket-type');
@@ -58,7 +58,6 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
     // socket.on('disconnect', onDisconnect);
 
 
-
     ////////////////////
     //socket functions//
     ////////////////////
@@ -68,7 +67,6 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
       console.log('on:: endHandShake');
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
-
         //update existing connections
         let connectionExists = false;
         global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
@@ -78,6 +76,16 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
           //update data that we do not store
           connection.online = true;
           connection.socketId = client.socketId;
+
+          //i already know it's following here but just in case and for consitency sake
+          if (connection.following) {
+            console.log('TODO: sync data');
+            socketUtil.syncData(connection, (data) => {
+              console.log('emit:: sync-data to:: a client');
+              io.to(client.socketId).emit('sync-data', data)
+            });
+          }
+
           connection = Object.assign({}, connection);
           connectionExists = true;
           return connection;
@@ -89,7 +97,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
 
           const clientData = {
             name: client.name,
-              _id: client._id,
+            _id: client._id,
             type: 'external-client',
             following: false,
             lastSync: null,
@@ -102,6 +110,10 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
           global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
         }
 
+
+        console.log('ipc to browser: update-connection-list');
+
+        console.log('global.appData.initialState.connections.length', global.appData.initialState.connections.length);
         //tell browser to update it's data.
         win.webContents.send('update-connection-list');
       } else {
@@ -113,17 +125,13 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
     function disconnect() {
       console.log('');
       console.log('on:: disconnect');
-      //remove connection from list
-
+      //get connection from list
       let connection = global.appData.initialState.connections.find(connection => connection.socketId === socket.id);
-      console.log('connection?', !!connection);
-      //remove non-followed users from connection array
       if (!connection.following) {
-        console.log('we are not following... ');
+        //remove non-followed users from connection array
         global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
       } else {
-        console.log('we are following');
-        //if we are following, updated persisted data
+        //if we are following, updated data don't remove
         global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
           if (con._id !== connection._id) {
             return con;
@@ -134,35 +142,20 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
           con = Object.assign({}, con);
           return con;
         })
-
-
-        // socketUtil.updateOnlineStatus(connection)
-        //   .then((updatedConnection) => {
-        //     global.appData.initialState.connections.map(con => con._id !== updatedConnection._id ? con : updatedConnection);
-        //     win.webContents.send('update-connection-list');
-        //   })
       }
 
       win.webContents.send('update-connection-list');
 
-      // global.appData.initialState.connections = global.appData.initialState.connections.filter((connection) => {
-      //
-      //   if(!connection.following && connection.socketId !== socket.id) { //returns connections that we are not following and are not equal to the socket.id
-      //     return connection;
-      //   } else if (connection.following && connection.socketId === socket.id) { //if we are following and the socket.id matches , update the connection then return it
-      //     console.log('TODO: update persistent storage... ');
-      //     connection.online = false;
-      //     delete connection.socketId;
-      //     connection = Object.assign({}, connection);
-      //     return connection;
-      //   }
-      //
-      // });
-
     }
 
 
+    function syncDataReturn(data) {
+      console.log('on:: sync-data:return', data);
 
+
+
+
+    }
 
     //helper functions
 
@@ -174,7 +167,6 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
       connection.socketId = client.socketId;
       return connection
     }
-
 
 
     /**
@@ -263,7 +255,7 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
       console.log('TODO: update to include phone numbers');
       console.log('TODO: update to include avatar');
 
-      socketUtil.getUser().then(function(user) {
+      socketUtil.getUser().then(function (user) {
         let limitedUser = {};
         limitedUser._id = user._id;
         limitedUser.name = user.name;
@@ -504,8 +496,6 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
       }
     };
   });
-
-
 
 
 };

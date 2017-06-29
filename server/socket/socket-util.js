@@ -334,8 +334,11 @@ module.exports = {
 /////////////////////////////////////////////////////
 
 
+  //toggle follow status
   updateFollow(data) {
 
+    //we are just updating following status
+    //we don't want the data that changes often
     if (data.socketId) {
       delete data.socketId;
     }
@@ -348,64 +351,153 @@ module.exports = {
         if (err) {
           reject(err);
         }
+        //if no user is found, we are begining to follow user
         if (!connection) {
-          console.log('is no connection so add this one');
           data.following = true;
           Connection.insert(data, (err, newConnection) => {
             resolve(newConnection)
           })
         }
+        //if user is found we are no longer following user
         if (connection) {
-          console.log('is connection so remove from persisted data');
           Connection.remove({_id: data._id}, {}, (err, numRemoved) => {
-            if (err) {
-              reject(err);
-            }
-            data.following = false;
-            resolve(data);
+              if (err) {
+                reject(err);
+              }
+              data.following = false;
+              resolve(data);
             }
           )
         }
       });
 
-      // Connection.update(query, update, options, (err, updatedCount, updatedDoc) => {
-      //   if (err) {
-      //     console.log('Error following connection', err);
-      //     reject(err);
-      //   }
-      //
-      //   console.log(' after update:', updatedDoc);
-      //   //TODO: there may be an issue here if the user that was selected goes offline during this process...
-      //   global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
-      //     return connection._id === updatedDoc._id ? updatedDoc : connection
-      //   });
-      //
-      //   console.log('global.appData.initialState.connections[0]', global.appData.initialState.connections[0]);
-      //   Connection.persistence.compactDatafile();
-      //   resolve(updatedCount)
-      // });
     })
   },
 
-  updateOnlineStatus(client) {
+  //called when we follow someone or when someone we follow comes online
+  syncData(client, callback) {
+    //  search for notebooks we have from this client
+    //  will return empty array if their are none
+    this.findNotebooksByCreatedBy(client._id)
+      .then((notebooks) => {
+        callback({notebooks: notebooks});
+      })
+
+  },
+
+  //finds notebooks based on created by and projects limited data from them
+  findNotebooksByCreatedBy(createdById) {
+    return new Promise((resolve, reject) => {
+      const query = {
+        'createdBy._id': createdById
+      };
+      //_id is also projected
+      const projection = {
+        updatedAt: 1,
+        createdAt: 1
+      };
+      Notebooks.find(query, projection, (err, notebooks) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(notebooks);
+      })
+    })
+  },
+
+  getNewAndUpdatedNotebooks(oldData) {
     return new Promise((resolve, reject) => {
 
-      const query = {
-        _id: client._id
-      };
-      const update = {
-        $set: {online: client.online, socketId: client.socketId}
-      };
-      const options = {
-        returnUpdatedDocs: true
-      };
+      let mediaPromises = [];
+      let notebooksToSend = [];
+      let allPotentialNotebooks = global.appData.initialState.notebooks.filter(notebook => notebook.createdBy._id === global.appData.initialState.user._id);
 
-      Connection.update(query, update, options, (err, updatedCount, updatedDoc) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(updatedDoc)
-      });
+
+      if (oldData.length === 0) {
+        console.log('getting all notebooks');
+        notebooksToSend = allPotentialNotebooks.map((notebook) => {
+          if (notebook.image) {
+            mediaPromises.push(
+              this.encodeBase64(notebook.image.path).then(imageBufferString => {
+                notebook.imageBuffer = imageBufferString;
+              })
+            )
+          }
+          if (notebook.audio) {
+            mediaPromises.push(
+              this.encodeBase64(notebook.audio.path).then(audioBufferString => {
+                notebook.audioBuffer = audioBufferString;
+              })
+            )
+          }
+        })
+      } else {
+        console.log('getting updates and new notebooks')
+
+        notebooksToSend = allPotentialNotebooks.map((notebook) => {
+
+          let individualNotebookPromises = [];
+
+          let notebookExists = false;
+          let notebookNeedsUpdate = false;
+
+
+          //run through the data we have
+          oldData.forEach((oldNotebook) => {
+            //if we have the data set the exist flag to true
+            if (oldNotebook._id === notebook._id) {
+              notebookExists = true;
+              //get the updatedAt data object for the existing notebook
+              let externalUpdatedAtDateObject = new Date(oldNotebook.updatedAt);
+
+              //check if notebook needs to be updated.
+              //if the times are note equal
+              if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
+                //and if the time of the new notebook is greater than the oldData notebook match
+                //we know there must be an update to this specific notebook;
+                //TODO: maybe to a deep object comparison...
+                if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
+                  notebookNeedsUpdate = true;
+                }
+              }
+            }
+          });
+
+          //if the notebook does not exist or if the notebook needs to be updated
+          //this means it's a new notebook or a notebook that has a newer updated time
+          //we assume it needs to be updatd
+          //we don't care what data has changed, we grab it all
+          if (!notebookExists || notebookNeedsUpdate) {
+
+            if (notebook.image) {
+              mediaPromises.push(
+                this.encodeBase64(notebook.image.path)
+                  .then((imageString) => {
+                    notebook.imageBuffer = imageString;
+                  })
+              );
+            }
+            if (notebook.audio) {
+              mediaPromises.push(
+                this.encodeBase64(notebook.audio.path)
+                  .then((audioString) => {
+                    notebook.audioBuffer = audioString;
+                  })
+              )
+            }
+          }
+          console.log('does notebook have audioBuffer attached?', !!notebook.audioBuffer);
+          console.log('does notebook have imageBuffer attached?', !!notebook.imageBuffer);
+
+          return notebook;
+        });
+      }
+
+      Promise.all(mediaPromises)
+        .then(data => {
+          resolve(notebooksToSend);
+        })
+
     })
   }
 

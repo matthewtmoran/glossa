@@ -7,41 +7,27 @@
 var express = require('express');
 var config = require('./config/environment');
 var path = require('path');
-var myBonjour = require('./bonjour');
-
+var myBonjour = require('../server/bonjour');
 
 module.exports = function (bonjour, appData, win) {
-  console.log('!!bonjour in app', !!bonjour);
-
-  console.log('win', win)
-
   // Populate DB with sample data
   if (config.seedDB) {
     require('./config/seed');
   }
   // Setup server
-  var app = express();
-  var server = require('http').createServer(app);
-  // var bonjour = require('bonjour')();
-  // var io = require('socket.io')(server);
+  const app = express();
+  const server = require('http').createServer(app);
+  const io = require('socket.io')(server);
+  // const ipcEvents = require('../ipc');
 
   require('./config/express')(app); //configuration for express
   require('./routes')(app); //routes
 
+
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
-
     // require ipc event...
-    require('../ipc')(server, bonjour, win);
-
-    if (appData.settings.isSharing) {
-
-      // myBonjour.init(server);
-
-    } else {
-      console.log('we are not sharing so no broadcasting service or initiating socket server')
-    }
-
+    const ipcEvents = require('../ipc').init(server, bonjour, io, win);
   });
 
 
@@ -60,11 +46,18 @@ module.exports = function (bonjour, appData, win) {
       //   });
       // }
 
-      myBonjour.disconnect();
-
       bonjour.unpublishAll(() => {
-        console.log('all bonjour services unpublished')
-      });
+        console.log('unpublishAll success')
+        bonjour.destroy();
+        // myBonjour.disconnect(bonjour);
+      })
+
+
+      // bonjour.unpublishAll(() => {
+      //   console.log('all bonjour services unpublished in app.component')
+      // });
+
+
 
 
       console.log('cleaning done...');

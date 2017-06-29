@@ -1,23 +1,22 @@
-// const bonjour = require('bonjour')();
 const config = require('../config/environment');
 var localService;
 
-
-exports.init = function (server, bonjour, win) {
+module.exports.init = function (server, bonjour, io, win) {
+  let browser = bonjour.find({type: 'http'}); //bonjour find services
   console.log('!!bonjour in bonjour', !!bonjour);
   console.log('init sharing called...');
 
   let glossaUser = global.appData.initialState.user; // local user data
   let session = global.appData.initialState.session; //local session data
-  let browser = bonjour.find({type: 'http'}); //bonjour find services
-  let io = require('socket.io')(server); // socket.io
+
+  // let io = require('socket.io')(server); // socket.io
 
   let externalSocketClient = require('../socket/socket-client'); //client portion of socket
 
   console.log('start socket.io server');
-  require('../socket')(glossaUser, session, io, browser, bonjour, win); //main socket server
+  require('../socket')(glossaUser, session, io, bonjour, win); //main socket server
 
-  console.log('Bonjour is listening...');
+
 
   localService = bonjour.publish({
     name: 'glossaApp-' + glossaUser._id,
@@ -28,6 +27,7 @@ exports.init = function (server, bonjour, win) {
     }
   }); //local service info - published
 
+  console.log('Bonjour is listening...');
 
   //if errors occur with service
   browser.on('error', function (service) {
@@ -40,15 +40,11 @@ exports.init = function (server, bonjour, win) {
     console.log('Service went down.......', service.name);
     console.log('Service on network:', browser.services.length);
     console.log('');
-
-    if (service.name === localService.name) {
-      // bonjour.destroy(function () {
-      //   console.log('is there a callback on destroy?');
-      // })
-    }
-
-
   });
+
+  // setInterval(() => {
+  //   console.log('browser.services.length', browser.services.length);
+  // }, 3000)
 
 
   //when a service comes alive
@@ -89,15 +85,14 @@ exports.init = function (server, bonjour, win) {
 
 };
 
-exports.disconnect = function () {
+module.exports.disconnect = function (bonjour) {
 
   console.log('disconnect event (stopping sharing)');
 
-  if (localService) {
-    localService.stop(function (val) {
-      console.log('stopped local service... ');
-    })
-  }
+  bonjour.unpublishAll(() => {
+    console.log('all bonjour services unpublished in bonjour/index.js....');
+    bonjour.destroy();
+  });
 
   //stopping seems to work for publishing services
   //TODO: need to test to see if sockets remain open
