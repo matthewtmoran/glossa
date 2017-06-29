@@ -42,6 +42,8 @@ export const rootComponent = {
 
     initIpcListeners() {
 
+
+
       console.log('initIpcListeners')
       // this.ipcSerivce.on('application:data', (event, data) => {
       //   console.log('application:data');

@@ -18,7 +18,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService) {
+    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce) {
       'ngInject';
       console.log('AppComponent loaded............');
       this.$scope = $scope;
@@ -27,6 +27,7 @@ export const appComponent = {
       this.cfpLoadingBar = cfpLoadingBar;
       this.$mdDialog = $mdDialog;
       this.notebookService = NotebookService;
+      this.ipcSerivce = IpcSerivce;
 
       this.__appData = __appData;
 
@@ -42,10 +43,24 @@ export const appComponent = {
 
       //broadcasted from hot-key event
       this.$scope.$on('newNotebook', this.viewNotebookDetails.bind(this));
+
+
+
+      this.ipcSerivce.on('update-connection-list', (event, data) => {
+
+        console.log('on:: update-connection-list');
+
+        this.allConnections = angular.copy(this.__appData.initialState.connections);
+
+        console.log('this.allConnections', this.allConnections);
+
+      });
+
     }
 
     $onChanges(changes) {
       if (changes.allConnections) {
+        console.log('changes with allConnections in app.component', changes);
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.notebooks) {

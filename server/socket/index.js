@@ -6,47 +6,134 @@ const fs = require('fs');
 const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
 var ipcEvents = require('../../ipc-listeners');
+var ipcUtil = require('../../ipc/util');
 
 let localClient = {};
 
-module.exports = function (glossaUser, mySession, io) {
+module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
+  console.log('socket index.js called');
   io.sockets.on('connection', function (socket) {
     console.log('');
-    console.log('new socket connection');
+    console.log('on:: connection');
 
     /////////////
     //handshake//
     /////////////
 
-    console.log('emit:: request:socket-type');
-    socket.emit('request:socket-type');
-    socket.on('return:socket-type', onReturnSocketType);
+    console.log('emit:: begin-handshake');
+    //every socket connection, ask for some data
+    socket.emit('begin-handshake');
+
+    //this should be the return of the data we asked for
+    socket.on('end-handshake', endHandShake);
+
+    // when a socket disconnects remove from connection list
+    socket.on('disconnect', disconnect);
 
 
-    //////////////////////////
-    //local-client listeners//
-    //////////////////////////
-
-    socket.on('broadcast:profile-updates', onBroadcastProfileUpdates);
-    socket.on('broadcast:Updates', onBroadcastUpdates);
-    socket.on('request:connections', onRequestConnections);
-    socket.on('update:following', onUpdateFollowing);
 
 
-    /////////////////////////////
-    //external-client listeners//
-    /////////////////////////////
-
-    socket.on('return:avatar', onReturnAvatar);
-    socket.on('return:updates', onReturnUpdates);
-
-    socket.on('disconnect', onDisconnect);
+    // console.log('emit:: request:socket-type');
+    // socket.emit('request:socket-type');
+    // socket.on('return:socket-type', onReturnSocketType);
+    //
+    //
+    // //////////////////////////
+    // //local-client listeners//
+    // //////////////////////////
+    //
+    // socket.on('broadcast:profile-updates', onBroadcastProfileUpdates);
+    // socket.on('broadcast:Updates', onBroadcastUpdates);
+    // socket.on('request:connections', onRequestConnections);
+    // socket.on('update:following', onUpdateFollowing);
+    //
+    //
+    // /////////////////////////////
+    // //external-client listeners//
+    // /////////////////////////////
+    //
+    // socket.on('return:avatar', onReturnAvatar);
+    // socket.on('return:updates', onReturnUpdates);
+    //
+    // socket.on('disconnect', onDisconnect);
 
 
 
     ////////////////////
     //socket functions//
     ////////////////////
+
+    //client returns 'end-handshake with data'
+    function endHandShake(client) {
+      //dumb check just to make sure it's a client we want...
+      if (client.type === 'external-client') {
+        console.log('on:: endHandShake', client.type === 'external-client');
+        //update existing connections
+        global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+          return connection._id === client._id ? existingConnection(connection, client) : connection;
+        });
+
+        //if client still does not exist it means its a new client
+        if (global.appData.initialState.connections.indexOf(client) < 0) {
+          console.log('is a new client');
+
+          const clientData = {
+            name: client.name,
+              _id: client._id,
+            type: 'external-client',
+            following: false,
+            lastSync: null,
+            avatar: null,
+            socketId: client.socketId,
+            online: true
+          };
+
+          //concat to array
+          global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
+        }
+
+        //tell browser to update it's data.
+        win.webContents.send('update-connection-list');
+      } else {
+        //if it's not its probably someone at the coffee shop
+        console.log('********SOMEONE IS SNOOPING*********')
+      }
+    }
+
+    function disconnect() {
+      console.log('');
+      console.log('on:: disconnect');
+      //remove connection from list
+      global.appData.initialState.connections = global.appData.initialState.connections.filter((connection) => {
+
+        if(!connection.following && connection.socketId !== socket.id) { //returns connections that we are not following and are not equal to the socket.id
+          return connection;
+        } else if (connection.following && connection.socketId === socket.id) { //if we are following and the socket.id matches , update the connection then return it
+          connection.online = false;
+          delete connection.socketId;
+          connection = Object.assign({}, connection);
+          return connection;
+        }
+
+      });
+      win.webContents.send('update-connection-list');
+    }
+
+
+
+
+    //helper functions
+
+    //modifiess dynamic data for persisted connection
+    //TODO: I don't believe i need touch nedb since this is only data that lasts a session... and we update global.appData
+    function existingConnection(connection, client) {
+      console.log('is an offline client that we follow or connection dropped');
+      connection.online = true;
+      connection.socketId = client.socketId;
+      return connection
+    }
+
+
 
     /**
      * handshake response

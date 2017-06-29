@@ -5,46 +5,35 @@ var socketUtil = require('../server/socket/socket-util');
 var User = require('../server/api/user/user.model');
 
 var dataSharing = require('../server/bonjour');
+var myBonjour = require('../server/bonjour');
+let isRefresh = false;
+
 
 // var ipcMain = electron.ipcMain;
 
-module.exports = function() {
+module.exports = function(server, bonjour, win) {
+  console.log('!!bonjour in ipc', !!bonjour);
 
-  ipcUtil.on('test:event', (event, data) => {
-    console.log('');
-    console.log('ipc event: test:event');
-  });
-
-
-  // ipcMain.on('window:loaded', (event, arg) => {
-  //   console.log('window:loaded heard on server side ')
-  //   // event.sender.send('asynchronous-reply', 'pong');
-  // });
-
-  ipcUtil.on('window:loaded', (event, data) => {
-    console.log('');
-    console.log('ipc event: window:loaded');
-    // console.log('data', data);
-    //when the local client electron window loads, get the browser window
-    // ipcUtil.initBrowserWindow()
-  });
-
-
-  ipcUtil.on('get:user', (event, data) => {
-    console.log('');
-    console.log('get:user ipc');
-    // socketUtil.getUser()
-    //   .then((user) => {
-    //   console.log('!!user', !!user);
-    //     event.sender.send('return:user', user);
-    //   })
-  });
 
   ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
   ipcUtil.on('update:following', onUpdateFollowing);
   ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
+
+
   ipcUtil.on('toggle:sharing', toggleSharing);
 
+  ipcUtil.on('window:loaded', windowLoaded);
+
+
+  function windowLoaded() {
+    console.log('window:loaded ipc from local-client');
+    if (global.appData.initialState.settings.isSharing) {
+      if (!isRefresh) {
+        isRefresh = true;
+        myBonjour.init(server, bonjour, win);
+      }
+    }
+  }
 
   function onBroadcastProfileUpdates() {
     console.log('');
@@ -152,16 +141,19 @@ module.exports = function() {
     // });
   }
 
+
+  //come from client
+  //is ipc event
+  //data is boolean
   function toggleSharing(event, data) {
     console.log('');
-    console.log('toggle:sharing');
+    console.log('toggle:sharing ipc');
 
-    // if (data.isSharing) {
-    //   console.log('isSharing');
-    //   dataSharing.init();
-    // } else {
-    //   dataSharing.disconnect();
-    // }
+    if (data.isSharing) {
+      dataSharing.init();
+    } else {
+      dataSharing.disconnect();
+    }
 
   }
 

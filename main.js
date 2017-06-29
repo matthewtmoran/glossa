@@ -8,9 +8,6 @@ var electron = require('electron'),
 var url = require('url');
 var AppMenu = require('./app-menu');
 var socketUtil = require('./server/socket/socket-util');
-var ipc = require('./ipc')();
-var Notebook = require('./server/api/notebook/notebook.model');
-
 
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
@@ -30,7 +27,7 @@ function startExpress() {
         initialState: appData[0],
         isWindows: process.platform === 'win32'
       };
-      express = require('./server/app')(bonjour, appData[0]);
+      express = require('./server/app')(bonjour, appData[0], win);
   });
 }
 startExpress();
