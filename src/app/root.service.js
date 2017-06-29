@@ -304,11 +304,9 @@ export class RootService {
 
   //TODO: Refractor
   toggleFollow(user) {
-    let userString = angular.toJson(user);
 
-    this.ipcSerivce.send('update:following', {connection: userString});
+    this.ipcSerivce.send('update:following', {user:  angular.toJson(user)})
 
-    // this.socketService.emit('update:following', {connection: userString});
   }
 
 //TODO: consider deletion

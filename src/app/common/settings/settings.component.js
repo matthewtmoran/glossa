@@ -16,7 +16,8 @@ export const settingsComponent = {
     onUpdateUserInfo: '&',
     onRemoveAvatar: '&',
     onUpdateTag: '&',
-    onConfirmToggleSharing:'&'
+    onConfirmToggleSharing:'&',
+    onToggleFollow: '&'
   },
   templateUrl,
   controller: class SettingsComponent {
@@ -182,7 +183,9 @@ export const settingsComponent = {
     }
 
     toggleFollow(event) {
-      this.rootService.toggleFollow(event.user);
+      this.onToggleFollow({
+        $event: event
+      })
     }
 
     updateTag(event) {

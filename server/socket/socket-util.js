@@ -291,7 +291,7 @@ module.exports = {
       });
 
       getLocalSocketId()
-        .then(function(socketId) {
+        .then(function (socketId) {
           console.log('emit:: notify:externalChanges to:: local-client');
           io.to(socketId).emit('notify:externalChanges', {updatedData: array});
         });
@@ -323,11 +323,92 @@ module.exports = {
     io.to('externalClientsRoom').emit(eventName, data)
   },
 
-  emitToLocalClientWithQuery: function(io, eventName, data) {
-    getLocalSocketId().then(function(socketId) {
+  emitToLocalClientWithQuery: function (io, eventName, data) {
+    getLocalSocketId().then(function (socketId) {
       io.to(socketId).emit(eventName, data)
     })
+  },
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+
+  updateFollow(data) {
+
+    if (data.socketId) {
+      delete data.socketId;
+    }
+    if (data.hasOwnProperty('online')) {
+      delete data.online;
+    }
+
+    return new Promise((resolve, reject) => {
+      Connection.findOne({_id: data._id}, (err, connection) => {
+        if (err) {
+          reject(err);
+        }
+        if (!connection) {
+          console.log('is no connection so add this one');
+          data.following = true;
+          Connection.insert(data, (err, newConnection) => {
+            resolve(newConnection)
+          })
+        }
+        if (connection) {
+          console.log('is connection so remove from persisted data');
+          Connection.remove({_id: data._id}, {}, (err, numRemoved) => {
+            if (err) {
+              reject(err);
+            }
+            data.following = false;
+            resolve(data);
+            }
+          )
+        }
+      });
+
+      // Connection.update(query, update, options, (err, updatedCount, updatedDoc) => {
+      //   if (err) {
+      //     console.log('Error following connection', err);
+      //     reject(err);
+      //   }
+      //
+      //   console.log(' after update:', updatedDoc);
+      //   //TODO: there may be an issue here if the user that was selected goes offline during this process...
+      //   global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+      //     return connection._id === updatedDoc._id ? updatedDoc : connection
+      //   });
+      //
+      //   console.log('global.appData.initialState.connections[0]', global.appData.initialState.connections[0]);
+      //   Connection.persistence.compactDatafile();
+      //   resolve(updatedCount)
+      // });
+    })
+  },
+
+  updateOnlineStatus(client) {
+    return new Promise((resolve, reject) => {
+
+      const query = {
+        _id: client._id
+      };
+      const update = {
+        $set: {online: client.online, socketId: client.socketId}
+      };
+      const options = {
+        returnUpdatedDocs: true
+      };
+
+      Connection.update(query, update, options, (err, updatedCount, updatedDoc) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(updatedDoc)
+      });
+    })
   }
+
 
 };
 

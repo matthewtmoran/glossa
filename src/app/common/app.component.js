@@ -328,6 +328,11 @@ export const appComponent = {
 
     }
 
+    //follow an online user
+    toggleFollow(event) {
+      this.rootService.toggleFollow(event.user);
+    }
+
 
     ////////////
     //Notebook//

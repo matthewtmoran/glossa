@@ -99,9 +99,7 @@ export const settingsSharingComponent = {
     toggleFollow(event) {
 
       this.onToggleFollow({
-        $event: {
-          user: event.user
-        }
+        $event: event
       });
 
       // console.log('toggleFollow in settings-sharing.componenetjs');

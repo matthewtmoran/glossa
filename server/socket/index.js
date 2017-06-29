@@ -65,16 +65,26 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
 
     //client returns 'end-handshake with data'
     function endHandShake(client) {
+      console.log('on:: endHandShake');
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
-        console.log('on:: endHandShake', client.type === 'external-client');
+
         //update existing connections
+        let connectionExists = false;
         global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
-          return connection._id === client._id ? existingConnection(connection, client) : connection;
+          if (connection._id !== client._id) {
+            return connection;
+          }
+          //update data that we do not store
+          connection.online = true;
+          connection.socketId = client.socketId;
+          connection = Object.assign({}, connection);
+          connectionExists = true;
+          return connection;
         });
 
         //if client still does not exist it means its a new client
-        if (global.appData.initialState.connections.indexOf(client) < 0) {
+        if (!connectionExists) {
           console.log('is a new client');
 
           const clientData = {
@@ -104,19 +114,51 @@ module.exports = function (glossaUser, mySession, io, browser, bonjour, win) {
       console.log('');
       console.log('on:: disconnect');
       //remove connection from list
-      global.appData.initialState.connections = global.appData.initialState.connections.filter((connection) => {
 
-        if(!connection.following && connection.socketId !== socket.id) { //returns connections that we are not following and are not equal to the socket.id
-          return connection;
-        } else if (connection.following && connection.socketId === socket.id) { //if we are following and the socket.id matches , update the connection then return it
-          connection.online = false;
-          delete connection.socketId;
-          connection = Object.assign({}, connection);
-          return connection;
-        }
+      let connection = global.appData.initialState.connections.find(connection => connection.socketId === socket.id);
+      console.log('connection?', !!connection);
+      //remove non-followed users from connection array
+      if (!connection.following) {
+        console.log('we are not following... ');
+        global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
+      } else {
+        console.log('we are following');
+        //if we are following, updated persisted data
+        global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
+          if (con._id !== connection._id) {
+            return con;
+          }
+          //reset dynamic data;
+          con.online = false;
+          delete con.socketId;
+          con = Object.assign({}, con);
+          return con;
+        })
 
-      });
+
+        // socketUtil.updateOnlineStatus(connection)
+        //   .then((updatedConnection) => {
+        //     global.appData.initialState.connections.map(con => con._id !== updatedConnection._id ? con : updatedConnection);
+        //     win.webContents.send('update-connection-list');
+        //   })
+      }
+
       win.webContents.send('update-connection-list');
+
+      // global.appData.initialState.connections = global.appData.initialState.connections.filter((connection) => {
+      //
+      //   if(!connection.following && connection.socketId !== socket.id) { //returns connections that we are not following and are not equal to the socket.id
+      //     return connection;
+      //   } else if (connection.following && connection.socketId === socket.id) { //if we are following and the socket.id matches , update the connection then return it
+      //     console.log('TODO: update persistent storage... ');
+      //     connection.online = false;
+      //     delete connection.socketId;
+      //     connection = Object.assign({}, connection);
+      //     return connection;
+      //   }
+      //
+      // });
+
     }
 
 

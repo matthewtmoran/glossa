@@ -16,13 +16,15 @@ module.exports = function(server, bonjour, win) {
 
 
   ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
-  ipcUtil.on('update:following', onUpdateFollowing);
   ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
 
 
-  ipcUtil.on('toggle:sharing', toggleSharing);
-
+  //called on window load
   ipcUtil.on('window:loaded', windowLoaded);
+  //called when sharing is toggled
+  ipcUtil.on('toggle:sharing', toggleSharing);
+  //called when follow user is toggled
+  ipcUtil.on('update:following', onUpdateFollowing);
 
 
   function windowLoaded() {
@@ -59,12 +61,40 @@ module.exports = function(server, bonjour, win) {
 
   /**
    * when user toggles follow on an external client
+   * @param event
    * @param data
    * TODO: refractor
    */
-  function onUpdateFollowing(data) {
+  function onUpdateFollowing(event, data) {
     console.log('');
     console.log('update:following ipc');
+
+    let user = JSON.parse(data.user);
+    console.log('user', user);
+
+    //the returned object will not have socketId or online status
+    socketUtil.updateFollow(user)
+      .then((toggled) => {
+        global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+          if (connection._id !== toggled._id) {
+            return connection;
+          }
+          //update connection object with following status
+          connection.following = toggled.following;
+          connection = Object.assign({}, connection);
+          return connection;
+        }).filter((con) => {
+          //only return connection that are online or that we are following
+          return con.online || con.following;
+        });
+
+        event.sender.send('update-connection-list')
+      })
+      .catch((err) => {
+        //TODO: notify user of error....
+        console.log('TODO: Notify user of error')
+      });
+
     // console.log('');
     // console.log('on:: update:following ipc');
     // console.log('data', data);
@@ -84,6 +114,9 @@ module.exports = function(server, bonjour, win) {
     //       followConnection(clientPersistedData);
     //     }
     //   })
+
+
+
   }
 
   /**
