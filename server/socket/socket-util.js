@@ -25,10 +25,9 @@ module.exports = {
     })
   },
 
-  encodeBase64: function (mediaPath) {
-    var myPath = path.join(config.root, '/server/data/', mediaPath);
-    return new Promise(function (resolve, reject) {
-      fs.readFile(myPath, function (err, data) {
+  encodeBase64(mediaPath) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(mediaPath, (err, data) => {
         if (err) {
           console.log('there was an error encoding media...');
           reject(err);
@@ -315,6 +314,8 @@ module.exports = {
 /////////////////////////////////////////////////////
 
 
+
+
   //toggle follow status
   updateFollow(data) {
     //we are just updating following status
@@ -366,18 +367,20 @@ module.exports = {
   },
 
   writeSyncedMedia(notebooks) {
-    console.log('writeSyncedMedia', notebooks);
+    console.log('writeSyncedMedia');
     return new Promise((resolve, reject) => {
       let mediaPromises = [];
       //if there are updates...
       if (notebooks.length) {
+        console.log('notebooks exist...');
         notebooks = notebooks.map((notebook) => {
           //if imageBuffer exists then write it to system
           if (notebook.imageBuffer) {
+            console.log('notebook.image.fileName', notebook.image.filename);
             //create an object  with the buffer and the path of the iamge
             let imageUpdateObject = {
               type: 'image',
-              name: notebook.image.name,
+              name: notebook.image.filename,
               path: notebook.image.path,
               buffer: notebook.imageBuffer
             };
@@ -391,9 +394,10 @@ module.exports = {
           }
           //if audioBuffer exist then write it to system
           if (notebook.audioBuffer) {
+            console.log('notebook.audio.fileName', notebook.audio.filename);
             let audioUpdateObject = {
               type: 'audio',
-              name: notebook.audio.name,
+              name: notebook.audio.filename,
               path: notebook.audio.path,
               buffer: notebook.audioBuffer
             };
@@ -407,7 +411,8 @@ module.exports = {
 
           return notebook;
         });
-
+        console.log('notebooks.length', notebooks.length);
+        console.log('!!notebooks[0].imageBuffer', !!notebooks[0].imageBuffer);
         //once all media promises have resolved
         Promise.all(mediaPromises)
           .then((result) => {
@@ -417,16 +422,20 @@ module.exports = {
           });
 
       } else {
-        console.log('resolve what was sent to us...')
+        console.log('resolve what was sent to us...');
         resolve(notebooks);
       }
     });
   },
 
 
-  writeMediaFile: (data) => {
-    return new Promise(function (resolve, reject) {
-      let mediaPath = path.join(app.getPath('userData'), 'storage', data.type, data.name);
+  writeMediaFile(data) {
+    console.log('writeMediaFile');
+    console.log('data.name', data.name);
+    return new Promise((resolve, reject) => {
+      console.log('inside promise');
+
+      let mediaPath = path.join(app.getPath('userData'), data.type, data.name);
 
       let buffer = new Buffer(data.buffer, 'base64', (err) => {
         if (err) {
@@ -440,6 +449,7 @@ module.exports = {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
         }
+        console.log('successful writing of media file.... ');
         resolve('success');
       })
     });
@@ -488,6 +498,7 @@ module.exports = {
 
 
   //called by socket client with data passed from external server
+  //@oldData = array
   getNewAndUpdatedNotebooks(oldData) {
     return new Promise((resolve, reject) => {
 
@@ -523,11 +534,9 @@ module.exports = {
 
 
       } else {
-        console.log('getting updates and new notebooks')
-
-        notebooksToSend = allPotentialNotebooks.map((notebook) => {
-
-          let individualNotebookPromises = [];
+        console.log('getting updates and new notebooks');
+        //notebookdsToSend should only be new or updated notebooks
+        notebooksToSend = allPotentialNotebooks.filter((notebook) => {
 
           let notebookExists = false;
           let notebookNeedsUpdate = false;
@@ -576,11 +585,9 @@ module.exports = {
                   })
               )
             }
+            //only return notebook if it has update or is new.
+            return notebook;
           }
-          console.log('does notebook have audioBuffer attached?', !!notebook.audioBuffer);
-          console.log('does notebook have imageBuffer attached?', !!notebook.imageBuffer);
-
-          return notebook;
         });
       }
 
@@ -588,7 +595,6 @@ module.exports = {
         .then(data => {
           resolve(notebooksToSend);
         })
-
     })
   }
 

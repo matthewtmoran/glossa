@@ -22,10 +22,10 @@ export const notebookSidebarComponent = {
       if (changes.allConnections) {
         this.allConnections = angular.copy(changes.allConnections.currentValue)
       }
-      if (changes.allConnections) {
+      if (changes.commonTags) {
         this.commonTags = angular.copy(changes.commonTags.currentValue)
       }
-      if (changes.allConnections) {
+      if (changes.selectedHashtags) {
         this.selectedHashtags = angular.copy(changes.selectedHashtags.currentValue)
       }
     }

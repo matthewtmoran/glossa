@@ -26,7 +26,9 @@ export const notebookComponent = {
     onDeleteNotebook:'&',
     onViewNotebookDetails: '&',
     onTagManageDialog: '&',
-    onShowNewNotebookUpdates: '&'
+    onShowNewNotebookUpdates: '&',
+    onCancel:'&',
+    onHide: '&'
   },
   templateUrl,
   controller: class NotebookComponent {
@@ -243,6 +245,18 @@ export const notebookComponent = {
     //pass to app.component
     tagManageDialog() {
       this.onTagManageDialog()
+    }
+
+    cancel(event) {
+      this.onCancel({
+        $event: event
+      })
+    }
+
+    hide(event) {
+      this.onHide({
+        $event: event
+      })
     }
 
     //TODO: deal with updating notebooks

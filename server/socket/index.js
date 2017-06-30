@@ -15,7 +15,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
   io.sockets.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
-    console.log('socket.id', socket.id);
 
     /////////////
     //handshake//
@@ -80,7 +79,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
           //i already know it's following here but just in case and for consitency sake
           if (connection.following) {
-            console.log('TODO: sync data');
+            console.log('TODO: begin display sync-event');
             socketUtil.syncData(connection, (data) => {
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
@@ -128,6 +127,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
       console.log('on:: disconnect');
       //get connection from list
       let connection = global.appData.initialState.connections.find(connection => connection.socketId === socket.id);
+      console.log('!!connection', !!connection);
       if (!connection.following) {
         //remove non-followed users from connection array
         global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
@@ -145,7 +145,9 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         })
       }
 
-      win.webContents.send('update-connection-list');
+      if (win.webContents) {
+        win.webContents.send('update-connection-list');
+      }
 
     }
 
@@ -153,37 +155,43 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     function syncDataReturn(data) {
       console.log('on:: sync-data:return');
 
-      //when this returns, it means that media files have been written to the file system
-      socketUtil.writeSyncedMedia(data.notebooks)
-        .then((notebooks) => {
-          socketUtil.updateOrInsertNotebooks(notebooks)
-            .then((notebooks) => {
-              // console.log('notebook should be inserted....: ', notebooks);
+      console.log('Amount of new or updated notebooks returned', data.notebooks.length);
+      //if there is actually data to update...
+      //TODO: at the very least update the last sync time
+      if (data.notebooks.length) {
+        //write the media buffers to the file system
+        socketUtil.writeSyncedMedia(data.notebooks)
+          .then((notebooks) => {
+          console.log('writeSyncedMedia has resolved');
+            //when that is complete, update the database
+            socketUtil.updateOrInsertNotebooks(notebooks)
+              .then((notebooks) => {
+                notebooks.forEach((notebook) => {
+                  let notebookExists = false;
 
-              notebooks.forEach((notebook) => {
-                let notebookExists = false;
+                  //update the global object
+                  global.appData.initialState.notebooks.forEach((nb, index) => {
+                    if (nb._id === notebook._id) {
+                      notebookExists = true;
+                      //update the object
+                      global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
+                    }
+                  });
 
-                global.appData.initialState.notebooks.forEach((nb, index) => {
-                  if (nb._id === notebook._id) {
-                    notebookExists = true;
-                    //update the object
-                    global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
+                  if (!notebookExists) {
+                    global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
                   }
                 });
 
-                if (!notebookExists) {
-                  global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
-                }
-
-              });
-
-              win.webContents.send('update-synced-notebooks');
-
-
-            })
-        })
-
-
+                //tell client to update notebooks
+                win.webContents.send('update-synced-notebooks');
+              })
+          })
+      } else {
+        console.log('no new data from this connection');
+      }
+      console.log('TODO: end display sync-event');
+      console.log('TODO: update last sync time');
     }
 
     //helper functions

@@ -11,7 +11,7 @@ module.exports = {
     console.log('--- initAsClient called');
 
     let externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-    let nodeClientSocket = require('socket.io-client')(externalPath);
+    let nodeClientSocket = require('socket.io-client')(externalPath, {forceNew: true});
 
 
     //initial connection to another server
@@ -19,7 +19,7 @@ module.exports = {
     //the other issue will be removing event listeners
     //TODO: !IMPORTANT - test for multiple connections
 
-    //initial connection to another server
+    // //initial connection to another server
     nodeClientSocket.once('connect', function () {
       console.log('');
       console.log('--- on:: connect');
@@ -30,7 +30,19 @@ module.exports = {
       console.log('');
       console.log('--- on:: disconnect');
       console.log('');
+      unbind();
     });
+
+    //remvoes the event listener
+    //TODO: !IMPORTANT - test for multiple connections
+    function unbind() {
+      console.log('unbind triggered...');
+      nodeClientSocket.removeAllListeners("begin-handshake");
+      nodeClientSocket.removeAllListeners("end-handshake");
+      nodeClientSocket.removeAllListeners("sync-data");
+      nodeClientSocket.removeAllListeners("connect");
+      nodeClientSocket.removeAllListeners("disconnect");
+    }
 
 
     //recievs event from an external server and emits the end-handshake
@@ -53,12 +65,25 @@ module.exports = {
     nodeClientSocket.on('sync-data', (data) => {
       console.log('--- on:: sync-data');
 
+      console.log('TODO: begin outside client sync event display');
+
       socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
         .then(notebooksToSend => {
           console.log('--- emit:: sync-data:return to:: whoever requested it');
-          nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend})
+          nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend});
+          console.log('TODO: end outside client sync event display');
         })
     });
+
+
+    ////////////////////
+    //old socket events//
+    ////////////////////
+
+    /*
+     “The mark of a mature programmer is willingness to throw out code you spent time on when you realize it’s pointless.” — Bram Cohen
+     */
+
 
     //
     // //handshake
@@ -187,105 +212,105 @@ module.exports = {
     // //here we immediately notify our local-client that an external-client is syncing data (so we know not to quit or understand why cpu my be strained)
     // //we take the data that the external-server sent us and compare for changes and new data based on timestamps to send back to the external-server
     // //we end this saga by sending an event to the local-client ending the syncing status.
-    nodeClientSocket.on('request:updates', function (data) {
-      console.log('--- on:: request:updates');
-      console.log('--- emit:: notify:sync-begin to:: local-client');
-      socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-begin');
-
-      //get me
-      socketUtil.getUser()
-        .then(function (user) {
-          return user._id;
-        })
-        .then(function (userId) {
-          var newNotebookEntries = [];
-          var mediaPromises = [];
-
-          console.log('--- looking for the notebooks i created.... ');
-          Notebooks.find({"createdBy._id": userId}, function (err, notebooks) {
-            if (err) {
-              return console.log('There was an Error', err);
-            }
-            //if no data... get all notebooks
-            if (!data) {
-              console.log('--- no data sent to compare against');
-              console.log('--- TODO: need to get all notebooks');
-              notebooks.forEach(function (notebook) {
-                if (notebook.image) {
-                  console.log('Notebook has image');
-                  mediaPromises.push(
-                    socketUtil.encodeBase64(notebook.image.path).then(function (imageString) {
-                      console.log('Encoded notebook image.');
-                      notebook.imageBuffer = imageString;
-                    })
-                  );
-                }
-                if (notebook.audio) {
-                  mediaPromises.push(
-                    socketUtil.encodeBase64(notebook.audio.path).then(function (audioString) {
-                      console.log('Encoded notebook audio.');
-                      notebook.audioBuffer = audioString;
-                    })
-                  )
-                }
-                newNotebookEntries.push(notebook);
-              });
-            } else {
-              console.log('--- some data sent to compare against: ', data.length);
-              //if there is data compare so we can get updates to notebooks...
-
-              notebooks.forEach(function (notebook) {
-                var exists = false;
-                var updates = false;
-
-                data.forEach(function (d) {
-                  if (d._id === notebook._id) {
-
-                    exists = true;
-                    var externalUpdatedAtDateObject = new Date(d.updatedAt);
-
-                    //TODO: when manual timestamp is implemented - change this to be more simple
-                    if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
-                      if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
-                        updates = true;
-                      }
-                    }
-                  }
-                });
-
-                if (!exists || updates) {
-                  if (notebook.image) {
-                    mediaPromises.push(
-                      socketUtil.encodeBase64(notebook.image.path)
-                        .then(function (imageString) {
-                          notebook.imageBuffer = imageString;
-                        })
-                    );
-                  }
-                  if (notebook.audio) {
-                    mediaPromises.push(
-                      socketUtil.encodeBase64(notebook.audio.path)
-                        .then(function (audioString) {
-                          notebook.audioBuffer = audioString;
-                        })
-                    )
-                  }
-                  newNotebookEntries.push(notebook);
-                }
-              });
-            }
-
-            //these promises will be media promises
-            Promise.all(mediaPromises)
-              .then(function (data) {
-                console.log('--- emit:: return:updates to:: external-client');
-                nodeClientSocket.emit('return:updates', {updates: newNotebookEntries});
-                console.log('--- emit:: notify:sync-end to:: local-client');
-                socketUtil.emitToLocalClientWithQuery(io, 'notify:sync-end', {});
-              });
-          });
-        });
-    });
+    // nodeClientSocket.on('request:updates', function (data) {
+    //   console.log('--- on:: request:updates');
+    //   console.log('--- emit:: notify:sync-begin to:: local-client');
+    //   socketUtil.emitToLocalClient(io, me.localSocketId, 'notify:sync-begin');
+    //
+    //   //get me
+    //   socketUtil.getUser()
+    //     .then(function (user) {
+    //       return user._id;
+    //     })
+    //     .then(function (userId) {
+    //       var newNotebookEntries = [];
+    //       var mediaPromises = [];
+    //
+    //       console.log('--- looking for the notebooks i created.... ');
+    //       Notebooks.find({"createdBy._id": userId}, function (err, notebooks) {
+    //         if (err) {
+    //           return console.log('There was an Error', err);
+    //         }
+    //         //if no data... get all notebooks
+    //         if (!data) {
+    //           console.log('--- no data sent to compare against');
+    //           console.log('--- TODO: need to get all notebooks');
+    //           notebooks.forEach(function (notebook) {
+    //             if (notebook.image) {
+    //               console.log('Notebook has image');
+    //               mediaPromises.push(
+    //                 socketUtil.encodeBase64(notebook.image.path).then(function (imageString) {
+    //                   console.log('Encoded notebook image.');
+    //                   notebook.imageBuffer = imageString;
+    //                 })
+    //               );
+    //             }
+    //             if (notebook.audio) {
+    //               mediaPromises.push(
+    //                 socketUtil.encodeBase64(notebook.audio.path).then(function (audioString) {
+    //                   console.log('Encoded notebook audio.');
+    //                   notebook.audioBuffer = audioString;
+    //                 })
+    //               )
+    //             }
+    //             newNotebookEntries.push(notebook);
+    //           });
+    //         } else {
+    //           console.log('--- some data sent to compare against: ', data.length);
+    //           //if there is data compare so we can get updates to notebooks...
+    //
+    //           notebooks.forEach(function (notebook) {
+    //             var exists = false;
+    //             var updates = false;
+    //
+    //             data.forEach(function (d) {
+    //               if (d._id === notebook._id) {
+    //
+    //                 exists = true;
+    //                 var externalUpdatedAtDateObject = new Date(d.updatedAt);
+    //
+    //                 //TODO: when manual timestamp is implemented - change this to be more simple
+    //                 if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
+    //                   if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
+    //                     updates = true;
+    //                   }
+    //                 }
+    //               }
+    //             });
+    //
+    //             if (!exists || updates) {
+    //               if (notebook.image) {
+    //                 mediaPromises.push(
+    //                   socketUtil.encodeBase64(notebook.image.path)
+    //                     .then(function (imageString) {
+    //                       notebook.imageBuffer = imageString;
+    //                     })
+    //                 );
+    //               }
+    //               if (notebook.audio) {
+    //                 mediaPromises.push(
+    //                   socketUtil.encodeBase64(notebook.audio.path)
+    //                     .then(function (audioString) {
+    //                       notebook.audioBuffer = audioString;
+    //                     })
+    //                 )
+    //               }
+    //               newNotebookEntries.push(notebook);
+    //             }
+    //           });
+    //         }
+    //
+    //         //these promises will be media promises
+    //         Promise.all(mediaPromises)
+    //           .then(function (data) {
+    //             console.log('--- emit:: return:updates to:: external-client');
+    //             nodeClientSocket.emit('return:updates', {updates: newNotebookEntries});
+    //             console.log('--- emit:: notify:sync-end to:: local-client');
+    //             socketUtil.emitToLocalClientWithQuery(io, 'notify:sync-end', {});
+    //           });
+    //       });
+    //     });
+    // });
     //
     // //when user updates profile data
     // //a server emits event with updated data
