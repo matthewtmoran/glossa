@@ -7,7 +7,6 @@
 var express = require('express');
 var config = require('./config/environment');
 var path = require('path');
-var myBonjour = require('../server/bonjour');
 
 module.exports = function (bonjour, appData, win) {
   // Populate DB with sample data
@@ -37,28 +36,9 @@ module.exports = function (bonjour, appData, win) {
     if (options.cleanup) {
       console.log('cleaning...');
 
-      // if (localService) {
-      //   console.log('Bonjour process exists');
-      //
-      //   localService.stop(function () {
-      //     console.log('Service Stop Success! called from app.js');
-      //     process.exit();
-      //   });
-      // }
-
       bonjour.unpublishAll(() => {
-        console.log('unpublishAll success')
         bonjour.destroy();
-        // myBonjour.disconnect(bonjour);
-      })
-
-
-      // bonjour.unpublishAll(() => {
-      //   console.log('all bonjour services unpublished in app.component')
-      // });
-
-
-
+      });
 
       console.log('cleaning done...');
     }

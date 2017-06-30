@@ -15,6 +15,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
   io.sockets.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
+    console.log('socket.id', socket.id);
 
     /////////////
     //handshake//
@@ -148,11 +149,39 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
     }
 
-
+    //socket client returns data
     function syncDataReturn(data) {
-      console.log('on:: sync-data:return', data);
+      console.log('on:: sync-data:return');
+
+      //when this returns, it means that media files have been written to the file system
+      socketUtil.writeSyncedMedia(data.notebooks)
+        .then((notebooks) => {
+          socketUtil.updateOrInsertNotebooks(notebooks)
+            .then((notebooks) => {
+              // console.log('notebook should be inserted....: ', notebooks);
+
+              notebooks.forEach((notebook) => {
+                let notebookExists = false;
+
+                global.appData.initialState.notebooks.forEach((nb, index) => {
+                  if (nb._id === notebook._id) {
+                    notebookExists = true;
+                    //update the object
+                    global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
+                  }
+                });
+
+                if (!notebookExists) {
+                  global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
+                }
+
+              });
+
+              win.webContents.send('update-synced-notebooks');
 
 
+            })
+        })
 
 
     }

@@ -1,7 +1,5 @@
 var ipcUtil = require('./util');
-
 var socketUtil = require('../server/socket/socket-util');
-
 var myBonjour = require('../server/bonjour');
 let isRefresh = false;
 
@@ -23,7 +21,6 @@ module.exports = {
       if (global.appData.initialState.settings.isSharing) {
         if (!isRefresh) {
           isRefresh = true;
-
           myBonjour.init(server, bonjour, io, win);
         }
       }

@@ -6,6 +6,7 @@ var Connection = require('./../api/connections/connection.model');
 var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
+var app = require('electron').app;
 
 var ipcUtil = require('../../ipc/util');
 module.exports = {
@@ -37,26 +38,6 @@ module.exports = {
     });
   },
 
-  writeMediaFile: function (data) {
-    return new Promise(function (resolve, reject) {
-      var mediaPath = path.join(config.root, '/server/data/', data.path);
-
-      var buffer = new Buffer(data.buffer, 'base64', function (err) {
-        if (err) {
-          console.log('issue decoding base64 data');
-          reject(err);
-        }
-      });
-
-      fs.writeFile(mediaPath, buffer, function (err) {
-        if (err) {
-          console.log('There was an error writing file to filesystem', err);
-          reject(err);
-        }
-        resolve('success');
-      })
-    });
-  },
 
   addExternalData: function (data) {
     console.log('');
@@ -336,7 +317,6 @@ module.exports = {
 
   //toggle follow status
   updateFollow(data) {
-
     //we are just updating following status
     //we don't want the data that changes often
     if (data.socketId) {
@@ -385,6 +365,107 @@ module.exports = {
 
   },
 
+  writeSyncedMedia(notebooks) {
+    console.log('writeSyncedMedia', notebooks);
+    return new Promise((resolve, reject) => {
+      let mediaPromises = [];
+      //if there are updates...
+      if (notebooks.length) {
+        notebooks = notebooks.map((notebook) => {
+          //if imageBuffer exists then write it to system
+          if (notebook.imageBuffer) {
+            //create an object  with the buffer and the path of the iamge
+            let imageUpdateObject = {
+              type: 'image',
+              name: notebook.image.name,
+              path: notebook.image.path,
+              buffer: notebook.imageBuffer
+            };
+            //store promise of image file in array
+            mediaPromises.push(
+              this.writeMediaFile(imageUpdateObject)
+            );
+            //delete image buffer from object so we don't save it in the db
+            delete notebook.imageBuffer;
+            notebook = Object.assign({}, notebook);
+          }
+          //if audioBuffer exist then write it to system
+          if (notebook.audioBuffer) {
+            let audioUpdateObject = {
+              type: 'audio',
+              name: notebook.audio.name,
+              path: notebook.audio.path,
+              buffer: notebook.audioBuffer
+            };
+
+            mediaPromises.push(
+              this.writeMediaFile(audioUpdateObject)
+            );
+            delete notebook.audioBuffer;
+            notebook = Object.assign({}, notebook);
+          }
+
+          return notebook;
+        });
+
+        //once all media promises have resolved
+        Promise.all(mediaPromises)
+          .then((result) => {
+          console.log('promises have resolved...');
+            //once all media files have been written to the system successfully
+            resolve(notebooks);
+          });
+
+      } else {
+        console.log('resolve what was sent to us...')
+        resolve(notebooks);
+      }
+    });
+  },
+
+
+  writeMediaFile: (data) => {
+    return new Promise(function (resolve, reject) {
+      let mediaPath = path.join(app.getPath('userData'), 'storage', data.type, data.name);
+
+      let buffer = new Buffer(data.buffer, 'base64', (err) => {
+        if (err) {
+          console.log('issue decoding base64 data');
+          reject(err);
+        }
+      });
+
+      fs.writeFile(mediaPath, buffer, (err) => {
+        if (err) {
+          console.log('There was an error writing file to filesystem', err);
+          reject(err);
+        }
+        resolve('success');
+      })
+    });
+  },
+
+  updateOrInsertNotebooks(notebooks) {
+    console.log('updateOrInsertNotebooks', notebooks);
+    return new Promise((resolve, reject) => {
+      let options = {returnUpdatedDocs: true, upsert: true};
+      notebooks.forEach((notebook) => {
+        let query = {_id: notebook._id};
+        //becuase nedb auto time stamp does not work
+        let manualTimeEntry = new Date(notebook.updatedAt);
+        notebook.updatedAt = new Date(manualTimeEntry.getTime());
+        Notebooks.update(query, notebook, options, (err, updateCount, updatedDoc) => {
+          if (err) {
+            console.log('Error inserting new notebooks', err);
+            reject(err);
+          }
+        });
+      });
+      resolve(notebooks);
+    });
+  },
+
+
   //finds notebooks based on created by and projects limited data from them
   findNotebooksByCreatedBy(createdById) {
     return new Promise((resolve, reject) => {
@@ -405,6 +486,8 @@ module.exports = {
     })
   },
 
+
+  //called by socket client with data passed from external server
   getNewAndUpdatedNotebooks(oldData) {
     return new Promise((resolve, reject) => {
 
@@ -415,6 +498,9 @@ module.exports = {
 
       if (oldData.length === 0) {
         console.log('getting all notebooks');
+        console.log('allPotentialNotebooks', allPotentialNotebooks);
+
+
         notebooksToSend = allPotentialNotebooks.map((notebook) => {
           if (notebook.image) {
             mediaPromises.push(
@@ -430,7 +516,12 @@ module.exports = {
               })
             )
           }
-        })
+          return notebook;
+        });
+
+        console.log("notebooksToSend", notebooksToSend);
+
+
       } else {
         console.log('getting updates and new notebooks')
 

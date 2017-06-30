@@ -56,6 +56,19 @@ export const appComponent = {
 
       });
 
+      this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
+
+        console.log('on:: update-synced-notebooks');
+
+        console.log('TODO: probably need to use map to update the new ones with a "new" flag');
+
+
+        this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+
+        console.log('this.notebooks', this.notebooks);
+
+      });
+
     }
 
     $onChanges(changes) {

@@ -1,7 +1,6 @@
 // var ioClient = require('socket.io-client');
 var socketUtil = require('./socket-util');
 var Notebooks = require('./../api/notebook/notebook.model.js');
-var nodeClientSocket = '';
 
 module.exports = {
   //this occurs when bonjour discovers an external server.
@@ -12,25 +11,24 @@ module.exports = {
     console.log('--- initAsClient called');
 
     let externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-    nodeClientSocket = require('socket.io-client')(externalPath);
+    let nodeClientSocket = require('socket.io-client')(externalPath);
 
 
     //initial connection to another server
-    nodeClientSocket.on('connect', function () {
+    //.once solve the problem however I'm not sure this will work with more than one connection
+    //the other issue will be removing event listeners
+    //TODO: !IMPORTANT - test for multiple connections
+
+    //initial connection to another server
+    nodeClientSocket.once('connect', function () {
       console.log('');
       console.log('--- on:: connect');
-      console.log("nodeClientSocket.id", nodeClientSocket.id);
       console.log('');
-
     });
 
     nodeClientSocket.on('disconnect', (reason) => {
       console.log('');
       console.log('--- on:: disconnect');
-      console.log('reason', reason);
-      console.log('nodeClientSocket.id', nodeClientSocket.id);
-
-
       console.log('');
     });
 
@@ -57,16 +55,9 @@ module.exports = {
 
       socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
         .then(notebooksToSend => {
-
-          console.log('does notebook have audioBuffer attached?', !!notebooksToSend[0].audioBuffer);
-          console.log('does notebook have imageBuffer attached?', !!notebooksToSend[0].imageBuffer);
-
           console.log('--- emit:: sync-data:return to:: whoever requested it');
           nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend})
-
         })
-
-
     });
 
     //

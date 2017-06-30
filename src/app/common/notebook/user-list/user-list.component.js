@@ -36,7 +36,7 @@ export const userListComponent = {
     }
 
     $onInit() {
-      // this.selected = [];
+      this.selected = [];
     }
 
 
