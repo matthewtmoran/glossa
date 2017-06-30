@@ -179,6 +179,18 @@ app.on('activate', function () {
   }
 });
 
+function getWindow(callback) {
+  return callback(win);
+}
+
+function _unref () {
+  delete win[this.id]
+}
+
+module.exports = {
+  _unref: _unref,
+  getWindow:getWindow
+};
 
 function beforeQuitThenQuit() {
   // socketUtil.resetClientData().then(function () {

@@ -5,10 +5,9 @@ const fs = require('fs');
 
 const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
-// var ipcEvents = require('../../ipc-listeners');
-let ipcUtil = require('../../ipc/util');
-
 let localClient = {};
+const main = require('../../main');
+
 
 module.exports = function (glossaUser, mySession, io, bonjour, win) {
   console.log('socket index.js called');
@@ -29,7 +28,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
     // when a socket disconnects remove from connection list
     socket.on('disconnect', disconnect);
-
 
     socket.on('sync-data:return', syncDataReturn);
 
@@ -126,8 +124,8 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
       console.log('');
       console.log('on:: disconnect');
       //get connection from list
-      let connection = global.appData.initialState.connections.find(connection => connection.socketId === socket.id);
-      console.log('!!connection', !!connection);
+      let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
+
       if (!connection.following) {
         //remove non-followed users from connection array
         global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
@@ -144,10 +142,11 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           return con;
         })
       }
-
-      if (win.webContents) {
-        win.webContents.send('update-connection-list');
-      }
+      main.getWindow((window) => {
+        if (window) {
+          window.webContents.send('update-connection-list');
+        }
+      });
 
     }
 
@@ -155,7 +154,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     function syncDataReturn(data) {
       console.log('on:: sync-data:return');
 
-      console.log('Amount of new or updated notebooks returned', data.notebooks.length);
       //if there is actually data to update...
       //TODO: at the very least update the last sync time
       if (data.notebooks.length) {
