@@ -8,9 +8,15 @@ var electron = require('electron'),
 var url = require('url');
 var AppMenu = require('./app-menu');
 var socketUtil = require('./server/socket/socket-util');
-
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
+
+//for mac to decide what to do with window object.. to quit or hide...
+let forceQuit = false;
+//flag to ensure server is running before electron creates window - this fixes mac wsod issue when err_connection refused is thrown
+let readyToGo = false;
+
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -21,6 +27,7 @@ function startExpress() {
   fsCheck();
   Promise.all([require('./server/config/init').getInitialState()])
     .then(function (appData) {
+      readyToGo = true; // set flag to true so electron can create window
       // here we set the global state for the entire app.
       //we also pass this data to the express server
       global.appData = {
@@ -96,39 +103,24 @@ function createWindow() {
   });
 
   // Emitted when the window is closed.
-  win.on('closed', function (e) {
+  win.on('close', function (e) {
     console.log('');
-    console.log('close event');
-
-
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-
-    //if the process is not windows (aka mac or linux)
-    // if (process.platform != 'win32') {
-    //     //if force quite is false (not cmd+Q) aka the 'x'
-    //     if(!forceQuit){
-    //         //prevent the default action.  What is the default action?
-    //         e.preventDefault();
-    //         //hide window.  does this dock it?  does the socket remain in tact when docked?
-    //         win.hide();
-    //     }
-    //
-    // } else {
-    //     //if the process is windows.... destroy the window object.
-    //     win = null;
-    // }
-
-    win = null;
+    console.log('closed event');
+    if (forceQuit) {
+      win = null;
+    } else {
+      e.preventDefault();
+      win.hide();
+    }
 
   })
 }
 
-//triggered first when cmd+Q or close button in menu
-app.on('before-quit', function (e) {
+//triggered first when cmd+Q or close button in menu(win32)
+app.on('before-quit', (e) => {
   console.log('');
   console.log('before-quit');
+  forceQuit = true;
 });
 
 app.on('activate-with-no-open-windows', function () {
@@ -150,7 +142,19 @@ app.on('will-quit', function () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-  createWindow();
+  //if data from init has returned create window otherwise check 10 times a second as it should be coming shortly...
+  if (readyToGo) {
+    createWindow();
+  } else {
+    let checkReadyState = setInterval(() => {
+      if (readyToGo) {
+        //yay, it's ready to load clear interval and create window
+        clearInterval(checkReadyState);
+        createWindow()
+      }
+    }, 100)
+  }
+
 });
 
 //this event is triggered first on windows when electron closes from clicking the X
@@ -163,38 +167,49 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     //this only happens when it's not a mac
     console.log('quitting app now from non-mac');
+    //set this timeout to ensure that bonjour is fully unpublished and destroyed
+    //TODO: consider if this is needed...
     setTimeout(() => {
       app.quit();
     }, 3000)
 
   }
+
+
 });
 
+//for mac activate new window if it was closed at all... i.e. clicking doc
 app.on('activate', function () {
   console.log('activate called');
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
+  //if window is destroyed... create a new one other wise just show the window
   if (win === null) {
     createWindow()
+  } else {
+    win.show();
   }
 });
 
+//so we can get the window (if it exists... ) to close and send ipc events properly
 function getWindow(callback) {
   return callback(win);
 }
 
+//TODO: consider deletion
 function _unref () {
   delete win[this.id]
 }
 
+function setReadyToGo() {
+  readyToGo = true;
+}
+
+
 module.exports = {
   _unref: _unref,
-  getWindow:getWindow
+  getWindow:getWindow,
+  setReadyToGo:setReadyToGo
 };
 
-function beforeQuitThenQuit() {
-  // socketUtil.resetClientData().then(function () {
-  //   console.log('resetClientData promise resolved');
-  // });
-}
 
