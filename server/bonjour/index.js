@@ -67,3 +67,11 @@ module.exports.init = function (server, bonjour, io, win) {
   });
 
 };
+
+module.exports.disconnect = function(bonjour) {
+  console.log('disconnect called...');
+  bonjour.unpublishAll(() => {
+    console.log('bonjour unpublished... ');
+    bonjour.destroy();
+  });
+};

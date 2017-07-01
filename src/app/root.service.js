@@ -321,7 +321,6 @@ export class RootService {
 
     this.ipcSerivce.send('broadcast:Updates', data);
 
-
     // this.socketService.emit('broadcast:Updates', data);
   }
 

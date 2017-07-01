@@ -23,13 +23,19 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     //every socket connection, ask for some data
     socket.emit('begin-handshake');
 
+
     //this should be the return of the data we asked for
     socket.on('end-handshake', endHandShake);
-
     // when a socket disconnects remove from connection list
     socket.on('disconnect', disconnect);
 
+    //when client sends data back to us
     socket.on('sync-data:return', syncDataReturn);
+
+
+
+
+
 
     // console.log('emit:: request:socket-type');
     // socket.emit('request:socket-type');
@@ -82,6 +88,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
             });
+
           }
 
           connection = Object.assign({}, connection);
@@ -109,9 +116,9 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         }
 
 
-        console.log('ipc to browser: update-connection-list');
+        socket.join('external-client-room');
 
-        console.log('global.appData.initialState.connections.length', global.appData.initialState.connections.length);
+        console.log('ipc to browser: update-connection-list');
         //tell browser to update it's data.
         win.webContents.send('update-connection-list');
       } else {

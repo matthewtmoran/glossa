@@ -20,7 +20,7 @@ module.exports = {
     //TODO: !IMPORTANT - test for multiple connections
 
     // //initial connection to another server
-    nodeClientSocket.once('connect', function () {
+    nodeClientSocket.once('connect', () => {
       console.log('');
       console.log('--- on:: connect');
       console.log('');
@@ -32,18 +32,6 @@ module.exports = {
       console.log('');
       unbind();
     });
-
-    //remvoes the event listener
-    //TODO: !IMPORTANT - test for multiple connections
-    function unbind() {
-      console.log('unbind triggered...');
-      nodeClientSocket.removeAllListeners("begin-handshake");
-      nodeClientSocket.removeAllListeners("end-handshake");
-      nodeClientSocket.removeAllListeners("sync-data");
-      nodeClientSocket.removeAllListeners("connect");
-      nodeClientSocket.removeAllListeners("disconnect");
-    }
-
 
     //recievs event from an external server and emits the end-handshake
     nodeClientSocket.on('begin-handshake', () => {
@@ -75,6 +63,23 @@ module.exports = {
         })
     });
 
+    nodeClientSocket.on('rt:updates', (data) => {
+
+    });
+
+
+    //remvoes the event listener
+    //TODO: !IMPORTANT - test for multiple connections
+    //TODO: refractor to get all events dynamically
+    function unbind() {
+      console.log('unbind triggered...');
+      nodeClientSocket.removeAllListeners("begin-handshake");
+      nodeClientSocket.removeAllListeners("end-handshake");
+      nodeClientSocket.removeAllListeners("sync-data");
+      nodeClientSocket.removeAllListeners("rt:updates");
+      nodeClientSocket.removeAllListeners("connect");
+      nodeClientSocket.removeAllListeners("disconnect");
+    }
 
     ////////////////////
     //old socket events//
