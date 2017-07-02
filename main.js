@@ -8,9 +8,15 @@ var electron = require('electron'),
 var url = require('url');
 var AppMenu = require('./app-menu');
 var socketUtil = require('./server/socket/socket-util');
-
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
+
+let forceQuit = false;
+let readyToGo = false;
+
+function setReadyToGo() {
+  readyToGo = true;
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -21,6 +27,7 @@ function startExpress() {
   fsCheck();
   Promise.all([require('./server/config/init').getInitialState()])
     .then(function (appData) {
+      readyToGo = true;
       // here we set the global state for the entire app.
       //we also pass this data to the express server
       global.appData = {
@@ -96,10 +103,19 @@ function createWindow() {
   });
 
   // Emitted when the window is closed.
-  win.on('closed', function (e) {
+  win.on('close', function (e) {
     console.log('');
-    console.log('close event');
+    console.log('closed event');
 
+
+    if (forceQuit) {
+      console.log('forceQuit is true...');
+      win = null;
+    } else {
+      console.log('forceQuite is false')
+      e.preventDefault();
+      win.hide();
+    }
 
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
@@ -120,15 +136,22 @@ function createWindow() {
     //     win = null;
     // }
 
-    win = null;
+    // win = null;
 
   })
 }
 
 //triggered first when cmd+Q or close button in menu
-app.on('before-quit', function (e) {
+app.on('before-quit', (e) => {
   console.log('');
   console.log('before-quit');
+
+    setTimeout(() => {
+        console.log('set timeout test for mac....');
+    },3000);
+
+
+  forceQuit = true;
 });
 
 app.on('activate-with-no-open-windows', function () {
@@ -141,6 +164,7 @@ app.on('activate-with-no-open-windows', function () {
 app.on('will-quit', function () {
   // This is a good place to add tests insuring the app is still
   // responsive and all windows are closed.
+
   console.log('');
   console.log("will-quit");
   // win = null;
@@ -150,7 +174,17 @@ app.on('will-quit', function () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-  createWindow();
+  if (readyToGo) {
+    createWindow();
+  } else {
+    let checkReadyState = setInterval(() => {
+      if (readyToGo) {
+        clearInterval(checkReadyState);
+        createWindow()
+      }
+    }, 100)
+  }
+
 });
 
 //this event is triggered first on windows when electron closes from clicking the X
@@ -168,6 +202,8 @@ app.on('window-all-closed', function () {
     }, 3000)
 
   }
+
+
 });
 
 app.on('activate', function () {
@@ -176,6 +212,8 @@ app.on('activate', function () {
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
     createWindow()
+  } else {
+    win.show();
   }
 });
 
@@ -189,7 +227,8 @@ function _unref () {
 
 module.exports = {
   _unref: _unref,
-  getWindow:getWindow
+  getWindow:getWindow,
+  setReadyToGo:setReadyToGo
 };
 
 function beforeQuitThenQuit() {

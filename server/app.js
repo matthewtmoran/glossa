@@ -33,18 +33,25 @@ module.exports = function (bonjour, appData, win) {
   function exitHandler(options, err) {
     console.log('exit handler from: ', options.from);
 
+      if (err) {
+          console.log(err.stack);
+      }
+
+
+
     if (options.cleanup) {
       console.log('cleaning...');
 
       bonjour.unpublishAll(() => {
+        console.log('bonjour unpublished all success...');
         bonjour.destroy();
+        console.log('bonjour destroyed called..... ')
       });
 
       console.log('cleaning done...');
     }
-    if (err) {
-      console.log(err.stack);
-    }
+
+
     if (options.exit) {
 
       console.log('Exit is true');
@@ -52,7 +59,7 @@ module.exports = function (bonjour, appData, win) {
 
       setTimeout(function () {
         console.log('Delay over.  Exiting.');
-        // process.exit();
+        process.exit();
       }, 3000);
     }
 
