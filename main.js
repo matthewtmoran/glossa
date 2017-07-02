@@ -105,8 +105,8 @@ function createWindow() {
   // Emitted when the window is closed.
   win.on('close', function (e) {
     console.log('');
-    console.log('closed event');
-    if (forceQuit) {
+    console.log('close event');
+    if (isWin10 || forceQuit) {
       win = null;
     } else {
       e.preventDefault();
@@ -193,7 +193,9 @@ app.on('activate', function () {
 
 //so we can get the window (if it exists... ) to close and send ipc events properly
 function getWindow(callback) {
-  return callback(win);
+  console.log('getWindow in main:', win);
+  callback(null, win);
+
 }
 
 //TODO: consider deletion

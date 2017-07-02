@@ -1,10 +1,6 @@
 var electron = require('electron');
 var ipcMain = electron.ipcMain;
 var BrowserWindow = electron.BrowserWindow;
-var remote = electron.remote;
-
-
-var mainBrowserWindow;
 
 
 module.exports = {

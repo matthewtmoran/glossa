@@ -119,8 +119,20 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         socket.join('external-client-room');
 
         console.log('ipc to browser: update-connection-list');
+
+
+        // console.log("win", win);
+
+        main.getWindow(function(err, window) {
+          if (err) {
+            return console.log('error getting window...', err);
+          }
+          console.log("send:: update-connection-list local-window");
+          window.webContents.send('update-connection-list');
+        });
+
         //tell browser to update it's data.
-        win.webContents.send('update-connection-list');
+        // win.webContents.send('update-connection-list');
       } else {
         //if it's not its probably someone at the coffee shop
         console.log('********SOMEONE IS SNOOPING*********')
@@ -149,10 +161,11 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           return con;
         })
       }
-      main.getWindow((window) => {
-        if (window) {
-          window.webContents.send('update-connection-list');
+      main.getWindow(function(err, window) {
+        if (err) {
+          return console.log('error getting window...');
         }
+        window.webContents.send('update-connection-list');
       });
 
     }
@@ -188,8 +201,15 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
                   }
                 });
 
+                main.getWindow(function(err, window) {
+                  if (err) {
+                    return console.log('error getting window...');
+                  }
+                  window.webContents.send('update-synced-notebooks');
+                });
+
                 //tell client to update notebooks
-                win.webContents.send('update-synced-notebooks');
+                // win.webContents.send('update-synced-notebooks');
               })
           })
       } else {
