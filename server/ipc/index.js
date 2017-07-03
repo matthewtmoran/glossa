@@ -168,7 +168,6 @@ module.exports = {
 
     }
 
-
     //come from client
     //is ipc event
     //data is boolean

@@ -5,7 +5,7 @@
   <md-grid-tile
           ng-show="$ctrl.notebooks.length"
           class="grid-tile mdl-shadow--2dp fade-in"
-          ng-repeat="notebook in $ctrl.notebooks | filter: $ctrl.searchText | exists: $ctrl.selected | hashtagFilter: $ctrl.selectedHashtags | orderBy: 'createdAt.$$date': true "
+          ng-repeat="notebook in $ctrl.notebooks | filter: $ctrl.searchText | exists: $ctrl.selected | hashtagFilter: $ctrl.selectedHashtags | orderBy: '-updatedAt'"
           md-colspan="1">
 
     <notebook-card unique-users="$ctrl.uniqueUsers"
