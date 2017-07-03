@@ -21,10 +21,6 @@ const paths = {
     }
 };
 
-// new webpack.ProvidePlugin({
-//   jQuery: "jquery"
-// })
-
 const add = {
   jquery: new webpack.ProvidePlugin({
     $: 'jquery',
@@ -33,10 +29,6 @@ const add = {
   })
 };
 
-
-// new webpack.ProvidePlugin({
-//   "window.jQuery": "jquery"
-// }),
 
 // Plugins
 const prep = {
@@ -69,11 +61,6 @@ const scripts = {
     ]
 };
 
-// const css = {
-//     test: /\.css$/,
-//     loader: extractPlugin.extract('style', 'css?sourceMap!sass?sourceMap')
-// }
-
 const styles = {
     test: /\.scss$/,
     loader: extractPlugin.extract('style', 'css?sourceMap!sass?sourceMap')
@@ -89,12 +76,6 @@ const fonts = {
     loader: 'file?name=fonts/[name].[ext]'
 };
 
-  // resolve: {
-    //   alias: {
-    //     'wavesurfer': path.resolve(__dirname, './src/lib/wavesurfer.js')
-    //   }
-    // },
-        // 'simplemde-css': path.resolve(__dirname, 'node_modules/simplemde/dist/simplemde.min.css')
 // Config object
 const config = {
     resolve: {

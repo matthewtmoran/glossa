@@ -35,9 +35,9 @@ export const userListComponent = {
       return this.selected.indexOf(user._id) > -1;
     }
 
-    $onInit() {
-      this.selected = [];
-    }
+    // $onInit() {
+    //   this.selected = [];
+    // }
 
 
   }

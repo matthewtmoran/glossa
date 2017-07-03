@@ -8,7 +8,8 @@
 	    on-exists="$ctrl.exists($event)"
 	    on-toggle="$ctrl.toggle($event)"
 	    on-tag-manage="$ctrl.tagManageDialog()"
-	></notebook-sidebar>
+		selected="$ctrl.selected">
+	</notebook-sidebar>
 
 	<md-content flex="75" class="notebook-list" layout-padding>
 		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>

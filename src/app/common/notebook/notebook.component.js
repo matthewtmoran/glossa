@@ -331,6 +331,7 @@ export const notebookComponent = {
     }
 
     toggle(event) {
+      console.log('event.list', event.list);
       let idx = event.list.indexOf(event.user._id);
       if (idx > -1) {
         this.selected.splice(idx, 1);
@@ -340,6 +341,8 @@ export const notebookComponent = {
         this.selected = angular.copy(this.selected);
       }
     };
+
+
 
     isOpenWatch(isOpen) {
       if (isOpen) {

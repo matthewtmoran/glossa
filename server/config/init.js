@@ -59,8 +59,6 @@ function getInitialState() {
         .then((data) => {
           initialState.hashtags = data
         })
-
-
     );
 
 

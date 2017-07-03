@@ -5,6 +5,7 @@ export const notebookSidebarComponent = {
     allConnections: '<',
     commonTags: '<',
     selectedHashtags: '<',
+    selected: '<',
     onToggleHashtags: '&',
     onExists: '&',
     onToggle: '&',
@@ -27,6 +28,9 @@ export const notebookSidebarComponent = {
       }
       if (changes.selectedHashtags) {
         this.selectedHashtags = angular.copy(changes.selectedHashtags.currentValue)
+      }
+      if (changes.selected) {
+        this.selected = angular.copy(changes.selected.currentValue);
       }
     }
 
