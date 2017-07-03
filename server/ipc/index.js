@@ -1,6 +1,6 @@
 var ipcUtil = require('./util');
-var socketUtil = require('../server/socket/socket-util');
-var myBonjour = require('../server/bonjour');
+var socketUtil = require('../socket/socket-util');
+var myBonjour = require('../bonjour/index');
 let isRefresh = false;
 
 

@@ -8,7 +8,7 @@ var fs = require('fs');
 var config = require('./../config/environment/index');
 var app = require('electron').app;
 
-var ipcUtil = require('../../ipc/util');
+var ipcUtil = require('../ipc/util');
 module.exports = {
 
   getUser: function () {

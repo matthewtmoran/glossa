@@ -26,7 +26,7 @@ module.exports = function (bonjour, appData, win) {
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     // require ipc event...
-    const ipcEvents = require('../ipc').init(server, bonjour, io, win);
+    const ipcEvents = require('./ipc').init(server, bonjour, io, win);
   });
 
 
