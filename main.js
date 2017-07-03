@@ -1,4 +1,4 @@
-var fs = require('fs');
+const fs = require('fs');
 var electron = require('electron'),
   path = require('path'),
   app = electron.app,
@@ -7,7 +7,6 @@ var electron = require('electron'),
   bonjour = require('bonjour')();
 var url = require('url');
 var AppMenu = require('./app-menu');
-var socketUtil = require('./server/socket/socket-util');
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 
@@ -15,8 +14,6 @@ const isWin10 = process.platform === 'win32';
 let forceQuit = false;
 //flag to ensure server is running before electron creates window - this fixes mac wsod issue when err_connection refused is thrown
 let readyToGo = false;
-
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -42,7 +39,7 @@ startExpress();
 
 function fsCheck() {
 
-  var dataPaths = [
+  const dataPaths = [
     'Glossa',
    'Glossa/storage',
    'Glossa/image',
@@ -103,7 +100,7 @@ function createWindow() {
   });
 
   // Emitted when the window is closed.
-  win.on('close', function (e) {
+  win.on('close', (e) => {
     console.log('');
     console.log('close event');
     if (isWin10 || forceQuit) {
@@ -112,14 +109,16 @@ function createWindow() {
       e.preventDefault();
       win.hide();
     }
-
-  })
+  });
 }
 
-//triggered first when cmd+Q or close button in menu(win32)
+//triggered first when cmd+Q or close button in menu
 app.on('before-quit', (e) => {
   console.log('');
   console.log('before-quit');
+    setTimeout(() => {
+        console.log('set timeout test for mac....');
+    },3000);
   forceQuit = true;
 });
 
@@ -206,7 +205,6 @@ function _unref () {
 function setReadyToGo() {
   readyToGo = true;
 }
-
 
 module.exports = {
   _unref: _unref,
