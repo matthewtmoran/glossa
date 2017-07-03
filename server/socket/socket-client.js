@@ -54,18 +54,41 @@ module.exports = {
     nodeClientSocket.on('sync-data', (data) => {
       console.log('--- on:: sync-data');
 
-      console.log('TODO: begin outside client sync event display');
+      //send sync notificatio to local window
+      main.getWindow(function (err, window) {
+        if (err) {
+          return console.log('error getting window...', err);
+        }
+        console.log("send:: sync-event-start local-window");
+        window.webContents.send('sync-event-start');
+      });
 
       socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
         .then(notebooksToSend => {
           console.log('--- emit:: sync-data:return to:: whoever requested it');
           nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend});
+
+
           console.log('TODO: end outside client sync event display');
+          main.getWindow((err, window) => {
+            if (err) {
+              return console.log('error getting window...');
+            }
+            window.webContents.send('sync-event-end');
+          });
         })
     });
 
     nodeClientSocket.on('rt:updates', (data) => {
       console.log('on:: rt:updates');
+
+      //send sync notification to user
+      main.getWindow((err, window) => {
+        if (err) {
+          return console.log('error getting window...');
+        }
+        window.webContents.send('sync-event-start');
+      });
 
       global.appData.initialState.connections.forEach((connection) => {
         //if the user matches and we are following hte user...
@@ -82,16 +105,12 @@ module.exports = {
                 }
                 console.log('send:: update-synced-notebooks');
                 window.webContents.send('update-synced-notebooks');
+                window.webContents.send('sync-event-end');
               });
 
             })
         }
-
       });
-
-
-
-
     });
 
 
@@ -101,7 +120,6 @@ module.exports = {
     function unbind() {
       console.log('unbind triggered...');
       nodeClientSocket.removeAllListeners("begin-handshake");
-      nodeClientSocket.removeAllListeners("end-handshake");
       nodeClientSocket.removeAllListeners("sync-data");
       nodeClientSocket.removeAllListeners("rt:updates");
       nodeClientSocket.removeAllListeners("connect");

@@ -26,7 +26,7 @@ export class NotificationService {
       .textContent(toast.message)
       .hideDelay(toast.hideDelay)
       .position(toast.position)
-      .action('Okay');
+      .action(toast.action || 'Okay');
 
 
     this.$mdToast.show(staticToast).then(() => {

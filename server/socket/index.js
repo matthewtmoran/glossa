@@ -79,7 +79,17 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
           //i already know it's following here but just in case and for consitency sake
           if (connection.following) {
-            console.log('TODO: begin display sync-event');
+
+
+            main.getWindow(function (err, window) {
+              if (err) {
+                return console.log('error getting window...', err);
+              }
+              console.log("send:: sync-event-start local-window");
+              window.webContents.send('sync-event-start');
+            });
+
+
             socketUtil.syncData(connection, (data) => {
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
@@ -179,12 +189,19 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
               if (err) {
                 return console.log('error getting window...');
               }
+              window.webContents.send('sync-event-end');
               window.webContents.send('update-synced-notebooks');
             });
 
 
           })
       } else {
+        main.getWindow((err, window) => {
+          if (err) {
+            return console.log('error getting window...');
+          }
+          window.webContents.send('sync-event-end');
+        });
         console.log('no new data from this connection');
       }
       console.log('TODO: end display sync-event');

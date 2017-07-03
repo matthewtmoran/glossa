@@ -316,7 +316,6 @@ module.exports = {
 
   syncDataReturn(data) {
     return new Promise((resolve, reject) => {
-
         //write the media buffers to the file system
         this.writeSyncedMedia(data.notebooks)
           .then((notebooks) => {

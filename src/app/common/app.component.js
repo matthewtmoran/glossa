@@ -69,6 +69,30 @@ export const appComponent = {
 
       });
 
+      this.ipcSerivce.on('sync-event-start', (event, data) => {
+
+        console.log('on:: sync-event-start');
+        this.cfpLoadingBar.start();
+
+        let msg = `Syncing Data`;
+        let delay = 3000;
+        let action = 'Dismiss';
+
+        this.notificationService.show({
+          message: msg,
+          hideDelay: delay,
+          action: action
+        });
+
+
+
+      });
+
+      this.ipcSerivce.on('sync-event-end', (event, data) => {
+        console.log('on:: sync-event-end');
+        this.cfpLoadingBar.complete();
+      });
+
     }
 
     $onChanges(changes) {
