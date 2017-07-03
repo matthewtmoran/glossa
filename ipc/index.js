@@ -101,47 +101,70 @@ module.exports = {
      * Emit rt:updates to all external-clients (in room)
      * @param data
      */
-    function onBroadcastUpdates(data) {
+    function onBroadcastUpdates(event, notebook) {
       console.log('');
       console.log('broadcast:Updates ipc');
-      console.log('data', data);
+      console.log('notebook in onBroadcastUpdates', notebook);
 
       let mediaPromises = [];
       //encode image
-      if (data.image) {
+      if (notebook.image) {
         mediaPromises.push(
-          socketUtil.encodeBase64(data.image.path)
+          socketUtil.encodeBase64(notebook.image.path)
             .then(function (imageString) {
-              data.imageBuffer = imageString;
+              notebook.imageBuffer = imageString;
             })
         )
       }
       //encode audio
-      if (data.audio) {
+      if (notebook.audio) {
         mediaPromises.push(
-          socketUtil.encodeBase64(data.audio.path)
+          socketUtil.encodeBase64(notebook.audio.path)
             .then(function (audioString) {
-              data.audioBuffer = audioString;
+              notebook.audioBuffer = audioString;
             })
         )
       }
 
-      // //once image and audio has been encoded...
-      Promise.all(mediaPromises).then((result) => {
+      if (mediaPromises.length) {
+        Promise.all(mediaPromises).then((result) => {
 
+          let updateObject = {
+            user: {
+              _id: global.appData.initialState.user._id,
+              name: global.appData.initialState.user.name,
+            }
+          };
+
+          updateObject.notebooks = [];
+          updateObject.notebooks.push(notebook);
+
+          io.to('externalClientsRoom').emit('rt:updates', updateObject)
+
+          // global.appData.initialState.connections.forEach((connection) => {
+          //   console.log('emit:: rt:updates');
+          //   console.log('connection.socketId', connection.socketId);
+          //   io.to(connection.socketId).emit('rt:updates', updateObject);
+          // });
+
+
+        });
+      } else {
         let updateObject = {
-          update: data,
           user: {
             _id: global.appData.initialState.user._id,
             name: global.appData.initialState.user.name,
           }
         };
+        updateObject.notebooks = [];
+        updateObject.notebooks.push(notebook);
 
-        console.log('broadcast:: rt:updates to:: external-client-room');
-        //send to clients
-        io.to('external-client-room').emit('rt:updates', updateObject)
+        console.log('broadcast:: rt:updates to:: externalClientsRoom');
+        io.to('externalClientsRoom').emit('rt:updates', updateObject)
+      }
 
-      });
+      // //once image and audio has been encoded...
+
 
     }
 

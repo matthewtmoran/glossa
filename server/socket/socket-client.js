@@ -1,6 +1,7 @@
 // var ioClient = require('socket.io-client');
 var socketUtil = require('./socket-util');
 var Notebooks = require('./../api/notebook/notebook.model.js');
+const main = require('../../main');
 
 module.exports = {
   //this occurs when bonjour discovers an external server.
@@ -64,6 +65,32 @@ module.exports = {
     });
 
     nodeClientSocket.on('rt:updates', (data) => {
+      console.log('on:: rt:updates');
+
+      global.appData.initialState.connections.forEach((connection) => {
+        //if the user matches and we are following hte user...
+        if (data.user._id === connection._id && connection.following) {
+
+          socketUtil.syncDataReturn(data)
+            .then((data) => {
+
+              socketUtil.updateGlobalArrayObject(data, 'notebooks');
+
+              main.getWindow((err, window) => {
+                if (err) {
+                  return console.log('error getting window...');
+                }
+                console.log('send:: update-synced-notebooks');
+                window.webContents.send('update-synced-notebooks');
+              });
+
+            })
+        }
+
+      });
+
+
+
 
     });
 

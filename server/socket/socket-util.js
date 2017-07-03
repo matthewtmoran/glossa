@@ -314,6 +314,39 @@ module.exports = {
 /////////////////////////////////////////////////////
 
 
+  syncDataReturn(data) {
+    return new Promise((resolve, reject) => {
+
+        //write the media buffers to the file system
+        this.writeSyncedMedia(data.notebooks)
+          .then((notebooks) => {
+            //when that is complete, update the database
+            this.updateOrInsertNotebooks(notebooks)
+              .then((notebooks) => {
+                resolve(notebooks);
+              })
+          })
+    });
+
+  },
+
+  updateGlobalArrayObject(array, type) {
+    array.forEach((item) => {
+      let itemExists = false;
+      //update the global object
+      global.appData.initialState[type].forEach((nb, index) => {
+        if (nb._id === item._id) {
+          itemExists = true;
+          //update the object
+          global.appData.initialState[type][index] = Object.assign({}, item);
+        }
+      });
+
+      if (!itemExists) {
+        global.appData.initialState[type] = [item, ...global.appData.initialState[type]]
+      }
+    });
+  },
 
 
   //toggle follow status
@@ -367,12 +400,10 @@ module.exports = {
   },
 
   writeSyncedMedia(notebooks) {
-    console.log('writeSyncedMedia');
     return new Promise((resolve, reject) => {
       let mediaPromises = [];
       //if there are updates...
       if (notebooks.length) {
-        console.log('notebooks exist...');
         notebooks = notebooks.map((notebook) => {
           //if imageBuffer exists then write it to system
           if (notebook.imageBuffer) {
@@ -409,25 +440,24 @@ module.exports = {
             notebook = Object.assign({}, notebook);
           }
 
+
           return notebook;
         });
-        console.log('notebooks.length', notebooks.length);
-        console.log('!!notebooks[0].imageBuffer', !!notebooks[0].imageBuffer);
-        //once all media promises have resolved
-        Promise.all(mediaPromises)
-          .then((result) => {
-          console.log('promises have resolved...');
-            //once all media files have been written to the system successfully
-            resolve(notebooks);
-          });
-
+        if (mediaPromises.length) {
+          Promise.all(mediaPromises)
+            .then((result) => {
+              console.log('promises have resolved...');
+              //once all media files have been written to the system successfully
+              resolve(notebooks);
+            });
+        } else {
+          resolve(notebooks);
+        }
       } else {
-        console.log('resolve what was sent to us...');
         resolve(notebooks);
       }
     });
   },
-
 
   writeMediaFile(data) {
     console.log('writeMediaFile');

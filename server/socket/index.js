@@ -33,10 +33,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     socket.on('sync-data:return', syncDataReturn);
 
 
-
-
-
-
     // console.log('emit:: request:socket-type');
     // socket.emit('request:socket-type');
     // socket.on('return:socket-type', onReturnSocketType);
@@ -116,14 +112,9 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         }
 
 
-        socket.join('external-client-room');
+        socket.join('externalClientsRoom');
 
-        console.log('ipc to browser: update-connection-list');
-
-
-        // console.log("win", win);
-
-        main.getWindow(function(err, window) {
+        main.getWindow(function (err, window) {
           if (err) {
             return console.log('error getting window...', err);
           }
@@ -161,7 +152,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           return con;
         })
       }
-      main.getWindow(function(err, window) {
+      main.getWindow(function (err, window) {
         if (err) {
           return console.log('error getting window...');
         }
@@ -174,49 +165,76 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     function syncDataReturn(data) {
       console.log('on:: sync-data:return');
 
+      console.log('data', data);
+
       //if there is actually data to update...
       //TODO: at the very least update the last sync time
       if (data.notebooks.length) {
-        //write the media buffers to the file system
-        socketUtil.writeSyncedMedia(data.notebooks)
-          .then((notebooks) => {
-          console.log('writeSyncedMedia has resolved');
-            //when that is complete, update the database
-            socketUtil.updateOrInsertNotebooks(notebooks)
-              .then((notebooks) => {
-                notebooks.forEach((notebook) => {
-                  let notebookExists = false;
+        socketUtil.syncDataReturn(data)
+          .then((data) => {
 
-                  //update the global object
-                  global.appData.initialState.notebooks.forEach((nb, index) => {
-                    if (nb._id === notebook._id) {
-                      notebookExists = true;
-                      //update the object
-                      global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
-                    }
-                  });
+            socketUtil.updateGlobalArrayObject(data);
 
-                  if (!notebookExists) {
-                    global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
-                  }
-                });
+            main.getWindow((err, window) => {
+              if (err) {
+                return console.log('error getting window...');
+              }
+              window.webContents.send('update-synced-notebooks');
+            });
 
-                main.getWindow(function(err, window) {
-                  if (err) {
-                    return console.log('error getting window...');
-                  }
-                  window.webContents.send('update-synced-notebooks');
-                });
 
-                //tell client to update notebooks
-                // win.webContents.send('update-synced-notebooks');
-              })
           })
       } else {
         console.log('no new data from this connection');
       }
       console.log('TODO: end display sync-event');
       console.log('TODO: update last sync time');
+
+
+      //
+      // //if there is actually data to update...
+      // //TODO: at the very least update the last sync time
+      // if (data.notebooks.length) {
+      //   //write the media buffers to the file system
+      //   socketUtil.writeSyncedMedia(data.notebooks)
+      //     .then((notebooks) => {
+      //     console.log('writeSyncedMedia has resolved');
+      //       //when that is complete, update the database
+      //       socketUtil.updateOrInsertNotebooks(notebooks)
+      //         .then((notebooks) => {
+      //           notebooks.forEach((notebook) => {
+      //             let notebookExists = false;
+      //
+      //             //update the global object
+      //             global.appData.initialState.notebooks.forEach((nb, index) => {
+      //               if (nb._id === notebook._id) {
+      //                 notebookExists = true;
+      //                 //update the object
+      //                 global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
+      //               }
+      //             });
+      //
+      //             if (!notebookExists) {
+      //               global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
+      //             }
+      //           });
+      //
+      //           main.getWindow(function(err, window) {
+      //             if (err) {
+      //               return console.log('error getting window...');
+      //             }
+      //             window.webContents.send('update-synced-notebooks');
+      //           });
+      //
+      //           //tell client to update notebooks
+      //           // win.webContents.send('update-synced-notebooks');
+      //         })
+      //     })
+      // } else {
+      //   console.log('no new data from this connection');
+      // }
+      // console.log('TODO: end display sync-event');
+      // console.log('TODO: update last sync time');
     }
 
     //helper functions
