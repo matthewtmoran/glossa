@@ -121,6 +121,62 @@ module.exports = {
       });
     });
 
+    nodeClientSocket.on('send-profile-updates', (data) => {
+      let win = {};
+      main.getWindow((err, window) => {
+        if (err) {
+          return console.log('error getting window...');
+        }
+        win = window;
+      });
+
+      global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+        if (connection._id === data._id) {
+          if (connection.following) {
+
+            win.webContents.send('sync-event-start');
+            //if data avatar exists
+            //if data avatar is different than connection avatar but connection avatar exists (not null)
+            if (data.avatar && (connection.avatar !== data.avatar ) || connection.avatar && (data.avatar !== connection.avatar)) {
+
+              console.log('emit:: request:avatar to:: server that sent us basic changes');
+              io.to(data.socketId).emit('request:avatar');
+            }
+
+            socketUtil.followedConnectionUpdate(data)
+              .then((updatedConnection) => {
+                // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+                  win.webContents.send('update-connection-list');
+              });
+
+            socketUtil.normalizeNotebooks(data)
+              .then((updatedNotebooks) => {
+                socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+                  win.webContents.send('update-synced-notebooks');
+              });
+          }
+
+          connection.name = data.name;
+          connection.avatar = data.avatar;
+          return connection;
+        }
+        return connection;
+      });
+
+        win.webContents.send('update-connection-list');
+
+
+    });
+
+    nodeClientSocket.on('return:avatar', (data) => {
+     socketUtil.writeAvatar(data)
+       .then(() => {
+        console.log('Avatar written');
+        console.log('TODO: Confirm avatar is visible!!');
+       })
+    });
+
+
 
     //remvoes the event listener
     //TODO: !IMPORTANT - test for multiple connections
@@ -129,6 +185,8 @@ module.exports = {
       console.log('unbind triggered...');
       nodeClientSocket.removeAllListeners("begin-handshake");
       nodeClientSocket.removeAllListeners("sync-data");
+      nodeClientSocket.removeAllListeners("return:avatar");
+      nodeClientSocket.removeAllListeners("send-profile-updates");
       nodeClientSocket.removeAllListeners("rt:updates");
       nodeClientSocket.removeAllListeners("connect");
       nodeClientSocket.removeAllListeners("disconnect");

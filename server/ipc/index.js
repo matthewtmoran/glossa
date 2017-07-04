@@ -80,6 +80,20 @@ module.exports = {
       console.log('broadcast:profile-updates ipc');
 
 
+
+      const basicProfileData = {
+        _id: global.appData.initialState.user._id,
+        name: global.appData.initialState.user.name,
+        type: 'external-client',
+        avatar: global.appData.initialState.user.avatar
+      };
+
+      console.log('basicProfileData', basicProfileData);
+
+      io.to('externalClientsRoom').emit('send-profile-updates', basicProfileData)
+
+
+
       //
       // console.log('');
       // console.log('on:: broadcast:profile-updates ipc');

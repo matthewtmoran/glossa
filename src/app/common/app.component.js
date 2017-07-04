@@ -100,7 +100,6 @@ export const appComponent = {
 
     $onChanges(changes) {
       if (changes.allConnections) {
-        console.log('changes with allConnections in app.component', changes);
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
       if (changes.notebooks) {
@@ -221,9 +220,11 @@ export const appComponent = {
         .then((data) => {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          // this.currentUser = angular.copy(data);
-          // this.settings = this.currentUser.settings;
           this.cfpLoadingBar.complete();
+
+          this.ipcSerivce.send('broadcast:profile-updates')
+
+
         });
     }
 

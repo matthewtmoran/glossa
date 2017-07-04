@@ -130,7 +130,6 @@ module.exports = {
     });
   },
 
-  normalizeNotebooks: normalizeNotebooks,
 
   removeConnection: function (client) {
     return new Promise(function (resolve, reject) {
@@ -314,21 +313,23 @@ module.exports = {
 /////////////////////////////////////////////////////
 
 
+  //called when new data comes from external clients
   syncDataReturn(data) {
     return new Promise((resolve, reject) => {
-        //write the media buffers to the file system
-        this.writeSyncedMedia(data.notebooks)
-          .then((notebooks) => {
-            //when that is complete, update the database
-            this.updateOrInsertNotebooks(notebooks)
-              .then((notebooks) => {
-                resolve(notebooks);
-              })
-          })
+      //write the media buffers to the file system
+      this.writeSyncedMedia(data.notebooks)
+        .then((notebooks) => {
+          //when that is complete, update the database
+          this.updateOrInsertNotebooks(notebooks)
+            .then((notebooks) => {
+              resolve(notebooks);
+            })
+        })
     });
 
   },
 
+  //helper function to update the global object works with any array....
   updateGlobalArrayObject(array, type) {
     array.forEach((item) => {
       let itemExists = false;
@@ -388,6 +389,7 @@ module.exports = {
   },
 
   //called when we follow someone or when someone we follow comes online
+  //we get our data then send back
   syncData(client, callback) {
     //  search for notebooks we have from this client
     //  will return empty array if their are none
@@ -398,6 +400,7 @@ module.exports = {
 
   },
 
+  //helper functio nto write the media dat to the filesystem
   writeSyncedMedia(notebooks) {
     return new Promise((resolve, reject) => {
       let mediaPromises = [];
@@ -406,7 +409,6 @@ module.exports = {
         notebooks = notebooks.map((notebook) => {
           //if imageBuffer exists then write it to system
           if (notebook.imageBuffer) {
-            console.log('notebook.image.fileName', notebook.image.filename);
             //create an object  with the buffer and the path of the iamge
             let imageUpdateObject = {
               type: 'image',
@@ -424,7 +426,6 @@ module.exports = {
           }
           //if audioBuffer exist then write it to system
           if (notebook.audioBuffer) {
-            console.log('notebook.audio.fileName', notebook.audio.filename);
             let audioUpdateObject = {
               type: 'audio',
               name: notebook.audio.filename,
@@ -445,7 +446,6 @@ module.exports = {
         if (mediaPromises.length) {
           Promise.all(mediaPromises)
             .then((result) => {
-              console.log('promises have resolved...');
               //once all media files have been written to the system successfully
               resolve(notebooks);
             });
@@ -458,11 +458,9 @@ module.exports = {
     });
   },
 
+  //does the actual writing of the media file
   writeMediaFile(data) {
-    console.log('writeMediaFile');
-    console.log('data.name', data.name);
     return new Promise((resolve, reject) => {
-      console.log('inside promise');
 
       let mediaPath = path.join(app.getPath('userData'), data.type, data.name);
 
@@ -478,14 +476,13 @@ module.exports = {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
         }
-        console.log('successful writing of media file.... ');
         resolve('success');
       })
     });
   },
 
+  //adds or updates notebook to datbase
   updateOrInsertNotebooks(notebooks) {
-    console.log('updateOrInsertNotebooks');
     return new Promise((resolve, reject) => {
       let options = {returnUpdatedDocs: true, upsert: true};
       notebooks.forEach((notebook) => {
@@ -505,7 +502,6 @@ module.exports = {
       resolve(notebooks);
     });
   },
-
 
   //finds notebooks based on created by and projects limited data from them
   findNotebooksByCreatedBy(createdById) {
@@ -539,7 +535,6 @@ module.exports = {
 
 
       if (oldData.length === 0) {
-        console.log('getting all notebooks');
 
         notebooksToSend = allPotentialNotebooks.map((notebook) => {
           if (notebook.image) {
@@ -559,11 +554,8 @@ module.exports = {
           return notebook;
         });
 
-        console.log("notebooksToSend", notebooksToSend);
-
 
       } else {
-        console.log('getting updates and new notebooks');
         //notebookdsToSend should only be new or updated notebooks
         notebooksToSend = allPotentialNotebooks.filter((notebook) => {
 
@@ -625,20 +617,101 @@ module.exports = {
           resolve(notebooksToSend);
         })
     })
+  },
+
+
+  followedConnectionUpdate(client) {
+    return new Promise((resolve, reject) => {
+
+      const query = {
+        _id: client._id
+      };
+
+      const update = {
+        $set: {
+          name: client.name,
+          avatar: client.avatar
+        }
+      };
+
+      const options = {
+        returnUpdatedDocs: true
+      };
+
+      Connection.update(query, update, options, (err, updatedCount, updatedDoc) => {
+        if (err) {
+          console.log("there was an error", err);
+          reject(err)
+        }
+        Connection.persistence.compactDatafile();
+        resolve(updatedDoc)
+      });
+    });
+
+
+  },
+
+
+  normalizeNotebooks(client) {
+    return new Promise(function (resolve, reject) {
+
+      const query = {"createdBy._id": client._id};
+      const options = {returnUpdatedDocs: true, multi: true};
+      const update = {$set: {
+        "createdBy.name": client.name,
+        "createdBy.avatar": client.avatar
+      }};
+
+      Notebooks.update(query, update, options, function (err, updatedCount, updatedDocs) {
+        if (err) {
+          console.log('Error normalizing notebook data', err);
+          reject(err);
+        }
+
+        // emitToLocalClient(io, socketId, 'normalize:notebooks', updatedDocs);
+        Notebooks.persistence.compactDatafile();
+        resolve(updatedDocs);
+      });
+    });
+
+
+  },
+
+
+
+  writeAvatar(data) {
+    return new Promise((resolve, reject) => {
+      let filename = data.path.replace(/^.*[\\\/]/, '');
+
+      let mediaObject = {
+        type: 'image',
+        name: filename,
+        buffer: data.bufferString
+      };
+
+      this.writeMediaFile(mediaObject)
+        .then(()=> {
+          resolve('success')
+        })
+    });
   }
+
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 
 };
 
 function getConnections() {
-  console.log('getConnections called');
   return new Promise(function (resolve, reject) {
     Connection.find({}, function (err, connections) {
       if (err) {
         console.log('There was an error finding connections', err);
         reject(err);
       }
-      console.log('Connections were found. ', connections.length);
       resolve(connections);
     })
   })
@@ -682,33 +755,7 @@ function getLocalSocketId() {
   });
 }
 
-function normalizeNotebooks(client, io, socketId) {
-  console.log('normalizeNotebooks - client:', client.name);
-  return new Promise(function (resolve, reject) {
 
-    var query = {"createdBy._id": client._id};
-    var options = {returnUpdatedDocs: true, multi: true};
-    var update = {$set: {"createdBy.name": client.name, "createdBy.avatar": client.avatar}};
-
-    Notebooks.update(query, update, options, function (err, updatedCount, updatedDocs) {
-      if (err) {
-        console.log('Error normalizing notebook data', err);
-        reject(err);
-      }
-
-      console.log('send:: normalize:notebooks ipc');
-      // console.log('emit:: normalize:notebooks to:: local-client');
-
-      ipcUtil.send('normalize:notebooks', updatedDocs);
-
-      // emitToLocalClient(io, socketId, 'normalize:notebooks', updatedDocs);
-      Notebooks.persistence.compactDatafile();
-      resolve({_id: client._id, name: client.name, avatar: client.avatar});
-    });
-  });
-
-
-}
 function emitToLocalClient(io, socketId, eventName, data) {
   io.to(socketId).emit(eventName, data);
 };

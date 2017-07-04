@@ -32,6 +32,8 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     //when client sends data back to us
     socket.on('sync-data:return', syncDataReturn);
 
+    socket.on('request:avatar', onRequestAvatar);
+
 
     // console.log('emit:: request:socket-type');
     // socket.emit('request:socket-type');
@@ -175,8 +177,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     function syncDataReturn(data) {
       console.log('on:: sync-data:return');
 
-      console.log('data', data);
-
       //if there is actually data to update...
       //TODO: at the very least update the last sync time
       if (data.notebooks.length) {
@@ -248,6 +248,20 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
       // }
       // console.log('TODO: end display sync-event');
       // console.log('TODO: update last sync time');
+    }
+
+    function onRequestAvatar() {
+      socketUtil.encodeBase64(global.appData.initialState.user.avatar)
+        .then((bufferString) => {
+
+          const avatarData = {
+            path: global.appData.initialState.user.avatar,
+            bufferString: bufferString
+          };
+
+          io.to(socket.id).emit('return:avatar', avatarData);
+
+        })
     }
 
     //helper functions
