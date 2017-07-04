@@ -20,6 +20,7 @@ export const notebookComponent = {
     hashtags: '<',
     commonTags: '<',
     project: '<',
+    newNotebooks: '<',
     onUpdateTag: '&',
     onSaveNotebook:'&',
     onUpdateNotebook:'&',
@@ -69,6 +70,9 @@ export const notebookComponent = {
       }
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
+      }
+      if (changes.newNotebooks) {
+        this.newNotebooks = angular.copy(changes.newNotebooks.currentValue);
       }
     }
 

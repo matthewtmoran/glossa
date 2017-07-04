@@ -183,14 +183,14 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         socketUtil.syncDataReturn(data)
           .then((data) => {
 
-            socketUtil.updateGlobalArrayObject(data);
+            socketUtil.updateGlobalArrayObject(data, 'notebooks');
 
             main.getWindow((err, window) => {
               if (err) {
                 return console.log('error getting window...');
               }
-              window.webContents.send('sync-event-end');
               window.webContents.send('update-synced-notebooks');
+              window.webContents.send('sync-event-end');
             });
 
 
@@ -204,10 +204,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         });
         console.log('no new data from this connection');
       }
-      console.log('TODO: end display sync-event');
-      console.log('TODO: update last sync time');
-
-
       //
       // //if there is actually data to update...
       // //TODO: at the very least update the last sync time

@@ -56,22 +56,25 @@ export const appComponent = {
 
       });
 
+
       this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
-
         console.log('on:: update-synced-notebooks');
-
-        console.log('TODO: probably need to use map to update the new ones with a "new" flag');
-
-
         this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-
-        console.log('this.notebooks', this.notebooks);
-
       });
 
-      this.ipcSerivce.on('sync-event-start', (event, data) => {
+      this.ipcSerivce.on('update-rt-synced-notebooks', (event, data) => {
+        console.log('on:: update-rt-synced-notebooks');
+        if (!this.newNotebooks || !this.newNotebooks.length || !data.length) {
+          this.newNotebooks = angular.copy(data);
+        } else {
+          this.newNotebooks = [...this.newNotebooks, ...data];
+        }
+      });
 
+
+      this.ipcSerivce.on('sync-event-start', (event, data) => {
         console.log('on:: sync-event-start');
+
         this.cfpLoadingBar.start();
 
         let msg = `Syncing Data`;
@@ -607,15 +610,19 @@ export const appComponent = {
 
     //TODO: refractor to use global object
     showNewNotebookUpdates() {
-      console.log('TODO: NEED TO REFRACTOR');
-      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
-      this.externalNotebooks.forEach((newNotebook) => {
-        newNotebook.isNew = true;
-        if (this.notebooks.indexOf(newNotebook) < 0) {
-          this.notebooks.push(newNotebook);
-        }
-      });
-      this.externalNotebooks = [];
+
+
+      this.ipcSerivce.send('combine:notebooks')
+
+      // console.log('TODO: NEED TO REFRACTOR');
+      // console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
+      // this.externalNotebooks.forEach((newNotebook) => {
+      //   newNotebook.isNew = true;
+      //   if (this.notebooks.indexOf(newNotebook) < 0) {
+      //     this.notebooks.push(newNotebook);
+      //   }
+      // });
+      // this.externalNotebooks = [];
     }
 
 

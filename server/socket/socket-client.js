@@ -81,7 +81,6 @@ module.exports = {
 
     nodeClientSocket.on('rt:updates', (data) => {
       console.log('on:: rt:updates');
-
       //send sync notification to user
       main.getWindow((err, window) => {
         if (err) {
@@ -90,23 +89,32 @@ module.exports = {
         window.webContents.send('sync-event-start');
       });
 
+
+
       global.appData.initialState.connections.forEach((connection) => {
-        //if the user matches and we are following hte user...
+        //if the user matches and we are following the user...
         if (data.user._id === connection._id && connection.following) {
 
           socketUtil.syncDataReturn(data)
             .then((data) => {
 
+
+              console.log('sync dat returned... ', data);
+
+              //updating the global object here
               socketUtil.updateGlobalArrayObject(data, 'notebooks');
+
 
               main.getWindow((err, window) => {
                 if (err) {
                   return console.log('error getting window...');
                 }
-                console.log('send:: update-synced-notebooks');
-                window.webContents.send('update-synced-notebooks');
+                console.log('send:: update-rt-synced-notebooks');
+                window.webContents.send('update-rt-synced-notebooks', data);
+                console.log('send:: sync-event-end');
                 window.webContents.send('sync-event-end');
               });
+
 
             })
         }

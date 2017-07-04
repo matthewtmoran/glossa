@@ -485,10 +485,11 @@ module.exports = {
   },
 
   updateOrInsertNotebooks(notebooks) {
-    console.log('updateOrInsertNotebooks', notebooks);
+    console.log('updateOrInsertNotebooks');
     return new Promise((resolve, reject) => {
       let options = {returnUpdatedDocs: true, upsert: true};
       notebooks.forEach((notebook) => {
+
         let query = {_id: notebook._id};
         //becuase nedb auto time stamp does not work
         let manualTimeEntry = new Date(notebook.updatedAt);
@@ -499,6 +500,7 @@ module.exports = {
             reject(err);
           }
         });
+
       });
       resolve(notebooks);
     });
@@ -538,8 +540,6 @@ module.exports = {
 
       if (oldData.length === 0) {
         console.log('getting all notebooks');
-        console.log('allPotentialNotebooks', allPotentialNotebooks);
-
 
         notebooksToSend = allPotentialNotebooks.map((notebook) => {
           if (notebook.image) {

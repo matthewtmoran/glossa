@@ -13,8 +13,8 @@
 
 	<md-content flex="75" class="notebook-list" layout-padding>
 		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>
-		<md-button class="md-raised update-btn" ng-if="$ctrl.externalNotebooks.length" ng-click="$ctrl.showNewUpdates()">
-			<span>{{$ctrl.externalNotebooks.length}} updates are available.</span>
+		<md-button class="md-raised update-btn" ng-if="$ctrl.newNotebooks.length" ng-click="$ctrl.showNewUpdates($event)">
+			<span>{{$ctrl.newNotebooks.length}} updates are available.</span>
 			<span>View changes</span>
 			<md-icon class="">update</md-icon>
 		</md-button>

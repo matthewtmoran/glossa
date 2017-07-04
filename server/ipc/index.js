@@ -18,6 +18,11 @@ module.exports = {
     ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
 
 
+    ipcUtil.on('combine:notebooks', onCombineNotebooks);
+
+
+
+
     function windowLoaded() {
       console.log('window:loaded ipc from local-client');
       if (global.appData.initialState.settings.isSharing) {
@@ -182,7 +187,21 @@ module.exports = {
       }
 
     }
+
+
+    function onCombineNotebooks(event, data) {
+      console.log('');
+      console.log('combine:notebooks ipc');
+
+      // global.appData.initialState.notebooks = [...global.appData.initialState.notebooks, ...global.appData.initialState.notebooks];
+
+
+      event.sender.send('update-synced-notebooks');
+      event.sender.send('update-rt-synced-notebooks', []);
+
+    }
   }
+
 };
 
 // var ipcMain = electron.ipcMain;
