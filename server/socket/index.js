@@ -10,7 +10,6 @@ const main = require('../../main');
 
 
 module.exports = function (glossaUser, mySession, io, bonjour, win) {
-  console.log('socket index.js called');
   io.sockets.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
@@ -22,16 +21,13 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     console.log('emit:: begin-handshake');
     //every socket connection, ask for some data
     socket.emit('begin-handshake');
-
-
     //this should be the return of the data we asked for
     socket.on('end-handshake', endHandShake);
     // when a socket disconnects remove from connection list
     socket.on('disconnect', disconnect);
-
     //when client sends data back to us
     socket.on('sync-data:return', syncDataReturn);
-
+    //when a client has requested the actual avatar image file.
     socket.on('request:avatar', onRequestAvatar);
 
 
@@ -164,11 +160,16 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           return con;
         })
       }
+
+
+
       main.getWindow(function (err, window) {
         if (err) {
           return console.log('error getting window...');
         }
-        window.webContents.send('update-connection-list');
+        if (!main.getForceQuit()) {
+          window.webContents.send('update-connection-list');
+        }
       });
 
     }

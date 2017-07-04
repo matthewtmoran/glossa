@@ -32,7 +32,7 @@ function startExpress() {
         isWindows: process.platform === 'win32'
       };
       express = require('./server/app')(bonjour, appData[0], win);
-  });
+    });
 }
 startExpress();
 
@@ -41,10 +41,10 @@ function fsCheck() {
 
   const dataPaths = [
     'Glossa',
-   'Glossa/storage',
-   'Glossa/image',
-   'Glossa/audio',
-   'Glossa/temp',
+    'Glossa/storage',
+    'Glossa/image',
+    'Glossa/audio',
+    'Glossa/temp',
   ];
 
   dataPaths.forEach((p) => {
@@ -103,6 +103,9 @@ function createWindow() {
   win.on('close', (e) => {
     console.log('');
     console.log('close event');
+    if (isWin10) {
+      forceQuit = true;
+    }
     if (isWin10 || forceQuit) {
       win = null;
     } else {
@@ -116,9 +119,9 @@ function createWindow() {
 app.on('before-quit', (e) => {
   console.log('');
   console.log('before-quit');
-    setTimeout(() => {
-        console.log('set timeout test for mac....');
-    },3000);
+  setTimeout(() => {
+    console.log('set timeout test for mac....');
+  },3000);
   forceQuit = true;
 });
 
@@ -206,10 +209,15 @@ function setReadyToGo() {
   readyToGo = true;
 }
 
+function getForceQuit() {
+  return forceQuit;
+}
+
 module.exports = {
   _unref: _unref,
-  getWindow:getWindow,
-  setReadyToGo:setReadyToGo
+  getWindow: getWindow,
+  setReadyToGo: setReadyToGo,
+  getForceQuit: getForceQuit
 };
 
 
