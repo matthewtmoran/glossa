@@ -22,6 +22,7 @@ export class RootService {
     //@electron-run
     ipc.on('navigateToState', this.navigateToState.bind(this));
     ipc.on('import:project', this.ipcImportProject.bind(this));
+
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
 
     //this overwrites events even if input/codemirror/siimplemde is focused...
@@ -103,6 +104,8 @@ export class RootService {
       }
     );
   }
+
+
 
   updateSettings(settings) {
     return this.$http.put(`/api/settings/${this.__appData.initialState.user._id}`, settings)

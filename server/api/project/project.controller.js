@@ -145,9 +145,7 @@ exports.importProject = (req, res) => {
         session: results[7],
       };
 
-
       global.appData.initialState = Object.assign({}, updatedData);
-
 
       return res.status(200).send(updatedData);
     });

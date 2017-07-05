@@ -23,6 +23,10 @@ module.exports = {
     BrowserWindow.getFocusedWindow().webContents.send('import:project');
   },
 
+  exportProject: function() {
+    BrowserWindow.getFocusedWindow().webContents.send('export:project');
+  },
+
   toggleFullScreen: function () {
     let win = BrowserWindow.getFocusedWindow();
 

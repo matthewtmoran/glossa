@@ -55,6 +55,7 @@ function buildFileMenu() {
       buildPreferencesMenuItem(),
       {type: 'separator'},
       buildImportMenuItem(),
+      buildExportMenuItem(),
       buildQuitMenuItem()
     ]
   };
@@ -299,6 +300,13 @@ function buildImportMenuItem() {
   return {
     label: 'Load Project',
     click: eventActions.importProject
+  }
+}
+
+function buildExportMenuItem() {
+  return {
+    label: 'Export Project',
+    click: eventActions.exportProject
   }
 }
 

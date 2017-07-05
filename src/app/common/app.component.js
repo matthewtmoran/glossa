@@ -102,6 +102,11 @@ export const appComponent = {
         this.cfpLoadingBar.complete();
       });
 
+      this.ipcSerivce.on('export:project', (event, data) => {
+        console.log('export:project')
+        this.exportProject({project:this.__appData.initialState.project});
+      })
+
     }
 
     $onChanges(changes) {
@@ -194,6 +199,7 @@ export const appComponent = {
     }
 
     exportProject(event) {
+      console.log('event', event);
       this.cfpLoadingBar.start();
       let options = {};
       options.title = "Are you sure you want to export all your project data?";
