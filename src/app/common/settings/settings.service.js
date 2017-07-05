@@ -42,8 +42,8 @@ export class SettingsService {
       let blob = new Blob([response.data], {type: 'application/zip'});
       let fileName = this.getFileNameFromHttpResponse(response);
       let url = this.$window.URL.createObjectURL(blob);
-
       let downloadLink = angular.element('<a></a>');
+
       downloadLink.attr('href', url);
       downloadLink.attr('download', fileName);
       downloadLink[0].click();

@@ -35,6 +35,7 @@ export const appComponent = {
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
+
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
 
@@ -46,6 +47,7 @@ export const appComponent = {
 
 
 
+      //called whne the connection list need to be updated
       this.ipcSerivce.on('update-connection-list', (event, data) => {
 
         console.log('on:: update-connection-list');
@@ -56,12 +58,14 @@ export const appComponent = {
 
       });
 
-
+      //called when notebooks need to be object - usually when external notebook are added
       this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
         console.log('on:: update-synced-notebooks');
         this.notebooks = angular.copy(this.__appData.initialState.notebooks);
       });
 
+      //called when new external notebooks are made in real-time
+      //adds the notebooks to a holding array before they just populate
       this.ipcSerivce.on('update-rt-synced-notebooks', (event, data) => {
         console.log('on:: update-rt-synced-notebooks');
         if (!this.newNotebooks || !this.newNotebooks.length || !data.length) {
@@ -71,7 +75,8 @@ export const appComponent = {
         }
       });
 
-
+      //listener for when something is syncing...
+      //TODO: consider removal and updateing sync display to be only client side...
       this.ipcSerivce.on('sync-event-start', (event, data) => {
         console.log('on:: sync-event-start');
 
@@ -91,6 +96,7 @@ export const appComponent = {
 
       });
 
+      //removes sync-display
       this.ipcSerivce.on('sync-event-end', (event, data) => {
         console.log('on:: sync-event-end');
         this.cfpLoadingBar.complete();
@@ -223,7 +229,6 @@ export const appComponent = {
           this.cfpLoadingBar.complete();
 
           this.ipcSerivce.send('broadcast:profile-updates')
-
 
         });
     }

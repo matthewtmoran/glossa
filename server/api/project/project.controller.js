@@ -21,7 +21,11 @@ const User = require('./../user/user.model');
 const Notebooks = require('./../notebook/notebook.model');
 const Transcriptions = require('./../transcription/transcription.model');
 const Hashtags = require('./../hashtag/hashtag.model');
+const Settings = require('./../settings/settings.model');
+const Session = require('./../session/session.model');
 const Connections = require('./../connections/connection.model');
+const electron = require('electron');
+const app = electron.app;
 // let Connections = require('./../connections/connections.model');
 
 
@@ -125,7 +129,8 @@ exports.importProject = (req, res) => {
     replacePromises.push(replaceConnections(newProjectData.connections));
     replacePromises.push(replaceTranscriptions(newProjectData.transcriptions));
     replacePromises.push(replaceHashtags(newProjectData.hashtags));
-    replacePromises.push(replaceCorporia(newProjectData.corporia));
+    replacePromises.push(replaceSettings(newProjectData.settings));
+    replacePromises.push(replaceSession(newProjectData.session));
 
     Promise.all(replacePromises).then((results) => {
 
@@ -136,8 +141,13 @@ exports.importProject = (req, res) => {
         connections: results[3],
         transcriptions: results[4],
         hashtags: results[5],
-        corporia: results[6],
+        settings: results[6],
+        session: results[7],
       };
+
+
+      global.appData.initialState = Object.assign({}, updatedData);
+
 
       return res.status(200).send(updatedData);
     });
@@ -152,6 +162,7 @@ exports.importProject = (req, res) => {
  * @param res
  */
 exports.exportProject = function (req, res) {
+
   let userId = req.params.userId;
   let projectId = req.params.projectId;
   let projectData = {};//initiate project data object
@@ -165,7 +176,8 @@ exports.exportProject = function (req, res) {
   databasePromises.push(getConnections());
   databasePromises.push(getTranscriptions());
   databasePromises.push(getHashtags());
-  databasePromises.push(getCorporia());
+  databasePromises.push(getSettings());
+  databasePromises.push(getSession());
 
   Promise.all(databasePromises).then((results) => {//once all the promises have resolved
 
@@ -178,15 +190,12 @@ exports.exportProject = function (req, res) {
     projectData.connections = results[3]; //TODO: get avatars
     projectData.transcriptions = results[4]; //TODO: get media files
     projectData.hashtags = results[5];
-    projectData.corporia = results[6];
+    projectData.settings = results[6];
+    projectData.session = results[7];
 
     //create and stream zip file
 
-    // console.log('notebooks being exported: ', projectData.notebooks.length);
-    // console.log('Image buffer?', !!projectData.notebooks[0].imageBuffer);
-    // console.log('Image buffer?', !!projectData.notebooks[1].imageBuffer);
-
-    var projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
+    let projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
 
     res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
     res.set('Content-Type', 'application/zip');
@@ -226,7 +235,6 @@ function getUser() {
         encodeBase64(user.avatar).then((imageBufferString) => {
           user.imageBufferString = imageBufferString;
           resolve(user);
-
         });
       } else {
         resolve(user);
@@ -326,6 +334,31 @@ function getHashtags() {
   })
 }
 
+function getSettings() {
+  return new Promise((resolve, reject) => {
+    Settings.findOne({}, (err, settings) => {
+      if (err) {
+        console.log('There was an error finding settings', err);
+        reject(err)
+      }
+      resolve(settings);
+    });
+  })
+}
+
+function getSession() {
+  return new Promise((resolve, reject) => {
+    Session.findOne({}, (err, session) => {
+      if (err) {
+        console.log('There was an error finding settings', err);
+        reject(err)
+      }
+      resolve(session);
+    });
+  })
+}
+
+
 function getCorporia() {
   return new Promise((resolve, reject) => {
     Corporia.find({}, (err, corporia) => {
@@ -352,8 +385,12 @@ function replaceUser(newUser) {
 
       if (newUser.avatar) {
 
+        let pathToWrite = path.join(app.getPath('userData'), 'image', process.platform === 'win32' ? path.win32.basename(newUser.avatar) :  path.posix.basename(newUser.avatar));
+
+        console.log(' pathToWrite: ', pathToWrite);
+
         let userAvatarData = {
-          path: newUser.avatar,
+          path: pathToWrite,
           buffer: newUser.imageBufferString
         };
 
@@ -490,19 +527,36 @@ function replaceHashtags(newHashtags) {
   })
 }
 
-function replaceCorporia(newCorpus) {
+function replaceSettings(newSettings) {
   return new Promise((resolve, reject) => {
-    Corporia.remove({}, {multi: true}, (err, numRemoved) => {
+    Settings.remove({}, {multi: true}, (err, numRemoved) => {
       if (err) {
-        console.log('Error removing corpus', err);
+        console.log('Error removing settings', err);
         reject(err);
       }
-      Corporia.insert(newCorpus, (err, corpus) => {
+      Settings.insert(newSettings, (err, settings) => {
         if (err) {
-          console.log('Error inserting new corpus ', err);
+          console.log('Error inserting new settings ', err);
           reject(err);
         }
-        resolve(corpus);
+        resolve(settings);
+      })
+    })
+  })
+}
+function replaceSession(newSession) {
+  return new Promise((resolve, reject) => {
+    Session.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing session', err);
+        reject(err);
+      }
+      Session.insert(newSession, (err, session) => {
+        if (err) {
+          console.log('Error inserting new session ', err);
+          reject(err);
+        }
+        resolve(session);
       })
     })
   })
@@ -549,10 +603,10 @@ function decodeMediaFiles(array) {
   return new Promise((resolve, reject) => {
     array.map((object) => { //iterate through array
       if (object.imageBufferString) { //if there is an image buffer string
-
+        let pathToWrite = path.join(app.getPath('userData'), 'image', process.platform === 'win32' ? path.win32.basename(object.image.path) :  path.posix.basename(object.image.path));
         let imageData = { //create an object with the path and buffer string to pass to wrtie media file function
           buffer: object.imageBufferString,
-          path: object.image.path
+          path: pathToWrite
         };
 
         mediaPromises.push( //push write media file promise
@@ -562,10 +616,10 @@ function decodeMediaFiles(array) {
         )
       }
       if (object.audioBufferString) {
-
+        let pathToWrite = path.join(app.getPath('userData'), 'audio', process.platform === 'win32' ? path.win32.basename(object.audio.path) :  path.posix.basename(object.audio.path));
         let audioData = {
           buffer: object.audioBufferString,
-          path: object.audio.path
+          path: pathToWrite
         };
 
         mediaPromises.push(
@@ -590,7 +644,8 @@ function decodeMediaFiles(array) {
  */
 function writeMediaFile(data) {
   return new Promise(function (resolve, reject) {
-    let mediaPath = path.join(config.root, '/server/data/', data.path); //the root path
+
+    // let mediaPath = path.join(config.root, '/server/data/', data.path); //the root path
 
     let buffer = new Buffer(data.buffer, 'base64', function (err) { //decode buffer bas364
       if (err) {
@@ -599,7 +654,7 @@ function writeMediaFile(data) {
       }
     });
 
-    fs.writeFile(mediaPath, buffer, function (err) { //write the file to the file system
+    fs.writeFile(data.path, buffer, function (err) { //write the file to the file system
       if (err) {
         console.log('There was an error writing file to filesystem', err);
         reject(err);
@@ -613,9 +668,8 @@ function writeMediaFile(data) {
  * @param mediaPath - String that is a relative path to a file.
  */
 function encodeBase64(mediaPath) {
-  let myPath = path.join(config.root, '/server/data/', mediaPath); //build a more 'absolute' path to the file
   return new Promise(function (resolve, reject) {
-    fs.readFile(myPath, function (err, data) {
+    fs.readFile(mediaPath, function (err, data) {
       if (err) {
         console.log('there was an error encoding media...', err);
         reject(err);

@@ -9,10 +9,5 @@ var Datastore = require('nedb'),
     autoload: true,
     timestampData: true
   });
-// userDb = new Datastore({
-//         filename: path.join(config.root, config.dbPath, '/user'),
-//         autoload: true,
-//         timestampData: true
-//     });
 
 module.exports = userDb;
