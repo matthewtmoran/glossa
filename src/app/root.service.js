@@ -79,6 +79,14 @@ export class RootService {
       this.$rootScope.$broadcast('playPause');
       return false
     });
+    Mousetrap.bind(['command+1', 'ctrl+1'], () => {
+      this.$state.go('corpus');
+      return false
+    });
+    Mousetrap.bind(['command+2', 'ctrl+2'], () => {
+      this.$state.go('notebook');
+      return false
+    });
   }
 
 
