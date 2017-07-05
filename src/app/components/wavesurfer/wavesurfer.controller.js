@@ -37,6 +37,7 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
+    console.log('$onChanges in wavesurfer.component');
     if (changes.urlSrc) {
       this.urlSrc = angular.copy(changes.urlSrc.currentValue);
       this.initWaveSurfer();
@@ -51,6 +52,7 @@ export class WaveSurferController {
   }
 
   $onInit() {
+    console.log('$onInit in wavesurfer.controller');
     this.speedIndex = 1;
   }
 
@@ -68,6 +70,7 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
+    console.log('initWaveSurfer in wavesurfer.component');
     this.cfpLoadingBar.start();
     this.timeInterval;
     this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects

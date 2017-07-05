@@ -3,15 +3,6 @@
 		<h2>Select a text or create a new text</h2>
 	</div>
 	<div ng-if="$ctrl.currentFile._id" layout="row">
-		<!--get-time-stamp="blVm.getTimeStamp"-->
-		<!--<wave-surfer-full-->
-				<!--ng-if="$ctrl.audioPath"-->
-				<!--flex-->
-				<!--image-src="$ctrl.imagePath"-->
-				<!--url-src="$ctrl.audioPath"-->
-				<!--auto-play="false"-->
-		<!--</wave-surfer-full>-->
-
 		<wave-surfer-full
 				ng-if="$ctrl.currentFile.audio.path || $ctrl.notebookAttached.audio.path"
 				flex
@@ -21,12 +12,15 @@
 				auto-play="false"
 		</wave-surfer-full>
 	</div>
-	<div ng-if="$ctrl.currentFile._id" ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
+	<md-progress-circular class="loading-circular fade-out" ng-hide="!$ctrl.isLoadingCodeMirror" md-diameter="50"></md-progress-circular>
+
+	<div ng-hide="$ctrl.isLoadingCodeMirror" ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
 	     ng-model="$ctrl.currentFile.content"
 	     ng-change="$ctrl.saveContent()"
 	     ng-model-options="{debounce: 750}"
 	     layout="row"
-	     flex></div>
+	     flex>
+	</div>
 
 
 </div>

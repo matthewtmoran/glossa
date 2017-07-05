@@ -20,6 +20,7 @@ export const baselineComponent = {
       this.doc = {};
       this.isDoubleClick = false;
       this.singleClick;
+      this.isLoadingCodeMirror = true;
 
 
       this.codemirrorLoaded = this.codemirrorLoaded.bind(this);
@@ -32,6 +33,7 @@ export const baselineComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in baseline.component');
       if (changes.selectedFile) {
         this.currentFile = angular.copy(this.selectedFile);
       }
@@ -41,6 +43,7 @@ export const baselineComponent = {
     }
 
     //passes event up
+    //save transcription content
     saveContent() {
       this.onUpdate({$event: {file: this.currentFile}});
     }
@@ -51,6 +54,8 @@ export const baselineComponent = {
 
 
     codemirrorLoaded(_editor) {
+      this.isLoadingCodeMirror = false;
+      console.log('codemirrorLoaded event');
       this._doc = _editor.getDoc();
       this.isDoubleClick = false;
       _editor.setOption('lineNumbers', true);

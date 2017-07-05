@@ -7,24 +7,35 @@ baseline {
 	-webkit-box-flex: 1;
 	height:100%;
 
+
+	.loading-circular {
+		position: fixed;
+		top: 50%;
+		bottom: 50%;
+		right: 50%;
+		left: 50%;
+	}
+
+
 	.baseline {
 		.CodeMirror{
 			width: 100%;
 			height: auto;
-			font-family: "DejaVu Mono";
-			//min-height: 100%;
 			padding: 0 !important;
-			border: none;
-
-			.CodeMirror-sizer {
-				padding-top: 12px;
-			}
+			border-color: white;
+		//	font-family: "DejaVu Mono";
+		//	//min-height: 100%;
+		//	//border: none;
+		//
+		//	.CodeMirror-sizer {
+		//		padding-top: 12px;
+		//	}
 		}
 
-		//.waveSurferWave {
-		//
-		//	@extend .grey-gradient;
-		//}
+		.waveSurferWave {
+
+			//@extend .grey-gradient;
+		}
 	}
 
 	.cm-timestamp {

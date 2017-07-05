@@ -2,11 +2,3 @@
 {"tag":"mycustomtag","tagColor":"#4285f4","realTitle":"mycustomtag","canEdit":true,"createdAt":1495909740707,"occurrence":0,"_id":"aQpNPHSZIhKoNCBD","tagDescription":"This is a description"}
 {"tag":"BasicHashtag","tagColor":"#4285f4","realTitle":"BasicHashtag","canEdit":true,"createdAt":1496243215559,"occurrence":0,"_id":"pJtPzmuj09OJISzO"}
 {"tag":"f","tagColor":"#4285f4","realTitle":"f","canEdit":true,"createdAt":1498863202400,"occurrence":1,"_id":"z3kcuYRdyq4FgIw2"}
-{"$$deleted":true,"_id":"5uRXYHUA1voQsQTR"}
-{"$$deleted":true,"_id":"aQpNPHSZIhKoNCBD"}
-{"$$deleted":true,"_id":"pJtPzmuj09OJISzO"}
-{"$$deleted":true,"_id":"z3kcuYRdyq4FgIw2"}
-{"tag":"thisNewTag","tagColor":"#4285f4","realTitle":"thisNewTag","canEdit":true,"createdAt":1498511859923,"occurrence":1,"_id":"5uRXYHUA1voQsQTR"}
-{"tag":"mycustomtag","tagColor":"#4285f4","realTitle":"mycustomtag","canEdit":true,"createdAt":1495909740707,"occurrence":0,"_id":"aQpNPHSZIhKoNCBD","tagDescription":"This is a description"}
-{"tag":"BasicHashtag","tagColor":"#4285f4","realTitle":"BasicHashtag","canEdit":true,"createdAt":1496243215559,"occurrence":0,"_id":"pJtPzmuj09OJISzO"}
-{"tag":"f","tagColor":"#4285f4","realTitle":"f","canEdit":true,"createdAt":1498863202400,"occurrence":1,"_id":"z3kcuYRdyq4FgIw2"}

@@ -55,11 +55,11 @@ export class RootService {
       }
       return false
     });
-    Mousetrap.bind(['command+right', 'ctrl+right'], () => {
+    Mousetrap.bind(['command+right'], () => {
       this.$rootScope.$broadcast('scrubRight');
       return false
     });
-    Mousetrap.bind(['command+left', 'ctrl+left'], () => {
+    Mousetrap.bind(['command+left'], () => {
       this.$rootScope.$broadcast('scrubLeft');
       return false
     });
@@ -67,11 +67,11 @@ export class RootService {
       this.$rootScope.$broadcast('addTimeStamp');
       return false
     });
-    Mousetrap.bind(['command+up', 'ctrl+up'], () => {
+    Mousetrap.bind(['command+up'], () => {
       this.$rootScope.$broadcast('adjustPlaySpeedUp');
       return false
     });
-    Mousetrap.bind(['command+down', 'ctrl+down'], () => {
+    Mousetrap.bind(['command+down'], () => {
       this.$rootScope.$broadcast('adjustPlaySpeedDown');
       return false
     });
