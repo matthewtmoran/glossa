@@ -19,9 +19,15 @@ export const notebookListComponent = {
     }
 
     $onChanges(changes) {
+      if (changes.currentUser) {
+        this.currentUser = angular.copy(changes.currentUser.currentValue);
+      }
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
       }
+      // if (changes.selected) {
+      //   this.selected = angular.copy(changes.selected.currentValue);
+      // }
     }
 
     $onInit() {

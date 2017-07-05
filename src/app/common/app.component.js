@@ -103,7 +103,6 @@ export const appComponent = {
       });
 
       this.ipcSerivce.on('export:project', (event, data) => {
-        console.log('export:project')
         this.exportProject({project:this.__appData.initialState.project});
       })
 
@@ -199,7 +198,6 @@ export const appComponent = {
     }
 
     exportProject(event) {
-      console.log('event', event);
       this.cfpLoadingBar.start();
       let options = {};
       options.title = "Are you sure you want to export all your project data?";

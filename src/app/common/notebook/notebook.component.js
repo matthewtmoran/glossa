@@ -82,6 +82,8 @@ export const notebookComponent = {
       this.isOpen = false;
       this.hover = false;
       this.selected = [];
+      this.initSelected();
+
       this.selectedHashtags = [];
 
       this.items = [
@@ -93,6 +95,18 @@ export const notebookComponent = {
       this.externalNotebooks = [];
       this.uniqueUsers = {};
 
+    }
+
+    initSelected() {
+      this.selected = this.allConnections.map((connection) => {
+        if (connection.following) {
+          return connection._id;
+        }
+      });
+      this.selected = [
+        ...this.selected,
+        this.currentUser._id
+      ]
     }
 
     //pass to app.component
@@ -335,7 +349,6 @@ export const notebookComponent = {
     }
 
     toggle(event) {
-      console.log('event.list', event.list);
       let idx = event.list.indexOf(event.user._id);
       if (idx > -1) {
         this.selected.splice(idx, 1);

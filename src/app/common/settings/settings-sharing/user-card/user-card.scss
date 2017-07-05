@@ -10,30 +10,7 @@ user-card {
 				display: inline-block;
 				vertical-align: middle;
 			}
-
-			.online-status {
-				height:15px;
-				width: 15px;
-				border-radius: 50px;
-				//position: absolute;
-				//bottom: 0;
-				//top: 0;
-				//margin: auto;
-				z-index: 99;
-
-				&.offline-notification {
-					background: #FF5607;
-				}
-
-				&.online-notification {
-					background: #CDDE20;
-				}
-			}
 		}
-
-
-
-
 
 		.user-sync-containaer {
 			font-size: .9em;
@@ -63,10 +40,7 @@ user-card {
 				color: white;
 			}
 		}
-
-
 		.md-button {
-
 			&.is-following {
 				color: rgba(158,158,158, 1);
 			}

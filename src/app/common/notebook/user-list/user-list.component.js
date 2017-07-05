@@ -3,6 +3,7 @@ import templateUrl from './user-list.html';
 export const userListComponent = {
   bindings: {
     allConnections: '<',
+    currentUser: '<',
     selected: '<',
     onToggle: '&',
     onExists: '&',
@@ -14,6 +15,7 @@ export const userListComponent = {
     }
 
     $onChanges(changes) {
+      console.log('$onChanges in user-list.componentn', changes);
       if (changes.allConnections) {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
@@ -31,6 +33,7 @@ export const userListComponent = {
       })
     }
 
+    //returns boolean if user is in list of users to filter notebooks by
     exists(user) {
       return this.selected.indexOf(user._id) > -1;
     }
