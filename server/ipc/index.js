@@ -17,7 +17,6 @@ module.exports = {
 
     ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
 
-
     ipcUtil.on('combine:notebooks', onCombineNotebooks);
 
 
@@ -123,7 +122,6 @@ module.exports = {
     function onBroadcastUpdates(event, notebook) {
       console.log('');
       console.log('broadcast:Updates ipc');
-      console.log('notebook in onBroadcastUpdates', notebook);
 
       let mediaPromises = [];
       //encode image

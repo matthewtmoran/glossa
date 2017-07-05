@@ -195,7 +195,6 @@ app.on('activate', function () {
 
 //so we can get the window (if it exists... ) to close and send ipc events properly
 function getWindow(callback) {
-  console.log('getWindow in main:', win);
   callback(null, win);
 
 }
