@@ -4,13 +4,15 @@ import { simplemde } from './simplemde/simplemde.module';
 import { ParseService } from './parse/parse.service';
 import { IpcSerivce } from './ipc/ipc.service';
 import { audioPreview } from './basic-audio-preview/basic-audio-preview.module';
+import { windowsTitlebar } from './windows-titlebar/windows-titlebar.module';
 
 export const components = angular
   .module('components', [
     waveSurfer,
     dialogs,
     simplemde,
-    audioPreview
+    audioPreview,
+    windowsTitlebar
   ])
   .service('ParseService', ParseService)
   .service('IpcSerivce', IpcSerivce)
