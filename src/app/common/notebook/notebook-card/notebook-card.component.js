@@ -20,10 +20,19 @@ export const notebookCardComponent = {
       this.$sce = $sce;
       this.$state = $state;
 
+
       this.isCorpus = false;
       // console.log('SimpleMDE.markdown', SimpleMDE.markdown);
 
     }
+
+    $onInit() {
+
+
+    }
+
+
+
 
     $onChanges(changes) {
       if (changes.notebook) {
@@ -37,6 +46,9 @@ export const notebookCardComponent = {
         this.settings = angular.copy(changes.settings.currentValue);
       }
     }
+
+
+
 
     renderNotebookPreview() {
       this.previewText = this.$sce.trustAsHtml(SimpleMDE.markdown(this.notebook.description));

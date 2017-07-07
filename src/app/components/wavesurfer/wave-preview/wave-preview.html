@@ -14,8 +14,11 @@
 					<!--<md-tooltip>-->
 					<!--{{$ctrl.surfer.isPlaying() ? 'Pause' : 'Play'}}-->
 					<!--</md-tooltip>-->
-					<md-icon ng-show="$ctrl.surfer.isPlaying()" class="material-icons">pause</md-icon>
-					<md-icon ng-show="!$ctrl.surfer.isPlaying()"  class="material-icons">play_arrow</md-icon>
+
+					<md-icon class="material-icons">{{$ctrl.surfer.isPlaying() ? 'pause' : 'play_arrow' }}</md-icon>
+
+					<!--<md-icon ng-show="$ctrl.surfer.isPlaying()" class="material-icons">pause</md-icon>-->
+					<!--<md-icon ng-show="!$ctrl.surfer.isPlaying()"  class="material-icons">play_arrow</md-icon>-->
 				</md-button>
 			</div>
 		</div>

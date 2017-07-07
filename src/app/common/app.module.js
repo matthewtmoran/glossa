@@ -1,7 +1,6 @@
 import uiRouter from '@uirouter/angularjs';
 import { appComponent } from './app.component';
-
-// import { attachmentComponent } from './dialog/dialog-attahcment/dialog-attachment.controller';
+// import { audioPreview } from '../components/basic-audio-preview/basic-audio-preview.module';
 import { appNav } from './app-nav/app-nav.module';
 import { appDrawer } from './app-drawer/app-drawer.module';
 import { appSidebar } from './app-sidebar/app-sidebar.module';
@@ -19,7 +18,8 @@ export const app = angular
     appDrawer,
     corpus,
     notebook,
-    settings
+    settings,
+    // audioPreview
   ])
   .component('app', appComponent)
   .config(($stateProvider) => {
