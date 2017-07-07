@@ -16,23 +16,6 @@
 
 		<audio-preview ng-if="$ctrl.notebook.postType === 'audio'" url-src="$ctrl.notebook.audio.path"></audio-preview>
 
-
-		<!--<div class="wave-container" ng-if="$ctrl.notebook.postType === 'audio'">-->
-
-			<!--<div ng-if="$ctrl.notebook.type === 'audio'" class="audio-container">-->
-				<!--<div class="audio-progressBar"><span class="audio-progress"></span></div>-->
-				<!--<button ng-click="$ctrl.playAudio()">Play</button>-->
-			<!--</div>-->
-
-
-			<!--<wave-surfer-preview-->
-					<!--flex-->
-					<!--settings="$ctrl.settings"-->
-					<!--url-src="$ctrl.notebook.audio.path"-->
-					<!--auto-play="false">-->
-			<!--</wave-surfer-preview>-->
-		<!--</div>-->
-
 		<div class="card-text inner-padding">
 			<div ng-if="$ctrl.previewText" ng-bind-html="$ctrl.previewText"></div>
 		</div>

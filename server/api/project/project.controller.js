@@ -12,10 +12,12 @@
 
 const _ = require('lodash');
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 const AdmZip = require('adm-zip');
 const config = require('./../../config/environment/index');
+
 const Projects = require('./project.model');
 const User = require('./../user/user.model');
 const Notebooks = require('./../notebook/notebook.model');
@@ -24,8 +26,59 @@ const Hashtags = require('./../hashtag/hashtag.model');
 const Settings = require('./../settings/settings.model');
 const Session = require('./../session/session.model');
 const Connections = require('./../connections/connection.model');
+
 const electron = require('electron');
 const app = electron.app;
+let allDataBaseItems = [
+  {
+    database: Connections,
+    name: 'connections'
+  },
+  {
+    database: User,
+    name: 'user'
+  },
+  {
+    database: Transcriptions,
+    name: 'transcriptions'
+  },
+  {
+    database: Notebooks,
+    name: 'notebooks'
+  },
+  {
+    database: Hashtags,
+    name: 'hashtags'
+  },
+
+  {
+    database: Projects,
+    name: 'project'
+  },
+  {
+    database: Session,
+    name: 'session'
+  },
+  {
+    database: Settings,
+    name: 'settings'
+  },
+]
+
+let dataBaseItems = [
+  {
+    database: Projects,
+    name: 'project'
+  },
+  {
+    database: Session,
+    name: 'session'
+  },
+  {
+    database: Settings,
+    name: 'settings'
+  },
+];
 // let Connections = require('./../connections/connections.model');
 
 
@@ -116,42 +169,242 @@ exports.destroy = function (req, res) {
  */
 exports.importProject = (req, res) => {
   console.log('TODO: REMOVE ALL MEDIA FILES FROM FILE SYSTEM!!!!!!!!!');
-  let newProjectData;
-  let zip = new AdmZip(req.body.projectPath);
-  let zipEntries = zip.getEntries();
-  zipEntries.forEach((zipEntry) => {
-    newProjectData = JSON.parse(zip.readAsText(zipEntry));
-    let replacePromises = [];
 
-    replacePromises.push(replaceUser(newProjectData.user));
-    replacePromises.push(replaceProject(newProjectData.project));
-    replacePromises.push(replaceNotebooks(newProjectData.notebooks));
-    replacePromises.push(replaceConnections(newProjectData.connections));
-    replacePromises.push(replaceTranscriptions(newProjectData.transcriptions));
-    replacePromises.push(replaceHashtags(newProjectData.hashtags));
-    replacePromises.push(replaceSettings(newProjectData.settings));
-    replacePromises.push(replaceSession(newProjectData.session));
+  let rootPath = app.getPath('userData');
+  fse.remove(path.join(rootPath, 'storage'), (err) => {
+    let zip = new AdmZip(req.body.projectPath);
+    zip.extractAllToAsync (rootPath, true, () => {
 
-    Promise.all(replacePromises).then((results) => {
+      User.loadDatabase();
+      Notebooks.loadDatabase();
+      Transcriptions.loadDatabase();
+      Hahstags.loadDatabase();
+      Settings.loadDatabase();
+      Session.loadDatabase();
+      Connections.loadDatabase();
+      Projects.loadDatabase();
 
-      let updatedData = {
-        user: results[0],
-        project: results[1],
-        notebooks: results[2],
-        connections: results[3],
-        transcriptions: results[4],
-        hashtags: results[5],
-        settings: results[6],
-        session: results[7],
-      };
+      resolvePathsAndReset()
+        .then(() => {
+          return res.status(200).send(true);
+        })
+    });
+  });
 
-      global.appData.initialState = Object.assign({}, updatedData);
+};
 
-      return res.status(200).send(updatedData);
+
+function resolvePathsAndReset() {
+  let promiseArray = [];
+  return new Promise((resolve, reject) => {
+    promiseArray.push(
+
+      resolveAndUpdateUser()
+        .then((data) => {
+          global.appData.initialState.user = Object.assign({}, data);
+        }),
+
+      resolveAndUpdateNotebooks()
+        .then((data) => {
+          global.appData.initialState.notebooks = data.map((nb) => {
+            return nb;
+          });
+        }),
+
+      resolveAndUpdateTranscriptions()
+        .then((data) => {
+          global.appData.initialState.transcriptions = data.map((tr) => {
+            return tr;
+          });
+        }),
+
+      resolveAndUpdateConnections()
+        .then((data) => {
+          global.appData.initialState.connections = data.map((co) => {
+            return co;
+          });
+        }),
+
+      updateHashtags()
+        .then((data) => {
+          global.appData.initialState.hashtags = data.map((tag) => {
+            return tag;
+          });
+        })
+
+    );
+
+    dataBaseItems.forEach((item) => {
+      promiseArray.push(
+
+        updateSingleObject(item)
+          .then((data) => {
+            global.appData.initialState[item.name] = Object.assign({}, data);
+          })
+
+      )
     });
 
+
+    Promise.all(promiseArray)
+      .then((results) => {
+        resolve(true);
+      })
+
+
   });
-};
+}
+
+function updateSingleObject(item) {
+  return new Promise((resolve, reject) => {
+    item.database.findOne({}, (err, project) => {
+      if (err) {
+        console.log('Error resetting app data', err);
+        reject(err);
+      }
+      resolve(project);
+    });
+  });
+}
+
+
+function updateHashtags() {
+  return new Promise((resolve, reject) => {
+    Hashtags.find({}, (err, hashtags) => {
+      if (err) {
+        console.log('Error resetting app data', err);
+        reject(err)
+      }
+      resolve(hashtags)
+    });
+  })
+}
+
+function resolveAndUpdateConnections() {
+  return new Promise((resolve, reject) => {
+    Connections.find({}, (err, connections) => {
+      if (err) {
+        console.log('error resolving paths', err);
+        reject(err);
+      }
+      connections = connections.map((connection) => {
+        if (connection.avatar) {
+          connection.avatar = resolvePath(connection.avatar, 'image');
+        }
+        return connection;
+      });
+
+      connections.forEach((n) => {
+        Connections.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+
+      resolve(connections);
+    });
+  })
+}
+
+function resolveAndUpdateTranscriptions() {
+  return new Promise((resolve, reject) => {
+    Transcriptions.find({}, (err, transcriptions) => {
+      if (err) {
+        console.log('error resolving notebook paths');
+      }
+
+      //update notebooks array
+      transcriptions = transcriptions.map((transcription) => {
+        if (transcription.audio) {
+          transcriptions.audio.path = resolvePath(transcription.audio.path, 'audio');
+        }
+        if (transcription.image) {
+          transcriptions.image.path = resolvePath(transcription.image.path, 'image');
+        }
+        return transcription;
+      });
+
+      //update each notebook
+      transcriptions.forEach((n) => {
+        Transcriptions.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+
+      resolve(transcriptions);
+
+    });
+  })
+}
+
+function resolveAndUpdateNotebooks() {
+  return new Promise((resolve, reject) => {
+    Notebooks.find({}, (err, notebooks) => {
+      if (err) {
+        console.log('error resolving notebook paths', err);
+        reject(err);
+      }
+
+      //update notebooks array
+      notebooks = notebooks.map((notebook) => {
+        if (notebook.audio) {
+          notebook.audio.path = resolvePath(notebook.audio.path, 'audio');
+        }
+        if (notebook.image) {
+          notebook.image.path = resolvePath(notebook.image.path, 'image');
+        }
+        return notebook;
+      });
+
+      //update each notebook
+      notebooks.forEach((n) => {
+        Notebooks.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+      resolve(notebooks);
+
+
+    });
+  })
+}
+
+function resolveAndUpdateUser() {
+  return new Promise((resolve, reject) => {
+    User.findOne({}, (err, user) => {
+      if (err) {
+        console.log('Error importing project data', err)
+        reject(err);
+      }
+      if (user.avatar) {
+        user.avatar = resolvePath(user.avatar, 'image');
+      }
+      let options = {returnUpdatedDocs: true};
+      User.update({_id: user._id}, user, options, (err, updatedCount, updatedDoc) => {
+        if (err) {
+          console.log('Error importing Project data');
+        }
+        resolve(updatedDoc);
+      })
+    });
+  })
+}
+
+function resolvePath(oldPath, type) {
+  let rootPath = app.getPath('userData');
+  let fileName = getBaseName(oldPath);
+  return path.join(rootPath, type, fileName);
+
+}
+
+function getBaseName(p) {
+  return process.platform === 'win32' ? path.win32.basename(p) :  path.posix.basename(p);
+}
 
 /**
  * Export all project data
@@ -160,62 +413,93 @@ exports.importProject = (req, res) => {
  * @param res
  */
 exports.exportProject = function (req, res) {
+  let archive = archiver('zip'); // Sets the compression level.
 
-  let userId = req.params.userId;
-  let projectId = req.params.projectId;
-  let projectData = {};//initiate project data object
-  let databasePromises = [];//initiate promise array
+  let rootPath = app.getPath('userData');
+  let imagePath = path.join(rootPath, 'image');
+  let audioPath = path.join(rootPath, 'audio');
+  let dataPath = path.join(rootPath, 'storage');
+  archive.directory(imagePath, 'image');
+  archive.directory(audioPath, 'audio');
+  archive.directory(dataPath, 'storage');
 
-  //TODO: queries need to be refractored
-  //push application data(promises) to array
-  databasePromises.push(getUser());
-  databasePromises.push(getProject(userId));
-  databasePromises.push(getNotebooks(userId));
-  databasePromises.push(getConnections());
-  databasePromises.push(getTranscriptions());
-  databasePromises.push(getHashtags());
-  databasePromises.push(getSettings());
-  databasePromises.push(getSession());
+  let projectNameNoSpace = global.appData.initialState.project.name.replace(/\s/g, '');
 
-  Promise.all(databasePromises).then((results) => {//once all the promises have resolved
+  res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
+  res.set('Content-Type', 'application/zip');
+  archive.pipe(res); //pipe the response
+  // //add file to archive
+  //
+  // archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
+  //
+  archive.on('error', (err) => { ///if there is an error....
+    console.error(err);
+    throw err;
+  });
+  //
+  res.on('close', () => { //when the response is done
+    return res.status(200).send('OK').end(); //send response to client
+  });
 
-    let archive = archiver('zip'); // Sets the compression level.
-
-    //update the application data object
-    projectData.user = results[0];
-    projectData.project = results[1];
-    projectData.notebooks = results[2];
-    projectData.connections = results[3]; //TODO: get avatars
-    projectData.transcriptions = results[4]; //TODO: get media files
-    projectData.hashtags = results[5];
-    projectData.settings = results[6];
-    projectData.session = results[7];
-
-    //create and stream zip file
-
-    let projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
-
-    res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
-    res.set('Content-Type', 'application/zip');
+  archive.finalize();
 
 
-    archive.pipe(res); //pipe the response
-    //add file to archive
+  /*
+   let userId = req.params.userId;
+   let projectId = req.params.projectId;
+   let projectData = {};//initiate project data object
+   let databasePromises = [];//initiate promise array
 
-    archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
+   //TODO: queries need to be refractored
+   //push application data(promises) to array
+   databasePromises.push(getUser());
+   databasePromises.push(getProject(userId));
+   databasePromises.push(getNotebooks(userId));
+   databasePromises.push(getConnections());
+   databasePromises.push(getTranscriptions());
+   databasePromises.push(getHashtags());
+   databasePromises.push(getSettings());
+   databasePromises.push(getSession());
 
-    archive.on('error', (err) => { ///if there is an error....
-      console.error(err);
-      throw err;
-    });
+   Promise.all(databasePromises).then((results) => {//once all the promises have resolved
 
-    res.on('close', () => { //when the response is done
-      return res.status(200).send('OK').end(); //send response to client
-    });
+   let archive = archiver('zip'); // Sets the compression level.
 
-    archive.finalize();
+   //update the application data object
+   projectData.user = results[0];
+   projectData.project = results[1];
+   projectData.notebooks = results[2];
+   projectData.connections = results[3]; //TODO: get avatars
+   projectData.transcriptions = results[4]; //TODO: get media files
+   projectData.hashtags = results[5];
+   projectData.settings = results[6];
+   projectData.session = results[7];
 
-  })
+   //create and stream zip file
+
+   let projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
+
+   res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
+   res.set('Content-Type', 'application/zip');
+
+
+   archive.pipe(res); //pipe the response
+   //add file to archive
+
+   archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
+
+   archive.on('error', (err) => { ///if there is an error....
+   console.error(err);
+   throw err;
+   });
+
+   res.on('close', () => { //when the response is done
+   return res.status(200).send('OK').end(); //send response to client
+   });
+
+   archive.finalize();
+   })
+   */
 };
 
 

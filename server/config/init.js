@@ -80,9 +80,9 @@ function getInitialState() {
 }
 
 function normalizeInitialData(initialState) {
-
   initialState.session.currentStateParams.user = initialState.user._id;
   initialState.session.projectId = initialState.project._id;
+
   Session.update({_id: initialState.session._id}, initialState.session, {}, (err, updatedSessionCount) => {
     if(err) {
        return console.log('update session error');
@@ -90,11 +90,14 @@ function normalizeInitialData(initialState) {
   });
 
   initialState.project.createdBy = initialState.user._id;
+
   Project.update({_id: initialState.project._id}, initialState.project, {}, (err, updatedProjectCount) => {
     if(err) {
-      return console.log('update projecterror');
+      return console.log('update project error');
     }
   });
+
+  console.log('returning initialState', initialState);
 
   return initialState;
 }
