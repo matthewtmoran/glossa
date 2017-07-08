@@ -413,7 +413,7 @@ module.exports = {
             let imageUpdateObject = {
               type: 'image',
               name: notebook.image.filename,
-              path: notebook.image.path,
+              path: path.join(app.getPath('userData'), 'image', notebook.image.filename),
               buffer: notebook.imageBuffer
             };
             //store promise of image file in array
@@ -422,6 +422,7 @@ module.exports = {
             );
             //delete image buffer from object so we don't save it in the db
             delete notebook.imageBuffer;
+            notebook.image.path = imageUpdateObject.path;
             notebook = Object.assign({}, notebook);
           }
           //if audioBuffer exist then write it to system
@@ -429,13 +430,14 @@ module.exports = {
             let audioUpdateObject = {
               type: 'audio',
               name: notebook.audio.filename,
-              path: notebook.audio.path,
+              path: path.join(app.getPath('userData'), 'audio', notebook.audio.filename),
               buffer: notebook.audioBuffer
             };
 
             mediaPromises.push(
               this.writeMediaFile(audioUpdateObject)
             );
+            notebook.audio.path = audioUpdateObject.path;
             delete notebook.audioBuffer;
             notebook = Object.assign({}, notebook);
           }
@@ -462,7 +464,7 @@ module.exports = {
   writeMediaFile(data) {
     return new Promise((resolve, reject) => {
 
-      let mediaPath = path.join(app.getPath('userData'), data.type, data.name);
+      // let mediaPath = path.join(app.getPath('userData'), data.type, data.name);
 
       let buffer = new Buffer(data.buffer, 'base64', (err) => {
         if (err) {
@@ -471,7 +473,7 @@ module.exports = {
         }
       });
 
-      fs.writeFile(mediaPath, buffer, (err) => {
+      fs.writeFile(data.path, buffer, (err) => {
         if (err) {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
@@ -686,7 +688,8 @@ module.exports = {
       let mediaObject = {
         type: 'image',
         name: filename,
-        buffer: data.bufferString
+        buffer: data.bufferString,
+        path: path.join(app.getPath('userData'), 'image', filename),
       };
 
       this.writeMediaFile(mediaObject)
