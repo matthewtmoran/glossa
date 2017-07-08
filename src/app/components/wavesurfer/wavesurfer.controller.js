@@ -77,15 +77,12 @@ export class WaveSurferController {
 
   initWaveSurfer() {
     this.cfpLoadingBar.start();
-    this.timeInterval;
-    this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects
-    this.defaultSettings = { //not sure we need if db is populated.....
-      skipForward: 2,
-      skipBack: 2,
-      waveColor: '#BDBDBD'
-    };
+    this.loading = true;
+    this.isReady = false;
     this.userSettings = this.settings;
-    // this.userSettings = this.rootService.getSettings();
+
+    this.wavesurferProgress = 0;
+    this.currentTime = 0;
     this.speed = [
       {
         value: 1,
@@ -100,19 +97,23 @@ export class WaveSurferController {
         label: '0.5x'
       }
     ];
-    this.loading = true;
-    this.wavesurferProgress = 0;
-    this.isReady = false;
-    this.currentTime = 0;
+
+    this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects
+
+    this.defaultSettings = { //not sure we need if db is populated.....
+      skipForward: 2,
+      skipBack: 2,
+      waveColor: '#BDBDBD'
+    };
 
     if (!this.surfer) {
 
       this.surfer = Object.create(WaveSurfer);
       this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
+      this.waveElement = angular.element(this.$element[0].querySelector('.waveSurferWave'));
 
-
-      let options = {
-        container: angular.element(this.$element[0].querySelector('.waveSurferWave'))[0]
+      this.options = {
+        container: this.waveElement[0]
       };
 
       let defaults = {
@@ -126,12 +127,10 @@ export class WaveSurferController {
         cursorColor: '#FF5252'
       };
 
-
-      options = angular.extend(defaults, (this.playerProperties || {}), options);
+      this.options = angular.extend(defaults, (this.playerProperties || {}), this.options);
       this.playerProperties = {};
 
-
-      this.surfer.init(options);
+      this.surfer.init(this.options);
 
       this.surfer.on('loading', (progress) => {
         this.wavesurferProgress = progress;
@@ -145,6 +144,7 @@ export class WaveSurferController {
         }
         this.cfpLoadingBar.complete();
       });
+
     }
 
     //play event listener
@@ -154,18 +154,18 @@ export class WaveSurferController {
 
     // this.title = this.title || this.urlSrc.split('/').pop();
 
-    if (this.imageSrc) {
-      let fixPath = this.__rootUrl + this.imageSrc.replace(/\\/g, "/");
+    if (!!this.imageSrc) {
+      console.log("TODO: verify this works cross platform!!!");
+      let fixPath = this.imageSrc.replace(/\\/g, "/");
 
-
-      angular.element('.waveSurferWave').css({
+     this.waveElement.css({
         'background-image': 'url(' + fixPath + ')',
         'background-size': 'cover',
         'background-position': 'center center'
       });
 
     } else {
-      angular.element('.waveSurferWave').css({
+      this.waveElement.css({
         'background-image': 'none',
         'background-size': 'unset',
         'background-position': 'unset'

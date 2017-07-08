@@ -19,7 +19,6 @@ export const baselineComponent = {
 
       this.doc = {};
       this.isDoubleClick = false;
-      this.singleClick;
       this.isLoadingCodeMirror = true;
 
 
@@ -33,9 +32,11 @@ export const baselineComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in baseline.component');
+      if (changes.notebookAttached) {
+        this.notebookAttached = angular.copy(changes.notebookAttached.currentValue)
+      }
       if (changes.selectedFile) {
-        this.currentFile = angular.copy(this.selectedFile);
+        this.currentFile = angular.copy(changes.selectedFile.currentValue);
       }
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
@@ -55,7 +56,6 @@ export const baselineComponent = {
 
     codemirrorLoaded(_editor) {
       this.isLoadingCodeMirror = false;
-      console.log('codemirrorLoaded event');
       this._doc = _editor.getDoc();
       this.isDoubleClick = false;
       _editor.setOption('lineNumbers', true);
@@ -63,7 +63,6 @@ export const baselineComponent = {
       _editor.setOption('extraKeys', {
         Enter: this.enterEvent
       });
-      console.log('_editor',_editor);
       this.timestampOverlay(_editor);
     }
 
