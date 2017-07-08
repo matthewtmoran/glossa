@@ -29,6 +29,7 @@
     "express": "^4.14.0",
     "express-session": "~1.0.2",
     "extract-text-webpack-plugin": "^1.0.1",
+    "fs-extra": "^3.0.1",
     "jquery": "^3.2.1",
     "lodash": "^4.16.2",
     "main-bower-files": "^2.13.1",
@@ -55,6 +56,7 @@
     "clean-webpack-plugin": "^0.1.10",
     "css-loader": "^0.25.0",
     "electron-packager": "^8.4.0",
+    "electron-rebuild": "^1.5.11",
     "electron-winstaller": "^2.6.2",
     "file-loader": "^0.9.0",
     "html-loader": "^0.4.3",
@@ -72,12 +74,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist && webpack --bail --progress --profile",
-    "start": "electron .",
+    "start": "electron --debug=5858 .",
     "startdev": "node server/app",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=dist/img/glossa-logo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/img/app-icons/win/glossa-logo.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Electron Tutorial App\"",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/glossa-logo.png --prune=true --out=release-builds",
-    "package-win-basic": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --out=release-builds"
+    "package-win-basic": "electron-packager . --ignore=src --overwrite --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --out=release-builds"
   },
   "author": "",
   "license": "ISC"

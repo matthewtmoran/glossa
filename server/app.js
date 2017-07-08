@@ -9,6 +9,7 @@ var config = require('./config/environment');
 var path = require('path');
 
 module.exports = function (bonjour, appData, win) {
+  console.log('express was requireed... ')
   // Populate DB with sample data
   if (config.seedDB) {
     require('./config/seed');
@@ -21,7 +22,6 @@ module.exports = function (bonjour, appData, win) {
 
   require('./config/express')(app); //configuration for express
   require('./routes')(app); //routes
-
 
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));

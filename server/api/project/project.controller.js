@@ -10,6 +10,7 @@
 'use strict';
 
 
+
 const _ = require('lodash');
 const fs = require('fs');
 const fse = require('fs-extra');
@@ -22,7 +23,7 @@ const Projects = require('./project.model');
 const User = require('./../user/user.model');
 const Notebooks = require('./../notebook/notebook.model');
 const Transcriptions = require('./../transcription/transcription.model');
-const Hashtags = require('./../hashtag/hashtag.model');
+const Hashtag = require('./../hashtag/hashtag.model');
 const Settings = require('./../settings/settings.model');
 const Session = require('./../session/session.model');
 const Connections = require('./../connections/connection.model');
@@ -47,7 +48,7 @@ let allDataBaseItems = [
     name: 'notebooks'
   },
   {
-    database: Hashtags,
+    database: Hashtag,
     name: 'hashtags'
   },
 
@@ -79,10 +80,6 @@ let dataBaseItems = [
     name: 'settings'
   },
 ];
-// let Connections = require('./../connections/connections.model');
-
-
-// let globalPaths = require('electron').remote.getGlobal('userPaths');
 
 // Get list of things
 exports.index = (req, res) => {
@@ -178,7 +175,7 @@ exports.importProject = (req, res) => {
       User.loadDatabase();
       Notebooks.loadDatabase();
       Transcriptions.loadDatabase();
-      Hahstags.loadDatabase();
+      Hashtag.loadDatabase();
       Settings.loadDatabase();
       Session.loadDatabase();
       Connections.loadDatabase();
@@ -225,7 +222,7 @@ function resolvePathsAndReset() {
           });
         }),
 
-      updateHashtags()
+      updateHashtag()
         .then((data) => {
           global.appData.initialState.hashtags = data.map((tag) => {
             return tag;
@@ -268,9 +265,9 @@ function updateSingleObject(item) {
 }
 
 
-function updateHashtags() {
+function updateHashtag() {
   return new Promise((resolve, reject) => {
-    Hashtags.find({}, (err, hashtags) => {
+    Hashtag.find({}, (err, hashtags) => {
       if (err) {
         console.log('Error resetting app data', err);
         reject(err)
@@ -457,7 +454,7 @@ exports.exportProject = function (req, res) {
    databasePromises.push(getNotebooks(userId));
    databasePromises.push(getConnections());
    databasePromises.push(getTranscriptions());
-   databasePromises.push(getHashtags());
+   databasePromises.push(getHashtag());
    databasePromises.push(getSettings());
    databasePromises.push(getSession());
 
@@ -603,10 +600,10 @@ function getTranscriptions() {
   });
 }
 
-function getHashtags() {
+function getHashtag() {
   return new Promise((resolve, reject) => {
     let query = {canEdit: true};
-    Hashtags.find(query, (err, hashtags) => {
+    Hashtag.find(query, (err, hashtags) => {
       if (err) {
         console.log('There was an error finding hashtags', err);
         reject(err)
@@ -791,14 +788,14 @@ function replaceTranscriptions(newTranscriptions) {
   })
 }
 
-function replaceHashtags(newHashtags) {
+function replaceHashtag(newHashtag) {
   return new Promise((resolve, reject) => {
-    Hashtags.remove({}, {multi: true}, (err, numRemoved) => {
+    Hashtag.remove({}, {multi: true}, (err, numRemoved) => {
       if (err) {
         console.log('Error removing hashtags', err);
         reject(err);
       }
-      Hashtags.insert(newHashtags, (err, hashtags) => {
+      Hashtag.insert(newHashtag, (err, hashtags) => {
         if (err) {
           console.log('Error inserting new user ', err);
           reject(err);

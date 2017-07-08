@@ -8,6 +8,7 @@ var path = require('path');
 var express = require('express');
 
 module.exports = function(app) {
+  console.log('debug routes1');
 
   // Insert routes below
   app.use('/api/project', require('./api/project'));
@@ -16,7 +17,6 @@ module.exports = function(app) {
   app.use('/api/connections', require('./api/connections'));
   app.use('/api/transcription', require('./api/transcription'));
   app.use('/api/hashtags', require('./api/hashtag'));
-  // app.use('/api/corporia', require('./api/corpus'));
   app.use('/api/session', require('./api/session'));
   app.use('/api/settings', require('./api/settings'));
 

@@ -18,7 +18,6 @@ function getInitialState() {
   return new Promise((resolve, reject) => {
     let statePromises = [];
     const initialState = {};
-
     statePromises.push(
 
       getInitialUser()

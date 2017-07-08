@@ -235,12 +235,13 @@ function normalizeNotebooks(updateDetails) {
     }
     Notebooks.persistence.compactDatafile();
 
-    updatedDocs.forEach((updatedDoc) => {
-      global.appData.initialState.notebooks = global.appData.initialState.notebooks.map(notebook => notebook._id === updatedDoc._id ? updatedDoc : notebook )
-    });
+    if (!!updatedDocs) {
+      updatedDocs.forEach((updatedDoc) => {
+        global.appData.initialState.notebooks = global.appData.initialState.notebooks.map(notebook => notebook._id === updatedDoc._id ? updatedDoc : notebook )
+      });
+    }
 
   });
-  console.log('global.appData.initialState.notebooks[0].createdBy.name', global.appData.initialState.notebooks[0].createdBy.name);
 }
 
 function handleError(res, err) {
