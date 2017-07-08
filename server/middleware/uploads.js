@@ -41,8 +41,10 @@ function validateFilename(req, res, next) {
         if (file.mimetype.indexOf('image') > -1) {
             var imagePromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'image', file.filename))
                 .then(function(response) {
-                    file.path = path.join(app.getPath('userData'),  'image',file.filename);
-                    dataObj.image = file;
+                    file.absolutePath = path.join(app.getPath('userData'), 'image', file.filename);
+                    file.path = path.join('image', file.filename);
+                    file.name = file.filename;
+                    dataObj.image = Object.assign({}, file);
                     return file;
                 });
             promises.push(imagePromise);
@@ -50,8 +52,10 @@ function validateFilename(req, res, next) {
             file = MediaObject(file);
             var audioPromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'audio', file.filename))
                 .then(function(response) {
-                    file.path = path.join(app.getPath('userData'), 'audio', file.filename);
-                    dataObj.audio = file;
+                    file.absolutePath = path.join(app.getPath('userData'), 'audio', file.filename);
+                    file.path = path.join('audio', file.filename);
+                    file.name = file.filename;
+                    dataObj.audio = Object.assign({}, file);
                     return file;
                 });
             promises.push(audioPromise);
@@ -61,7 +65,7 @@ function validateFilename(req, res, next) {
     });
 
     q.all(promises).then(function(response) {
-        req.body.dataObj = dataObj;
+        req.body.dataObj = Object.assign({}, dataObj);
         next()
     });
 }

@@ -6,6 +6,7 @@
 var errors = require('./components/errors');
 var path = require('path');
 var express = require('express');
+var electronApp = require('electron').app;
 
 module.exports = function(app) {
   console.log('debug routes1');
@@ -20,6 +21,13 @@ module.exports = function(app) {
   app.use('/api/session', require('./api/session'));
   app.use('/api/settings', require('./api/settings'));
 
+  console.log('path ptah', path.join(electronApp.getPath('userData'), 'image'));
+
+  app.use('/image', express.static(path.join(electronApp.getPath('userData'), 'image')));
+  app.use('/audio', express.static(path.join(electronApp.getPath('userData'), 'audio')));
+  // app.use('/assets', express.static(path.join(__dirname, 'audio')));
+
+
   // All undefined asset or api routes should return a 404
   app.route('/:url(api|auth|components|bower_components|assets)/*')
    .get(errors[404]);
@@ -29,6 +37,7 @@ module.exports = function(app) {
     .get(function(req, res) {
       res.sendFile(path.resolve(app.get('appPath') + '/index.html'));
     });
+
 
   // serve angular front end files from root path
 //   app.use('/', express.static('app', { redirect: false }));

@@ -34,15 +34,17 @@ function validateFilename(req, res, next) {
         file = MediaObject(file);
         var imagePromise = copyAndWrite(file.path, path.join(app.getPath('userData'), 'image', file.filename))
             .then(function(response) {
-                file.path = path.join(app.getPath('userData'), 'image', file.filename);
-                dataObj.image = file;
+                file.name = file.filename;
+                file.absolutePath = path.join(app.getPath('userData'), 'image', file.filename);
+                file.path = path.join('image', file.filename);
+                dataObj.image = Object.assign({}, file);
                 return file;
             });
         promises.push(imagePromise);
     });
 
     q.all(promises).then(function(response) {
-        req.body.dataObj = dataObj;
+        req.body.dataObj = Object.assign({}, dataObj);
         next()
     });
 }

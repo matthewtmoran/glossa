@@ -314,10 +314,10 @@ function resolveAndUpdateTranscriptions() {
       //update notebooks array
       transcriptions = transcriptions.map((transcription) => {
         if (transcription.audio) {
-          transcriptions.audio.path = resolvePath(transcription.audio.path, 'audio');
+          transcriptions.audio.absolutePath = resolvePath(transcription.audio.absolutePath, 'audio');
         }
         if (transcription.image) {
-          transcriptions.image.path = resolvePath(transcription.image.path, 'image');
+          transcriptions.image.absolutePath = resolvePath(transcription.image.absolutePath, 'image');
         }
         return transcription;
       });
@@ -348,10 +348,10 @@ function resolveAndUpdateNotebooks() {
       //update notebooks array
       notebooks = notebooks.map((notebook) => {
         if (notebook.audio) {
-          notebook.audio.path = resolvePath(notebook.audio.path, 'audio');
+          notebook.audio.absolutePath = resolvePath(notebook.audio.absolutePath, 'audio');
         }
         if (notebook.image) {
-          notebook.image.path = resolvePath(notebook.image.path, 'image');
+          notebook.image.absolutePath = resolvePath(notebook.image.absolutePath, 'image');
         }
         return notebook;
       });
@@ -853,7 +853,7 @@ function encodeMediaFiles(array) {
     array.map(function (object) { //iterate through array an modify array
       if (object.image) {// if there is an image
         mediaPromises.push( //push the enodeBase64 promise
-          encodeBase64(object.image.path).then(function (imageBufferString) {
+          encodeBase64(object.image.absolutePath).then(function (imageBufferString) {
             object.imageBufferString = imageBufferString; //add image buffer string as property
           })
         )
@@ -861,7 +861,7 @@ function encodeMediaFiles(array) {
 
       if (object.audio) { //if there is an audio file
         mediaPromises.push(
-          encodeBase64(object.audio.path).then(function (audioBufferString) {
+          encodeBase64(object.audio.absolutePath).then(function (audioBufferString) {
             object.audioBufferString = audioBufferString;
           })
         )
@@ -885,7 +885,9 @@ function decodeMediaFiles(array) {
         let pathToWrite = path.join(app.getPath('userData'), 'image', process.platform === 'win32' ? path.win32.basename(object.image.path) :  path.posix.basename(object.image.path));
         let imageData = { //create an object with the path and buffer string to pass to wrtie media file function
           buffer: object.imageBufferString,
-          path: pathToWrite
+          absolutePath: pathToWrite,
+          path: path.join('image', object.name),
+          name: object.name
         };
 
         mediaPromises.push( //push write media file promise
@@ -898,7 +900,9 @@ function decodeMediaFiles(array) {
         let pathToWrite = path.join(app.getPath('userData'), 'audio', process.platform === 'win32' ? path.win32.basename(object.audio.path) :  path.posix.basename(object.audio.path));
         let audioData = {
           buffer: object.audioBufferString,
-          path: pathToWrite
+          absolutePath: pathToWrite,
+          path: path.join('audio', object.name),
+          name: object.name
         };
 
         mediaPromises.push(

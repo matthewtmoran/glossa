@@ -127,7 +127,7 @@ module.exports = {
       //encode image
       if (notebook.image) {
         mediaPromises.push(
-          socketUtil.encodeBase64(notebook.image.path)
+          socketUtil.encodeBase64(notebook.image.absolutePath)
             .then(function (imageString) {
               notebook.imageBuffer = imageString;
             })
@@ -136,7 +136,7 @@ module.exports = {
       //encode audio
       if (notebook.audio) {
         mediaPromises.push(
-          socketUtil.encodeBase64(notebook.audio.path)
+          socketUtil.encodeBase64(notebook.audio.absolutePath)
             .then(function (audioString) {
               notebook.audioBuffer = audioString;
             })

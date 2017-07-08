@@ -38,42 +38,6 @@ module.exports = {
   },
 
 
-  addExternalData: function (data) {
-    console.log('');
-    console.log('addExternalData');
-
-    data.forEach(function (notebook, index) {
-      if (notebook.imageBuffer) {
-        console.log('notebook ahs media buffer...');
-        var imagePath = path.join(__dirname, config.dataRoot, notebook.image.path);
-
-        var buffer = new Buffer(notebook.imageBuffer, 'base64', function (err) {
-          if (err) {
-            return console.log('issue decoding base64 data');
-          }
-        });
-
-        fs.writeFile(imagePath, buffer, function (err) {
-          if (err) {
-            return console.log('There was an error writing file to filesystem', err);
-          }
-          delete notebook.imageBuffer
-        })
-      }
-    });
-
-    return new Promise(function (resolve, reject) {
-      Notebooks.insert(data, function (err, notebook) {
-        if (err) {
-          console.log('There was an error inserting external Notebooks', err);
-          reject(err);
-        }
-        console.log('*TODO: emit event to local-client');
-        resolve(notebook);
-      })
-
-    })
-  },
 
   //Queries the database for a clients data to send to client to compare against.
   getUserSyncedData: function (client) {
@@ -413,7 +377,7 @@ module.exports = {
             let imageUpdateObject = {
               type: 'image',
               name: notebook.image.filename,
-              path: path.join(app.getPath('userData'), 'image', notebook.image.filename),
+              absolutePath: path.join(app.getPath('userData'), 'image', notebook.image.filename),
               buffer: notebook.imageBuffer
             };
             //store promise of image file in array
@@ -422,7 +386,7 @@ module.exports = {
             );
             //delete image buffer from object so we don't save it in the db
             delete notebook.imageBuffer;
-            notebook.image.path = imageUpdateObject.path;
+            notebook.image.absolutePath = imageUpdateObject.absolutePath;
             notebook = Object.assign({}, notebook);
           }
           //if audioBuffer exist then write it to system
@@ -430,14 +394,14 @@ module.exports = {
             let audioUpdateObject = {
               type: 'audio',
               name: notebook.audio.filename,
-              path: path.join(app.getPath('userData'), 'audio', notebook.audio.filename),
+              absolutePath: path.join(app.getPath('userData'), 'audio', notebook.audio.filename),
               buffer: notebook.audioBuffer
             };
 
             mediaPromises.push(
               this.writeMediaFile(audioUpdateObject)
             );
-            notebook.audio.path = audioUpdateObject.path;
+            notebook.audio.absolutePath = audioUpdateObject.absolutePath;
             delete notebook.audioBuffer;
             notebook = Object.assign({}, notebook);
           }
@@ -473,7 +437,7 @@ module.exports = {
         }
       });
 
-      fs.writeFile(data.path, buffer, (err) => {
+      fs.writeFile(data.absolutePath, buffer, (err) => {
         if (err) {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
@@ -541,14 +505,14 @@ module.exports = {
         notebooksToSend = allPotentialNotebooks.map((notebook) => {
           if (notebook.image) {
             mediaPromises.push(
-              this.encodeBase64(notebook.image.path).then(imageBufferString => {
+              this.encodeBase64(notebook.image.absolutePath).then(imageBufferString => {
                 notebook.imageBuffer = imageBufferString;
               })
             )
           }
           if (notebook.audio) {
             mediaPromises.push(
-              this.encodeBase64(notebook.audio.path).then(audioBufferString => {
+              this.encodeBase64(notebook.audio.absolutePath).then(audioBufferString => {
                 notebook.audioBuffer = audioBufferString;
               })
             )
@@ -594,7 +558,7 @@ module.exports = {
 
             if (notebook.image) {
               mediaPromises.push(
-                this.encodeBase64(notebook.image.path)
+                this.encodeBase64(notebook.image.absolutePath)
                   .then((imageString) => {
                     notebook.imageBuffer = imageString;
                   })
@@ -602,7 +566,7 @@ module.exports = {
             }
             if (notebook.audio) {
               mediaPromises.push(
-                this.encodeBase64(notebook.audio.path)
+                this.encodeBase64(notebook.audio.absolutePath)
                   .then((audioString) => {
                     notebook.audioBuffer = audioString;
                   })
@@ -689,7 +653,8 @@ module.exports = {
         type: 'image',
         name: filename,
         buffer: data.bufferString,
-        path: path.join(app.getPath('userData'), 'image', filename),
+        absolutePath: path.join(app.getPath('userData'), 'image', filename),
+        path: path.join('image', filename),
       };
 
       this.writeMediaFile(mediaObject)
