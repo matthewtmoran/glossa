@@ -1,6 +1,6 @@
 import WaveSurfer from 'wavesurferDev';
 export class WaveSurferController {
-  constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element) {
+  constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element, $window) {
     'ngInject';
 
     this.$timeout = $timeout;
@@ -11,6 +11,7 @@ export class WaveSurferController {
     this.$scope = $scope;
     this.cfpLoadingBar = cfpLoadingBar;
     this.$element = $element;
+    this.$window = $window;
 
     // this.initWaveSurfer = this.initWaveSurfer.bind(this);
     this.setTimestamp = this.setTimestamp.bind(this);
@@ -24,6 +25,7 @@ export class WaveSurferController {
     this.$scope.$on('adjustPlaySpeedUp', this.adjustPlaySpeedUp.bind(this));
     this.$scope.$on('adjustPlaySpeedDown', this.adjustPlaySpeedDown.bind(this));
     this.$scope.$on('playPause', this.playPause.bind(this));
+
   }
 
   stopInterval() {
@@ -37,7 +39,6 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
-    console.log('$onChanges in wavesurfer.component');
     if (changes.urlSrc) {
       this.urlSrc = angular.copy(changes.urlSrc.currentValue);
       this.initWaveSurfer();
@@ -52,9 +53,14 @@ export class WaveSurferController {
   }
 
   $onInit() {
-    console.log('$onInit in wavesurfer.controller');
     this.speedIndex = 1;
   }
+
+  responsiveWave() {
+    this.surfer.empty();
+    this.surfer.drawBuffer();
+  }
+
 
 
 
@@ -70,7 +76,6 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
-    console.log('initWaveSurfer in wavesurfer.component');
     this.cfpLoadingBar.start();
     this.timeInterval;
     this.themeClass = "md-" + this.$mdTheming.defaultTheme() + "-theme"; //not sure what this affects
@@ -100,10 +105,11 @@ export class WaveSurferController {
     this.isReady = false;
     this.currentTime = 0;
 
-
     if (!this.surfer) {
 
       this.surfer = Object.create(WaveSurfer);
+      this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
+
 
       let options = {
         container: angular.element(this.$element[0].querySelector('.waveSurferWave'))[0]
