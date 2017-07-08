@@ -19,7 +19,7 @@ let readyToGo = false;
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-app.setPath('userData', path.join(app.getPath('appData'), 'Glossa'));
+// app.setPath('userData', path.join(app.getPath('appData'), 'Glossa'));
 function startExpress() {
   fsCheck();
   Promise.all([require('./server/config/init').getInitialState()])
@@ -186,7 +186,7 @@ app.on('activate', function () {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   //if window is destroyed... create a new one other wise just show the window
-  if (win === null) {
+  if (!win) {
     createWindow()
   } else {
     win.show();
