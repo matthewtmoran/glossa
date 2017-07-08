@@ -20,20 +20,15 @@ export const corpusSidebarComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in corpus-sidebar.component', changes);
       if (changes.searchText) {
-        console.log('changes in searchText');
         this.searchText = angular.copy(changes.searchText.currentValue)
       }
 
       if (changes.selectedFile) {
-        console.log('changes in selectedFile');
         this.selectedFile = angular.copy(changes.selectedFile.currentValue);
       }
 
       if (changes.markDownFiles) {
-        // this.filteredFiles = [];
-        console.log('changes in markDownFiles');
         this.markDownFiles = angular.copy(changes.markDownFiles.currentValue);
       }
 
