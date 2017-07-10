@@ -428,8 +428,6 @@ module.exports = {
   writeMediaFile(data) {
     return new Promise((resolve, reject) => {
 
-      // let mediaPath = path.join(app.getPath('userData'), data.type, data.name);
-
       let buffer = new Buffer(data.buffer, 'base64', (err) => {
         if (err) {
           console.log('issue decoding base64 data');

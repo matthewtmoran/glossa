@@ -1,7 +1,10 @@
 // var ioClient = require('socket.io-client');
 var socketUtil = require('./socket-util');
+var path = require('path');
+var fs = require('fs');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 const main = require('../../main');
+const app = require('electron').app;
 
 module.exports = {
   //this occurs when bonjour discovers an external server.
@@ -134,39 +137,66 @@ module.exports = {
       global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
         if (connection._id === data._id) {
           if (connection.following) {
-
             win.webContents.send('sync-event-start');
-            //if data avatar exists
-            //if data avatar is different than connection avatar but connection avatar exists (not null)
-            if (data.avatar && (connection.avatar !== data.avatar ) || connection.avatar && (data.avatar !== connection.avatar)) {
 
+            //if client avatar exists and it is different than connection avatar
+            if ((data.avatar.name !== connection.avatar.name) || (!connection.avatar && data.avatar.name)) {
+              //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
               console.log('emit:: request:avatar to:: server that sent us basic changes');
               io.to(data.socketId).emit('request:avatar');
-            }
 
-            socketUtil.followedConnectionUpdate(data)
-              .then((updatedConnection) => {
-                // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+              connection.avatar = data.avatar;
+              connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
+              connection.avatar.path = path.resolve(data.avatar.path);
+              connection.avatar = Object.assign({}, connection.avatar);
+
+
+              socketUtil.followedConnectionUpdate(connection)
+                .then((updatedConnection) => {
+                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+                  console.log('send:: update-connection-list to:: local window');
                   win.webContents.send('update-connection-list');
-              });
+                });
 
-            socketUtil.normalizeNotebooks(data)
-              .then((updatedNotebooks) => {
-                socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+              socketUtil.normalizeNotebooks(connection)
+                .then((updatedNotebooks) => {
+                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+                  console.log('send:: update-synced-notebooks to:: local window');
                   win.webContents.send('update-synced-notebooks');
-              });
-          }
+                });
 
-          connection.name = data.name;
-          connection.avatar = data.avatar;
+
+
+            }
+            //if client avatar does not exist but connection avatar does exist
+            else if (!data.avatar || !data.avatar.name && connection.avatar && connection.avatar.name) {
+            //  copy data object, save data, remove old image from filesystem, normalize notebooks
+              connection.avatar = Object.assign({}, data.avatar);
+
+              fs.unlink(connection.avatar.absolutePath);
+
+              socketUtil.followedConnectionUpdate(connection)
+                .then((updatedConnection) => {
+                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+                  console.log('send:: update-connection-list to:: local window');
+                  win.webContents.send('update-connection-list');
+                });
+
+              socketUtil.normalizeNotebooks(connection)
+                .then((updatedNotebooks) => {
+                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+                  console.log('send:: update-synced-notebooks to:: local window');
+                  win.webContents.send('update-synced-notebooks');
+                });
+
+            }
+          }
           return connection;
         }
         return connection;
       });
-
         win.webContents.send('update-connection-list');
-
-
+        win.webContents.send('sync-event-end');
     });
 
     nodeClientSocket.on('return:avatar', (data) => {

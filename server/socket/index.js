@@ -7,6 +7,7 @@ const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
 let localClient = {};
 const main = require('../../main');
+const app = require('electron').app;
 
 
 module.exports = function (glossaUser, mySession, io, bonjour, win) {
@@ -62,6 +63,15 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
     //client returns 'end-handshake with data'
     function endHandShake(client) {
+      this.win = {};
+      main.getWindow((err, window) => {
+        if (err) {
+          return console.log('error getting window...', err);
+        }
+        this.win = window;
+        console.log("send:: sync-event-start local-window");
+        this.win.webContents.send('sync-event-start');
+      });
       console.log('on:: endHandShake');
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
@@ -78,23 +88,61 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           //i already know it's following here but just in case and for consitency sake
           if (connection.following) {
 
+            //if client avatar exists and it is different than connection avatar
+            if ((client.avatar.name !== connection.avatar.name) || (!connection.avatar && client.avatar.name)) {
+              //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
+              console.log('emit:: request:avatar to:: server that sent us basic changes');
+              io.to(client.socketId).emit('request:avatar');
 
-            main.getWindow(function (err, window) {
-              if (err) {
-                return console.log('error getting window...', err);
-              }
-              console.log("send:: sync-event-start local-window");
-              window.webContents.send('sync-event-start');
-            });
+              connection.avatar = client.avatar;
+              connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
+              connection.avatar.path = path.resolve(client.avatar.path);
+              connection.avatar = Object.assign({}, connection.avatar);
 
+              socketUtil.followedConnectionUpdate(connection)
+                .then((updatedConnection) => {
+                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+                  console.log('send:: update-connection-list to:: local window');
+                  this.win.webContents.send('update-connection-list');
+                });
+
+              socketUtil.normalizeNotebooks(connection)
+                .then((updatedNotebooks) => {
+                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+                  console.log('send:: update-synced-notebooks to:: local window');
+                  this.win.webContents.send('update-synced-notebooks');
+                });
+
+
+            }
+            //if client avatar does not exist but connection avatar does exist
+            else if (!client.avatar || !client.avatar.name && connection.avatar && connection.avatar.name) {
+              //  copy data object, save data, remove old image from filesystem, normalize notebooks
+              connection.avatar = Object.assign({}, client.avatar);
+
+              fs.unlink(connection.avatar.absolutePath);
+
+              socketUtil.followedConnectionUpdate(connection)
+                .then((updatedConnection) => {
+                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+                  console.log('send:: update-connection-list to:: local window');
+                  win.webContents.send('update-connection-list');
+                });
+
+              socketUtil.normalizeNotebooks(connection)
+                .then((updatedNotebooks) => {
+                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+                  console.log('send:: update-synced-notebooks to:: local window');
+                  win.webContents.send('update-synced-notebooks');
+                });
+
+            }
 
             socketUtil.syncData(connection, (data) => {
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
             });
-
           }
-
           connection = Object.assign({}, connection);
           connectionExists = true;
           return connection;
@@ -119,16 +167,8 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
         }
 
-
         socket.join('externalClientsRoom');
-
-        main.getWindow(function (err, window) {
-          if (err) {
-            return console.log('error getting window...', err);
-          }
-          console.log("send:: update-connection-list local-window");
-          window.webContents.send('update-connection-list');
-        });
+        this.win.webContents.send('update-connection-list');
 
         //tell browser to update it's data.
         // win.webContents.send('update-connection-list');
