@@ -280,7 +280,6 @@ export const appComponent = {
       });
 
       if (!doesExist) {
-        console.log('is a new connection coming online?');
         this.allConnections.push(data.connection)
       }
 
@@ -390,9 +389,6 @@ export const appComponent = {
 
     //new notebook
     saveNotebook(event) {
-      console.log('this', this);
-      console.log('this.notebooks on saveNotebook', this.notebooks);
-      console.log('event.notebook', event.notebook);
       this.$mdDialog.hide();
       this.cfpLoadingBar.start();
       event.notebook.createdBy = {
@@ -404,11 +400,7 @@ export const appComponent = {
 
       this.notebookService.createNotebook(event.notebook)
         .then((data) => {
-        console.log('this', this);
-        console.log('createNotebook resolved... ');
-        console.log('this.notebooks.length', this.notebooks.length);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-        console.log('this.notebooks.length', this.notebooks.length);
           this.cfpLoadingBar.complete();
         })
         .catch((data) => {

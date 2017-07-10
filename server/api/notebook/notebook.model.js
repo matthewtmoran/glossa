@@ -1,7 +1,6 @@
 'use strict';
 var Datastore = require('nedb'),
   path = require('path'),
-  config = require('../../config/environment'),
   app = require('electron').app,
 
   notebookDb = new Datastore({

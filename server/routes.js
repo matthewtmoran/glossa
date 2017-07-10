@@ -3,8 +3,8 @@
  */
 
 'use strict';
-var errors = require('./components/errors');
 var path = require('path');
+var errors = require(path.join(__dirname, './components/errors'));
 var express = require('express');
 var electronApp = require('electron').app;
 
@@ -12,14 +12,14 @@ module.exports = function(app) {
   console.log('debug routes1');
 
   // Insert routes below
-  app.use('/api/project', require('./api/project'));
-  app.use('/api/user', require('./api/user'));
-  app.use('/api/notebooks', require('./api/notebook'));
-  app.use('/api/connections', require('./api/connections'));
-  app.use('/api/transcription', require('./api/transcription'));
-  app.use('/api/hashtags', require('./api/hashtag'));
-  app.use('/api/session', require('./api/session'));
-  app.use('/api/settings', require('./api/settings'));
+  app.use('/api/project', require(path.join(__dirname,'./api/project')));
+  app.use('/api/user', require(path.join(__dirname,'./api/user')));
+  app.use('/api/notebooks', require(path.join(__dirname,'./api/notebook')));
+  app.use('/api/connections', require(path.join(__dirname,'./api/connections')));
+  app.use('/api/transcription', require(path.join(__dirname,'./api/transcription')));
+  app.use('/api/hashtags', require(path.join(__dirname,'./api/hashtag')));
+  app.use('/api/session', require(path.join(__dirname,'./api/session')));
+  app.use('/api/settings', require(path.join(__dirname,'./api/settings')));
 
   console.log('path ptah', path.join(electronApp.getPath('userData'), 'image'));
 
@@ -35,7 +35,7 @@ module.exports = function(app) {
   // All other routes should redirect to the index.html
   app.route('/*')
     .get(function(req, res) {
-      res.sendFile(path.resolve(app.get('appPath') + '/index.html'));
+      res.sendFile(path.resolve(app.get('appPath'), '/index.html'));
     });
 
 

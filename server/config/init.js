@@ -1,11 +1,13 @@
-var Project = require('../api/project/project.model');
-var User = require('../api/user/user.model');
-var Notebook = require('../api/notebook/notebook.model');
-var Session = require('../api/session/session.model');
-var Settings = require('../api/settings/settings.model');
-var Connections = require('../api/connections/connection.model');
-var Transcriptions = require('../api/transcription/transcription.model');
-var Hashtags = require('../api/hashtag/hashtag.model');
+const path = require('path');
+const fs = require('fs');
+var Project = require(path.join(__dirname, '../api/project/project.model'));
+var User = require(path.join(__dirname, '../api/user/user.model'));
+var Notebook = require(path.join(__dirname, '../api/notebook/notebook.model'));
+var Session = require(path.join(__dirname, '../api/session/session.model'));
+var Settings = require(path.join(__dirname, '../api/settings/settings.model'));
+var Connections = require(path.join(__dirname, '../api/connections/connection.model'));
+var Transcriptions = require(path.join(__dirname, '../api/transcription/transcription.model'));
+var Hashtags = require(path.join(__dirname, '../api/hashtag/hashtag.model'));
 var q = require('q');
 
 module.exports = {
@@ -56,6 +58,7 @@ function getInitialState() {
 
       getInitialHashtags()
         .then((data) => {
+          console.log('Initial hashtag length', data.length);
           initialState.hashtags = data
         })
     );
@@ -96,11 +99,16 @@ function normalizeInitialData(initialState) {
     }
   });
 
-  console.log('returning initialState', initialState);
+  // console.log('returning initialState', initialState);
 
   return initialState;
 }
 
+/**
+ * Look for initial user
+ * If it does not exist, build new user
+ * @returns {Promise} = user object either existing, or a newly created user
+ */
 function getInitialUser() {
   return new Promise((resolve, reject) => {
     User.findOne({}, (err, user) => {
@@ -115,17 +123,15 @@ function getInitialUser() {
     })
   })
 }
+/**
+ *  Builds initial user
+ *  Called if no user exists
+ */
 function buildInitialUser() {
   const user = {
-    name: 'glossa user',
+    name: 'New Glossa User',
     createdAt: Date.now(),
   };
-    // settings: {
-    //   isSharing: true,
-    //   waveColor: "#BDBDBD",
-    //   skipLength: 2
-    // },
-
   return new Promise((resolve, reject) => {
     User.insert(user, (err, user) => {
       if (err) {
@@ -138,7 +144,11 @@ function buildInitialUser() {
 
 }
 
-
+/**
+ * Look for initial session
+ * If it does not exist, build new session object
+ * @returns {Promise} = session object either existing, or a newly created session
+ */
 function getInitialSession() {
   return new Promise((resolve, reject) => {
     Session.findOne({}, (err, session) => {
@@ -153,6 +163,10 @@ function getInitialSession() {
 
   })
 }
+/**
+ *  Builds initial session
+ *  Called if no user exists
+ */
 function buildInitialSession() {
   const session = {
     start: Date.now(),
@@ -194,7 +208,7 @@ function getInitialProject() {
 }
 function buildInitialProject() {
   const project = {
-    name: 'glossa project',
+    name: 'New Glossa Project',
     createdBy: ''
   };
   return new Promise((resolve, reject) => {
@@ -289,7 +303,25 @@ function getInitialHashtags() {
         console.log('Error getting initial hashtags', err);
         reject(err);
       }
-      resolve(hashtags);
+      if (!hashtags.length) {
+
+        fs.readFile(path.join(__dirname, '../../hashtags.json'), 'utf8', (err, contents) => {
+          if (err) {
+            return console.log('Error hashtag file... ', err)
+          }
+          let defaultHashtags = JSON.parse(contents);
+
+          Hashtags.insert(defaultHashtags.hashtags, (err, insertedDocs)=> {
+            if (err) {
+              return console.log('error inserting default hashtags');
+            }
+
+            resolve(insertedDocs);
+          });
+        })
+      } else {
+        resolve(hashtags);
+      }
     });
   });
 }

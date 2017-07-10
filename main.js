@@ -6,7 +6,7 @@ var electron = require('electron'),
   express,
   bonjour = require('bonjour')();
 var url = require('url');
-var AppMenu = require('./app-menu');
+var AppMenu = require(path.join(__dirname, './app-menu'));
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 
@@ -22,7 +22,7 @@ var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
 // app.setPath('userData', path.join(app.getPath('appData'), 'Glossa'));
 function startExpress() {
   fsCheck();
-  Promise.all([require('./server/config/init').getInitialState()])
+  Promise.all([require(path.join(__dirname, './server/config/init')).getInitialState()])
     .then(function (appData) {
       readyToGo = true; // set flag to true so electron can create window
       // here we set the global state for the entire app.
@@ -31,7 +31,8 @@ function startExpress() {
         initialState: appData[0],
         isWindows: process.platform === 'win32'
       };
-      express = require('./server/app')(bonjour, appData[0], win);
+
+      express = require(path.join(__dirname, './server/app'))(bonjour, appData[0], win);
     });
 }
 startExpress();
@@ -51,9 +52,7 @@ function fsCheck() {
     let storagePath = path.join(app.getPath('appData'), p);
 
     if (!fs.statSyncNoException(storagePath)) {
-      console.log('path does not exist....');
       fs.mkdirSync(storagePath);
-      console.log('path created...')
     }
   });
 

@@ -1,7 +1,8 @@
 'use strict';
 
+const path = require('path');
 var express = require('express');
-var controller = require('./connection.controller');
+var controller = require(path.join(__dirname, './connection.controller'));
 
 var router = express.Router();
 

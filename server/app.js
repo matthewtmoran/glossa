@@ -5,14 +5,14 @@
 'use strict';
 
 var express = require('express');
-var config = require('./config/environment');
 var path = require('path');
+var config = require(path.join(__dirname,'./config/environment'));
 
 module.exports = function (bonjour, appData, win) {
-  console.log('express was requireed... ')
+  console.log('express was requireed... ');
   // Populate DB with sample data
   if (config.seedDB) {
-    require('./config/seed');
+    require(path.join(__dirname, './config/seed'));
   }
   // Setup server
   const app = express();
@@ -20,13 +20,13 @@ module.exports = function (bonjour, appData, win) {
   const io = require('socket.io')(server);
   // const ipcEvents = require('../ipc');
 
-  require('./config/express')(app); //configuration for express
-  require('./routes')(app); //routes
+  require(path.join(__dirname, './config/express'))(app); //configuration for express
+  require(path.join(__dirname, './routes'))(app); //routes
 
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     // require ipc event...
-    const ipcEvents = require('./ipc').init(server, bonjour, io, win);
+    const ipcEvents = require(path.join(__dirname, './ipc')).init(server, bonjour, io, win);
   });
 
 
