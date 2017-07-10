@@ -175,9 +175,7 @@ exports.avatar = function (req, res) {
     var options = {returnUpdatedDocs: true};
 
     var updated = user[0];
-    updated.avatar = req.body.dataObj.image.path;
-
-    console.log('updated', updated);
+    updated.avatar = req.body.dataObj.image;
 
     User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) {

@@ -81,9 +81,9 @@ function copyAndWrite(from, to){
 
 
 function removeAvatar(req, res, next) {
-    var mediaPath;
-    mediaPath = path.join(app.getPath('userData'), req.body.filePath);
-    fs.unlink(mediaPath);
+    // var mediaPath;
+    // mediaPath = path.join(app.getPath('userData'), req.body.filePath);
+    fs.unlink(req.body.filePath);
     next();
 }
 

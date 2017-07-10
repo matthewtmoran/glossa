@@ -243,8 +243,6 @@ export const appComponent = {
         .then((data) => {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          // this.currentUser = angular.copy(data);
-          // this.settings = this.currentUser.settings;
         })
     }
 

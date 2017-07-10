@@ -15,7 +15,7 @@
 
 		<div class="image-container profile-image-container" >
 
-			<img ng-show="$ctrl.currentUser.avatar" ng-src="{{$ctrl.currentUser.avatar}}" class="thumb image-preview">
+			<img ng-show="$ctrl.currentUser.avatar" ng-src="{{$ctrl.currentUser.avatar.path}}" class="thumb image-preview">
 
 			<h2>Your Profile</h2>
 
@@ -30,8 +30,6 @@
 				<!--ngf-validate="{width: {min: 1400, max:2000}, height: {min: 630, max: 900}}"-->
 				<span>Add Image</span>
 			</md-button>
-
-			<!--<md-button class="md-raised upload-button">Upload Photo</md-button>-->
 
 			<md-button ng-if="$ctrl.currentUser.avatar" class="md-icon-button options-button">
 				<md-icon ng-click="$ctrl.removeAvatar($ctrl.currentUser.avatar); $ctrl.currentUser.avatar = null">visibility_off</md-icon>
@@ -68,7 +66,7 @@
 
 		<md-list>
 			<md-list-item ng-repeat="contact in $ctrl.contributers" class="md-3-line contact-item">
-				<img ng-src="{{contact.avatar}}" class="md-avatar" alt="" />
+				<img ng-src="{{contact.avatar.path}}" class="md-avatar" alt="" />
 				<div class="md-list-item-text compact">
 					<h3>{{contact.name}}</h3>
 					<h4>{{contact.title}}</h4>

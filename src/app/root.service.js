@@ -238,9 +238,9 @@ export class RootService {
     });
   }
 
-  removeAvatar(filePath) {
-    let data = {filePath: filePath};
-    return this.$http.put(`/api/user/${this.__appData.initialState.user._id}/avatar`, data)
+  removeAvatar(file) {
+    console.log('file', file);
+    return this.$http.put(`/api/user/${this.__appData.initialState.user._id}/avatar`, {filePath: file.absolutePath})
       .then((response) => {
         return response.data;
       })

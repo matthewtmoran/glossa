@@ -145,119 +145,6 @@ export const notebookComponent = {
       this.onViewNotebookDetails({
         $event: event
       })
-      //
-      //
-      //
-      // if (!event.notebook) {
-      //   event.notebook = {
-      //     postType: type
-      //   }
-      // }
-      //
-      // let state = {};
-      // switch(event.notebook.postType) {
-      //   case 'image':
-      //     this.notebook = event.notebook;
-      //     this.editorOptions = {
-      //       toolbar: false,
-      //       status: false,
-      //       spellChecker: false,
-      //       autoDownloadFontAwesome: false,
-      //       placeholder: 'Image caption...',
-      //     };
-      //     state = {
-      //       templateUrl: NotebookImageTemplate,
-      //       parent: angular.element(document.body),
-      //       targetEvent: event,
-      //       controller: NotebookDialogController,
-      //       controllerAs: '$ctrl',
-      //       bindToController: true,
-      //       locals: {
-      //         settings: this.settings,
-      //         hashtags: this.hashtags,
-      //         notebook: event.notebook || {},
-      //         editorOptions: this.editorOptions,
-      //         onCancel: this.cancel.bind(this),
-      //         onDeleteNotebook: this.deleteNotebook.bind(this),
-      //         onHide: this.hide.bind(this),
-      //         onUpdate: this.update.bind(this),
-      //         onSave: this.save.bind(this)
-      //       }
-      //     };
-      //
-      //     break;
-      //   case 'audio':
-      //     this.notebook = event.notebook;
-      //     this.editorOptions = {
-      //       toolbar: false,
-      //       status: false,
-      //       spellChecker: false,
-      //       autoDownloadFontAwesome: false,
-      //       placeholder: 'Audio caption...',
-      //     };
-      //     state = {
-      //       templateUrl: NotebookAudioTemplate,
-      //       parent: angular.element(document.body),
-      //       targetEvent: event,
-      //       controller: NotebookDialogController,
-      //       controllerAs: '$ctrl',
-      //       bindToController: true,
-      //       locals: {
-      //         settings: this.settings,
-      //         hashtags: this.hashtags,
-      //         notebook: event.notebook || {},
-      //         editorOptions: this.editorOptions,
-      //         onCancel: this.cancel.bind(this),
-      //         onDeleteNotebook: this.deleteNotebook.bind(this),
-      //         onHide: this.hide.bind(this),
-      //         onUpdate: this.update.bind(this),
-      //         onSave: this.save.bind(this)
-      //       }
-      //     };
-      //     break;
-      //   case 'normal':
-      //     this.notebook = event.notebook;
-      //     this.editorOptions = {
-      //       toolbar: this.simplemdeToolbar,
-      //       spellChecker: false,
-      //       status: false,
-      //       forceSync: true,
-      //       autoDownloadFontAwesome: false,
-      //       placeholder: 'Post description...',
-      //     };
-      //
-      //     state = {
-      //       templateUrl: NotebookNormalTemplate,
-      //       parent: angular.element(document.body),
-      //       targetEvent: event,
-      //       controller: NotebookDialogController,
-      //       controllerAs: '$ctrl',
-      //       bindToController: true,
-      //       locals: {
-      //         settings: this.settings,
-      //         hashtags: this.hashtags,
-      //         notebook: event.notebook || {},
-      //         editorOptions: this.editorOptions,
-      //         onCancel: this.cancel.bind(this),
-      //         onDeleteNotebook: this.deleteNotebook.bind(this),
-      //         onHide: this.hide.bind(this),
-      //         onUpdate: this.update.bind(this),
-      //         onSave: this.save.bind(this)
-      //       }
-      //     };
-      //
-      //     break;
-      //   case 'default':
-      //     console.log('error');
-      // }
-      //
-      // this.$mdDialog.show(state)
-      //   .then((data) => {
-      //     return data;
-      //   })
-      //   .catch((data) => {
-      //     return data;
-      //   });
     };
 
     //pass to app.component
@@ -288,17 +175,6 @@ export const notebookComponent = {
 
     //TODO: refractro to use same function as viewDetails...
     viewPreview(event) {
-
-      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
-
-      // event.simplemde = {
-      //   toolbar: false,
-      //   status: false,
-      //   spellChecker: false,
-      //   autoDownloadFontAwesome: false,
-      //   autoPreview: true
-      // };
-
       this.notebook = event.notebook;
       this.editorOptions = {
         toolbar: false,
@@ -307,7 +183,6 @@ export const notebookComponent = {
         autoDownloadFontAwesome: false,
         autoPreview: true
       };
-
 
       this.$mdDialog.show({
         templateUrl: NotebookPreviewTemplate,
@@ -328,6 +203,7 @@ export const notebookComponent = {
           onSave: this.save.bind(this)
         }
       }).then((data) => {
+
       }).catch(() => {
 
       })

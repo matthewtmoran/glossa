@@ -157,7 +157,6 @@ export const settingsComponent = {
           file: event.path
         }
       });
-      // this.rootService.removeAvatar(event.path)
     }
     //passes event up to app.component
     uploadAvatar(event) {
