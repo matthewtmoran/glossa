@@ -11,7 +11,8 @@ const app = require('electron').app;
 
 
 module.exports = function (glossaUser, mySession, io, bonjour, win) {
-  io.sockets.on('connection', function (socket) {
+  console.log('io', io);
+  io.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
 

@@ -1,120 +1,177 @@
 const webpack = require('webpack');
 const cleanPlugin = require('clean-webpack-plugin');
 const copyPlugin = require('copy-webpack-plugin');
-const extractPlugin = require('extract-text-webpack-plugin');
-
-// const electron = require('electron');
-// const remote = electron.remote;
-// const ProvidePlugin = require('ProvidePlugin');
-
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
 
-const root = `${__dirname}/src`;
+const frontEndRoot = `${__dirname}/src`;
+const backEndRoot = `${__dirname}/server`;
 const dist = `${__dirname}/dist`;
+
 const paths = {
-    app: `${root}/app/root.module.js`,
-    styles: `${root}/styles`,
+  common: {},
+  frontEnd: {
+    app: `${frontEndRoot}/app/root.module.js`,
+    output: `${dist}/`,
+    styles: `${frontEndRoot}/styles`,
     static: {
-        index: `${root}/index.html`,
-        manifest: `${root}/manifest.json`,
-        images: `${root}/img/**/*`
+      index: `${frontEndRoot}/index.html`,
+      manifest: `${frontEndRoot}/manifest.json`,
+      images: `${frontEndRoot}/img/**/*`
     }
+  },
+  backEnd: {
+    app: `${backEndRoot}/app.js`,
+    output: `${dist}/backEnd`,
+  },
 };
 
-const add = {
-  jquery: new webpack.ProvidePlugin({
-    $: 'jquery',
-    jQuery:'jquery',
-    'window.jQuery':'jquery'
-  })
-};
 
 
 // Plugins
 const prep = {
-    clean: new cleanPlugin([
-        dist
-    ]),
-    copy: new copyPlugin([{
-        from: paths.static.index
-    }, {
-        from: paths.static.manifest
-    }, {
-        from: paths.static.images,
-        to: 'img/',
-        flatten: true
-    }])
+  clean: new cleanPlugin([
+    dist
+  ]),
+  copy: new copyPlugin([
+    {
+      from: paths.frontEnd.static.index,
+      to: `${paths.frontEnd.output}`,
+    },
+    {
+      from: paths.frontEnd.static.images,
+      to: `${paths.frontEnd.output}/img/`,
+      flatten: true
+    }
+  ]),
+  jquery: new webpack.ProvidePlugin({
+    $: 'jquery',
+    jQuery: 'jquery',
+    'window.jQuery': 'jquery'
+  })
 };
 
 
 const extract = {
-    styles: new extractPlugin('css/styles.css')
+  styles: new ExtractTextPlugin('css/styles.css')
 };
 
 // Loaders
-const scripts = {
-    test: /\.js$/,
-    exclude: /node_modules/,
-    loaders: [
-        'ng-annotate',
-        'babel',
-    ]
+const frontEndScripts = {
+  test: /\.js$/,
+  use: [
+    'ng-annotate-loader',
+    'babel-loader',
+  ],
+  exclude: path.resolve(__dirname, "node_modules"),
+};
+
+const backEndScripts = {
+  test: /\.js$/,
+  use: [
+    'babel-loader',
+  ],
+  exclude: path.resolve(__dirname, "node_modules"),
 };
 
 const styles = {
-    test: /\.scss$/,
-    loader: extractPlugin.extract('style', 'css?sourceMap!sass?sourceMap')
+  test: /\.scss$/,
+  use:
+    ExtractTextPlugin.extract({
+      fallback: "style-loader",
+      use: [
+        {loader: 'css-loader', options: {sourceMap: true}},
+        {loader: 'sass-loader', options: {
+          sourceMap: true,
+          includePaths: [paths.frontEnd.styles]
+        }}
+      ]
+    }),
 };
 
 const markup = {
-    test: /\.html$/,
-    loader: 'ngtemplate!html'
+  test: /\.html$/,
+  use: [
+    {loader: 'ngtemplate-loader'},
+    {loader: 'html-loader'}
+  ]
 };
 
 const fonts = {
-    test: /\.(eot|svg|ttf|woff|woff2)$/,
-    loader: 'file?name=fonts/[name].[ext]'
+  test: /\.(eot|svg|ttf|woff|woff2)$/,
+
+  use: [{
+    loader: 'file-loader',
+    options: {
+      name: 'fonts/[name].[ext]',
+    }
+  }]
 };
 
-// Config object
-const config = {
-    resolve: {
-      alias: {
-        'wavesurferDev': path.resolve(__dirname, 'node_modules/wavesurfer.js/dist/wavesurfer.js'),
-        'ngCodemirror': path.resolve(__dirname, 'node_modules/angular-ui-codemirror/src/ui-codemirror.js'),
-        'socket.io-client': path.resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js' )
-      },
+const common = {
+  resolve: {
+    alias: {
+      'wavesurferDev': path.resolve(__dirname, 'node_modules/wavesurfer.js/dist/wavesurfer.js'),
+      'ngCodemirror': path.resolve(__dirname, 'node_modules/angular-ui-codemirror/src/ui-codemirror.js'),
+      'socket.io-client': path.resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js')
     },
-    entry: {
-        bundle: paths.app
-    },
-    devtool: 'source-map',
-    module: {
-        loaders: [
-            scripts,
-            styles,
-            markup,
-            fonts
-        ],
-    },
-    plugins: [
-        prep.clean,
-        prep.copy,
-        add.jquery,
-        extract.styles,
-        // new webpack.IgnorePlugin(new RegExp("^(fs|ipc)$"))
-    ],
-    sassLoader: {
-        includePaths: [paths.styles]
-    },
-    output: {
-        path: `${dist}/`,
-        publicPath: '/',
-        filename: 'js/app.[name].js'
-    },
-      node: {
-        fs: 'empty'
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+  },
+  devtool: 'source-map',
+  plugins: [
+    prep.clean,
+    prep.copy,
+  ],
+};
+
+const frontEnd = {
+  entry: [
+    paths.frontEnd.app
+  ],
+  output: {
+    path: paths.frontEnd.output,
+    filename: 'app.bundle.js',
+    publicPath: "http://localhost:9000/", // Development Server
+  },
+  module: {
+    rules: [
+      frontEndScripts,
+      styles,
+      markup,
+      fonts,
+      {
+        test: /\.json$/,
+        use: 'json-loader'
       }
+    ],
+  },
+  plugins: [
+    prep.clean,
+    prep.copy,
+    prep.jquery,
+    extract.styles,
+  ],
 };
 
-module.exports = config;
+const backEnd = {
+  target: 'node',
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+  },
+  entry: [
+    paths.backEnd.app
+  ],
+  output: {
+    path: paths.backEnd.output,
+    filename: 'server.bundle.js',
+  },
+  module: {
+    rules: [
+      backEndScripts,
+      { test: /\.json$/, use: 'json-loader' },
+    ]
+  }
+};
+
+
+module.exports = Object.assign({}, common, frontEnd);

@@ -21,7 +21,7 @@ module.exports = function(app) {
   app.use('/api/session', require(path.join(__dirname,'./api/session')));
   app.use('/api/settings', require(path.join(__dirname,'./api/settings')));
 
-  console.log('path ptah', path.join(electronApp.getPath('userData'), 'image'));
+  console.log('A path im looking for', electronApp.getAppPath());
 
   app.use('/image', express.static(path.join(electronApp.getPath('userData'), 'image')));
   app.use('/audio', express.static(path.join(electronApp.getPath('userData'), 'audio')));
@@ -35,12 +35,12 @@ module.exports = function(app) {
   // All other routes should redirect to the index.html
   app.route('/*')
     .get(function(req, res) {
-      res.sendFile(path.resolve(app.get('appPath'), '/index.html'));
+      res.sendFile(path.resolve(electronApp.getAppPath(), 'dist/index.html'));
     });
 
 
   // serve angular front end files from root path
-//   app.use('/', express.static('app', { redirect: false }));
+  // app.use('/', express.static('app', { redirect: false }));
 //
 // // rewrite virtual urls to angular app to enable refreshing of internal pages
 //   app.get('*', function (req, res, next) {

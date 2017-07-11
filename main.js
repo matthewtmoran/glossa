@@ -1,14 +1,14 @@
 const fs = require('fs');
-var electron = require('electron'),
-  path = require('path'),
-  app = electron.app,
-  BrowserWindow = electron.BrowserWindow,
-  express,
-  bonjour = require('bonjour')();
-var url = require('url');
-var AppMenu = require(path.join(__dirname, './app-menu'));
+const electron = require('electron');
+const path = require('path');
+const app = electron.app;
+const url = require('url');
+const AppMenu = require(path.join(__dirname, './app-menu'));
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
+const express = require(path.join(__dirname, './server/app'));
+let BrowserWindow = electron.BrowserWindow;
+let bonjour = require('bonjour')();
 
 //for mac to decide what to do with window object.. to quit or hide...
 let forceQuit = false;
@@ -32,7 +32,7 @@ function startExpress() {
         isWindows: process.platform === 'win32'
       };
 
-      express = require(path.join(__dirname, './server/app'))(bonjour, appData[0], win);
+      express(bonjour, appData[0], win);
     });
 }
 startExpress();
