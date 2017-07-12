@@ -50,14 +50,22 @@ module.exports = {
             if (connection._id !== toggled._id) {
               return connection;
             }
+            console.log('the connection being toggled: ', connection);
             //update connection object with following status
             connection.following = toggled.following;
+
             if (connection.following) {
-              console.log('TODO: sync data');
               socketUtil.syncData(connection, (data) => {
                 console.log('emit:: sync-data to:: a client');
                 io.to(connection.socketId).emit('sync-data', data)
               });
+
+              if (connection.avatar) {
+                console.log('There is an avatar?', connection.avatar);
+                //sends to connected socket client
+                io.to(connection.socketId).emit('request:avatar');
+              }
+
             }
             connection = Object.assign({}, connection);
             return connection;

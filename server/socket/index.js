@@ -2,16 +2,14 @@
 
 const path = require('path');
 const fs = require('fs');
-
 const config = require('./../config/environment/index');
 const socketUtil = require('./socket-util');
-let localClient = {};
 const main = require('../../main');
 const app = require('electron').app;
+let localClient = {};
 
 
 module.exports = function (glossaUser, mySession, io, bonjour, win) {
-  console.log('io', io);
   io.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
@@ -32,30 +30,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     //when a client has requested the actual avatar image file.
     socket.on('request:avatar', onRequestAvatar);
 
-
-    // console.log('emit:: request:socket-type');
-    // socket.emit('request:socket-type');
-    // socket.on('return:socket-type', onReturnSocketType);
-    //
-    //
-    // //////////////////////////
-    // //local-client listeners//
-    // //////////////////////////
-    //
-    // socket.on('broadcast:profile-updates', onBroadcastProfileUpdates);
-    // socket.on('broadcast:Updates', onBroadcastUpdates);
-    // socket.on('request:connections', onRequestConnections);
-    // socket.on('update:following', onUpdateFollowing);
-    //
-    //
-    // /////////////////////////////
-    // //external-client listeners//
-    // /////////////////////////////
-    //
-    // socket.on('return:avatar', onReturnAvatar);
-    // socket.on('return:updates', onReturnUpdates);
-    //
-    // socket.on('disconnect', onDisconnect);
+    socket.on('return:avatar', onReturnAvatar);
 
 
     ////////////////////
@@ -64,6 +39,11 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
 
     //client returns 'end-handshake with data'
     function endHandShake(client) {
+      console.log('on:: endHandShake');
+      console.log('');
+      console.log(`User ${client.name} just connected. ID = ${client._id}`);
+      console.log(`User ${client.name} socketID = ${client.socketId}`);
+      console.log('');
       this.win = {};
       main.getWindow((err, window) => {
         if (err) {
@@ -73,7 +53,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         console.log("send:: sync-event-start local-window");
         this.win.webContents.send('sync-event-start');
       });
-      console.log('on:: endHandShake');
+
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
         //update existing connections
@@ -82,6 +62,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           if (connection._id !== client._id) {
             return connection;
           }
+          console.log('found match in connection list... Update data.');
           //update data that we do not store
           connection.online = true;
           connection.socketId = client.socketId;
@@ -89,64 +70,40 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
           //i already know it's following here but just in case and for consitency sake
           if (connection.following) {
 
-            //if client avatar exists and it is different than connection avatar
-            if ((client.avatar.name !== connection.avatar.name) || (!connection.avatar && client.avatar.name)) {
-              //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
-              console.log('emit:: request:avatar to:: server that sent us basic changes');
-              io.to(client.socketId).emit('request:avatar');
+            console.log("");
+            console.log("Begin check for avatar differences");
+            console.log("");
 
-              connection.avatar = client.avatar;
-              connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
-              connection.avatar.path = path.resolve(client.avatar.path);
-              connection.avatar = Object.assign({}, connection.avatar);
-
-              socketUtil.followedConnectionUpdate(connection)
-                .then((updatedConnection) => {
-                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
-                  console.log('send:: update-connection-list to:: local window');
-                  this.win.webContents.send('update-connection-list');
-                });
-
-              socketUtil.normalizeNotebooks(connection)
-                .then((updatedNotebooks) => {
-                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
-                  console.log('send:: update-synced-notebooks to:: local window');
-                  this.win.webContents.send('update-synced-notebooks');
-                });
-
-
-            }
-            //if client avatar does not exist but connection avatar does exist
-            else if (!client.avatar || !client.avatar.name && connection.avatar && connection.avatar.name) {
-              //  copy data object, save data, remove old image from filesystem, normalize notebooks
-              connection.avatar = Object.assign({}, client.avatar);
-
+            //if client has avatar exists
+            if ((client.avatar && client.avatar.name) && (!connection.avatar || !connection.avatar.name)) {
+              console.log("client has avatar connection does not have avatar");
+              //this means connection is null but client is not null
+              //client has an avatar image we need
+              getNewAvatarData(connection, client, this.win)
+            } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
+              //this means client is null but connection is not null
+              //client has removed his avatar image
+              console.log('TODO: get rid of the stored avatar data we hold');
               fs.unlink(connection.avatar.absolutePath);
-
-              socketUtil.followedConnectionUpdate(connection)
-                .then((updatedConnection) => {
-                  // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
-                  console.log('send:: update-connection-list to:: local window');
-                  win.webContents.send('update-connection-list');
-                });
-
-              socketUtil.normalizeNotebooks(connection)
-                .then((updatedNotebooks) => {
-                  socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
-                  console.log('send:: update-synced-notebooks to:: local window');
-                  win.webContents.send('update-synced-notebooks');
-                });
-
+              delete connection.avatar;
+            } else if (client.avatar && client.avatar.name && connection.avatar && connection.avatar.name && client.avatar.name !== connection.avatar.name) {
+              //this means client has changed his avatar image to a new avatar
+              console.log('TODO: remove the data we hold and get the new data');
+              fs.unlink(connection.avatar.absolutePath);
+              getNewAvatarData(connection, client, this.win)
             }
+
 
             socketUtil.syncData(connection, (data) => {
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
             });
+
           }
           connection = Object.assign({}, connection);
           connectionExists = true;
           return connection;
+
         });
 
         //if client still does not exist it means its a new client
@@ -169,10 +126,10 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         }
 
         socket.join('externalClientsRoom');
+        console.log('send:: update-connection-list');
+        console.log('May need to change this to wait on promises???????');
         this.win.webContents.send('update-connection-list');
 
-        //tell browser to update it's data.
-        // win.webContents.send('update-connection-list');
       } else {
         //if it's not its probably someone at the coffee shop
         console.log('********SOMEONE IS SNOOPING*********')
@@ -184,6 +141,10 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
       console.log('on:: disconnect');
       //get connection from list
       let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
+
+      if (!connection) {
+        return console.log("no connection in global object.  Am going to throw an error")
+      }
 
       if (!connection.following) {
         //remove non-followed users from connection array
@@ -203,7 +164,6 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
       }
 
 
-
       main.getWindow(function (err, window) {
         if (err) {
           return console.log('error getting window...');
@@ -213,6 +173,38 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         }
       });
 
+    }
+
+    function getNewAvatarData(connection, client, win) {
+      console.log('this new connection object contains new avatar data that requires us to add new data');
+      //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
+      console.log('emit:: request:avatar to:: server that sent us basic changes');
+      io.to(client.socketId).emit('request:avatar');
+
+      //resolve path
+      //resolve absolutePath
+
+      connection.avatar = client.avatar;
+      connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
+      connection.avatar.path = path.normalize(client.avatar.path);
+      connection.avatar = Object.assign({}, connection.avatar);
+
+
+      socketUtil.followedConnectionUpdate(connection)
+        .then((updatedConnection) => {
+          // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+          global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
+            return con;
+          });
+          // this.win.webContents.send('update-connection-list');
+        });
+
+      socketUtil.normalizeNotebooks(connection)
+        .then((updatedNotebooks) => {
+          socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+          console.log('send:: update-synced-notebooks to:: local window');
+          win.webContents.send('update-synced-notebooks');
+        });
     }
 
     //socket client returns data
@@ -293,17 +285,25 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     }
 
     function onRequestAvatar() {
-      socketUtil.encodeBase64(global.appData.initialState.user.avatar)
+      console.log('on:: request:avatar');
+      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
         .then((bufferString) => {
 
-          const avatarData = {
-            path: global.appData.initialState.user.avatar,
-            bufferString: bufferString
-          };
-
+          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
+          avatarData.bufferString = bufferString;
+          console.log('avatarData.path', avatarData.path);
+          console.log('emit:: return:avatar');
           io.to(socket.id).emit('return:avatar', avatarData);
 
         })
+    }
+
+    function onReturnAvatar(data) {
+      console.log('on:: return:avatar ', data.path);
+        socketUtil.writeAvatar(data)
+          .then(() => {
+            console.log('Avatar written');
+          })
     }
 
     //helper functions
@@ -502,28 +502,28 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
         })
     }
 
-    /**
-     * response to 'request:avatar' emitted event
-     * occurs during the handshake if client has update avatar
-     * data:
-     * @param data = {avatarString: Base64, imagePath: String, userData: object}
-     */
-    function onReturnAvatar(data) {
-      console.log('');
-      console.log('on:: return:avatar ');
-
-      //store buffer object and path
-      var avatarData = {
-        buffer: data.avatarString,
-        path: data.imagePath
-      };
-
-      //writes media to file system
-      socketUtil.writeMediaFile(avatarData)
-        .then(function () {
-          console.log('TODO: watch results: media file written, client data note returned after, consider what we need to do to reflect changes')
-        });
-    }
+    // /**
+    //  * response to 'request:avatar' emitted event
+    //  * occurs during the handshake if client has update avatar
+    //  * data:
+    //  * @param data = {avatarString: Base64, imagePath: String, userData: object}
+    //  */
+    // function onReturnAvatar(data) {
+    //   console.log('');
+    //   console.log('on:: return:avatar ');
+    //
+    //   //store buffer object and path
+    //   var avatarData = {
+    //     buffer: data.avatarString,
+    //     path: data.imagePath
+    //   };
+    //
+    //   //writes media to file system
+    //   socketUtil.writeMediaFile(avatarData)
+    //     .then(function () {
+    //       console.log('TODO: watch results: media file written, client data note returned after, consider what we need to do to reflect changes')
+    //     });
+    // }
 
     /**
      *

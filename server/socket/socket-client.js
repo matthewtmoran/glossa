@@ -126,6 +126,8 @@ module.exports = {
     });
 
     nodeClientSocket.on('send-profile-updates', (data) => {
+      console.log('on:: send-profile-updates');
+
       let win = {};
       main.getWindow((err, window) => {
         if (err) {
@@ -203,8 +205,25 @@ module.exports = {
      socketUtil.writeAvatar(data)
        .then(() => {
         console.log('Avatar written');
-        console.log('TODO: Confirm avatar is visible!!');
        })
+    });
+
+
+    //on connection, avatar is different this is where the request is heard
+    nodeClientSocket.on('request:avatar', (data) => {
+      console.log('--- on:: request:avatar')
+
+      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
+        .then((bufferString) => {
+
+          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
+          avatarData.bufferString = bufferString;
+          console.log('--- avatarData.path', avatarData.path);
+          console.log('--- emit:: return:avatar to:: server that is connected (that made request)');
+          nodeClientSocket.emit('return:avatar', avatarData);
+        })
+
+
     });
 
 
@@ -217,6 +236,7 @@ module.exports = {
       nodeClientSocket.removeAllListeners("begin-handshake");
       nodeClientSocket.removeAllListeners("sync-data");
       nodeClientSocket.removeAllListeners("return:avatar");
+      nodeClientSocket.removeAllListeners("request:avatar");
       nodeClientSocket.removeAllListeners("send-profile-updates");
       nodeClientSocket.removeAllListeners("rt:updates");
       nodeClientSocket.removeAllListeners("connect");

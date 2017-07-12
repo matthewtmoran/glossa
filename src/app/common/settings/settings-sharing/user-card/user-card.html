@@ -7,17 +7,8 @@
 		</div>
 
 		<div ng-if="$ctrl.user.avatar && $ctrl.user.following" >
-			<img ng-src="{{$ctrl.user.avatar}}" class="md-avatar">
+			<img ng-src="{{$ctrl.user.avatar.path}}" class="md-avatar">
 		</div>
-
-
-		<!--<md-button ng-if="!$ctrl.user.following || !$ctrl.user.avatar" disabled="true" class="md-fab avatar-button" ng-style="{'background-color': $ctrl.user.color }">-->
-			<!--<span class="letter">{{$ctrl.user.name[0]}}</span>-->
-		<!--</md-button>-->
-
-		<!--<img ng-if="$ctrl.user.avatar && $ctrl.user.following" ng-src="{{$ctrl.user.avatar}}" class="md-avatar">-->
-
-		<!--<span ng-class="{'online-notification': $ctrl.user.online, 'offline-notification': !$ctrl.user.online}"></span>-->
 	</div>
 	<div class="user-name-container">
 		<span>{{$ctrl.user.name}}</span>
@@ -35,25 +26,3 @@
 		</md-button>
 	</div>
 </md-list-item>
-
-<!--<md-card ng-class="{'user-online' : $ctrl.user.online, 'user-offline' : !$ctrl.user.online}">-->
-<!--<md-card-title layout="column" layout-align="center center">-->
-
-<!--<div class="user-card-items" flex layout="row" layout-align="space-between center">-->
-
-<!--<div>-->
-<!--<md-button class="md-fab" ng-style="{'background-color': $ctrl.user.color }">-->
-<!--<span class="letter">{{$ctrl.user.name[0]}}</span>-->
-<!--</md-button>-->
-<!--<span>{{$ctrl.user.name}}</span>-->
-<!--</div>-->
-
-<!--<span>{{$ctrl.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</span>-->
-
-<!--<md-switch ng-model="$ctrl.user.following" ng-change="$ctrl.toggleFollow($ctrl.user.following)" aria-label="Switch 1">-->
-<!--Following: <span>{{$ctrl.user.following ? 'On' : 'Off'}}</span>-->
-<!--</md-switch>-->
-
-<!--</div>-->
-<!--</md-card-title>-->
-<!--</md-card>-->
