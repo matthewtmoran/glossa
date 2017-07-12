@@ -63,7 +63,10 @@ const frontEndScripts = {
     'ng-annotate-loader',
     'babel-loader',
   ],
-  exclude: path.resolve(__dirname, "node_modules"),
+  exclude: [
+    path.resolve(__dirname, "node_modules"),
+    path.resolve(__dirname, "src/server")
+  ],
 };
 
 const backEndScripts = {

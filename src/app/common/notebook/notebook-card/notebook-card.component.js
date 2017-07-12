@@ -51,7 +51,7 @@ export const notebookCardComponent = {
 
 
     renderNotebookPreview() {
-      this.previewText = this.$sce.trustAsHtml(SimpleMDE.markdown(this.notebook.description));
+      this.previewText = this.$sce.trustAsHtml(SimpleMDE.markdown(this.notebook.description ? this.notebook.description : ''));
 
       if (this.notebook.isNew) {
         this.$element.addClass('new-data');

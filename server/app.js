@@ -1,7 +1,6 @@
 /**
  * Main application file
  */
-
 'use strict';
 
 module.exports = (bonjour, appData, win) => {
@@ -10,6 +9,7 @@ module.exports = (bonjour, appData, win) => {
   const config = require(path.join(__dirname, './config/environment'));
   // Setup server
   const app = express();
+
   const server = require('http').createServer(app);
   const io = require('socket.io')(server);
 
