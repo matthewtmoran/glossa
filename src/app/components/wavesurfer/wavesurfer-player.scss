@@ -14,7 +14,6 @@
 .waveSurferWave {//container of wave surfer
 	background-size: cover;
 	min-height: 200px;
-
 	background: $white; /* For browsers that do not support gradients */
 	background: -webkit-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Safari 5.1 to 6.0 */
 	background: -o-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Opera 11.1 to 12.0 */
@@ -24,6 +23,9 @@
 
 	wave {
 		overflow: hidden !important;
+		wave {
+
+		}
 	}
 
 	md-progress-linear {
@@ -53,6 +55,13 @@
 		position: absolute;
 		bottom: -20px;
 		right: 12px;
+	}
+
+	&.wave-preview {
+		.md-fab-bottom-right {
+			top: 175px !important;
+			z-index: 101;
+		}
 	}
 
 }

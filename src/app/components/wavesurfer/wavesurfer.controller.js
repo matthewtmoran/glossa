@@ -1,4 +1,5 @@
 import WaveSurfer from 'wavesurferDev';
+// import WaveSurfer from 'wavesurfer.js';
 export class WaveSurferController {
   constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element, $window) {
     'ngInject';
@@ -39,6 +40,7 @@ export class WaveSurferController {
   };
 
   $onChanges(changes) {
+    console.log('$onChanges');
     if (changes.urlSrc) {
       this.urlSrc = angular.copy(changes.urlSrc.currentValue);
       this.initWaveSurfer();
@@ -53,6 +55,8 @@ export class WaveSurferController {
   }
 
   $onInit() {
+    console.log('$onInit');
+    this.loading = true;
     this.speedIndex = 1;
   }
 
@@ -76,8 +80,10 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
+    console.log("initWaveSurfer triggered");
+
+
     this.cfpLoadingBar.start();
-    this.loading = true;
     this.isReady = false;
     this.userSettings = this.settings;
 
@@ -107,36 +113,54 @@ export class WaveSurferController {
     };
 
     if (!this.surfer) {
+      // this.surfer = Object.create(WaveSurfer);
 
-      this.surfer = Object.create(WaveSurfer);
-      this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
+
       this.waveElement = angular.element(this.$element[0].querySelector('.waveSurferWave'));
 
-      this.options = {
-        container: this.waveElement[0]
-      };
-
       let defaults = {
-        skipLength: this.userSettings.skipLength,
-        scrollParent: false,
-        waveColor: this.userSettings.waveColor,
         progressColor: '#757575',
+        cursorColor: '#FF5252',
         height: '200',
-        barHeight: 1,
+        barHeight: 6,
         barWidth: 1,
-        cursorColor: '#FF5252'
+        scrollParent: false,
+        container:this.waveElement[0],
+        skipLength: this.userSettings.skipLength,
+        waveColor: this.userSettings.waveColor,
       };
 
-      this.options = angular.extend(defaults, (this.playerProperties || {}), this.options);
-      this.playerProperties = {};
+      this.options = angular.extend({}, defaults, this.options);
 
+      console.log('about to call create wavesurfer object');
+
+      console.log('this.options', this.options);
+
+      this.surfer = Object.create(WaveSurfer);
       this.surfer.init(this.options);
+      console.log('create wavesurefer called - this.surfer:', this.surfer);
+      this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
+
 
       this.surfer.on('loading', (progress) => {
+        console.log('loading event listener');
         this.wavesurferProgress = progress;
       });
 
+
+      this.surfer.on('waveform-ready', () => {
+        console.log('waveform-ready event listener');
+        // this.loading = false;
+        // this.isReady = true;
+        // if (this.autoPlay) {
+        //   this.surfer.play();
+        // }
+        // this.cfpLoadingBar.complete();
+      });
+
+
       this.surfer.on('ready', () => {
+        console.log('ready event listener');
         this.loading = false;
         this.isReady = true;
         if (this.autoPlay) {
@@ -145,7 +169,7 @@ export class WaveSurferController {
         this.cfpLoadingBar.complete();
       });
 
-    }
+    };
 
     //play event listener
     this.surfer.on('play', this.play.bind(this));
@@ -171,6 +195,8 @@ export class WaveSurferController {
         'background-position': 'unset'
       });
     }
+
+    console.log('this.surfer', this.surfer);
 
     this.surfer.load(this.urlSrc);
 
