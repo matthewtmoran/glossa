@@ -119,10 +119,12 @@ export class WaveSurferController {
       this.waveElement = angular.element(this.$element[0].querySelector('.waveSurferWave'));
 
       let defaults = {
+        preload: true,
+        backend: 'MediaElement',
         progressColor: '#757575',
         cursorColor: '#FF5252',
         height: '200',
-        barHeight: 6,
+        barHeight: 5,
         barWidth: 1,
         scrollParent: false,
         container:this.waveElement[0],
@@ -151,22 +153,22 @@ export class WaveSurferController {
       this.surfer.on('waveform-ready', () => {
         console.log('waveform-ready event listener');
         // this.loading = false;
-        // this.isReady = true;
-        // if (this.autoPlay) {
-        //   this.surfer.play();
-        // }
-        // this.cfpLoadingBar.complete();
+        this.isReady = true;
+        if (this.autoPlay) {
+          this.surfer.play();
+        }
+        this.cfpLoadingBar.complete();
       });
 
 
       this.surfer.on('ready', () => {
         console.log('ready event listener');
         this.loading = false;
-        this.isReady = true;
-        if (this.autoPlay) {
-          this.surfer.play();
-        }
-        this.cfpLoadingBar.complete();
+        // this.isReady = true;
+        // if (this.autoPlay) {
+        //   this.surfer.play();
+        // }
+        // this.cfpLoadingBar.complete();
       });
 
     };
