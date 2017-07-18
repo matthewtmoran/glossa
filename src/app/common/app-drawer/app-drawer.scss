@@ -32,15 +32,6 @@ md-sidenav {
 
 md-sidenav.drawer {
 	z-index: 62;
-	md-toolbar {
-		background: none !important;
-
-		img {
-			height: 96px;
-			width: 96px;
-			margin: auto;
-		}
-	}
 
 	.side-menu {
 		list-style: none;
