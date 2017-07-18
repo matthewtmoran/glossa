@@ -122,13 +122,19 @@ export class WaveSurferController {
         waveColor: this.userSettings.waveColor,
         progressColor: '#757575',
         height: '200',
-        barHeight: 1,
+        barHeight: 4,
         barWidth: 1,
         cursorColor: '#FF5252'
       };
 
       this.options = angular.extend(defaults, (this.playerProperties || {}), this.options);
+
+
+
       this.playerProperties = {};
+
+
+      console.log('waversurefer option we are initiating with: ', this.options);
 
       this.surfer.init(this.options);
 
