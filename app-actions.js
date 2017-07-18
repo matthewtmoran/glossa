@@ -1,7 +1,8 @@
 var electron = require('electron'),
   app = electron.app,
   BrowserWindow = electron.BrowserWindow,
-  ipcMain = electron.ipcMain;
+  ipcMain = electron.ipcMain,
+  shell = electron.shell;
 
 
 
@@ -9,10 +10,13 @@ var electron = require('electron'),
 module.exports = {
 
   navigateToState: function(state) {
-    console.log('navigateToState')
     if (BrowserWindow.getFocusedWindow()) {
       BrowserWindow.getFocusedWindow().webContents.send('navigateToState', {state:state})
     }
+  },
+
+  navigateToExternalUrl: function(page) {
+    shell.openExternal(page);
   },
 
   quitApp: function() {

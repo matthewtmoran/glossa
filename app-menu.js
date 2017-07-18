@@ -182,32 +182,17 @@ function buildWindowMenu() {
 }
 
 function buildHelpMenu() {
-  const fileManager = isDarwin ?
-    'Finder' : process.platform === 'win32' ?
-      'Explorer' :
-      'File Manager';
+  const fileManager = isDarwin ? 'Finder' : process.platform === 'win32' ? 'Explorer' : 'File Manager';
 
   const menu = {
     label: '&Help',
     role: 'help',
-    submenu: [{
-      label: 'Keyboard Shortcuts',
-      // click: () => eventActions.showWebappDialog('shortcuts'),
-      accelerator: 'CmdOrCtrl+/'
-    }, {
-      label: 'Open Help Center',
-      // click: () => shell.openExternal('https://get.slack.help'),
-    }, {
-      type: 'separator'
-    }, {
-      label: 'Report Issue…',
-      // click: eventActions.reportIssue
-    }, {
-      type: 'separator'
-    }, {
-      label: "What's &New…",
-      // click: eventActions.showReleaseNotes
-    }]
+    submenu: [
+      {
+        label: 'Glossa Help Online',
+        click: () => eventActions.navigateToExternalUrl('http://glossa.io/help')
+      },
+    ]
   };
 
   //non mac os system lacks of `slack` menu, and `about slack` menu is belong to help menu instead
