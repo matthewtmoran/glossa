@@ -48,7 +48,11 @@ function buildGlossaMenu() {
 function buildFileMenu() {
   return isDarwin ? {
     label: 'File',
-    submenu: [buildCloseMenuItem()]
+    submenu: [
+      buildCloseMenuItem(),
+      buildImportMenuItem(),
+      buildExportMenuItem(),
+    ]
   } : {
     label: 'File',
     submenu: [
@@ -103,15 +107,16 @@ function buildEditMenu() {
 function buildViewMenu() {
   const menu = {
     label: 'View',
-    submenu: [{
-      label: 'Reload',
-      click: () => eventActions.reload(),
-      accelerator: 'CmdOrCtrl+R'
-    }, {
-      label: 'Reload All',
-      click: () => eventActions.reloadAll(),
-      accelerator: 'CmdOrCtrl+shift+R'
-    },
+    submenu: [
+      {
+        label: 'Reload',
+        click: () => eventActions.reload(),
+        accelerator: 'CmdOrCtrl+R'
+      }, {
+        label: 'Reload All',
+        click: () => eventActions.reloadAll(),
+        accelerator: 'CmdOrCtrl+shift+R'
+      },
       {
         type: 'separator'
       }, {
@@ -120,21 +125,34 @@ function buildViewMenu() {
         accelerator: isDarwin ?
           'Command+Control+F' :
           'Control+Shift+F'
-      }, {
+      },
+      {
         type: 'separator'
-      }, {
-        label: 'Actual Size',
-        // click: settingActions.resetZoom,
-        accelerator: 'CmdOrCtrl+0'
-      }, {
-        label: 'Zoom In',
-        // click: settingActions.zoomIn,
-        accelerator: 'CmdOrCtrl+Plus'
-      }, {
-        label: 'Zoom Out',
-        // click: settingActions.zoomOut,
-        accelerator: 'CmdOrCtrl+-'
-      }]
+      },
+      {
+        label: 'Corpus',
+        click: () => eventActions.navigateToState('meta'),
+      },
+      {
+        label: 'Notebooks',
+        click: () => eventActions.navigateToState('notebook'),
+      }
+      // {
+      //   label: 'Actual Size',
+      //   // click: settingActions.resetZoom,
+      //   accelerator: 'CmdOrCtrl+0'
+      // },
+      // {
+      //   label: 'Zoom In',
+      //   // click: settingActions.zoomIn,
+      //   accelerator: 'CmdOrCtrl+Plus'
+      // },
+      // {
+      //   label: 'Zoom Out',
+      //   // click: settingActions.zoomOut,
+      //   accelerator: 'CmdOrCtrl+-'
+      // }
+      ]
   };
   return menu;
 }
