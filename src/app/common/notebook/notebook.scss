@@ -331,7 +331,14 @@ notebook {
 		height: 200px;
 		width: 100%;
 		position: absolute;
-		top: 100px;
+		//top: 100px;
+
+		wave {
+			//top: 100px;
+			canvas {
+				top: 100px !important;
+			}
+		}
 
 		.wave-content-wrapper {
 			background: transparent;
