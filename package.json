@@ -79,7 +79,7 @@
     "build": "rimraf dist && webpack --bail --progress --profile",
     "start": "electron .",
     "package-mac": "electron-packager . --overwrite --ignore=src --platform=darwin --arch=x64 --icon=dist/img/glossa-logo.icns --prune=true --out=release-builds",
-    "package-win": "electron-packager . --overwrite --asar=true --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds2",
+    "package-win": "electron-packager . --overwrite --asar=true --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/glossa-logo.png --prune=true --out=release-builds",
     "package-win-basic": "electron-packager . --ignore=src --overwrite --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --out=release-builds --prune=true"
   },
