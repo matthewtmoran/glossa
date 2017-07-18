@@ -77,8 +77,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist && webpack --bail --progress --profile",
-    "start": "electron --debug=5858 .",
-    "startdev": "node server/app",
+    "start": "electron .",
     "package-mac": "electron-packager . --overwrite --ignore=src --platform=darwin --arch=x64 --icon=dist/img/glossa-logo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds2",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/glossa-logo.png --prune=true --out=release-builds",
