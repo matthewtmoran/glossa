@@ -34,7 +34,7 @@ export const settingsComponent = {
       this.cfpLoadingBar = cfpLoadingBar;
       this.hideNav = true;
 
-      this.$scope.$watch('this.selectedTab', this.selectedIndexWatch.bind(this));
+      this.$scope.$watch(() => this.selectedTab.index, this.selectedIndexWatch.bind(this));
     }
 
 
@@ -85,6 +85,7 @@ export const settingsComponent = {
           index: 4
         }
       ];
+      this.selectedTab = this.tabs.find(tab => tab.state === this.$state.current.name);
     }
 
     selectedIndexWatch(current, old) {
@@ -110,16 +111,6 @@ export const settingsComponent = {
           this.$state.go(this.tabs[4].state);
           break;
       }
-    }
-
-
-    getDefaultState() {
-      this.tabs.forEach((tab, index) => {
-        if (tab.state === this.$state.current.name) {
-          this.selectedTab = tab;
-          this.$scope.selectedIndex = index;
-        }
-      })
     }
 
     back() {
@@ -194,14 +185,5 @@ export const settingsComponent = {
         }
       })
     }
-
-    updateConnection(event) {
-
-    }
-
-    updateConnections(event) {
-
-    }
-
   }
 };

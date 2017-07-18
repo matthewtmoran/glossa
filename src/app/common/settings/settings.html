@@ -14,7 +14,7 @@
 	<md-content layout="column" flex>
 		<md-tabs md-dynamic-height=""
 		         md-border-bottom=""
-		         md-selected="selectedTab"
+		         md-selected="$ctrl.selectedTab.index"
 		         md-stretch-tabs="always" >
 		         <!--selected-tab="selectedIndex"-->
 			<md-tab ng-repeat="tab in $ctrl.tabs" label="{{tab.label}}"></md-tab>
@@ -43,7 +43,6 @@
 					on-confirm-toggle-sharing="$ctrl.confirmToggleSharing($event)"
 					on-toggle-follow="$ctrl.toggleFollow($event)">
 		</md-content>
-
 	</md-content>
 
 
