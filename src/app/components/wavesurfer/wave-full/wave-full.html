@@ -3,9 +3,8 @@
 	<md-content flex class="wave-content-wrapper">
 		<div class="waveSurferWave">
 			<md-progress-linear ng-if="$ctrl.loading" class="md-warn"
-			                    md-mode="buffer"
-			                    value="{{$ctrl.wavesurferProgress}}"
-			                    md-buffer-value="{{$ctrl.wavesurferProgress2}}">
+			                    md-mode="indeterminate"
+			                    value="{{$ctrl.wavesurferProgress}}">
 			</md-progress-linear>
 		</div>
 	</md-content>
