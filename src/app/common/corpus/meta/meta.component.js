@@ -60,12 +60,12 @@ export const metaComponent = {
     }
 
     //passes event up
-    removeMedia(event, media, type) {
+    removeMedia(event) {
       this.onRemoveMedia({
         $event: {
           currentFile: this.currentFile,
-          media: media,
-          type: type
+          media: event.file,
+          type: event.type
         }
       });
     }
