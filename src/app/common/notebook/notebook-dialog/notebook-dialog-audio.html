@@ -1,7 +1,6 @@
 <md-dialog class="post-dialog" flex-xs="90" flex-sm="75" flex-gt-sm="75">
 	<md-content>
-
-			<form name="postForm" ng-cloak>
+		<form name="postForm" ng-cloak>
 			<div layout="row" class="media-container">
 				<div layout="column"
 				     flex
@@ -17,15 +16,18 @@
 						<span>Add Audio</span>
 					</md-button>
 
-					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.currentNotebook.image}" layout="row" layout-align="start center">
-						<md-button ng-if="$ctrl.currentNotebook.audio" class="md-icon-button remove-button" aria-label="Remove Button"
-						           ng-click="$ctrl.removeMedia($ctrl.currentNotebook.audio); $ctrl.currentNotebook.audio = null" >
+					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.currentNotebook.image}" layout="row"
+					     layout-align="start center">
+						<md-button ng-if="$ctrl.currentNotebook.audio" class="md-icon-button remove-button"
+						           aria-label="Remove Button"
+						           ng-click="$ctrl.removeMedia($ctrl.currentNotebook.audio); $ctrl.currentNotebook.audio = null">
 							<md-icon>volume_off</md-icon>
 						</md-button>
 					</div>
 
 					<div flex class="audio-container" ng-if="$ctrl.currentNotebook.audio">
 						<wave-surfer-preview
+								class="full-preview"
 								ng-if="$ctrl.currentNotebook.audio"
 								flex
 								settings="$ctrl.settings"
@@ -50,10 +52,11 @@
 			</div>
 
 
-
 		</form>
-		<div layout="row" class="top-border" >
-			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button"><md-icon>delete</md-icon></md-button>
+		<div layout="row" class="top-border">
+			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">
+				<md-icon>delete</md-icon>
+			</md-button>
 			<span flex></span>
 			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
 			<md-button ng-disabled="postForm.$invalid"

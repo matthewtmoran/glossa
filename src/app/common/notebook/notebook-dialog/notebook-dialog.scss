@@ -9,12 +9,13 @@
 		width: 100%;
 
 		.media-container {
+			min-height: 200px;
 			.waveSurferWave {
 				background: transparent;
 			}
 
 			.top-actions {
-				height: 200px;
+				//height: 200px;
 				position: relative;
 				background: $white;
 				background: linear-gradient(white 24%, $white 46%, $lGrey);
@@ -32,7 +33,7 @@
 				.image-container {
 					height: 100%;
 					width: 100%;
-					overflow: hidden;
+					//overflow: hidden;
 
 					.image-preview {
 						//position: absolute;
@@ -42,7 +43,7 @@
 						//width: 100%;
 						width: 100%;
 						max-width: 100%;
-						margin-top: -20%;
+						//margin-top: -20%;
 					}
 				}
 
@@ -73,10 +74,10 @@
 					height: 200px;
 					width: 100%;
 					position: absolute;
+					bottom: 0;
 					//top: 100px;
 
 					wave {
-						//top: 100px;
 						canvas {
 							top: 100px !important;
 						}

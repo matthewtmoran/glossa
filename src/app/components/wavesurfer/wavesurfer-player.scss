@@ -1,5 +1,23 @@
 @import "colors";
 
+wave-surfer-preview {
+	.post-dialog {
+		&.full-preview {
+			.media-container {
+				.top-actions {
+					.audio-container{
+						wave {
+							canvas {
+								top: 0!important;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 .transparent {
 	background-color: transparent !important;
 }
