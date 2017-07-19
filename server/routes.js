@@ -25,6 +25,7 @@ module.exports = function(app) {
   console.log('A path im looking for', electronApp.getAppPath());
 
   app.use('/image', express.static(path.join(electronApp.getPath('userData'), 'image')));
+  app.use('/assets', express.static(path.join(__dirname, './components/assets/img/')));
   app.use('/audio', express.static(path.join(electronApp.getPath('userData'), 'audio')));
   // app.use('/assets', express.static(path.join(__dirname, 'audio')));
 

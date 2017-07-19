@@ -20,13 +20,13 @@ export const settingsAboutComponent = {
           name: 'Matthew Moran',
           title: 'Software Engineer',
           url: '',
-          avatar: ''
+          avatar: 'assets/moran-avatar.jpg'
         },
         {
           name: 'Chris Jones',
           title: 'Field Linguist',
           url: 'onechrisjones.me',
-          avatar: ''
+          avatar: 'assets/jones-avatar.jpg'
         },
         {
           name: 'Justin Rees',
