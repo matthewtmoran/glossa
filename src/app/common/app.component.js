@@ -494,6 +494,7 @@ export const appComponent = {
             targetEvent: event,
             controller: NotebookDialogController,
             controllerAs: '$ctrl',
+            escapeToClose: false,
             bindToController: true,
             locals: {
               settings: this.settings,
@@ -524,6 +525,7 @@ export const appComponent = {
             targetEvent: event,
             controller: NotebookDialogController,
             controllerAs: '$ctrl',
+            escapeToClose: false,
             bindToController: true,
             locals: {
               settings: this.settings,
@@ -555,6 +557,7 @@ export const appComponent = {
             targetEvent: event,
             controller: NotebookDialogController,
             controllerAs: '$ctrl',
+            escapeToClose: false,
             bindToController: true,
             locals: {
               settings: this.settings,
