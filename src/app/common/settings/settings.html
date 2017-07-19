@@ -2,7 +2,8 @@
 
 	<md-toolbar class="light-toolbar">
 		<div class="md-toolbar-tools">
-			<h2>Settings<md-icon>keyboard_arrow_right</md-icon> {{$ctrl.selectedTab.label}}</h2>
+			<h2>Settings<md-icon>keyboard_arrow_right</md-icon>{{$ctrl.$state.current.name.charAt(0).toUpperCase() + $ctrl.$state.current.name.slice(1)}}</h2>
+			<!--<h2>Settings<md-icon>keyboard_arrow_right</md-icon> {{$ctrl.selectedTab.label}}</h2>-->
 		</div>
 		<md-button class="close-button md-icon-button" ng-click="$ctrl.back()">
 			<md-icon>close</md-icon>
@@ -14,6 +15,7 @@
 	<md-content layout="column" flex>
 		<md-tabs md-dynamic-height=""
 		         md-border-bottom=""
+		         settings-tab-index="$ctrl.selectedTab.index"
 		         md-selected="$ctrl.selectedTab.index"
 		         md-stretch-tabs="always" >
 		         <!--selected-tab="selectedIndex"-->

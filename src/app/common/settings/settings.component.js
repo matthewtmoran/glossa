@@ -34,7 +34,7 @@ export const settingsComponent = {
       this.cfpLoadingBar = cfpLoadingBar;
       this.hideNav = true;
 
-      this.$scope.$watch(() => this.selectedTab.index, this.selectedIndexWatch.bind(this));
+      // this.$scope.$watch(() => this.selectedTab.index, this.selectedIndexWatch.bind(this));
     }
 
 
@@ -92,23 +92,18 @@ export const settingsComponent = {
       switch (current) {
         case 0:
           this.selectedTab = this.tabs[0];
-          this.$state.go(this.tabs[0].state);
           break;
         case 1:
           this.selectedTab = this.tabs[1];
-          this.$state.go(this.tabs[1].state);
           break;
         case 2:
           this.selectedTab = this.tabs[2];
-          this.$state.go(this.tabs[2].state);
           break;
         case 3:
           this.selectedTab = this.tabs[3];
-          this.$state.go(this.tabs[3].state);
           break;
         case 4:
           this.selectedTab = this.tabs[4];
-          this.$state.go(this.tabs[4].state);
           break;
       }
     }

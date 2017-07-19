@@ -5,6 +5,7 @@ import { settingsMedia } from './settings-media/settings-media.module';
 import { settingsHashtags } from './settings-hashtags/settings-hashtags.module';
 import { SettingsService } from './settings.service';
 import {settingsComponent} from './settings.component';
+import {SettingsTabIndex} from './settings-tab-index.directive';
 import './settings.scss';
 
 export const settings = angular
@@ -36,4 +37,5 @@ export const settings = angular
       })
   })
   .service('SettingsService', SettingsService)
+  .directive('settingsTabIndex', ['$state', ($state) => new SettingsTabIndex($state)])
   .name;
