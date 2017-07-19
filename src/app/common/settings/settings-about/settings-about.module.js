@@ -3,6 +3,7 @@ import { settingsAboutComponent } from './settings-about.component';
 import { aboutMainComponent } from './about-main/about-main.component';
 import { aboutSidebarComponent } from './about-sidebar/about-sidebar.component';
 import './settings-about.scss';
+import './about-sidebar/about-sidebar.scss';
 
 export const settingsAbout = angular
   .module('components.settings.about', [
