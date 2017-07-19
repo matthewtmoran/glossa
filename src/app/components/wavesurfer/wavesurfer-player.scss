@@ -1,14 +1,15 @@
 @import "colors";
-
-wave-surfer-preview {
-	.post-dialog {
-		&.full-preview {
-			.media-container {
-				.top-actions {
-					.audio-container{
-						wave {
-							canvas {
-								top: 0!important;
+.post-dialog {
+	form {
+		.media-container {
+			.top-actions {
+				.audio-container{
+					wave-surfer-preview {
+						&.full-preview {
+							wave {
+								canvas {
+									top: 0!important;
+								}
 							}
 						}
 					}
