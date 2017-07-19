@@ -1,5 +1,5 @@
 <md-dialog class="post-dialog" aria-label="notebook dialog" flex-xs="90" flex-sm="75" flex-gt-sm="75">
-	<!--<md-content>-->
+	<md-content>
 		<form name="postForm" ng-cloak>
 			<div layout="row" class="media-container">
 				<div layout="column"
@@ -27,7 +27,8 @@
 					</md-button>
 
 					<div class="image-container">
-						<img ng-show="$ctrl.currentNotebook.image" ngf-src="$ctrl.imagePath" class="thumb image-preview">
+						<img ng-show="$ctrl.currentNotebook.image" ngf-src="$ctrl.imagePath"
+						     class="thumb image-preview">
 					</div>
 
 					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.currentNotebook.image}" layout="row"
@@ -59,30 +60,45 @@
 			</div>
 
 			<div class="no-padding content-container" flex layout-fill>
-				<md-input-container class="simplemde-wrapper" flex layout-fill>
 
-					<simplemde
-							hashtags="$ctrl.hashtags"
-							editor-options="$ctrl.editorOptions"
-							value-binding="$ctrl.currentNotebook"
-							update-model="$ctrl.updateModel($event)">
-					</simplemde>
+				<!--<textarea name="" id="" cols="30" rows="10"></textarea>-->
+				<!--<md-input-container class="simplemde-wrapper" flex layout-fill>-->
 
-				</md-input-container>
+
+				<simplemde
+						hashtags="$ctrl.hashtags"
+						editor-options="$ctrl.editorOptions"
+						value-binding="$ctrl.currentNotebook"
+						update-model="$ctrl.updateModel($event)">
+				</simplemde>
+
+				<!--</md-input-container>-->
 			</div>
 		</form>
-	<!--</md-content>-->
+		<div>
+			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">
+				<md-icon>delete</md-icon>
+			</md-button>
+			<span flex></span>
+			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
+			<md-button ng-disabled="postForm.$invalid"
+			           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
+				{{$ctrl.postDetails.button.text}}
+			</md-button>
+		</div>
+	</md-content>
 
-	<md-dialog-actions layout="row" class="top-border">
-		<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">
-			<md-icon>delete</md-icon>
-		</md-button>
-		<span flex></span>
-		<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
-		<md-button ng-disabled="postForm.$invalid"
-		           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
-			{{$ctrl.postDetails.button.text}}
-		</md-button>
-	</md-dialog-actions>
+
+	<!--<md-dialog-actions layout="row" class="top-border">-->
+	<!--<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">-->
+	<!--<md-icon>delete</md-icon>-->
+	<!--</md-button>-->
+	<!--<span flex></span>-->
+	<!--<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>-->
+	<!--<md-button ng-disabled="postForm.$invalid"-->
+	<!--ng-click="$ctrl.postDetails.button.action('Create Normal Post')">-->
+	<!--{{$ctrl.postDetails.button.text}}-->
+	<!--</md-button>-->
+	<!--</md-dialog-actions>-->
 
 </md-dialog>

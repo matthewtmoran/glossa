@@ -1,11 +1,12 @@
 export class NotebookDialogController {
-  constructor($scope, $timeout, $window, notebook, editorOptions, hashtags, onCancel, onDeleteNotebook, onHide, onUpdate, onSave, settings) {
+  constructor($scope, $timeout, $window, $document, notebook, editorOptions, hashtags, onCancel, onDeleteNotebook, onHide, onUpdate, onSave, settings, $element) {
   // constructor($scope, $timeout, $window) {
     'ngInject';
 
     this.$scope = $scope;
     this.$timeout = $timeout;
     this.$window = $window;
+    this.$document = $document;
 
     this.currentNotebook = angular.copy(notebook);
     this.editorOptions = editorOptions;
@@ -16,6 +17,7 @@ export class NotebookDialogController {
     this.hashtags = hashtags;
     this.onDeleteNotebook = onDeleteNotebook;
     this.settings = settings;
+    this.$element = $element;
 
     this.$scope.$watch(() => this.currentNotebook.image, this.imageWatcher.bind(this));
     this.$scope.$watch(() => this.currentNotebook.audio, this.audioWatcher.bind(this));
@@ -34,12 +36,14 @@ export class NotebookDialogController {
   }
 
   $onInit() {
+    console.log('$onInit');
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();
   }
 
   init() {
+    console.log('init')
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();
@@ -76,6 +80,11 @@ export class NotebookDialogController {
 
   //keep simplemde and ngmodel synced
   updateModel(event) {
+    //this keeps the scroll at the bottom of the text editor
+    this.$timeout(() => {
+      // this.scrollElement = angular.element(this.$document[0].querySelector(".post-dialog md-content"));
+      // this.scrollElement[0].scrollTop = this.scrollElement[0].scrollHeight;
+    });
     this.currentNotebook.description = angular.copy(event.value);
   }
 
