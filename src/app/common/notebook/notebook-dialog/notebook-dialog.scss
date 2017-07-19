@@ -1,15 +1,170 @@
+@import "colors";
 .post-dialog {
-	.waveSurferWave {
-		background: transparent;
+	.md-dialog-content {
+		padding-right: 0;
+		padding-left: 0;
 	}
 
-	.editor-toolbar {
-		opacity: 1 !important;
+	form {
+		width: 100%;
+
+		.media-container {
+			.waveSurferWave {
+				background: transparent;
+			}
+
+			.top-actions {
+				height: 200px;
+				position: relative;
+				background: $white;
+				background: linear-gradient(white 24%, $white 46%, $lGrey);
+
+				.add-button {
+					margin: 15px;
+					height: 40px;
+					min-width: 50%;
+					opacity: .7;
+					font-size: 1.1em;
+					z-index: 102;
+					text-transform: capitalize;
+				}
+
+				.image-container {
+					height: 100%;
+					width: 100%;
+					overflow: hidden;
+
+					.image-preview {
+						//position: absolute;
+						//top: 100%;
+						//bottom: 100%;
+						//margin: auto;
+						//width: 100%;
+						width: 100%;
+						max-width: 100%;
+						margin-top: -20%;
+					}
+				}
+
+				.remove-container {
+					position: absolute;
+					top: 15px;
+					right: 15px;
+
+					&.dark-theme {
+						.remove-button {
+							md-icon {
+								opacity: .8;
+								color: $lBlack;
+							}
+						}
+					}
+
+					.remove-button {
+						md-icon {
+							opacity: .8;
+							color: white;
+						}
+					}
+				}
+
+				.audio-container {
+					background: transparent;
+					height: 200px;
+					width: 100%;
+					position: absolute;
+					//top: 100px;
+
+					wave {
+						//top: 100px;
+						canvas {
+							top: 100px !important;
+						}
+					}
+
+					.wave-content-wrapper {
+						background: transparent;
+					}
+
+					.md-player-controls {
+						top: 65px;
+						z-index: 101;
+						width: 90px;
+					}
+
+					.waveSurferWave:after{
+						box-shadow: none !important;
+					}
+				}
+
+
+			}
+		}
+
+		.content-container {
+			.simplemde-wrapper {
+				z-index: 100;
+				padding: 0;
+				width: 100% !important;
+
+				.editor-toolbar {
+					opacity: 1 !important;
+					border-radius: 0 !important;
+					background: white;
+					border-right:0;
+					border-left:0;
+
+					.toolbar-icon {
+						position: relative;
+
+						.md-icon-button {
+							position: absolute;
+							top: 0;
+							bottom: 0;
+							left: 0;
+							right: 0;
+						}
+
+						&.active {
+							.material-icons {
+								color: $lBlue !important;
+
+							}
+						}
+					}
+					.separator {
+						position: relative;
+					}
+				}
+
+				.CodeMirror {
+					//height:
+					padding: 0;
+				}
+
+				.CodeMirror-wrap {
+					border: none;
+					border-radius: 0 !important;
+				}
+			}
+		}
 	}
 
-	md-toolbar {
-		top: 60px;
-		position: absolute;
-		z-index: 101;
-	}
+
+
+
+
+
+	//
+	//md-toolbar {
+	//	top: 60px;
+	//	position: absolute;
+	//	z-index: 101;
+	//}
+
+
+
+
+
+
 }
