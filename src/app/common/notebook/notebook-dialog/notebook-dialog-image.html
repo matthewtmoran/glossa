@@ -41,11 +41,7 @@
 							update-model="$ctrl.updateModel($event)">
 					</simplemde>
 				</md-input-container>
-
 			</div>
-
-
-
 		</form>
 		<div layout="row" class="top-border">
 			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">
@@ -53,7 +49,7 @@
 			</md-button>
 			<span flex></span>
 			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
-			<md-button ng-disabled="postForm.$invalid"
+			<md-button ng-disabled="postForm.$invalid || !$ctrl.currentNotebook.image || !$ctrl.currentNotebook.description "
 			           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
 				{{$ctrl.postDetails.button.text}}
 			</md-button>

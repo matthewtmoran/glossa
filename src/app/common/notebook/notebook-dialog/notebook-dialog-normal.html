@@ -81,7 +81,7 @@
 			</md-button>
 			<span flex></span>
 			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
-			<md-button ng-disabled="postForm.$invalid"
+			<md-button ng-disabled="postForm.$invalid || !$ctrl.currentNotebook.description"
 			           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
 				{{$ctrl.postDetails.button.text}}
 			</md-button>
