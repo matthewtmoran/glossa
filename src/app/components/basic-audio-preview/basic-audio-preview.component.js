@@ -30,6 +30,15 @@ export const basicAudioPreviewComponent = {
       this.audio.addEventListener('timeupdate', this.timeupdate.bind(this));
     }
 
+    $onDestroy() {
+
+      if (this.isPlaying) {
+        this.playAudio();
+      }
+      // this.audio = null;
+      // this.audio.removeAllListeners();
+    }
+
     reset() {
       this.audio.addEventListener('timeupdate', this.timeupdate.bind(this));
     }
