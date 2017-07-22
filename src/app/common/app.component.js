@@ -134,6 +134,8 @@ export const appComponent = {
 
     $onInit() {
 
+      angular.element('.loading-spinner').fadeOut();
+
       this.simplemdeToolbar = [
         {
           name: "italic",

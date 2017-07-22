@@ -37,11 +37,14 @@ window.onload = () => {
   angular.module('config').constant('__appData', appData);
   console.log('appData', appData);
 
+
   //handles click events on links that should open with default browser
   angular.element(document).on('click', 'a[href^="http"]', function(event) {
     event.preventDefault();
     shell.openExternal(this.href);
   });
+
+
 
   //bootstrap angular
   angular.bootstrap(document, [root]);
