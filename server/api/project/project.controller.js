@@ -170,7 +170,7 @@ exports.importProject = (req, res) => {
   let rootPath = app.getPath('userData');
   fse.remove(path.join(rootPath, 'storage'), (err) => {
     let zip = new AdmZip(req.body.projectPath);
-    zip.extractAllToAsync (rootPath, true, () => {
+    zip.extractAllToAsync(rootPath, true, () => {
 
       User.loadDatabase();
       Notebooks.loadDatabase();
@@ -379,7 +379,7 @@ function resolveAndUpdateUser() {
         reject(err);
       }
       if (user.avatar) {
-        user.avatar = resolvePath(user.avatar, 'image');
+        user.avatar.absolutePath = resolvePath(user.avatar.absolutePath, 'image');
       }
       let options = {returnUpdatedDocs: true};
       User.update({_id: user._id}, user, options, (err, updatedCount, updatedDoc) => {

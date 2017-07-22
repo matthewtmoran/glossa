@@ -35,16 +35,12 @@ window.onload = () => {
 
   const appData = electron.remote.getGlobal('appData');
   angular.module('config').constant('__appData', appData);
-  console.log('appData', appData);
-
 
   //handles click events on links that should open with default browser
   angular.element(document).on('click', 'a[href^="http"]', function(event) {
     event.preventDefault();
     shell.openExternal(this.href);
   });
-
-
 
   //bootstrap angular
   angular.bootstrap(document, [root]);
@@ -129,8 +125,10 @@ export const root = angular
   .run(($rootScope, $state, $injector, $window, RootService, $mdUtil, $compile, IpcSerivce, $transitions, __appData) => {
     'ngInject';
 
-    if (__appData.initialState.session.currentState.length > 0) {
+    if (__appData.initialState.session.currentState && __appData.initialState.session.currentState.length > 0) {
       $state.go(__appData.initialState.session.currentState);
+    } else {
+      $state.go('notebook');
     }
 
     $transitions.onStart({to: '*', from: '*'}, (trans) => {
