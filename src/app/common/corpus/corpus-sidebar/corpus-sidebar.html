@@ -3,13 +3,13 @@
         md-is-locked-open="true"
         class="md-whiteframe-4dp"
         layout-column>
+  <md-button id="uploadButton"
+             class="md-button md-fab md-grey-fab md-fab-bottom-left"
+             ng-click="$ctrl.createNewMarkdown()"
+             aria-label="attach_file">
+    <md-icon class="material-icons">add</md-icon>
+  </md-button>
   <md-content layout-fill role="navigation">
-    <md-button id="uploadButton"
-               class="md-button md-fab md-grey-fab md-fab-bottom-left"
-               ng-click="$ctrl.createNewMarkdown()"
-               aria-label="attach_file">
-      <md-icon class="material-icons">add</md-icon>
-    </md-button>
     <md-list>
 
       <md-list-item ng-if="!$ctrl.transcriptions.length" class="md-2-line" ng-click="$ctrl.createNewMarkdown()">
