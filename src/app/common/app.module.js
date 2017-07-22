@@ -40,10 +40,6 @@ export const app = angular
           settings: (__appData) => __appData.initialState.settings,
           notebooks: (__appData) => __appData.initialState.notebooks,
           transcriptions: (__appData) => __appData.initialState.transcriptions,
-          // determineState: (($timeout, __appData, $state) => {
-          //   $state.go(__appData.initialState.session.currentState);
-          // })
-
         },
         component: 'app',
       });

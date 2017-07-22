@@ -18,15 +18,6 @@ export const baseline = angular
         params: {
           fileId: ''
         },
-        resolve: {
-          // selectedFile: function ($transition$, markDownFiles) {
-          //   console.log('resolve started for baseline component');
-          //
-          //   let mdFile = markDownFiles.find(selectedFile => selectedFile._id == $transition$.params().fileId);
-          //   console.log('resolve returning', !!mdFile);
-          //   return mdFile;
-          // }
-        },
       });
   })
   .name;

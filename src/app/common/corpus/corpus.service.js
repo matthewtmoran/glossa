@@ -8,13 +8,6 @@ export class CorpusService {
     this.$q = $q;
     this.parseService = ParseService;
 
-    // console.log('calling user api');
-    // this.$http.get('api/user').then((response) => {
-    //   console.log('user api resolved');
-    //   this.__user = response.data
-    // });
-
-    //TODO: refractor the use of __user constant
   }
 
   //get all md files

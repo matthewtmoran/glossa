@@ -66,7 +66,7 @@ export const corpusComponent = {
       } else {
         this.selectFile({fileId: this.transcriptions[0]._id});
       }
-      this.selectedIndex = this.$state.current.name = 'meta' ? 0 : 1;
+      this.selectedIndex = this.$state.current.name === 'baseline' ? 1: 0;
     }
 
     newAttachment(event) {

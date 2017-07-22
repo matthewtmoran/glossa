@@ -71,16 +71,9 @@ export const root = angular
   .component('root', rootComponent)
   .service('RootService', RootService)
   .service('NotificationService', NotificationService)
-  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider, $stateProvider, __appData, $transitionsProvider) => {
+  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider) => {
     'ngInject';
     $locationProvider.html5Mode(true);
-    // $urlRouterProvider.otherwise('/app/notebook');
-``
-    // $stateProvider.transitionTo(__appData.initialState.session.currentState);
-    // $urlRouterProvider.when('', '/app/corpus');
-
-
-
     //material theme stuff...
     const customAccent = {
       '50': '#b80000',
@@ -120,7 +113,6 @@ export const root = angular
         '200', '300', '400', 'A100'],
       'contrastLightColors': undefined    // could also specify this if default was 'dark'
     };
-
     $mdThemingProvider.definePalette('customAccent', customAccent);
     $mdThemingProvider.definePalette('glossaPalette', glossaPalette);
 
@@ -135,10 +127,37 @@ export const root = angular
     'ngInject';
 
     if (__appData.initialState.session.currentState.length > 0) {
-      console.log('on run, going to state:', __appData.initialState.session.currentState);
       $state.go(__appData.initialState.session.currentState);
     }
 
+    $transitions.onStart({to: '*', from: '*'}, (trans) => {
+      console.log('$transitions onStart');
+      let toState = trans.$to();
+      //This keeps the state from redirecting away from the child state when that same child state is clicked.
+      let redirect = toState.redirectTo;
+      if (redirect) {
+        console.log('Redirect is happening');
+        if (angular.isString(redirect)) {
+          // event.preventDefault();
+          $state.go(redirect, toState.params);
+        }
+        else {
+          console.log('no redirect...');
+          let newState = $injector.invoke(redirect, null, {toState: toState.name, toParams: toState.params});
+          if (newState) {
+            if (angular.isString(newState)) {
+              console.log('going to newstate');
+              $state.go(newState);
+            }
+            else if (newState.state) {
+              // event.preventDefault();
+              console.log('going to some other state');
+              $state.go(toState.name, toState.params);
+            }
+          }
+        }
+      }
+    });
 
     $transitions.onSuccess('*', (trans) => {
       let currentState = trans.router.stateService.current.name;
@@ -152,35 +171,6 @@ export const root = angular
       $mdUtil.nextTick(() => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
     });
 
-    $transitions.onStart({to: '*', from: '*'}, ($transitions) => {
-
-      //This keeps the state from redirecting away from the child state when that same child state is clicked.
-      // let redirect = toState.redirectTo;
-      // if (redirect) {
-      //   console.log('Redirect is happening');
-      //   if (angular.isString(redirect)) {
-      //     // event.preventDefault();
-      //     $state.go(redirect, toState.params);
-      //   }
-      //   else {
-      //     console.log('no redirect...');
-      //     let newState = $injector.invoke(redirect, null, {toState: toState.name, toParams: toState.params});
-      //     if (newState) {
-      //       if (angular.isString(newState)) {
-      //         console.log('going to newstate');
-      //         $state.go(newState);
-      //       }
-      //       else if (newState.state) {
-      //         // event.preventDefault();
-      //         console.log('going to some other state');
-      //         $state.go(toState.name, toState.params);
-      //       }
-      //     }
-      //   }
-      // }
-
-
-    });
   })
   .name;
 

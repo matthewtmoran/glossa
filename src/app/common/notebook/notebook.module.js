@@ -27,18 +27,11 @@ export const notebook = angular
       .state('notebook', {
         parent: 'app',
         url: '/notebook',
-        // abstract: true,
         component: 'notebook',
         params: {
           user: {},
           corpus: 'default'
         },
-        resolve: {
-          currentState: ($transition$) => {
-            // return $transition$.
-          },
-          // notebooksData: NotebookService => NotebookService.getNotebooks()
-        }
       })
   })
   .filter('exists', Exists)

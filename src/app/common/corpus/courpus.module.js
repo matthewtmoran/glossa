@@ -20,21 +20,11 @@ export const corpus = angular
       .state('corpus', {
         parent: 'app',
         url: '/corpus',
-        // abstract: true,
-        // redirectTo:'meta',
         component: 'corpus',
         params: {
           user: {},
           corpus: 'default'
         },
-        resolve: {
-          markDownFiles: (CorpusService, $stateParams) => {
-            return CorpusService.getFiles($stateParams.corpus)
-          },
-          currentState: ($transition$) => {
-            // return $transition$.
-          }
-         }
       })
   })
   .service('CorpusService', CorpusService)
