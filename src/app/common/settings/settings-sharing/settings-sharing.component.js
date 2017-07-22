@@ -15,12 +15,11 @@ export const settingsSharingComponent = {
   },
   templateUrl,
   controller: class SettingsSharingComponent {
-    constructor($q, RootService, SocketService, DialogService, cfpLoadingBar) {
+    constructor($q, RootService, DialogService, cfpLoadingBar) {
       'ngInject';
 
       this.$q = $q;
       this.rootService = RootService;
-      this.socketService = SocketService;
       this.dialogService = DialogService;
       this.cfpLoadingBar = cfpLoadingBar;
 

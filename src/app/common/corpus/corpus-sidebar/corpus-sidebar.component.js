@@ -4,8 +4,8 @@ export const corpusSidebarComponent = {
   bindings: {
     searchText: '<',
     selectedFile: '<',
-    markDownFiles: '<',
-    fileSelection: '&',
+    transcriptions: '<',
+    onSelectFile: '&',
     onNew: '&'
   },
   templateUrl,
@@ -28,21 +28,22 @@ export const corpusSidebarComponent = {
         this.selectedFile = angular.copy(changes.selectedFile.currentValue);
       }
 
-      if (changes.markDownFiles) {
-        this.markDownFiles = angular.copy(changes.markDownFiles.currentValue);
+      if (changes.transcriptions) {
+        this.transcriptions = angular.copy(changes.transcriptions.currentValue);
       }
 
     }
 
     $onInit() {
+
     }
 
     createNewMarkdown() {
       this.onNew()
     }
 
-    onSelection(fileId) {
-      this.fileSelection({
+    selectFile(fileId) {
+      this.onSelectFile({
         $event: {
           fileId: fileId
         }

@@ -27,7 +27,6 @@ export const app = angular
 
     $stateProvider
       .state('app', {
-        // redirectTo: 'corpus',
         url: '/app',
         data: {
           requiredAuth: false,
@@ -40,6 +39,11 @@ export const app = angular
           project: (__appData) => __appData.initialState.project,
           settings: (__appData) => __appData.initialState.settings,
           notebooks: (__appData) => __appData.initialState.notebooks,
+          transcriptions: (__appData) => __appData.initialState.transcriptions,
+          // determineState: (($timeout, __appData, $state) => {
+          //   $state.go(__appData.initialState.session.currentState);
+          // })
+
         },
         component: 'app',
       });

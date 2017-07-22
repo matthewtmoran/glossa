@@ -4,14 +4,13 @@ var ipc = window.require('electron').ipcRenderer;
 var dialog = window.require('electron').remote.dialog;
 
 export class RootService {
-  constructor($http, $rootScope, $state, $window, SocketService, NotificationService, Upload, cfpLoadingBar, IpcSerivce, __appData) {
+  constructor($http, $rootScope, $state, $window, NotificationService, Upload, cfpLoadingBar, IpcSerivce, __appData) {
     'ngInject';
 
     this.$http = $http;
     this.$rootScope = $rootScope;
     this.$state = $state;
     this.$window = $window;
-    this.socketService = SocketService;
     this.NotificationService = NotificationService;
     this.Upload = Upload;
     this.cfpLoadingBar = cfpLoadingBar;
@@ -24,6 +23,7 @@ export class RootService {
     ipc.on('import:project', this.ipcImportProject.bind(this));
 
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
+
 
     //this overwrites events even if input/codemirror/siimplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
@@ -112,7 +112,6 @@ export class RootService {
       }
     );
   }
-
 
 
   updateSettings(settings) {
@@ -269,9 +268,6 @@ export class RootService {
 
         this.ipcSerivce.send('broadcast:profile-updates');
 
-        // this.socketService.emit('broadcast:profile-updates');
-
-
         return response.data;
       })
       .catch((response) => {
@@ -315,201 +311,14 @@ export class RootService {
 
   //TODO: Refractor
   toggleFollow(user) {
-
     this.ipcSerivce.send('update:following', {user:  angular.toJson(user)})
-
-  }
-
-//TODO: consider deletion
-  getOnlineUsersSE() {
-    this.socketFactory.emit('get:networkUsers')
   }
 
 
   //TODO: refractor
   //broadcast updates to users that follow
   broadcastUpdates(data) {
-
     this.ipcSerivce.send('broadcast:Updates', data);
-
-    // this.socketService.emit('broadcast:Updates', data);
-  }
-
-
-  //called when application is bootstrapped
-  initListeners() {
-    console.log('initListeners');
-
-    // hand shake
-    this.socketService.on('request:SocketType', (data) => {
-      console.log("Heard 'request:SocketType' in rootService:", data);
-
-      // let msg = 'server requesting socket type... ';
-      // let delay = 3000;
-      //
-      //
-      // this.NotificationService.show({
-      //   message: msg,
-      //   hideDelay: delay
-      // });
-
-      // let socketData = {
-      //   type: 'local-client',
-      //   socketId: data.socketId
-      // };
-
-      // console.log('Emitting: return:SocketType');
-      // this.socketService.emit('return:SocketType', socketData);
-
-    });
-
-    // handshake success
-    this.socketService.on('notify:server-connection', (data) => {
-      console.log("Heard 'notify:server-connection' in rootService.data:", data);
-
-      // let msg = 'connected to local server';
-      // let delay = 3000;
-      //
-      // this.NotificationService.show({
-      //   message: msg,
-      //   hideDelay: delay
-      // });
-
-    });
-
-    //any time external client this should be heard
-    this.socketService.on('send:updatedUserList', (data) => {
-      console.log('Heard : send:updatedUserList in app.service', data.onlineUsers);
-
-      let onlineClients = [];
-      data.onlineUsers.forEach((client) => {
-        if (client.online) {
-          onlineClients.push(client);
-        }
-      });
-
-      let msg = `Users list count: ${onlineClients.length}`;
-      let delay = 3000;
-
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
-
-
-      // checkForUpdates(data.onlineUsers);
-
-      console.log('Angular broadcast event: update:networkUsers');
-      this.$rootScope.$broadcast('update:networkUsers', {onlineUsers: data.onlineUsers});
-
-    });
-
-    //normalize notebooks when data changes
-    this.socketService.on('normalize:notebooks', (data) => {
-      console.log('Heard : normalize:notebooks in root.service', data);
-
-      this.$rootScope.$broadcast('normalize:notebooks', data)
-
-    });
-
-    //when external-client disconnects
-    this.socketService.on('userDisconnected', (data) => {
-      console.log('$broadcast : update:networkUsers:disconnect');
-      this.$rootScope.$broadcast('update:networkUsers:disconnect', data)
-    });
-
-    //when external-client makes changes
-    this.socketService.on('notify:externalChanges', (data) => {
-      console.log('on:: notify:externalChanges', data);
-      // let msg = `Data synced with ${data.connection.name}`;
-      // let delay = 3000;
-      //
-      // this.NotificationService.show({
-      //   message: msg,
-      //   hideDelay: delay
-      // });
-
-      console.log('$broadCast event update:externalData');
-      this.$rootScope.$broadcast('update:externalData', data);
-    });
-
-    this.socketService.on('update:external-client', (data) => {
-      console.log("Heard : update:external-client in app.service");
-
-      let msg = `User ${data.createdBy._id}`;
-      let delay = 3000;
-
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
-
-      this.$rootScope.$broadcast('update:externalData', {updatedData: data});
-    });
-
-    //update dynamic data that connection may update manually
-    this.socketService.on('update:connectionInfo', (data) => {
-      console.log('on:: update:connectionInfo', data);
-
-      console.log('angular broadcast:: update:connection');
-      this.$rootScope.$broadcast('update:connection', data);
-
-    });
-
-    //update connection
-    this.socketService.on('update:connection', (data) => {
-      console.log('on:: update:connection - data');
-      console.log('angular event $broadcast:: update:connection');
-      this.$rootScope.$broadcast('update:connection', data);
-    });
-
-    //Listen for connections list
-    //broadcast all connections to controllers that display connections
-    //here we track the entire user list and add or remove users ids from an array.
-    this.socketService.on('send:connections', (data) => {
-      console.log('on:: send:connections');
-      console.log('$broadcast:: update:connections');
-      this.$rootScope.$broadcast('update:connections', data);
-    });
-
-    //TODO: currently we do not use consider using socket vs http
-    this.socketService.on('import:project', (data) => {
-      alert('importing project....');
-    });
-
-    /////////////////
-    //Newer Methods//
-    /////////////////
-
-    /**
-     * Socket handshake
-     */
-    // this.socketService.on('request:socket-type', () => {
-    //   console.log('on:: request:socket-type');
-    //   console.log('emit:: return:socket-type');
-    //   this.socketService.emit('return:socket-type', {type: 'local-client'});
-    // });
-
-
-    this.socketService.on('notify:sync-begin', () => {
-      console.log('on:: notify:sync-begin');
-
-      let msg = `Data Syncing`;
-      let delay = 3000;
-
-      this.NotificationService.show({
-        message: msg,
-        hideDelay: delay
-      });
-
-      this.cfpLoadingBar.start();
-    });
-
-    this.socketService.on('notify:sync-end', () => {
-      console.log('on:: notify:sync-end');
-      this.cfpLoadingBar.complete();
-    })
-
   }
 
 }

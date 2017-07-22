@@ -9,24 +9,24 @@ export const baselineComponent = {
   },
   templateUrl,
   controller: class BaselineComponent {
-    constructor($scope, $timeout, NotebookService, cfpLoadingBar) {
+    constructor($scope, $timeout, cfpLoadingBar, NotebookService) {
       'ngInject';
 
-      this.$timeout = $timeout;
       this.$scope = $scope;
-      this.notebookService = NotebookService;
+      this.$timeout = $timeout;
       this.cfpLoadingBar = cfpLoadingBar;
+
+      this.notebookService = NotebookService;
 
       this.doc = {};
       this.isDoubleClick = false;
       this.isLoadingCodeMirror = true;
 
-
       this.codemirrorLoaded = this.codemirrorLoaded.bind(this);
       this.enterEvent = this.enterEvent.bind(this);
       this.clockFormat = this.clockFormat.bind(this);
 
-      //TODO: refractor listener so service.......
+      //TODO: refractor listener so service....... or pass up and down componenents
       this.$scope.$on('send:timeStamp', this.insertTimestamp.bind(this))
 
     }

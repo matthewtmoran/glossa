@@ -19,8 +19,18 @@ module.exports = {
 
     ipcUtil.on('combine:notebooks', onCombineNotebooks);
 
+    ipcUtil.on('update:session', onUpdateSession);
 
 
+    function onUpdateSession(event, session) {
+      console.log("onUpdateSession");
+      console.log("session", session);
+      socketUtil.saveSession(session)
+        .then((data) => {
+          global.appData.initialState.session = Object.assign({}, data);
+          event.sender.send('update-session-data');
+        });
+    }
 
     function windowLoaded() {
       console.log('window:loaded ipc from local-client');

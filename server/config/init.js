@@ -1,14 +1,14 @@
 const path = require('path');
 const fs = require('fs');
-var Project = require(path.join(__dirname, '../api/project/project.model'));
-var User = require(path.join(__dirname, '../api/user/user.model'));
-var Notebook = require(path.join(__dirname, '../api/notebook/notebook.model'));
-var Session = require(path.join(__dirname, '../api/session/session.model'));
-var Settings = require(path.join(__dirname, '../api/settings/settings.model'));
-var Connections = require(path.join(__dirname, '../api/connections/connection.model'));
-var Transcriptions = require(path.join(__dirname, '../api/transcription/transcription.model'));
-var Hashtags = require(path.join(__dirname, '../api/hashtag/hashtag.model'));
-var q = require('q');
+const Project = require(path.join(__dirname, '../api/project/project.model'));
+const User = require(path.join(__dirname, '../api/user/user.model'));
+const Notebook = require(path.join(__dirname, '../api/notebook/notebook.model'));
+const Session = require(path.join(__dirname, '../api/session/session.model'));
+const Settings = require(path.join(__dirname, '../api/settings/settings.model'));
+const Connections = require(path.join(__dirname, '../api/connections/connection.model'));
+const Transcriptions = require(path.join(__dirname, '../api/transcription/transcription.model'));
+const Hashtags = require(path.join(__dirname, '../api/hashtag/hashtag.model'));
+const q = require('q');
 
 module.exports = {
   getInitialState: getInitialState
@@ -63,8 +63,6 @@ function getInitialState() {
         })
     );
 
-
-
     Promise.all(statePromises)
       .then((results) => {
         if (isFirstRun) {
@@ -82,10 +80,14 @@ function getInitialState() {
 }
 
 function normalizeInitialData(initialState) {
-  initialState.session.currentStateParams.user = initialState.user._id;
-  initialState.session.projectId = initialState.project._id;
+  // initialState.session.currentStateParams.user = initialState.user._id;
+  // initialState.session.projectId = initialState.project._id;
 
-  Session.update({_id: initialState.session._id}, initialState.session, {}, (err, updatedSessionCount) => {
+  const query = {_id: initialState.session._id};
+  const update = initialState.session;
+  const options = {};
+
+  Session.update(query, update, options, (err, updatedSessionCount) => {
     if(err) {
        return console.log('update session error');
     }
@@ -155,6 +157,7 @@ function getInitialSession() {
       if (err) {
         reject(err)
       }
+      console.log('found Session', session);
       if (!session) {
         resolve(buildInitialSession())
       }
@@ -170,14 +173,14 @@ function getInitialSession() {
 function buildInitialSession() {
   const session = {
     start: Date.now(),
-    currenteState: 'notebook',
+    currentState: 'notebook',
     projectId: '',
     currentStateParams: {}
   };
 
 
-  session.currentStateParams.user = '';
-  session.currentStateParams.corpus = 'default';
+  // session.currentStateParams.user = '';
+  // session.currentStateParams.corpus = 'default';
 
 
   return new Promise((resolve, reject) => {

@@ -4,20 +4,14 @@
 'use strict';
 
 module.exports = (bonjour, appData, win) => {
-  console.log('express called');
   const path = require('path');
-  console.log('debug1');
   const express = require('express');
-  console.log('debug2');
   const config = require(path.join(__dirname, './config/environment'));
   // Setup server
-  console.log('debug3');
   const app = express();
 
   const server = require('http').createServer(app);
-  console.log('debug4');
   const io = require('socket.io')(server);
-  console.log('debug5');
 
   require(path.join(__dirname, './config/express'))(app); //configuration for express
   require(path.join(__dirname, './routes'))(app); //routes

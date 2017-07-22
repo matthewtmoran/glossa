@@ -4,24 +4,27 @@ import { NotebookDialogController } from '../notebook/notebook-dialog/notebook-d
 
 export const corpusComponent = {
   bindings: {
-    markDownFiles: '<',
+    transcriptions: '<',
+    notebooks: '<',
     searchText: '<',
     hashtags: '<',
     settings: '<'
   },
   templateUrl,
   controller: class CorpusComponent {
-    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService, $mdToast, ParseService) {
+    constructor($scope, $mdDialog, CorpusService, cfpLoadingBar, DialogService, NotebookService, $mdToast, ParseService, $state) {
       'ngInject';
+      this.$scope = $scope;
+      this.$mdDialog = $mdDialog;
+      this.$state = $state;
+      this.$mdToast = $mdToast;
+
       this.cfpLoadingBar = cfpLoadingBar;
-      // this.$state = $state;
-      // this.filteredContacts = $filter('contactsFilter')(this.contacts, this.filter);
+
       this.corpusService = CorpusService;
       this.dialogService = DialogService;
       this.notebookService = NotebookService;
-      this.filteredFiles = [];
-      // this.selectedFile = {};
-      this.markDownFiles = [];
+
       this.editorOptions = {
         toolbar: false,
         status: false,
@@ -31,29 +34,17 @@ export const corpusComponent = {
         placeholder: 'Description...',
       };
 
-      this.$scope = $scope;
-      this.$mdDialog = $mdDialog;
-      this.$mdToast = $mdToast;
-
       this.$scope.$on('createNamedMarkdown', this.namedMarkdown.bind(this));
       this.$scope.$on('newMarkdown', this.newMarkdown.bind(this));
-
-      // this.newAttachment = this.newAttachment.bind(this);
 
     }
 
     $onChanges(changes) {
-      if (changes.markDownFiles) {
-        this.markDownFiles = angular.copy(changes.markDownFiles.currentValue);
-
-
-        if (this.markDownFiles.length < 1) {
-          this.selectedFile = null;
-        }
+      if (changes.transcriptions) {
+        this.transcriptions = angular.copy(changes.transcriptions.currentValue);
       }
       if (changes.searchText) {
         this.searchText = angular.copy(changes.searchText.currentValue);
-        // this.searchText = changes.searchText;
       }
       if (changes.notebookAttachment) {
         this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue)
@@ -64,14 +55,18 @@ export const corpusComponent = {
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
       }
+      if (changes.notebooks) {
+        this.notebooks = angular.copy(changes.notebooks.currentValue);
+      }
     }
 
     $onInit() {
-      if (this.markDownFiles.length > 0) {
-        this.fileSelection({fileId: this.markDownFiles[0]._id});
+      if (this.transcriptions.length < 1) {
+        this.selectedFile = null;
       } else {
-        this.selectedFile = {};
+        this.selectFile({fileId: this.transcriptions[0]._id});
       }
+      this.selectedIndex = this.$state.current.name = 'meta' ? 0 : 1;
     }
 
     newAttachment(event) {
@@ -87,9 +82,9 @@ export const corpusComponent = {
                 if (this.selectedFile.notebookId) {
                   this.getAttchachedNotebook(this.selectedFile.notebookId);
                 }
-                this.markDownFiles.map((file, index) => {
+                this.transcriptions.map((file, index) => {
                   if (file._id === this.selectedFile._id) {
-                    this.markDownFiles[index] = this.selectedFile;
+                    this.transcriptions[index] = this.selectedFile;
                   }
                 });
 
@@ -106,8 +101,8 @@ export const corpusComponent = {
       this.corpusService.createFile()
         .then((data) => {
           this.cfpLoadingBar.complete();
-          this.markDownFiles.push(data);
-          this.markDownFiles = angular.copy(this.markDownFiles);
+          this.transcriptions.push(data);
+          this.transcriptions = angular.copy(this.transcriptions);
           this.selectedFile = data;
           this.notebookAttachment = null;
         })
@@ -121,9 +116,9 @@ export const corpusComponent = {
       this.corpusService.createFile(data.name)
         .then((data) => {
           this.cfpLoadingBar.complete();
-          this.markDownFiles.push(data);
+          this.transcriptions.push(data);
           //copy data so reference is updated.
-          this.markDownFiles = angular.copy(this.markDownFiles);
+          this.transcriptions = angular.copy(this.transcriptions);
           this.selectedFile = data;
           this.notebookAttachment = null;
         })
@@ -152,9 +147,9 @@ export const corpusComponent = {
             .then((data) => {
 
               this.selectedFile = data;
-              this.markDownFiles.map((file, index) => {
+              this.transcriptions.map((file, index) => {
                 if (file._id === this.selectedFile._id) {
-                  this.markDownFiles[index] = this.selectedFile;
+                  this.transcriptions[index] = this.selectedFile;
                 }
               });
 
@@ -166,24 +161,17 @@ export const corpusComponent = {
         })
     }
 
-    fileSelection(event) {
-      this.selectedFile = this.markDownFiles.find(file => file._id == event.fileId);
+    //when a file is selected from the sidebar
+    selectFile(event) {
+      //set the selected file
+      this.selectedFile = this.transcriptions.find(file => file._id === event.fileId);
+      //if there is an attached notebook
       if (this.selectedFile.notebookId) {
-        this.getAttchachedNotebook(this.selectedFile.notebookId);
+        //get the attached notebook data
+        this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
       } else {
         this.notebookAttachment = null;
       }
-    }
-
-    getAttchachedNotebook(notebookId) {
-      if (!notebookId) {
-        this.notebookAttachment = null;
-        return;
-      }
-      this.notebookService.findNotebook(notebookId)
-        .then((data) => {
-          this.notebookAttachment = data;
-        })
     }
 
     updateMarkdown(event) {
@@ -193,13 +181,13 @@ export const corpusComponent = {
           this.cfpLoadingBar.complete();
           this.selectedFile = Object.assign({}, data);
           this.getAttchachedNotebook(this.selectedFile.notebookId);
-          this.markDownFiles.map((file, index) => {
+          this.transcriptions.map((file, index) => {
             if (file._id === this.selectedFile._id) {
-              this.markDownFiles[index] = this.selectedFile;
+              this.transcriptions[index] = this.selectedFile;
             }
           });
 
-          this.markDownFiles = angular.copy(this.markDownFiles);
+          this.transcriptions = angular.copy(this.transcriptions);
         })
         .catch((data) => {
           console.log('there was an issue', data)
@@ -224,17 +212,17 @@ export const corpusComponent = {
           this.corpusService.removeFile(this.selectedFile)
             .then((data) => {
 
-              this.markDownFiles.map((file, index) => {
+              this.transcriptions.map((file, index) => {
                 if (file._id === this.selectedFile._id) {
-                  this.markDownFiles.splice(index, 1);
+                  this.transcriptions.splice(index, 1);
                 }
               });
 
               //copy reference to trigger $onChanges in child components
-              this.markDownFiles = angular.copy(this.markDownFiles);
+              this.transcriptions = angular.copy(this.transcriptions);
 
-              if (this.markDownFiles.length > 0) {
-                this.fileSelection({fileId:this.markDownFiles[0]._id})
+              if (this.transcriptions.length > 0) {
+                this.fileSelection({fileId:this.transcriptions[0]._id})
               } else {
                 this.selectedFile = null;
               }
@@ -297,13 +285,6 @@ export const corpusComponent = {
 
     hide() {
       this.$mdDialog.hide();
-    }
-
-    update() {
-      console.log('NOT USED');
-    }
-    save() {
-      console.log('NOT USED');
     }
 
     disconnectNotebook(event) {

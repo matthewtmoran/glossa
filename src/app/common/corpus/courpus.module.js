@@ -21,7 +21,7 @@ export const corpus = angular
         parent: 'app',
         url: '/corpus',
         // abstract: true,
-        redirectTo:'meta',
+        // redirectTo:'meta',
         component: 'corpus',
         params: {
           user: {},

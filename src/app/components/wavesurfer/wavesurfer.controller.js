@@ -54,7 +54,6 @@ export class WaveSurferController {
   }
 
   $onInit() {
-    this.loading = true;
     this.speedIndex = 1;
   }
 
@@ -62,9 +61,6 @@ export class WaveSurferController {
     this.surfer.empty();
     this.surfer.drawBuffer();
   }
-
-
-
 
   resetWaveSurfer() {
     this.initWaveSurfer();
@@ -80,6 +76,7 @@ export class WaveSurferController {
   initWaveSurfer() {
     this.cfpLoadingBar.start();
     this.isReady = false;
+    this.loading = true;
     this.userSettings = this.settings;
 
     this.wavesurferProgress = 0;
@@ -124,25 +121,17 @@ export class WaveSurferController {
       };
 
       this.options = angular.extend(defaults, (this.playerProperties || {}), this.options);
-
-
-
       this.playerProperties = {};
-
-
-      console.log('waversurefer option we are initiating with: ', this.options);
 
       this.options = angular.extend({}, defaults, this.options);
       this.surfer = Object.create(WaveSurfer);
       this.surfer.init(this.options);
-      this.surfer.load(this.urlSrc);
 
       this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
 
       this.surfer.on('loading', (progress) => {
         this.wavesurferProgress = progress;
       });
-
 
       //occurs after waveform is drawn
       this.surfer.on('waveform-ready', () => {
@@ -163,14 +152,15 @@ export class WaveSurferController {
         // }
         // this.cfpLoadingBar.complete();
       });
-    };
+
+    }
+
+    this.surfer.load(this.urlSrc);
 
     //play event listener
     this.surfer.on('play', this.play.bind(this));
     //end of sound event listener
     this.surfer.on('finish', this.finish.bind(this));
-
-    // this.title = this.title || this.urlSrc.split('/').pop();
 
     if (!!this.imageSrc) {
       console.log("TODO: verify this works cross platform!!!");

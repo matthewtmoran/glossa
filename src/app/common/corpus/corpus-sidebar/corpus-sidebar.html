@@ -12,20 +12,20 @@
     </md-button>
     <md-list>
 
-      <md-list-item ng-if="!$ctrl.markDownFiles.length" class="md-2-line" ng-click="$ctrl.createNewMarkdown()">
+      <md-list-item ng-if="!$ctrl.transcriptions.length" class="md-2-line" ng-click="$ctrl.createNewMarkdown()">
          <md-item-content>
            <div class="md-list-item-text">
             <h3>Create New File</h3>
            </div>
          </md-item-content>
       </md-list-item>
-        <!--ng-repeat="file in $ctrl.markDownFiles | filter: $ctrl.searchText"-->
+        <!--ng-repeat="file in $ctrl.transcriptions | filter: $ctrl.searchText"-->
 
       <md-list-item
         ui-sref-active="fileSelected"
-        ng-repeat="file in $ctrl.markDownFiles | filter: $ctrl.searchText"
+        ng-repeat="file in $ctrl.transcriptions | filter: $ctrl.searchText"
         ng-class="{'active': $ctrl.selectedFile._id === file._id}"
-        ng-click="$ctrl.onSelection(file._id)"
+        ng-click="$ctrl.selectFile(file._id)"
         class="md-2-line">
         <a>
           <md-item-content md-ink-ripple layout="row" layout-align="start center">

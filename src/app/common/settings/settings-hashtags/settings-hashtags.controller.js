@@ -1,11 +1,10 @@
 export class SettingsHashtagsComponent {
-  constructor($q, RootService, SocketService, DialogService, cfpLoadingBar, $mdEditDialog, $scope) {
+  constructor($q, RootService, DialogService, cfpLoadingBar, $mdEditDialog, $scope) {
     'ngInject';
 
     this.$q = $q;
     this.$scope = $scope;
     this.rootService = RootService;
-    this.socketService = SocketService;
     this.dialogService = DialogService;
     this.cfpLoadingBar = cfpLoadingBar;
     this.$mdEditDialog = $mdEditDialog;

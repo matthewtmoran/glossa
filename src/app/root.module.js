@@ -8,85 +8,49 @@ import * as _ from "lodash"
 import ngMaterial from 'angular-material';
 import ngFileUpload from 'ng-file-upload';
 import CodeMirror from 'codemirror';
-
 import ngCodeMirror from 'ngCodemirror'
-
 import {rootComponent} from './root.component';
 import {common} from './common/common.module';
 import {RootService} from './root.service';
-import {SocketService} from './components/socket/socket.service';
 import {NotificationService} from './components/notification/notification.service';
 import {components} from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
-import io from 'socket.io-client';
 
 const electron = window.require('electron');
 var ipcRenderer = window.require('electron').ipcRenderer;
 var shell = window.require('electron').shell;
 //open links externally by default
 
-
-// var webFrame = electron.webFrame;
-// console.log('webFrame', webFrame);
-// webFrame.setVisualZoomLevelLimits(1, 1);
-// webFrame.setLayoutZoomLevelLimits(0, 0);
-
 //TODO: figure out how to make this shit modular and WORK
 angular.module('config', []);
 //needed for ui-codemirror not sure this is the best way to bind to window objet
 window.CodeMirror = CodeMirror;
-// let ioRoom = window.location.origin;
-// window.socket = io(ioRoom);
-// window.socket.on('request:socket-type', () => {
-//   console.log('request:SocketType');
-//   window.socket.emit('return:socket-type', {type: 'local-client'})
-// });
 
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
-
-  console.log('window.onload event');
-
-
+  //TODO: change rootUrl to come from server... global.appData.initialstate etc....
   const rootUrl = 'http://localhost:9000/';
-  let initInjector = angular.injector(['ng']);
-  let $http = initInjector.get('$http');
-  let $timeout = initInjector.get('$timeout');
-  let $animate = initInjector.get('$animate');
-
   angular.module('config').constant('__rootUrl', rootUrl);
-  // angular.module('config').constant('isWindows', isWindows);
 
   const appData = electron.remote.getGlobal('appData');
-
+  angular.module('config').constant('__appData', appData);
   console.log('appData', appData);
 
-  angular.module('config').constant('__appData', appData);
-
+  //handles click events on links that should open with default browser
   angular.element(document).on('click', 'a[href^="http"]', function(event) {
     event.preventDefault();
     shell.openExternal(this.href);
   });
 
+  //bootstrap angular
   angular.bootstrap(document, [root]);
 
-  ipcRenderer.send('window:loaded', {someData: 'my data is here'});
+  //let the server know the window has loaded.
+  ipcRenderer.send('window:loaded', {});
 
 };
 
-//   $http({
-//     url: `${rootUrl}api/user`,
-//     method: 'GET'
-//   }).then((res) => {
-//       //define some constant that we can inject through the application.
-//       // angular.module('config').constant('__user', res.data);
-//     }).catch((res) => {
-//       console.log('error', res);
-//     }).then(() => {
-//       angular.bootstrap(document, [root]);
-//     });
-// };
 //Not sure this only works if config is a string.  As a variable, it was failing hard.
 //     SimpleMDE,
 // 'ngSimple',
@@ -106,12 +70,16 @@ export const root = angular
   ])
   .component('root', rootComponent)
   .service('RootService', RootService)
-  .service('SocketService', SocketService)
   .service('NotificationService', NotificationService)
-  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider) => {
+  .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider, $stateProvider, __appData, $transitionsProvider) => {
     'ngInject';
     $locationProvider.html5Mode(true);
-    $urlRouterProvider.otherwise('/app/corpus');
+    // $urlRouterProvider.otherwise('/app/notebook');
+``
+    // $stateProvider.transitionTo(__appData.initialState.session.currentState);
+    // $urlRouterProvider.when('', '/app/corpus');
+
+
 
     //material theme stuff...
     const customAccent = {
@@ -160,81 +128,58 @@ export const root = angular
       .primaryPalette('glossaPalette')
       .accentPalette('customAccent');
 
+    //template for the loading spinner use material components
     cfpLoadingBarProvider.spinnerTemplate = `<md-progress-circular id="loading-spinner"  md-diameter="30"></md-progress-circular>`;
   })
-  .run(($rootScope, $state, $injector, $window, RootService, $transitions, SocketService, $mdUtil, $compile, IpcSerivce, __appData) => {
+  .run(($rootScope, $state, $injector, $window, RootService, $mdUtil, $compile, IpcSerivce, $transitions, __appData) => {
     'ngInject';
+
+    if (__appData.initialState.session.currentState.length > 0) {
+      console.log('on run, going to state:', __appData.initialState.session.currentState);
+      $state.go(__appData.initialState.session.currentState);
+    }
+
+
+    $transitions.onSuccess('*', (trans) => {
+      let currentState = trans.router.stateService.current.name;
+      let session = {
+        currentState: currentState,
+      };
+      IpcSerivce.send('update:session', session);
+    });
 
     $rootScope.$on('cfpLoadingBar:started', event => {
       $mdUtil.nextTick(() => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
     });
 
-    $state.go(__appData.initialState.session.currentState, __appData.initialState.session.currentStateParams);
-
-    //request user to get first state
-    //TODO: iniiate app with call to electrons appData api instead of ipc request
-    // RootService.getUserIpc();
-    // IpcSerivce.on('return:user', (event, data) => {
-    //   console.log('return:user', data);
-    //   $state.go(data.session.currentState, data.session.currentStateParams);
-    // });
-
-
-
-    // let sessionData = RootService.getUserIpc().session;
-    //
-    // $state.go(sessionData.session.currentState, sessionData.currentStateParams);
-
-    // RootService.getUser()
-    //   .then((data) => {
-    //     $state.go(data.session.currentState, data.session.currentStateParams);
-    //   });
-
-      //TODO: add check for sharing
-      // RootService.initListeners();
-
     $transitions.onStart({to: '*', from: '*'}, ($transitions) => {
-      let toState = $transitions.$to();
-      // let fromState = $transitions.$from();
-      // transition.$to()
-
-      let session = {
-        currentState: toState.name,
-        currentStateParams: toState.params
-      };
-      // __user.session.currentState = toState.name;
-      // __user.session.currentStateParams = toState.params;
-      //update session data in persistent storage every state change
-      //TODO: might just be able to use localstorage
-      // RootService.updateSession(session)
-      //   .then((data) => {
-      //     //update the __user object in memory
-      //     // console.log('updatedSession');
-      //     // __user.session = data.session;
-      //   });
 
       //This keeps the state from redirecting away from the child state when that same child state is clicked.
-      let redirect = toState.redirectTo;
-      if (redirect) {
-        console.log('Redirect is happening');
-        if (angular.isString(redirect)) {
-          // event.preventDefault();
-          $state.go(redirect, toState.params);
-        }
-        else {
-          let newState = $injector.invoke(redirect, null, {toState: toState.name, toParams: toState.params});
-          if (newState) {
-            if (angular.isString(newState)) {
-              // event.preventDefault();
-              $state.go(newState);
-            }
-            else if (newState.state) {
-              // event.preventDefault();
-              $state.go(toState.name, toState.params);
-            }
-          }
-        }
-      }
+      // let redirect = toState.redirectTo;
+      // if (redirect) {
+      //   console.log('Redirect is happening');
+      //   if (angular.isString(redirect)) {
+      //     // event.preventDefault();
+      //     $state.go(redirect, toState.params);
+      //   }
+      //   else {
+      //     console.log('no redirect...');
+      //     let newState = $injector.invoke(redirect, null, {toState: toState.name, toParams: toState.params});
+      //     if (newState) {
+      //       if (angular.isString(newState)) {
+      //         console.log('going to newstate');
+      //         $state.go(newState);
+      //       }
+      //       else if (newState.state) {
+      //         // event.preventDefault();
+      //         console.log('going to some other state');
+      //         $state.go(toState.name, toState.params);
+      //       }
+      //     }
+      //   }
+      // }
+
+
     });
   })
   .name;

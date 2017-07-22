@@ -15,7 +15,6 @@ export const userListComponent = {
     }
 
     $onChanges(changes) {
-      console.log('$onChanges in user-list.componentn', changes);
       if (changes.allConnections) {
         this.allConnections = angular.copy(changes.allConnections.currentValue);
       }
@@ -37,11 +36,5 @@ export const userListComponent = {
     exists(user) {
       return this.selected.indexOf(user._id) > -1;
     }
-
-    // $onInit() {
-    //   this.selected = [];
-    // }
-
-
   }
 };

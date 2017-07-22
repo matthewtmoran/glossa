@@ -35,24 +35,9 @@ export const rootComponent = {
     }
 
     $onInit() {
-      this.initIpcListeners()
-
 
     }
 
-    initIpcListeners() {
-
-
-
-      console.log('initIpcListeners')
-      // this.ipcSerivce.on('application:data', (event, data) => {
-      //   console.log('application:data');
-      //   console.log('event', event);
-      //   console.log('data', data);
-      // })
-
-
-    }
 
     minimize() {
       BrowserWindow.minimize();

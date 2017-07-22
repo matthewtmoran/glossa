@@ -3,6 +3,7 @@ var _ = require('lodash');
 var User = require('./../api/user/user.model.js');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 var Connection = require('./../api/connections/connection.model');
+var Session = require('./../api/session/session.model');
 var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
@@ -660,6 +661,33 @@ module.exports = {
           resolve('success')
         })
     });
+  },
+
+  saveSession(data) {
+    console.log('data', data);
+    return new Promise((resolve, reject) => {
+
+      Session.findOne({}, (err, session) => {
+        if (err) {
+          console.log('error finding state');
+          reject(err);
+        }
+
+        session.currentState = data.currentState;
+        // session.currentState = data.currentStateParams;
+
+        const options = {returnUpdatedDocs: true};
+        Session.update({_id: session._id}, session, options, (err, updatedCount, updatedDoc) => {
+          if (err) {
+            console.log('error updating state');
+            reject(err);
+          }
+          console.log('updatedDoc', updatedDoc);
+          resolve(updatedDoc)
+        })
+      });
+
+    })
   }
 
 

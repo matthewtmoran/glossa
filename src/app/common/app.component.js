@@ -9,6 +9,7 @@ import { NotebookDialogController } from './notebook/notebook-dialog/notebook-di
 export const appComponent = {
   bindings: {
     allConnections: '<',
+    transcriptions: '<',
     commonTags: '<',
     currentUser: '<',
     hashtags: '<',
@@ -20,7 +21,6 @@ export const appComponent = {
   controller: class AppComponent {
     constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce) {
       'ngInject';
-      console.log('AppComponent loaded............');
       this.$scope = $scope;
       this.$state = $state;
       this.$q = $q;
@@ -49,7 +49,6 @@ export const appComponent = {
 
       //called whne the connection list need to be updated
       this.ipcSerivce.on('update-connection-list', (event, data) => {
-
         console.log('on:: update-connection-list');
 
         this.allConnections = angular.copy(this.__appData.initialState.connections);
@@ -91,9 +90,6 @@ export const appComponent = {
           hideDelay: delay,
           action: action
         });
-
-
-
       });
 
       //removes sync-display
@@ -104,7 +100,11 @@ export const appComponent = {
 
       this.ipcSerivce.on('export:project', (event, data) => {
         this.exportProject({project:this.__appData.initialState.project});
-      })
+      });
+
+      // this.ipcSerivce.on('update-session-data', (event, data) => {
+      //   this.__appData.initialState.session = angular.copy(data);
+      // });
 
     }
 
@@ -126,6 +126,9 @@ export const appComponent = {
       }
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
+      }
+      if (changes.transcriptions) {
+        this.transcriptions = angular.copy(changes.transcriptions.currentValue);
       }
     }
 

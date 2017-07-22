@@ -10,8 +10,6 @@ var electronApp = require('electron').app;
 
 
 module.exports = function(app) {
-  console.log('debug routes1');
-
   // Insert routes below
   app.use('/api/project', require(path.join(__dirname,'./api/project')));
   app.use('/api/user', require(path.join(__dirname,'./api/user')));

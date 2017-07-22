@@ -16,8 +16,6 @@
     const electron = window.require('electron');
     const appData = electron.remote.getGlobal('appData');
 
-    console.log("test")
-
     document.body.classList.add("platform-" + process.platform);
 
     if (appData.isWindows) {
