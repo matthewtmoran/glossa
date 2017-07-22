@@ -174,13 +174,15 @@ export const corpusComponent = {
       }
     }
 
+    //TODO: pass this up to app.componenet;
     updateMarkdown(event) {
+      console.log('TODO: pass this event to App.component');
       this.cfpLoadingBar.start();
       this.corpusService.updateFile(event.file)
         .then((data) => {
           this.cfpLoadingBar.complete();
           this.selectedFile = Object.assign({}, data);
-          this.getAttchachedNotebook(this.selectedFile.notebookId);
+          this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
           this.transcriptions.map((file, index) => {
             if (file._id === this.selectedFile._id) {
               this.transcriptions[index] = this.selectedFile;

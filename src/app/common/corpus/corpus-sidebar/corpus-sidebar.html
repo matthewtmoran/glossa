@@ -20,11 +20,10 @@
            </div>
          </md-item-content>
       </md-list-item>
-        <!--ng-repeat="file in $ctrl.transcriptions | filter: $ctrl.searchText"-->
 
       <md-list-item
         ui-sref-active="fileSelected"
-        ng-repeat="file in $ctrl.transcriptions | filter: $ctrl.searchText"
+        ng-repeat="file in $ctrl.transcriptions | filter: $ctrl.searchText | orderBy: 'createdAt': true"
         ng-class="{'active': $ctrl.selectedFile._id === file._id}"
         ng-click="$ctrl.selectFile(file._id)"
         class="md-2-line">
