@@ -3,4 +3,10 @@ notebook-sidebar {
 	max-width: 25%;
 	max-height: 100%;
 	box-sizing: border-box;
+
+	.left-side {
+		max-width: 100%;
+		padding-left: 8px;
+		padding-right: 8px;
+	}
 }

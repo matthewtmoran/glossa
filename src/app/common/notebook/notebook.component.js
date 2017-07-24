@@ -211,14 +211,15 @@ export const notebookComponent = {
     }
 
 
-    toggleHashtags(tag) {
-      let idx = this.selectedHashtags.indexOf(tag._id);
+    toggleHashtags(event) {
+      let idx = event.list.indexOf(event.tag._id);
+      // let idx = this.selectedHashtags.indexOf(tag._id);
 
       if (idx > -1) {
         this.selectedHashtags.splice(idx, 1);
         this.selectedHashtags = angular.copy(this.selectedHashtags);
       } else {
-        this.selectedHashtags.push(tag._id);
+        this.selectedHashtags.push(event.tag._id);
         this.selectedHashtags = angular.copy(this.selectedHashtags);
       }
 

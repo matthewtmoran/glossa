@@ -2,7 +2,7 @@ import templateUrl from './tag-list.html';
 
 export const tagListComponent = {
   bindings: {
-    commonTag: '<',
+    commonTags: '<',
     selectedHashtags: '<',
     onToggleHashtags: '&',
     onTagManage: '&'
@@ -14,17 +14,15 @@ export const tagListComponent = {
     }
 
     $onChanges(changes) {
-      if (changes.allConnections) {
-        this.allConnections = angular.copy(changes.allConnections.currentValue);
-      }
-      if (changes.selected) {
-        this.selected = angular.copy(changes.selected.currentValue);
+      if (changes.selectedHashtags) {
+        this.selectedHashtags = angular.copy(changes.selectedHashtags.currentValue);
       }
     }
 
     toggleHashtags(tag) {
       this.onToggleHashtags({
         $event: {
+          list: this.selectedHashtags,
           tag: tag
         }
       })
@@ -32,6 +30,10 @@ export const tagListComponent = {
 
     tagManageDialog() {
       this.onTagManage()
+    }
+
+    exists(tag) {
+      return this.selectedHashtags.indexOf(tag._id) > -1;
     }
 
 
