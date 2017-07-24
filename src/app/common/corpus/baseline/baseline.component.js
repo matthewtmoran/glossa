@@ -3,9 +3,9 @@ import templateUrl from './baseline.html';
 export const baselineComponent = {
   bindings: {
     selectedFile: '<',
-    notebookAttached: '<',
+    notebookAttachment: '<',
     settings: '<',
-    onUpdate: '&'
+    onUpdateTranscription: '&'
   },
   templateUrl,
   controller: class BaselineComponent {
@@ -32,8 +32,8 @@ export const baselineComponent = {
     }
 
     $onChanges(changes) {
-      if (changes.notebookAttached) {
-        this.notebookAttached = angular.copy(changes.notebookAttached.currentValue)
+      if (changes.notebookAttachment) {
+        this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue)
       }
       if (changes.selectedFile) {
         this.currentFile = angular.copy(changes.selectedFile.currentValue);
@@ -46,7 +46,7 @@ export const baselineComponent = {
     //passes event up
     //save transcription content
     saveContent() {
-      this.onUpdate({$event: {file: this.currentFile}});
+      this.onUpdateTranscription({$event: {file: this.currentFile}});
     }
 
     //TODO: move to separate component

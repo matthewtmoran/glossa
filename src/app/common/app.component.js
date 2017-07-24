@@ -19,7 +19,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce) {
+    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce, CorpusService, $stateParams) {
       'ngInject';
       this.$scope = $scope;
       this.$state = $state;
@@ -28,6 +28,7 @@ export const appComponent = {
       this.$mdDialog = $mdDialog;
       this.notebookService = NotebookService;
       this.ipcSerivce = IpcSerivce;
+      this.$stateParams = $stateParams;
 
       this.__appData = __appData;
 
@@ -35,10 +36,10 @@ export const appComponent = {
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
+      this.corpusService = CorpusService;
 
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
-
       this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this));
       this.$scope.$on('update:externalData', this.updateExternalData.bind(this));
 
@@ -102,6 +103,19 @@ export const appComponent = {
         this.exportProject({project:this.__appData.initialState.project});
       });
 
+
+      this.ipcSerivce.on('update-transcription-list', (event, data) => {
+        console.log('update-transcription-list');
+        this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
+        //if a new file was created, data contains the id of the new file
+        if (data && data.selectedFileId) {
+          this.selectFile({fileId: data.selectedFileId}); // set the selected file
+        } else {
+          this.selectInitialFile(); //set to the first file in the list...
+        }
+        this.cfpLoadingBar.complete();
+      });
+
       // this.ipcSerivce.on('update-session-data', (event, data) => {
       //   this.__appData.initialState.session = angular.copy(data);
       // });
@@ -133,9 +147,8 @@ export const appComponent = {
     }
 
     $onInit() {
-
       angular.element('.loading-spinner').fadeOut();
-
+      this.selectInitialFile();
       this.simplemdeToolbar = [
         {
           name: "italic",
@@ -190,6 +203,180 @@ export const appComponent = {
         }
       ];
     }
+
+
+
+
+    //////////
+    //Corpus//
+    //////////
+
+    //select the initial file from transcriptions
+    selectInitialFile() {
+      if (this.transcriptions.length < 1) {
+        this.selectedFile = null;
+        this.notebookAttachment = null;
+      } else {
+        let latestFile = this.transcriptions.sort((a,b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        this.selectFile({fileId: latestFile[0]._id});
+      }
+    }
+
+    //select file event for new files and other events
+    selectFile(event) {
+      //set the selected file
+      this.selectedFile = this.transcriptions.find(file => file._id === event.fileId);
+      //if there is an attached notebook
+      if (this.selectedFile.notebookId) {
+        //get the attached notebook data
+        this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
+      } else {
+        this.notebookAttachment = null;
+      }
+    }
+
+
+    createTranscription(event) {
+      this.cfpLoadingBar.start();
+
+      let file = {
+        displayName: event && event.name ? event.name : 'untitled',
+        description: '',
+        content: '',
+        corpus: this.$stateParams.corpus,
+        createdAt: Date.now(),
+        createdBy: this.__appData.initialState.user._id,
+        projectId: this.__appData.initialState.project._id
+      };
+
+      this.ipcSerivce.send('create:transcription', file);
+
+    }
+
+    removeTranscription(event) {
+      let options = {
+        title: 'Are you sure you want to delete this text?',
+        textContent: ' ',
+        okBtn: 'Yes, Delete',
+        cancelBtn: 'No, cancel'
+      };
+      this.dialogService.confirmDialog(options)
+        .then((response) => {
+          if (!response) {
+            return;
+          }
+          this.cfpLoadingBar.start();
+          this.ipcSerivce.send('remove:transcription', {transcriptionId: event.fileId});
+        });
+    }
+
+    updateTranscription(event) {
+
+      this.corpusService.updateFile(event.file)
+        .then((data) => {
+
+          this.cfpLoadingBar.complete();
+
+          //update selected file
+          this.selectedFile = Object.assign({}, data);
+
+          //update atat
+          this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
+
+
+          this.transcriptions = this.transcriptions.map((file, index) => {
+            if (file._id !== this.selectedFile._id) {
+              return file;
+            }
+            return this.selectedFile;
+          });
+
+        })
+        .catch((data) => {
+          console.log('there was an issue', data)
+        });
+    }
+
+    disconnectNotebook(event) {
+      let options = {
+        title: 'Are you sure you want to disconnect this notebooks?',
+        textContent: 'By clicking yes, you will disconnect the Notebook and it\'s associated media from this file.'
+      };
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+          delete event.file.notebookId;
+          this.updateTranscription(event);
+        })
+    }
+
+    attachNotebook(event) {
+      event.settings = this.settings;
+
+      this.dialogService.mediaAttachment(event, this.selectedFile)
+        .then((result) => {
+          if (result) {
+
+            console.log('result', result);
+
+
+            this.updateTranscription({file:result})
+
+
+            // this.corpusService.updateFile(result)
+            //   .then((data) => {
+            //     this.cfpLoadingBar.complete();
+            //
+            //     this.selectedFile = Object.assign({}, data);
+            //
+            //     this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
+            //
+            //     this.transcriptions = this.transcriptions.map((file, index) => {
+            //       if (file._id !== this.selectedFile._id) {
+            //         return file;
+            //       }
+            //       return this.selectedFile;
+            //     });
+            //
+            //   })
+            //   .catch((data) => {
+            //     console.log('there was an issue', data)
+            //   });
+
+
+
+
+          }
+        });
+    }
+
+    disconnectMedia(event) {
+      let options = {
+        title: 'Are you sure you want to disconnect this media attachment?',
+        textContent: 'By clicking yes you will remove this media attachment from the application',
+      };
+
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+
+          this.cfpLoadingBar.start();
+          this.selectedFile.removeItem = []; //create this temp property to send to server
+          this.selectedFile.removeItem.push(event.media);
+          delete this.selectedFile[event.type]; //delete this property...
+
+          this.updateTranscription({file: this.selectedFile})
+        })
+    }
+
+
+
 
     ////////////
     //Settings//
@@ -439,6 +626,12 @@ export const appComponent = {
         title: "Are you sure you want to delete this post?",
         textContent: "By deleting this post... it wont be here anymore..."
       };
+
+      this.$mdDialog.show({
+        controller: () => this,
+
+      });
+
 
       this.dialogService.confirmDialog(options)
         .then((result) => {

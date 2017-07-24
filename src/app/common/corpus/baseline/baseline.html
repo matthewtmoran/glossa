@@ -4,11 +4,11 @@
 	</div>
 	<div ng-if="$ctrl.currentFile._id" layout="row">
 		<wave-surfer-full
-				ng-if="$ctrl.notebookAttached.audio.path || $ctrl.currentFile.audio.path"
+				ng-if="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path"
 				flex
 				settings="$ctrl.settings"
-				image-src="$ctrl.currentFile.image ? $ctrl.currentFile.image.path : $ctrl.notebookAttached.image.path"
-				url-src="$ctrl.notebookAttached.audio.path || $ctrl.currentFile.audio.path"
+				image-src="$ctrl.currentFile.image ? $ctrl.currentFile.image.path : $ctrl.notebookAttachment.image.path"
+				url-src="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path"
 		</wave-surfer-full>
 	</div>
 	<md-progress-circular class="loading-circular fade-out" ng-hide="!$ctrl.isLoadingCodeMirror" md-diameter="50"></md-progress-circular>

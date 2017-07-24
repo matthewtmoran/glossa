@@ -4,6 +4,7 @@ var User = require('./../api/user/user.model.js');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 var Connection = require('./../api/connections/connection.model');
 var Session = require('./../api/session/session.model');
+var Transcriptions = require('./../api/transcription/transcription.model');
 var path = require('path');
 var fs = require('fs');
 var config = require('./../config/environment/index');
@@ -688,7 +689,29 @@ module.exports = {
       });
 
     })
+  },
+
+  createTranscription(data) {
+    return new Promise((resolve, reject) => {
+      Transcriptions.insert(data, (err, insertedDoc) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(insertedDoc);
+      })
+    })
+  },
+  removeTranscription(transcriptionId) {
+    return new Promise((resolve, reject) => {
+      Transcriptions.remove({_id: transcriptionId}, {}, (err, removedCount) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(removedCount);
+      })
+    })
   }
+
 
 
 /////////////////////////////////////////////////////

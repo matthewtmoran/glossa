@@ -20,10 +20,10 @@
 		</md-input-container>
 	</form>
 	<div ng-if="$ctrl.currentFile._id" layout="row" layout-align="space-between center">
-		<md-button ng-click="$ctrl.deleteMarkdown($event)" class="md-warn">Delete Text
+		<md-button ng-click="$ctrl.removeTranscription($ctrl.currentFile._id)" class="md-warn">Delete Text
 		</md-button>
 		<md-button ng-disabled="$ctrl.currentFile.notebookId || ($ctrl.currentFile.image && $ctrl.currentFile.audio)"
-		           ng-click="$ctrl.addAttachment($event)">Attach
+		           ng-click="$ctrl.attachNotebook($event)">Attach
 		</md-button>
 	</div>
 	<div ng-if="$ctrl.currentFile._id" layout="column" class="attached-media">
@@ -43,8 +43,8 @@
 			</independent-media>
 			<!--Notebook Attachment-->
 			<notebook-card flex="50"
-			               ng-if="$ctrl.notebookAttached"
-			               notebook="$ctrl.notebookAttached"
+			               ng-if="$ctrl.notebookAttachment"
+			               notebook="$ctrl.notebookAttachment"
 			               settings="$ctrl.settings"
 			               current-user="$ctrl.currentUser"
 			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"

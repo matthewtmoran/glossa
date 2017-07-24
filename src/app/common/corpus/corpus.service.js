@@ -23,7 +23,6 @@ export class CorpusService {
 
   //update md file
   updateFile(file) {
-
     return this.$q.when(this.parseService.hashtags(file))
       .then((data) => {
         file.hashtags = data;
@@ -31,7 +30,6 @@ export class CorpusService {
           url:`/api/transcription/${file._id}`,
           method: 'PUT'
         };
-
         return this.uploadReq(file, options)
           .then((data) => {
             return data;
@@ -60,8 +58,11 @@ export class CorpusService {
       corpus: this.$stateParams.corpus,
       createdAt: Date.now(),
       createdBy: this.__appData.initialState.user._id,
-      projectId: this.__appData.initialState.session.projectId
+      projectId: this.__appData.initialState.project._id
     };
+
+
+
 
     return this.$http.post('/api/transcription', file)
       .then((response) => {

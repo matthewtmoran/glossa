@@ -4,7 +4,7 @@ export const navComponent = {
   bindings: {
     searchText: '<',
     onSearchSubmit: '&',
-    onCreateNewMarkdown: '&',
+    onCreateTranscription: '&',
     onClearSearch: '&',
     onCreate: '&'
   },
@@ -46,8 +46,13 @@ export const navComponent = {
 
     create() {
       if (this.$state.current.parent === 'corpus') {
-        this.rootService.tunnelEvent('createNamedMarkdown', {name: this.searchText});
+        this.onCreateTranscription({
+          $event: {
+            name: this.searchText
+          }
+        });
       }
+        // this.rootService.tunnelEvent('createNamedMarkdown', {name: this.searchText});
       this.onClearSearch({
         $event: {
           text: ''

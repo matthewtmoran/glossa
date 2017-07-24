@@ -21,6 +21,32 @@ module.exports = {
 
     ipcUtil.on('update:session', onUpdateSession);
 
+    ipcUtil.on('create:transcription', onCreateTranscription);
+    ipcUtil.on('remove:transcription', onRemoveTranscription);
+
+
+    function onRemoveTranscription(event, data) {
+      socketUtil.removeTranscription(data.transcriptionId)
+        .then((numRemoved) => {
+          global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(trans => trans._id !== data.transcriptionId);
+          event.sender.send('update-transcription-list');
+        })
+        .catch((err) => {
+          return console.log(' Error : ', err);
+        })
+
+    }
+
+    function onCreateTranscription(event, data) {
+      socketUtil.createTranscription(data)
+        .then((transcription) => {
+          global.appData.initialState.transcriptions = [transcription, ...global.appData.initialState.transcriptions];
+          event.sender.send('update-transcription-list', {selectedFileId: transcription._id});
+        })
+        .catch((err) => {
+          return console.log(' Error : ', err);
+        })
+    }
 
     function onUpdateSession(event, session) {
       console.log("onUpdateSession");

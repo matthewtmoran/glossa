@@ -2,15 +2,15 @@ import templateUrl from './meta.html';
 
 export const metaComponent = {
   bindings: {
-    notebookAttached: '<',
+    notebookAttachment: '<',
     selectedFile: '<',
     editorOptions: '<',
     settings: '<',
     hashtags: '<',
-    onUpdate: '&',
-    onAttachment: '&',
+    onUpdateTranscription: '&',
+    onAttachNotebook: '&',
     onRemoveMedia: '&',
-    onDeleteMarkdown: '&',
+    onRemoveTranscription: '&',
     onViewDetails: '&',
     onUpdateModel: '&',
     onDisconnectNotebook: '&'
@@ -25,8 +25,8 @@ export const metaComponent = {
       if (changes.selectedFile) {
         this.currentFile = angular.copy(changes.selectedFile.currentValue);
       }
-      if (changes.notebookAttached) {
-        this.notebookAttached = angular.copy(changes.notebookAttached.currentValue);
+      if (changes.notebookAttachment) {
+        this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue);
       }
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
@@ -41,9 +41,11 @@ export const metaComponent = {
       this.editorOptions.updateFunction = this.update.bind(this)
     }
 
-    //passes event up
+
+    //called on blur
+    //passed down to simplemde as well
     update(event) {
-      this.onUpdate({
+      this.onUpdateTranscription({
         $event: {
           file: this.currentFile
         }
@@ -51,8 +53,8 @@ export const metaComponent = {
     }
 
     //passes event up
-    addAttachment() {
-      this.onAttachment({
+    attachNotebook() {
+      this.onAttachNotebook({
         $event: {
           currentFile: this.currentFile
         }
@@ -71,10 +73,10 @@ export const metaComponent = {
     }
 
     //passes event up
-    deleteMarkdown() {
-      this.onDeleteMarkdown({
+    removeTranscription(fileId) {
+      this.onRemoveTranscription({
         $event: {
-          currentFile: this.currentFile,
+          fileId: fileId,
         }
       })
     }
