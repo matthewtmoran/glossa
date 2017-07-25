@@ -58,9 +58,9 @@ export const simplemdeComponent = {
         this.cm = this.mde.myCodeMirror; //should be codeMirror global object
         this.editor = this.mde.codemirror; //from text area codemirror object
 
+        this.render(this.valueBinding.description);
         this.editor.on('change', this.changeEvent.bind(this));
         this.editor.on('blur', this.blurEvent.bind(this));
-        this.render(this.valueBinding.description);
 
 
         this.cm.registerHelper('hint', 'hashtagHints', (editor) => {
@@ -74,9 +74,7 @@ export const simplemdeComponent = {
           if (curWord) {
             tag = curWord.charAt(0) === '#' ? curWord.slice(1) : '';
           }
-
           let regex = new RegExp('^' + tag, 'i'); //this is just the word
-
           let result = {
             list: (!tag ? [] : this.hashtags.filter((item) => {
               if (!item.tagDescription) {
@@ -87,7 +85,6 @@ export const simplemdeComponent = {
             from: this.cm.Pos(cur.line, start),
             to: this.cm.Pos(cur.line, end)
           };
-
           if (result) {
             this.cm.on(result, "pick", (item) => {
               let lengthOfTag = {line:result.to.line, ch: item.tag.length + 1 }; //the length of the tag plus the # char
@@ -144,10 +141,9 @@ export const simplemdeComponent = {
 
     //hashtags and hints
     showHashtagHints(instance, object) {
-      console.log('');
-
-      if (object.origin !== 'complete') {
-        instance.showHint({ hint: this.cm.hint.hashtagHints, completeSingle: false });
+      console.log('this.editor.hasFocus()', this.editor.hasFocus());
+      if (this.editor.hasFocus() && object.origin !== 'complete') {
+        instance.showHint({ hint: this.cm.hint.hashtagHints, completeSingle: false, closeOnUnfocus: true });
       }
 
 
