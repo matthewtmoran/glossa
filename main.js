@@ -8,7 +8,6 @@ const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 const express = require(path.join(__dirname, './server/app'));
 let BrowserWindow = electron.BrowserWindow;
-let bonjour = require('bonjour')();
 
 //for mac to decide what to do with window object.. to quit or hide...
 let forceQuit = false;
@@ -32,7 +31,7 @@ function startExpress() {
         isWindows: process.platform === 'win32'
       };
 
-      express(bonjour, appData[0], win);
+      express(appData[0]);
     });
 }
 startExpress();
@@ -55,9 +54,6 @@ function fsCheck() {
       fs.mkdirSync(storagePath);
     }
   });
-
-  console.log('done fs check');
-
 }
 
 function createWindow() {

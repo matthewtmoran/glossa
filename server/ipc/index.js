@@ -1,15 +1,16 @@
-var ipcUtil = require('./util');
-var socketUtil = require('../socket/socket-util');
-var myBonjour = require('../bonjour/index');
+const ipcUtil = require('./util');
+const socketUtil = require('../socket/socket-util');
+const udp = require('./udp');
+const main = require('../../main');
 let isRefresh = false;
 
-
 module.exports = {
-  init: function (server, bonjour, io, win) {
-    ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
-
+  init: function (server, bonjour, io) {
     //called on window load
     ipcUtil.on('window:loaded', windowLoaded);
+
+    ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
+
     //called when sharing is toggled
     ipcUtil.on('toggle:sharing', toggleSharing);
     //called when follow user is toggled
@@ -25,16 +26,32 @@ module.exports = {
     ipcUtil.on('remove:transcription', onRemoveTranscription);
 
 
-    function onRemoveTranscription(event, data) {
-      socketUtil.removeTranscription(data.transcriptionId)
-        .then((numRemoved) => {
-          global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(trans => trans._id !== data.transcriptionId);
-          event.sender.send('update-transcription-list');
-        })
-        .catch((err) => {
-          return console.log(' Error : ', err);
-        })
+    //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
+    function windowLoaded() {
+      //if we are sharing
+      if (global.appData.initialState.settings.isSharing) {
+        //if it's not merely a refresh
+        if (!isRefresh) {
+          isRefresh = true;
+          //get the main window object
+          main.getWindow((err, window) => {
+            if (err) {
+              return console.log('error getting window...', err);
+            }
+            //initial udp discovery
+            udp.init(server, io, window)
+          });
+        }
+      }
+    }
 
+    function onUpdateSession(event, session) {
+      console.log("onUpdateSession");
+      socketUtil.saveSession(session)
+        .then((data) => {
+          global.appData.initialState.session = Object.assign({}, data);
+          event.sender.send('update-session-data');
+        });
     }
 
     function onCreateTranscription(event, data) {
@@ -48,26 +65,17 @@ module.exports = {
         })
     }
 
-    function onUpdateSession(event, session) {
-      console.log("onUpdateSession");
-      console.log("session", session);
-      socketUtil.saveSession(session)
-        .then((data) => {
-          global.appData.initialState.session = Object.assign({}, data);
-          event.sender.send('update-session-data');
-        });
-    }
+    function onRemoveTranscription(event, data) {
+      socketUtil.removeTranscription(data.transcriptionId)
+        .then((numRemoved) => {
+          global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(trans => trans._id !== data.transcriptionId);
+          event.sender.send('update-transcription-list');
+        })
+        .catch((err) => {
+          return console.log(' Error : ', err);
+        })
 
-    function windowLoaded() {
-      console.log('window:loaded ipc from local-client');
-      if (global.appData.initialState.settings.isSharing) {
-        if (!isRefresh) {
-          isRefresh = true;
-          myBonjour.init(server, bonjour, io, win);
-        }
-      }
     }
-
 
     /**
      * when user toggles follow on an external client

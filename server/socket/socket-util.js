@@ -665,7 +665,6 @@ module.exports = {
   },
 
   saveSession(data) {
-    console.log('data', data);
     return new Promise((resolve, reject) => {
 
       Session.findOne({}, (err, session) => {
@@ -683,7 +682,6 @@ module.exports = {
             console.log('error updating state');
             reject(err);
           }
-          console.log('updatedDoc', updatedDoc);
           resolve(updatedDoc)
         })
       });

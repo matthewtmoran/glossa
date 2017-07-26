@@ -9,12 +9,12 @@ const app = require('electron').app;
 module.exports = {
   //this occurs when bonjour discovers an external server.
   //we are going to connect to the server as a client so the server can interact with us
-  initAsClient: function (service, me, io) {
+  init: function (service, io) {
 
     console.log('');
-    console.log('--- initAsClient called');
+    console.log('--- socketClient.init called');
 
-    let externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
+    let externalPath = 'http://' + service.addr + ':9000' ;
     let nodeClientSocket = require('socket.io-client')(externalPath, {forceNew: true});
 
 

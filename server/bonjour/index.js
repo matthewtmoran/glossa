@@ -38,7 +38,7 @@ module.exports.init = function (server, bonjour, io, win) {
   //if it's a glossa service and is not our own glossa service, connect to it as a client
   browser.on('up', function (service) {
     console.log('');
-    console.log('Service went/is live........', service.name);
+    console.log('Service is live........', service.name);
     if (service.name !== 'glossaApp-' + glossaUser._id) {
       console.log('((not our service))');
     }
@@ -47,7 +47,7 @@ module.exports.init = function (server, bonjour, io, win) {
     }
 
     console.log('Services on network:', browser.services.length);
-
+    console.log('');
     // make sure network service is a glossa instance....
     if (service.name.indexOf('glossaApp') > -1) {
       if (service.name === 'glossaApp-' + glossaUser._id) {
@@ -61,7 +61,6 @@ module.exports.init = function (server, bonjour, io, win) {
         //they will see our data through this
         //this is how we send out data
         require('../socket/socket-client').initAsClient(service, glossaUser, io)
-
       }
     }
   });
@@ -69,6 +68,7 @@ module.exports.init = function (server, bonjour, io, win) {
 };
 
 module.exports.disconnect = function(bonjour) {
+  console.log('');
   console.log('disconnect called...');
   bonjour.unpublishAll(() => {
     console.log('bonjour unpublished... ');

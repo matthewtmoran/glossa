@@ -58,7 +58,6 @@ function getInitialState() {
 
       getInitialHashtags()
         .then((data) => {
-          console.log('Initial hashtag length', data.length);
           initialState.hashtags = data
         })
     );
@@ -66,10 +65,8 @@ function getInitialState() {
     Promise.all(statePromises)
       .then((results) => {
         if (isFirstRun) {
-          console.log('this is a first run');
           resolve(normalizeInitialData(initialState))
         } else {
-          console.log('this is not a first run');
           resolve(initialState);
         }
       })
@@ -157,7 +154,6 @@ function getInitialSession() {
       if (err) {
         reject(err)
       }
-      console.log('found Session', session);
       if (!session) {
         resolve(buildInitialSession())
       }

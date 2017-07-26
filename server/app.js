@@ -3,15 +3,18 @@
  */
 'use strict';
 
-module.exports = (bonjour, appData, win) => {
+module.exports = (appData) => {
   const path = require('path');
   const express = require('express');
   const config = require(path.join(__dirname, './config/environment'));
   // Setup server
   const app = express();
-
   const server = require('http').createServer(app);
   const io = require('socket.io')(server);
+  const ipc = require('./ipc');
+
+
+
 
   require(path.join(__dirname, './config/express'))(app); //configuration for express
   require(path.join(__dirname, './routes'))(app); //routes
@@ -19,8 +22,10 @@ module.exports = (bonjour, appData, win) => {
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     // require ipc event...
-    require(path.join(__dirname, './ipc')).init(server, bonjour, io, win); //ipc event for communication between renderer / main process
+    ipc.init(server, io); //ipc event for communication between renderer / main process
   });
+
+
 
   function exitHandler(options, err) {
     console.log('exit handler from: ', options.from);

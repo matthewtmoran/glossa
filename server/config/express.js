@@ -34,7 +34,7 @@ module.exports = function(app) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));
     app.set('appPath', path.join(config.root, 'public'));
-    app.use(morgan('dev'));
+    // app.use(morgan('dev'));
   }
 
   if ('development' === env || 'test' === env) {
@@ -43,7 +43,7 @@ module.exports = function(app) {
     app.use(express.static(path.join(config.root, 'client')));
     app.use(express.static(path.join(config.root, 'server/data')));
     app.set('appPath', path.join(config.root, 'client'));
-    app.use(morgan('dev'));
+    // app.use(morgan('dev'));
     app.use(errorHandler()); // Error handler - has to be last
   }
 
@@ -53,7 +53,7 @@ module.exports = function(app) {
         app.use(express.static(path.join(config.root, 'dist')));
         app.use(express.static(path.join(config.root, 'server/data')));
         app.set('appPath', path.join(config.root, 'dist'));
-        app.use(morgan('dev'));
+        // app.use(morgan('dev'));
         app.use(errorHandler()); // Error handler - has to be last
     }
 };
