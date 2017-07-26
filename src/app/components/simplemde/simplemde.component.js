@@ -42,7 +42,15 @@ export const simplemdeComponent = {
     $onInit() {
       this.isLoading = true;
       this.hashReg = new RegExp("(^|\s)(#[a-z\d-]+)", "i");
+
       //TODO: should probably change data structure or hint source code
+      this.hashtagList = this.hashtags.map((tag) => {
+        tag.displayText = tag.tag;
+        tag.text = tag.tag;
+        tag.description = tag.description || '';
+        return tag;
+      });
+
       //timeout here so angular digest cycle is valid
       this.$timeout(() => {
         this.mde = new SimpleMDE(this.editorOptions);
@@ -69,12 +77,9 @@ export const simplemdeComponent = {
           //TODO: might want to change for more specific regex for accuracy
           let regex = new RegExp('^' + tag, 'i'); //this is just the word
           let result = {
-            list: (!tag ? [] : this.hashtags.filter((item) => {
-              if (!item.tagDescription) {
-                item.tagDescription = '';
-              }
+            list: (!tag ? [] : this.hashtagList.filter((item) => {
              // looking for whatever is typed in certain parameters in taglist
-             return item.tag.toLowerCase().indexOf(tag.toLowerCase()) > -1 || item.tagDescription.toLowerCase().indexOf(tag.toLowerCase()) > -1
+             return item.text.toLowerCase().indexOf(tag.toLowerCase()) > -1 || item.description.toLowerCase().indexOf(tag.toLowerCase()) > -1
             })).sort(),
             from: this.cm.Pos(cur.line, start),
             to: this.cm.Pos(cur.line, end)
