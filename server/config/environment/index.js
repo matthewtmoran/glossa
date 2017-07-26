@@ -3,7 +3,7 @@
 var path = require('path');
 var _ = require('lodash');
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
 
 function requiredProcessEnv(name) {
     if (!process.env[name]) {
@@ -36,7 +36,9 @@ var all = {
     dbPath: 'server/data/database/',
     imagePath: 'server/data/image',
     audioPath: 'server/data/audio',
-    markdownPath: 'server/data/markdown'
+    markdownPath: 'server/data/markdown',
+    newPathRoot: '/Glossa',
+
 
 
 };

@@ -1,0 +1,40 @@
+<div layout="column" class="audioPlayerWrapper">
+	<!--the wave graphic-->
+	<md-content flex class="wave-content-wrapper">
+		<div class="waveSurferWave">
+			<md-progress-linear ng-if="$ctrl.loading" class="md-warn"
+			                    md-mode="indeterminate"
+			                    value="{{$ctrl.wavesurferProgress}}">
+			</md-progress-linear>
+		</div>
+	</md-content>
+
+	<div flex="50" class="md-player-controls transparent md-fab-bottom-right">
+		<div  layout="row" layout-align="end center">
+			<md-button class="md-button md-fab md-mini"
+			           ng-click="$ctrl.surfer.skipBackward()">
+				<md-icon class="material-icons">fast_rewind</md-icon>
+			</md-button>
+
+			<md-button class="md-button md-fab md-mini"
+			           ng-disabled="!$ctrl.isReady"
+			           type="button"
+			           ng-click="$ctrl.surfer.playPause()">
+				<md-icon class="material-icons">{{$ctrl.surfer.isPlaying() ? 'pause' : 'play_arrow'}}</md-icon>
+			</md-button>
+
+			<md-button class="md-button md-fab md-mini"
+			           type="button"
+			           ng-click="$ctrl.surfer.skipForward()">
+				<md-icon class="material-icons">fast_forward</md-icon>
+			</md-button>
+
+			<md-button class="md-button md-fab md-mini"
+			           type="button"
+			           ng-click="$ctrl.adjustPlaySpeed()">
+				<md-icon class="material-icons">slow_motion_video</md-icon>
+			</md-button>
+			<span class="current-speed">{{$ctrl.playbackSpeed.label}}</span>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,104 @@
+<md-dialog class="post-dialog" aria-label="notebook dialog" flex-xs="90" flex-sm="75" flex-gt-sm="75">
+	<md-content>
+		<form name="postForm" ng-cloak>
+			<div layout="row" class="media-container">
+				<div layout="column"
+				     flex
+				     layout-align="center center"
+				     class="top-actions">
+
+					<md-button
+							ng-if="!$ctrl.currentNotebook.image"
+							ngf-select
+							name="imageUpload"
+							class="md-raised add-button"
+							ng-model="$ctrl.currentNotebook.image"
+							accept="image/*">
+						<span>Add Image</span>
+					</md-button>
+					<md-button
+							ng-if="!$ctrl.currentNotebook.audio"
+							ngf-select
+							name="audioUpload"
+							class="md-raised add-button"
+							ng-model="$ctrl.currentNotebook.audio"
+							accept="audio/*">
+						<span>Add Audio</span>
+					</md-button>
+
+					<div class="image-container">
+						<img ng-show="$ctrl.currentNotebook.image" ngf-src="$ctrl.imagePath"
+						     class="thumb image-preview">
+					</div>
+
+					<div class="remove-container" ng-class="{'dark-theme' :!$ctrl.currentNotebook.image}" layout="row"
+					     layout-align="start center">
+						<md-button ng-if="$ctrl.currentNotebook.image" class="md-icon-button remove-button"
+						           aria-label="Remove Button"
+						           ng-click="$ctrl.removeMedia($ctrl.currentNotebook.image); $ctrl.currentNotebook.image = null">
+							<!--<md-icon>cancel</md-icon>-->
+							<md-icon>visibility_off</md-icon>
+						</md-button>
+						<md-button ng-if="$ctrl.currentNotebook.audio" class="md-icon-button remove-button"
+						           aria-label="Remove Button"
+						           ng-click="$ctrl.removeMedia($ctrl.currentNotebook.audio); $ctrl.currentNotebook.audio = null">
+							<!--<md-icon>cancel</md-icon>-->
+							<md-icon>volume_off</md-icon>
+						</md-button>
+					</div>
+
+					<div flex class="audio-container" ng-if="$ctrl.currentNotebook.audio">
+						<wave-surfer-preview
+								ng-if="$ctrl.currentNotebook.audio"
+								flex
+								settings="$ctrl.settings"
+								url-src="$ctrl.audioPath"
+								auto-play="false">
+						</wave-surfer-preview>
+					</div>
+				</div>
+			</div>
+
+			<div class="no-padding content-container" flex layout-fill>
+
+				<!--<textarea name="" id="" cols="30" rows="10"></textarea>-->
+				<!--<md-input-container class="simplemde-wrapper" flex layout-fill>-->
+
+
+				<simplemde
+						hashtags="$ctrl.hashtags"
+						editor-options="$ctrl.editorOptions"
+						value-binding="$ctrl.currentNotebook"
+						update-model="$ctrl.updateModel($event)">
+				</simplemde>
+
+				<!--</md-input-container>-->
+			</div>
+		</form>
+		<div>
+			<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">
+				<md-icon>delete</md-icon>
+			</md-button>
+			<span flex></span>
+			<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>
+			<md-button ng-disabled="postForm.$invalid || !$ctrl.currentNotebook.description"
+			           ng-click="$ctrl.postDetails.button.action('Create Normal Post')">
+				{{$ctrl.postDetails.button.text}}
+			</md-button>
+		</div>
+	</md-content>
+
+
+	<!--<md-dialog-actions layout="row" class="top-border">-->
+	<!--<md-button ng-click="$ctrl.deleteNotebook($event)" ng-if="$ctrl.notebook._id" class="md-icon-button">-->
+	<!--<md-icon>delete</md-icon>-->
+	<!--</md-button>-->
+	<!--<span flex></span>-->
+	<!--<md-button ng-click="$ctrl.cancel($event)">Cancel</md-button>-->
+	<!--<md-button ng-disabled="postForm.$invalid"-->
+	<!--ng-click="$ctrl.postDetails.button.action('Create Normal Post')">-->
+	<!--{{$ctrl.postDetails.button.text}}-->
+	<!--</md-button>-->
+	<!--</md-dialog-actions>-->
+
+</md-dialog>

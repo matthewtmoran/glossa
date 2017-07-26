@@ -1,0 +1,56 @@
+<div class="meta" layout="column" flex>
+	<div layout="column" flex ng-if="!$ctrl.currentFile._id" layout-align="center center">
+		<h2>Select a text or create a new text</h2>
+	</div>
+	<form name="fileMeta" ng-if="$ctrl.currentFile._id">
+		<md-input-container class="md-block" flex-gt-sm="">
+			<label>File Name</label>
+			<input ng-blur="$ctrl.update('name', $ctrl.currentFile)"
+			       ng-model="$ctrl.currentFile.displayName"
+			       value="$ctrl.currentFile.displayName">
+		</md-input-container>
+		<md-input-container class="md-block">
+			<simplemde
+					hashtags="$ctrl.hashtags"
+					editor-options="$ctrl.editorOptions"
+					update-function="$ctrl.update($event)"
+					value-binding="$ctrl.currentFile"
+					update-model="$ctrl.updateModel($event)">
+			</simplemde>
+		</md-input-container>
+	</form>
+	<div ng-if="$ctrl.currentFile._id" layout="row" layout-align="space-between center">
+		<md-button ng-click="$ctrl.removeTranscription($ctrl.currentFile._id)" class="md-warn">Delete Text
+		</md-button>
+		<md-button ng-disabled="$ctrl.currentFile.notebookId || ($ctrl.currentFile.image && $ctrl.currentFile.audio)"
+		           ng-click="$ctrl.attachNotebook($event)">Attach
+		</md-button>
+	</div>
+	<div ng-if="$ctrl.currentFile._id" layout="column" class="attached-media">
+		<h3>Associated Media</h3>
+		<md-content layout="row">
+			<independent-media ng-if="$ctrl.currentFile.image"
+			                   file="$ctrl.currentFile.image"
+			                   on-remove-media="$ctrl.removeMedia($event)"
+			                   flex="50"
+			                   class="mdl-shadow--2dp attachment-card">
+			</independent-media>
+			<independent-media ng-if="$ctrl.currentFile.audio"
+			                   file="$ctrl.currentFile.audio"
+			                   on-remove-media="$ctrl.removeMedia($event)"
+			                   flex="50"
+			                   class="mdl-shadow--2dp attachment-card">
+			</independent-media>
+			<!--Notebook Attachment-->
+			<notebook-card flex="50"
+			               ng-if="$ctrl.notebookAttachment"
+			               notebook="$ctrl.notebookAttachment"
+			               settings="$ctrl.settings"
+			               current-user="$ctrl.currentUser"
+			               on-disconnect-notebook="$ctrl.disconnectNotebook($event)"
+			               on-view-details="$ctrl.viewDetails($event)"
+			               on-view-preview="$ctrl.viewDetails($event)">
+			</notebook-card>
+		</md-content>
+	</div>
+</div>

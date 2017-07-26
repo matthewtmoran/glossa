@@ -1,0 +1,55 @@
+@import "colors";
+//@import "fonts";
+
+baseline {
+	flex-direction: row;
+	display: flex;
+	-webkit-box-flex: 1;
+	height:100%;
+
+
+	.loading-circular {
+		position: fixed;
+		top: 50%;
+		bottom: 50%;
+		right: 50%;
+		left: 50%;
+	}
+
+
+	.baseline {
+		.CodeMirror{
+			width: 100%;
+			height: auto;
+			padding: 0 !important;
+			border-color: white;
+			font-family: "DejaVu Mono", Roboto, "Helvetica Neue", sans-serif;
+		//	//min-height: 100%;
+		//	//border: none;
+		//
+		//	.CodeMirror-sizer {
+		//		padding-top: 12px;
+		//	}
+		}
+
+		.waveSurferWave {
+
+			//@extend .grey-gradient;
+		}
+	}
+
+	.cm-timestamp {
+		background: $lGrey;
+		color: white !important;
+		transition: .3s;
+		padding-left: 3px;
+		padding-right: 3px;
+		border-radius: 6px;
+
+		&:hover {
+			cursor: pointer;
+			background: $red;
+		}
+	}
+}
+

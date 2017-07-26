@@ -1,0 +1,14 @@
+<md-content>
+	<h2 class="md-padding">Glossa made possible by these amazing softwares</h2>
+
+	<md-list >
+		<md-list-item class="md-3-line" ng-repeat="software in $ctrl.softwares">
+			<div class="md-list-item-text compact">
+				<h3>{{software.name}}</h3>
+				<h4><a target="_blank" ng-href="{{software.url}}">{{software.url}}</a></h4>
+			</div>
+			<md-divider></md-divider>
+		</md-list-item>
+	</md-list>
+
+</md-content>

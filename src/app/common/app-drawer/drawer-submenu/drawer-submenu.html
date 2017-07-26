@@ -1,0 +1,15 @@
+<md-menu md-position-mode="target-left bottom">
+	<md-button
+			aria-label="Open interactions menu"
+			class="md-icon-button"
+			ng-click="$ctrl.openMenu($mdMenu, $event); $event.stopPropagation()">
+		<md-icon md-font-library="material-icons">more_horiz</md-icon>
+	</md-button>
+	<md-menu-content width="4">
+		<md-menu-item ng-repeat="setting in $ctrl.section.settings">
+			<md-button ng-disabled="setting.disabled" ng-click="$ctrl.execute(setting.action, section)">
+				<p>{{setting.name}}</p>
+			</md-button>
+		</md-menu-item>
+	</md-menu-content>
+</md-menu>

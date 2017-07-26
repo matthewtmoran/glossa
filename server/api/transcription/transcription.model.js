@@ -1,12 +1,13 @@
 'use strict';
 var Datastore = require('nedb'),
-    path = require('path'),
-    config = require('../../config/environment'),
+  path = require('path'),
+  config = require('../../config/environment'),
+  app = require('electron').app,
 
-    transcriptionDb = new Datastore({
-        filename: path.join(config.root, config.dbPath, '/transcription'),
-        autoload: true,
-        timestampData: true
-    });
+  transcriptionDb = new Datastore({
+    filename: path.join(app.getPath('userData'), '/storage/glossa-transcription'),
+    autoload: true,
+    timestampData: true
+  });
 
 module.exports = transcriptionDb;

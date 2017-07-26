@@ -1,12 +1,13 @@
 'use strict';
 var Datastore = require('nedb'),
-    path = require('path'),
-    config = require('../../config/environment'),
+  path = require('path'),
+  config = require('../../config/environment'),
+  app = require('electron').app,
 
-    projectDb = new Datastore({
-        filename: path.join(config.root, config.dbPath, '/project'),
-        autoload: true,
-        timestampData: true
-    });
+  projectDb = new Datastore({
+    filename: path.join(app.getPath('userData'), '/storage/glossa-project'),
+    autoload: true,
+    timestampData: true
+  });
 
 module.exports = projectDb;

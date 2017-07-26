@@ -1,0 +1,12 @@
+<div class="audio-container">
+    <md-button class="md-fab" ng-click="$ctrl.playAudio()">
+        <md-icon class="material-icons">{{$ctrl.isPlaying ? 'pause' : 'play_arrow' }}</md-icon>
+    </md-button>
+	<div class="audio-controls">
+	    <div class="audio-row">
+	        <div class="progress" ng-mousedown="$ctrl.setTime($event)" ng-mouseup="$ctrl.reset()">
+	            <div class="bar" ng-style="$ctrl.barstyle"></div>
+	        </div>
+	    </div>
+	</div>
+</div>

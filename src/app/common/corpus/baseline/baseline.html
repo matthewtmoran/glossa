@@ -1,0 +1,25 @@
+<div class="baseline" layout="column" flex>
+	<div layout="column" flex ng-if="!$ctrl.currentFile._id" layout-align="center center">
+		<h2>Select a text or create a new text</h2>
+	</div>
+	<div ng-if="$ctrl.currentFile._id" layout="row">
+		<wave-surfer-full
+				ng-if="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path"
+				flex
+				settings="$ctrl.settings"
+				image-src="$ctrl.currentFile.image ? $ctrl.currentFile.image.path : $ctrl.notebookAttachment.image.path"
+				url-src="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path"
+		</wave-surfer-full>
+	</div>
+	<md-progress-circular class="loading-circular fade-out" ng-hide="!$ctrl.isLoadingCodeMirror" md-diameter="50"></md-progress-circular>
+
+	<div ng-hide="$ctrl.isLoadingCodeMirror" ui-codemirror="{ onLoad : $ctrl.codemirrorLoaded }"
+	     ng-model="$ctrl.currentFile.content"
+	     ng-change="$ctrl.saveContent()"
+	     ng-model-options="{debounce: 750}"
+	     layout="row"
+	     flex>
+	</div>
+
+
+</div>

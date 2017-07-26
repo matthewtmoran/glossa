@@ -48,8 +48,10 @@ module.exports = {
 
     publish: function(glossaUser, browser, bonjour, callback) {
         console.log('');
-        console.log('publish being called');
+        console.log('publish saga');
         if (!browser || !browser.services.length) {
+            console.log('there is no browser object or there are no services');
+            console.log('... this is where publish happens');
             //publish service
             myLocalService = bonjour.publish({
                 name:'glossaApp-' + glossaUser._id,
@@ -63,18 +65,24 @@ module.exports = {
             console.log('Published my glossa App... : ', myLocalService.name);
 
         } else if (browser.services.length > 0) {
+            console.log('there are services....');
             //flag for local service
             var localServicePublished = false;
 
             //check for local service in published services
             for (var i = 0; i < browser.services.length; i++) {
+                console.log('browser.services[i].name', browser.services[i].name);
+                console.log('glossaApp-' + glossaUser._id);
                 if (browser.services[i].name === 'glossaApp-' + glossaUser._id) {
-                    console.log('Service is already published on the network', myLocalService);
+
+                    console.log('My service is already published on the network');
                     // browser.services[i].stop();
                     localServicePublished = true;
                     // return callback("ERROR: Service is already published")
                 }
             }
+
+            console.log('service check done');
 
             //if local service is not published publish service
             if (!localServicePublished) {

@@ -1,0 +1,22 @@
+<div flex="50" flex-offset="25" >
+	<form name="projectSettings" ng-submit="$ctrl.updateProject($ctrl.project)" class="md-padding">
+
+		<md-input-container class="md-block" flex="25">
+			<label>Project Name</label>
+			<input ng-model="$ctrl.project.name" type="text">
+		</md-input-container>
+
+		<md-input-container class="md-block">
+			<label>Project Description</label>
+			<textarea ng-model="$ctrl.project.description"></textarea>
+		</md-input-container>
+
+		<!--<md-divider></md-divider>-->
+
+		<md-button type="submit" class="md-raised">Save Changes</md-button>
+
+	</form>
+
+	<md-button class="md-raised" ng-click="$ctrl.exportProject($ctrl.project)">Export Project</md-button>
+
+</div>

@@ -1,0 +1,29 @@
+<md-toolbar
+		layout="row"
+		class="nav-content primary-bg "
+		md-whiteframe="1"
+		md-selected-nav-item="currentNavItem"
+		nav-bar-aria-label="navigation links">
+	<div class="md-toolbar-tools">
+		<md-button aria-label="Open demo menu" class="md-icon-button " ng-click="$ctrl.toggleDrawer($event)">
+			<md-icon md-font-library="material-icons">menu</md-icon>
+		</md-button>
+		<md-button aria-label="Open Settings" class="md-icon-button">
+			<md-icon class="material-icons">search</md-icon>
+		</md-button>
+		<md-input-container md-no-float flex>
+			<form ng-submit="$ctrl.create()">
+				<input id="main-search" ng-change="$ctrl.searchSubmit()" ng-model="$ctrl.searchText"
+				       placeholder="Search...">
+			</form>
+		</md-input-container>
+		<div layout="row">
+			<div flex="50" ng-repeat="connection in $ctrl.allConnections">
+				{{connections.name}}
+			</div>
+			<div flex="50" ng-repeat="online in $ctrl.onlineConnections">
+				{{online.name}}
+			</div>
+		</div>
+	</div>
+</md-toolbar>
