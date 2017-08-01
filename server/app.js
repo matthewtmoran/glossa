@@ -12,6 +12,7 @@ module.exports = (appData) => {
   const server = require('http').createServer(app);
   const io = require('socket.io')(server);
   const ipc = require('./ipc');
+  const udp = require('./udp');
 
 
 
@@ -38,11 +39,7 @@ module.exports = (appData) => {
     if (options.cleanup) {
       console.log('cleaning...');
 
-      bonjour.unpublishAll(() => {
-        console.log('bonjour unpublished all success...');
-        bonjour.destroy();
-        console.log('bonjour destroyed called..... ')
-      });
+      udp.stop();
 
       console.log('cleaning done...');
     }

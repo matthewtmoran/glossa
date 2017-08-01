@@ -1,11 +1,22 @@
 const ipcUtil = require('./util');
 const socketUtil = require('../socket/socket-util');
-const udp = require('./udp');
+const udp = require('../udp');
 const main = require('../../main');
 let isRefresh = false;
-
+let win;
 module.exports = {
-  init: function (server, bonjour, io) {
+  init: function (server, io) {
+    console.log('ipc.init');
+
+    //get the main window object becuase we are certain it exists now
+    main.getWindow((err, window) => {
+      if (err) {
+        return console.log('error getting window...', err);
+      }
+      //initial udp discovery
+      win = window;
+    });
+
     //called on window load
     ipcUtil.on('window:loaded', windowLoaded);
 
@@ -28,19 +39,14 @@ module.exports = {
 
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
     function windowLoaded() {
+      console.log('windowLoaded');
       //if we are sharing
       if (global.appData.initialState.settings.isSharing) {
         //if it's not merely a refresh
         if (!isRefresh) {
           isRefresh = true;
-          //get the main window object
-          main.getWindow((err, window) => {
-            if (err) {
-              return console.log('error getting window...', err);
-            }
-            //initial udp discovery
-            udp.init(server, io, window)
-          });
+          //initial udp discovery
+          udp.init(server, io, win)
         }
       }
     }
@@ -237,19 +243,16 @@ module.exports = {
 
     }
 
-    //come from client
-    //is ipc event
     //data is boolean
     function toggleSharing(event, data) {
       console.log('');
       console.log('toggle:sharing ipc');
 
       if (data.isSharing) {
-        myBonjour.init(server, bonjour, io, win);
+        udp.init(server, io, win)
       } else {
-        myBonjour.disconnect(bonjour);
+        udp.stop();
       }
-
     }
 
 
@@ -267,68 +270,3 @@ module.exports = {
   }
 
 };
-
-// var ipcMain = electron.ipcMain;
-//
-// module.exports = function (server, bonjour, win) {
-//
-//
-//   console.log('!!bonjour in ipc', !!bonjour);
-//
-//
-//
-//
-//
-//
-//
-//
-//   //TODO: refractor....
-//   /**
-//    * removes avatar from file system
-//    * deletes avatar data;
-//    * normalizes notebooks
-//    * @param client
-//    */
-//   function unfollowConnection(client) {
-//     //if there is an avatar, remove avatar
-//     if (client.avatar) {
-//       socketUtil.removeAvatarImage(client.avatar)
-//         .then(function () {
-//           console.log('avatar removed from file system');
-//           // client.avatar = null;
-//           delete client.avatar;
-//           socketUtil.updateConnection(client, io);
-//         })
-//         .catch(function (err) {
-//           console.log('Error removing avatar from file system', err);
-//           delete client.avatar;
-//           socketUtil.updateConnection(client, io)
-//         })
-//     } else {
-//       socketUtil.updateConnection(client, io)
-//     }
-//   }
-//
-//   /**
-//    * called when user follows client
-//    * get data we may already have for user
-//    * emits to to external client request:updates with limited data objects
-//    * emits to external client request:avatar
-//    * updates client data
-//    * @param client
-//    */
-//   function followConnection(client) {
-//     socketUtil.getUserSyncedData(client)
-//       .then(function (data) {
-//         console.log('emit:: request:updates  to:: external-client');
-//         socketUtil.emitToExternalClient(io, client.socketId, 'request:updates', data);
-//         console.log('emit:: request:avatar  to:: external-client');
-//         console.log('TODO: I dont believe this adequately updates avatar data.......');
-//         socketUtil.emitToExternalClient(io, client.socketId, 'request:avatar', {});
-//       });
-//     console.log('TODO: consider if this overwrites data we need... or if it has the data we need...');
-//     console.log('TODO: verify no avatar descrepencies here... Im assuming there are issues.');
-//     socketUtil.updateConnection(client, io)
-//   }
-//
-// };

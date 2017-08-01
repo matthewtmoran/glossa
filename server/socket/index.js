@@ -21,8 +21,10 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     console.log('emit:: begin-handshake');
     //every socket connection, ask for some data
     socket.emit('begin-handshake');
+
+
     //this should be the return of the data we asked for
-    socket.on('end-handshake', endHandShake);
+    socket.on('end-handshake', onEndHandshake);
     // when a socket disconnects remove from connection list
     socket.on('disconnect', disconnect);
     //when client sends data back to us
@@ -38,7 +40,7 @@ module.exports = function (glossaUser, mySession, io, bonjour, win) {
     ////////////////////
 
     //client returns 'end-handshake with data'
-    function endHandShake(client) {
+    function onEndHandshake(client) {
       console.log('on:: endHandShake');
       console.log('');
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
