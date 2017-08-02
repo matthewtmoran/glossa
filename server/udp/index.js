@@ -33,6 +33,7 @@ module.exports = {
     //when other services come alive
     discover.on('available', function (name, data, reason) {
       console.log('App Available :', name);
+      console.log('app Data: ', data);
       console.log('reason', reason);
 
       console.log('Checking data.app:', (data.app === 'Glossa'));
