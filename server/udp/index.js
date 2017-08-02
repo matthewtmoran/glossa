@@ -3,16 +3,22 @@ const ipcUtil = require('../ipc/util');
 const socketServer = require('../socket');
 const socketClient = require('../socket/socket-client');
 
+let discover;
+let serviceName;
+let available;
+let userData;
+
 module.exports = {
   init: (server, io, win) => {
     console.log('udp begin');
-    this.discover = new Discovery();
-    this.serviceName = 'Glossa-' + global.appData.initialState.user._id;
+    discover = new Discovery();
+
+    serviceName = 'Glossa-' + global.appData.initialState.user._id;
     let interval = 500;
-    let available = global.appData.initialState.settings.isSharing;
+    available = global.appData.initialState.settings.isSharing;
 
     //basic data that will be broadcast across network to all users
-    this.userData = {
+    userData = {
       app: 'Glossa',
       name: global.appData.initialState.user.name,
       _id: global.appData.initialState.user._id,
@@ -22,11 +28,11 @@ module.exports = {
     console.log('announcing discovery');
 
     //announce our service
-    this.discover.announce(this.serviceName, this.userData, interval, available);
+    discover.announce(serviceName, userData, interval, available);
 
     //when other services come alive
-    this.discover.on('available', function (name, data, reason) {
-      console.log('available ', name);
+    discover.on('available', function (name, data, reason) {
+      console.log('App Available :', name);
       console.log('reason', reason);
 
       //if it's a glossa application and it's not our own service (though h I'm not sure that this is an issue with this package)
@@ -36,7 +42,7 @@ module.exports = {
       }
     });
 
-    this.discover.on('unavailable', function (name, data, reason) {
+    discover.on('unavailable', function (name, data, reason) {
       console.log(name, ':', 'unavailable:', reason);
       console.log(data);
     });
@@ -44,7 +50,7 @@ module.exports = {
   },
 
   stop: () => {
-    this.discover.update(this.serviceName, this.userData, 500, false)
+    discover.update(serviceName, userData, 500, false)
   }
 };
 
