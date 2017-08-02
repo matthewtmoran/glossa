@@ -26,7 +26,7 @@ module.exports = {
     };
 
     console.log('announcing discovery');
-
+    console.log('My Service name: ', serviceName );
     //announce our service
     discover.announce(serviceName, userData, interval, available);
 
