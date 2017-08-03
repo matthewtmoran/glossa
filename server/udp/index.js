@@ -36,11 +36,11 @@ module.exports = {
       console.log('app Data: ', data);
       console.log('reason', reason);
 
-      console.log('Checking data.app:', (data.app === 'Glossa'));
+      console.log('Checking data.app:', (data.data.app === 'Glossa'));
       console.log('Checking name: ', name !== serviceName);
 
       //if it's a glossa application and it's not our own service (though h I'm not sure that this is an issue with this package)
-      if (data.app === 'Glossa' && name !== serviceName) {
+      if (data.data.app === 'Glossa' && name !== serviceName) {
         console.log('External Glossa Application Online');
         socketClient.init(data, io, win)
       } else {
