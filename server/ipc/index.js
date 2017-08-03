@@ -1,5 +1,6 @@
 const ipcUtil = require('./util');
 const socketUtil = require('../socket/socket-util');
+const socketServer = require('../socket');
 const udp = require('../udp');
 const main = require('../../main');
 let isRefresh = false;
@@ -7,6 +8,7 @@ let win;
 module.exports = {
   init: function (server, io) {
     console.log('ipc.init');
+
 
     //get the main window object becuase we are certain it exists now
     main.getWindow((err, window) => {
@@ -46,6 +48,7 @@ module.exports = {
         if (!isRefresh) {
           isRefresh = true;
           //initial udp discovery
+          socketServer(io, win);
           udp.init(server, io, win)
         }
       }

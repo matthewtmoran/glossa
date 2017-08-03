@@ -5,6 +5,7 @@ var fs = require('fs');
 var Notebooks = require('./../api/notebook/notebook.model.js');
 const main = require('../../main');
 const app = require('electron').app;
+const config = require('../config/environment');
 
 module.exports = {
   //this occurs when bonjour discovers an external server.
@@ -14,7 +15,8 @@ module.exports = {
     console.log('');
     console.log('--- socketClient.init called');
 
-    let externalPath = 'http://' + service.addr + ':9090' ;
+    let externalPath = 'http://' + service.addr + ':' + config.port;
+    console.log('externalPathL ', externalPath);
     let nodeClientSocket = require('socket.io-client')(externalPath, {forceNew: true});
 
 

@@ -9,7 +9,7 @@ const app = require('electron').app;
 let localClient = {};
 
 
-module.exports = function (glossaUser, mySession, io, bonjour, win) {
+module.exports = function (io, win) {
   io.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
