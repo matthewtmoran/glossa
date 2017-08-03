@@ -49,6 +49,7 @@
     "socket.io": "^1.0.0",
     "socket.io-client": "^1.0.0",
     "sw-precache": "~4.0.0",
+    "udp-discovery": "0.0.3",
     "wavesurfer.js": "git+https://github.com/matthewtmoran/wavesurfer.js.git"
   },
   "devDependencies": {

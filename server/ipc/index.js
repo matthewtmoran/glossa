@@ -9,15 +9,8 @@ module.exports = {
   init: function (server, io) {
     console.log('ipc.init');
 
-
     //get the main window object becuase we are certain it exists now
-    main.getWindow((err, window) => {
-      if (err) {
-        return console.log('error getting window...', err);
-      }
-      //initial udp discovery
-      win = window;
-    });
+
 
     //called on window load
     ipcUtil.on('window:loaded', windowLoaded);
@@ -42,6 +35,17 @@ module.exports = {
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
     function windowLoaded() {
       console.log('windowLoaded');
+
+      main.getWindow((err, window) => {
+        if (err) {
+          return console.log('error getting window...', err);
+        }
+        //initial udp discovery
+        console.log('window', window);
+        win = window;
+      });
+
+
       //if we are sharing
       if (global.appData.initialState.settings.isSharing) {
         //if it's not merely a refresh

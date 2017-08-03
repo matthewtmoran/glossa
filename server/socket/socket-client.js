@@ -12,6 +12,8 @@ module.exports = {
   //we are going to connect to the server as a client so the server can interact with us
   init: function (service, io, win) {
 
+    console.log('win', win);
+
     console.log('');
     console.log('--- socketClient.init called');
 
@@ -108,10 +110,13 @@ module.exports = {
     });
 
     nodeClientSocket.on('send-profile-updates', (data) => {
-      console.log('on:: send-profile-updates');
+      console.log('--- on:: send-profile-updates');
 
       global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
         if (connection._id === data._id) {
+          if (connection.name !== data.name) {
+            connection.name = data.name;
+          }
           if (connection.following) {
             win.webContents.send('sync-event-start');
 
