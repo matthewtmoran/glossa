@@ -8,12 +8,19 @@ const main = require('../../main');
 const app = require('electron').app;
 let localClient = {};
 
+let socketList = [];
+
 
 module.exports = function (io, win) {
+  console.log('main socket server');
+  console.log('win?', !!win);
   io.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
 
+    socketList.push(socket.id);
+    console.log('socketList.length', socketList.length);
+    console.log('socketList', socketList);
     /////////////
     //handshake//
     /////////////
@@ -21,7 +28,6 @@ module.exports = function (io, win) {
     console.log('emit:: begin-handshake');
     //every socket connection, ask for some data
     socket.emit('begin-handshake');
-
 
     //this should be the return of the data we asked for
     socket.on('end-handshake', onEndHandshake);
@@ -42,19 +48,10 @@ module.exports = function (io, win) {
     //client returns 'end-handshake with data'
     function onEndHandshake(client) {
       console.log('on:: endHandShake');
-      console.log('');
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
-      console.log('');
-      this.win = {};
-      main.getWindow((err, window) => {
-        if (err) {
-          return console.log('error getting window...', err);
-        }
-        this.win = window;
-        console.log("send:: sync-event-start local-window");
-        this.win.webContents.send('sync-event-start');
-      });
+
+      win.webContents.send('sync-event-start');
 
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
@@ -81,7 +78,7 @@ module.exports = function (io, win) {
               console.log("client has avatar connection does not have avatar");
               //this means connection is null but client is not null
               //client has an avatar image we need
-              getNewAvatarData(connection, client, this.win)
+              getNewAvatarData(connection, client, win)
             } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
               //this means client is null but connection is not null
               //client has removed his avatar image
@@ -92,7 +89,7 @@ module.exports = function (io, win) {
               //this means client has changed his avatar image to a new avatar
               console.log('TODO: remove the data we hold and get the new data');
               fs.unlink(connection.avatar.absolutePath);
-              getNewAvatarData(connection, client, this.win)
+              getNewAvatarData(connection, client, win)
             }
 
 
@@ -129,8 +126,7 @@ module.exports = function (io, win) {
 
         socket.join('externalClientsRoom');
         console.log('send:: update-connection-list');
-        console.log('May need to change this to wait on promises???????');
-        this.win.webContents.send('update-connection-list');
+        win.webContents.send('update-connection-list');
 
       } else {
         //if it's not its probably someone at the coffee shop

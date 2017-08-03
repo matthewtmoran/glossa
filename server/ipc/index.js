@@ -36,14 +36,18 @@ module.exports = {
     function windowLoaded() {
       console.log('windowLoaded');
 
-      main.getWindow((err, window) => {
-        if (err) {
-          return console.log('error getting window...', err);
-        }
-        //initial udp discovery
-        console.log('window', window);
-        win = window;
-      });
+      win = main.getWindow();
+
+      console.log('win?', !!win);
+
+      // main.getWindow((err, window) => {
+      //   if (err) {
+      //     return console.log('error getting window...', err);
+      //   }
+      //   //initial udp discovery
+      //   console.log('window', window);
+      //   win = window;
+      // });
 
 
       //if we are sharing

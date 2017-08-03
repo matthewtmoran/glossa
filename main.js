@@ -189,9 +189,12 @@ app.on('activate', function () {
 });
 
 //so we can get the window (if it exists... ) to close and send ipc events properly
-function getWindow(callback) {
-  callback(null, win);
+// function getWindow(callback) {
+//   callback(null, win);
+// }
 
+function getWindow () {
+  return win;
 }
 
 //TODO: consider deletion
