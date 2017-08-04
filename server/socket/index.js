@@ -140,13 +140,17 @@ module.exports = function (io, win) {
       //get connection from list
       let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
 
+      console.log('global.appData.initialState.connections', global.appData.initialState.connections);
+
       if (!connection) {
         return console.log("no connection in global object.  Am going to throw an error")
       }
 
       if (!connection.following) {
+        console.log('not following this user');
         //remove non-followed users from connection array
         global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
+        console.log('global.appData.initialState.connections', global.appData.initialState.connections);
       } else {
         //if we are following, updated data don't remove
         global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
@@ -160,16 +164,8 @@ module.exports = function (io, win) {
           return con;
         })
       }
-
-
-      main.getWindow(function (err, window) {
-        if (err) {
-          return console.log('error getting window...');
-        }
-        if (!main.getForceQuit()) {
-          window.webContents.send('update-connection-list');
-        }
-      });
+      console.log('send: update-connection-list');
+      win.webContents.send('update-connection-list');
 
     }
 
@@ -284,6 +280,7 @@ module.exports = function (io, win) {
 
     function onRequestAvatar() {
       console.log('on:: request:avatar');
+
       socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
         .then((bufferString) => {
 

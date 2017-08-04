@@ -6,21 +6,30 @@ var Notebooks = require('./../api/notebook/notebook.model.js');
 const main = require('../../main');
 const app = require('electron').app;
 const config = require('../config/environment');
+//master list of active socket connections
+let connectionList = [];
 
 module.exports = {
+
   //this occurs when bonjour discovers an external server.
   //we are going to connect to the server as a client so the server can interact with us
   init: function (service, io, win) {
+    let nodeClientSocket;
+    //if the service is not in the master list then we connect to it as a client
+    if (connectionList.indexOf(service.name) < 0) {
+      let externalPath = 'http://' + service.addr + ':' + config.port;
+      nodeClientSocket = require('socket.io-client')(externalPath);
+      //handle the connection to the external socket server
+      this.connect(service, io, win, nodeClientSocket);
+    } else {
+      // we are already connected to this service so just ignore
+      return false;
+    }
+  },
 
-    console.log('win?', !!win);
-
+  connect: function (service, io, win, nodeClientSocket) {
     console.log('');
-    console.log('--- socketClient.init called');
-
-    let externalPath = 'http://' + service.addr + ':' + config.port;
-    let nodeClientSocket = require('socket.io-client')(externalPath);
-    console.log('connected as client to :', externalPath);
-
+    console.log('--- socketClient.connect called');
 
     //initial connection to another server
     //.once solve the problem however I'm not sure this will work with more than one connection
@@ -28,16 +37,23 @@ module.exports = {
     //TODO: !IMPORTANT - test for multiple connections
 
     // //initial connection to another server
-    nodeClientSocket.once('connect', () => {
+    nodeClientSocket.on('connect', () => {
       console.log('');
       console.log('--- on:: connect');
       console.log('');
+
+      //when the connection is truly established, we add the service name ot the list.
+      connectionList.push(service.name);
+
     });
 
     nodeClientSocket.on('disconnect', (reason) => {
       console.log('');
       console.log('--- on:: disconnect');
       console.log('');
+      //when the socket disconnects, we remove the service name from the list
+      connectionList.splice(connectionList.indexOf(service.name), 1);
+      //unbind listeners so they are not duplicated
       unbind();
     });
 
@@ -61,11 +77,9 @@ module.exports = {
     nodeClientSocket.on('sync-data', (data) => {
       console.log('--- on:: sync-data');
 
-      console.log('win??', !!win);
-
       //send sync notificatio to local window
-        console.log("--- send:: sync-event-start local-window");
-        win.webContents.send('sync-event-start');
+      console.log("--- send:: sync-event-start local-window");
+      win.webContents.send('sync-event-start');
 
       socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
         .then(notebooksToSend => {
@@ -143,10 +157,10 @@ module.exports = {
     });
 
     nodeClientSocket.on('return:avatar', (data) => {
-     socketUtil.writeAvatar(data)
-       .then(() => {
-        console.log('Avatar written');
-       })
+      socketUtil.writeAvatar(data)
+        .then(() => {
+          console.log('Avatar written');
+        })
     });
 
 
@@ -185,7 +199,10 @@ module.exports = {
     }
 
     function getAvatarData(connection, data) {
-      io.to(data.socketId).emit('request:avatar');
+      console.log('--- emit:: request:avatar');
+      console.log('data.socketId', data.socketId);
+      console.log('connection.socketId', connection.socketId);
+      io.to(connection.socketId).emit('request:avatar');
       connection.avatar = data.avatar;
       connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
       connection.avatar.path = path.resolve(data.avatar.path);
@@ -220,4 +237,5 @@ module.exports = {
         });
     }
   }
+
 };
