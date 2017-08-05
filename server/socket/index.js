@@ -11,9 +11,8 @@ let localClient = {};
 let socketList = [];
 
 
-module.exports = function (io, win) {
+module.exports = function (io) {
   console.log('main socket server');
-  console.log('win?', !!win);
   io.on('connection', function (socket) {
     console.log('');
     console.log('on:: connection');
@@ -51,6 +50,7 @@ module.exports = function (io, win) {
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
 
+      let win = main.getWindow();
       win.webContents.send('sync-event-start');
 
       //dumb check just to make sure it's a client we want...
@@ -135,6 +135,7 @@ module.exports = function (io, win) {
     }
 
     function disconnect() {
+      let win = main.getWindow();
       console.log('');
       console.log('on:: disconnect');
       //get connection from list
@@ -204,6 +205,7 @@ module.exports = function (io, win) {
     //socket client returns data
     function syncDataReturn(data) {
       console.log('on:: sync-data:return');
+      let win = main.getWindow();
 
       //if there is actually data to update...
       //TODO: at the very least update the last sync time
@@ -213,23 +215,15 @@ module.exports = function (io, win) {
 
             socketUtil.updateGlobalArrayObject(data, 'notebooks');
 
-            main.getWindow((err, window) => {
-              if (err) {
-                return console.log('error getting window...');
-              }
-              window.webContents.send('update-synced-notebooks');
-              window.webContents.send('sync-event-end');
-            });
+
+
+              win.webContents.send('update-synced-notebooks');
+              win.webContents.send('sync-event-end');
 
 
           })
       } else {
-        main.getWindow((err, window) => {
-          if (err) {
-            return console.log('error getting window...');
-          }
-          window.webContents.send('sync-event-end');
-        });
+          win.webContents.send('sync-event-end');
         console.log('no new data from this connection');
       }
       //

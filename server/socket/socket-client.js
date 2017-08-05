@@ -6,24 +6,36 @@ var Notebooks = require('./../api/notebook/notebook.model.js');
 const main = require('../../main');
 const app = require('electron').app;
 const config = require('../config/environment');
+const ioClient = require('socket.io-client');
 //master list of active socket connections
 let connectionList = [];
+const ip = require('ip');
+let devObject = {};
 
 module.exports = {
 
-  initLocal: function (service, io, win) {
+  initLocal: function (io, win) {
+    devObject.io = io;
+    devObject.win = win;
+    console.log('running local dev connection');
+    let service = {
+      name: 'Glossa-' + global.appData.initialState.user._id,
+      addr: ip.address()
+    };
+
     console.log('TODO: for local tests, we can probably just ping the port we are trying to connect to every 3 seconds if it does not connect');
-    let nodeClientSocket;
+    let port = !config.secondInstance ? '9090' : '9000';
+    let externalPath = 'http://' + service.addr + ':' + port;
+    console.log('external path we are trying to connect to: ', externalPath);
     //if the service is not in the master list then we connect to it as a client
     if (connectionList.indexOf(service.name) < 0) {
-      let externalPath = 'http://' + service.addr + ':' + !config.secondInstance ? '9090' : '9000';
-      nodeClientSocket = require('socket.io-client')(externalPath);
-      console.log('nodeClientSocket', nodeClientSocket);
+      console.log('We are not connected to this server yet');
+        let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
+        this.connect(service, io, win, nodeClientSocket);
       //handle the connection to the external socket server
-      this.connect(service, io, win, nodeClientSocket);
     } else {
-      console.log('test');
       // we are already connected to this service so just ignore
+      console.log('we are already connected to this server');
       return false;
     }
   },
@@ -72,6 +84,7 @@ module.exports = {
       connectionList.splice(connectionList.indexOf(service.name), 1);
       //unbind listeners so they are not duplicated
       unbind();
+      this.initLocal(devObject.io, devObject.win);
     });
 
     //recievs event from an external server and emits the end-handshake

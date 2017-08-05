@@ -13,6 +13,7 @@ module.exports = (appData) => {
   const io = require('socket.io')(server);
   const ipc = require('./ipc');
   const udp = require('./udp');
+  const socketServer = require('./socket');
 
   require(path.join(__dirname, './config/express'))(app); //configuration for express
   require(path.join(__dirname, './routes'))(app); //routes
@@ -23,6 +24,7 @@ module.exports = (appData) => {
     config.useDiscovery ? console.log('Using udp discovery for external applications') : console.log('Bypassing udp discovery');
     // require ipc event...
     ipc.init(server, io); //ipc event for communication between renderer / main process
+    socketServer(io);
   });
 
 
@@ -37,7 +39,7 @@ module.exports = (appData) => {
 
     if (options.cleanup) {
       console.log('cleaning...');
-     return config.useDiscovery ? udp.stop() : false;
+      return config.useDiscovery ? udp.stop() : false;
     }
 
 

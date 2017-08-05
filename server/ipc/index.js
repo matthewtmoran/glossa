@@ -5,7 +5,6 @@ const udp = require('../udp');
 const main = require('../../main');
 const config = require('../config/environment');
 const socketClient = require('../socket/socket-client');
-const ip = require('ip');
 let isRefresh = false;
 let win;
 module.exports = {
@@ -39,8 +38,8 @@ module.exports = {
         if (!isRefresh) {
           isRefresh = true;
           //initial udp discovery
-          socketServer(io, win);
-          config.useDiscovery ? udp.init(server, io, win) : localDev(server, io, win);
+          // socketServer(io, win);
+          config.useDiscovery ? udp.init(server, io, win) : socketClient.initLocal(io, win);
         }
       }
     }
@@ -266,11 +265,3 @@ module.exports = {
   }
 
 };
-
-function localDev(server, io, win) {
-  let data = {
-    name: 'Glossa-' + global.appData.initialState.user._id,
-    addr: ip.address()
-  };
-  socketClient.initLocal(data, io, win)
-}
