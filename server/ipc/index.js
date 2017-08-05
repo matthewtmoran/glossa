@@ -105,6 +105,8 @@ module.exports = {
       console.log('on:: update:following ipc');
       let user = JSON.parse(data.user);
       //the returned object will not have socketId or online status
+
+      console.log('user.avatar.path', user.avatar.path);
       socketUtil.updateFollow(user)
         .then((toggled) => {
           global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
@@ -114,6 +116,8 @@ module.exports = {
             console.log('the connection being toggled: ', connection);
             //update connection object with following status
             connection.following = toggled.following;
+
+            console.log('connection.avatar.path', connection.avatar.path);
 
             if (connection.following) {
               socketUtil.syncData(connection, (data) => {
@@ -129,6 +133,7 @@ module.exports = {
 
             }
             connection = Object.assign({}, connection);
+            console.log('connection.avatar', connection.avatar);
             return connection;
           }).filter((con) => {
             //only return connection that are online or that we are following

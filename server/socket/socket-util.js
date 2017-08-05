@@ -326,6 +326,8 @@ module.exports = {
       delete data.online;
     }
 
+    console.log('data.avatar',data.avatar);
+
     return new Promise((resolve, reject) => {
       Connection.findOne({_id: data._id}, (err, connection) => {
         if (err) {
