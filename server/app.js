@@ -21,7 +21,7 @@ module.exports = (appData) => {
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
     config.secondInstance ? console.log("Glossa running as secondary dev instance") : console.log('Glossa Running as main dev instance');
-    config.useDiscovery ? console.log('Using udp discovery for external applications') : console.log('Bypassing udp discovery');
+    config.localDev ?  console.log('Bypassing udp discovery') : console.log('Using udp discovery for external applications') ;
     // require ipc event...
     ipc.init(server, io); //ipc event for communication between renderer / main process
     socketServer(io);
@@ -39,7 +39,7 @@ module.exports = (appData) => {
 
     if (options.cleanup) {
       console.log('cleaning...');
-      return config.useDiscovery ? udp.stop() : false;
+      return config.localDev ? false : udp.stop();
     }
 
 

@@ -2,17 +2,14 @@
 
 var path = require('path');
 var _ = require('lodash');
-let local = true;
-let secondInstance = false;
-
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
-
 function requiredProcessEnv(name) {
     if (!process.env[name]) {
         throw new Error('You must set the ' + name + ' environment variable');
     }
     return process.env[name];
 }
+
 
 // All configurations will extend these options
 // ============================================
@@ -23,21 +20,22 @@ var all = {
     root: path.normalize(__dirname + '/../../..'),
 
     // Server port
-    port: secondInstance ? 9090 : process.env.PORT || 9000,
+    port: process.env.PORT || 9000,
 
     // Server IP
     ip: process.env.IP || '0.0.0.0',
 
     // Should we populate the DB with sample data?
     seedDB: false,
-    useDiscovery: !local,
-    secondInstance: secondInstance,
+    localDev: process.env.LOCAL || false,
+    secondInstance: process.env.SECOND_INSTANCE || false,
 
     // List of user roles
     userRoles: ['guest', 'user', 'admin'],
-    dataRootPath: secondInstance ? '/Glossa2' : 'Glossa',
+    dataRootPath: process.env.SECOND_INSTANCE ? '/Glossa2' : 'Glossa',
 };
-
+console.log('process.env.LOCAL', process.env.LOCAL);
+console.log('process.env.BYPASS_UDP', process.env.BYPASS_UDP);
 // Export the config object based on the NODE_ENV
 // ==============================================
 

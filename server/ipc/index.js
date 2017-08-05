@@ -39,7 +39,7 @@ module.exports = {
           isRefresh = true;
           //initial udp discovery
           // socketServer(io, win);
-          config.useDiscovery ? udp.init(server, io, win) : socketClient.initLocal(io, win);
+          config.localDev ? socketClient.initLocal(io, win) : udp.init(server, io, win);
         }
       }
     }
@@ -247,9 +247,9 @@ module.exports = {
       console.log('toggle:sharing ipc');
 
       if (data.isSharing) {
-        config.useDiscovery ? udp.init(server, io, win) : localDev(server, io, win);
+        config.localDev ? socketClient.initLocal(io, win) : udp.init(server, io, win);
       } else {
-        config.useDiscovery ? udp.stop() : '';
+        config.localDev ? console.log('Local dev') : udp.stop();
       }
     }
 
