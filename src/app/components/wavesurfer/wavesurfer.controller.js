@@ -1,11 +1,10 @@
 import WaveSurfer from 'wavesurferDev';
 // import WaveSurfer from 'wavesurfer.js';
 export class WaveSurferController {
-  constructor($timeout, __rootUrl, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element, $window) {
+  constructor($timeout, $mdTheming, RootService, $interval, $scope, cfpLoadingBar, $element, $window) {
     'ngInject';
 
     this.$timeout = $timeout;
-    this.__rootUrl = __rootUrl;
     this.$mdTheming = $mdTheming;
     this.rootService = RootService;
     this.$interval = $interval;

@@ -2,6 +2,8 @@
 
 var path = require('path');
 var _ = require('lodash');
+let local = true;
+let secondInstance = false;
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
 
@@ -21,26 +23,19 @@ var all = {
     root: path.normalize(__dirname + '/../../..'),
 
     // Server port
-    port: process.env.PORT || 9000,
+    port: secondInstance ? 9090 : process.env.PORT || 9000,
 
     // Server IP
     ip: process.env.IP || '0.0.0.0',
 
     // Should we populate the DB with sample data?
     seedDB: false,
+    useDiscovery: !local,
+    secondInstance: secondInstance,
 
     // List of user roles
     userRoles: ['guest', 'user', 'admin'],
-
-    dataRoot: '/data',
-    dbPath: 'server/data/database/',
-    imagePath: 'server/data/image',
-    audioPath: 'server/data/audio',
-    markdownPath: 'server/data/markdown',
-    newPathRoot: '/Glossa',
-
-
-
+    dataRootPath: secondInstance ? '/Glossa2' : 'Glossa',
 };
 
 // Export the config object based on the NODE_ENV

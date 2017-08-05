@@ -3,15 +3,13 @@ const socketUtil = require('../socket/socket-util');
 const socketServer = require('../socket');
 const udp = require('../udp');
 const main = require('../../main');
+const config = require('../config/environment');
+const socketClient = require('../socket/socket-client');
+const ip = require('ip');
 let isRefresh = false;
 let win;
 module.exports = {
   init: function (server, io) {
-    console.log('ipc.init');
-
-    //get the main window object becuase we are certain it exists now
-
-
     //called on window load
     ipcUtil.on('window:loaded', windowLoaded);
 
@@ -34,22 +32,7 @@ module.exports = {
 
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
     function windowLoaded() {
-      console.log('windowLoaded');
-
       win = main.getWindow();
-
-      console.log('win?', !!win);
-
-      // main.getWindow((err, window) => {
-      //   if (err) {
-      //     return console.log('error getting window...', err);
-      //   }
-      //   //initial udp discovery
-      //   console.log('window', window);
-      //   win = window;
-      // });
-
-
       //if we are sharing
       if (global.appData.initialState.settings.isSharing) {
         //if it's not merely a refresh
@@ -57,7 +40,7 @@ module.exports = {
           isRefresh = true;
           //initial udp discovery
           socketServer(io, win);
-          udp.init(server, io, win)
+          config.useDiscovery ? udp.init(server, io, win) : localDev(server, io, win);
         }
       }
     }
@@ -265,9 +248,9 @@ module.exports = {
       console.log('toggle:sharing ipc');
 
       if (data.isSharing) {
-        udp.init(server, io, win)
+        config.useDiscovery ? udp.init(server, io, win) : localDev(server, io, win);
       } else {
-        udp.stop();
+        config.useDiscovery ? udp.stop() : '';
       }
     }
 
@@ -276,9 +259,6 @@ module.exports = {
       console.log('');
       console.log('combine:notebooks ipc');
 
-      // global.appData.initialState.notebooks = [...global.appData.initialState.notebooks, ...global.appData.initialState.notebooks];
-
-
       event.sender.send('update-synced-notebooks');
       event.sender.send('update-rt-synced-notebooks', []);
 
@@ -286,3 +266,11 @@ module.exports = {
   }
 
 };
+
+function localDev(server, io, win) {
+  let data = {
+    name: 'Glossa-' + global.appData.initialState.user._id,
+    addr: ip.address()
+  };
+  socketClient.initLocal(data, io, win)
+}

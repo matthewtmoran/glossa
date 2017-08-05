@@ -14,14 +14,13 @@ module.exports = (appData) => {
   const ipc = require('./ipc');
   const udp = require('./udp');
 
-
-
-
   require(path.join(__dirname, './config/express'))(app); //configuration for express
   require(path.join(__dirname, './routes'))(app); //routes
 
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+    config.secondInstance ? console.log("Glossa running as secondary dev instance") : console.log('Glossa Running as main dev instance');
+    config.useDiscovery ? console.log('Using udp discovery for external applications') : console.log('Bypassing udp discovery');
     // require ipc event...
     ipc.init(server, io); //ipc event for communication between renderer / main process
   });
@@ -38,10 +37,7 @@ module.exports = (appData) => {
 
     if (options.cleanup) {
       console.log('cleaning...');
-
-      udp.stop();
-
-      console.log('cleaning done...');
+     return config.useDiscovery ? udp.stop() : false;
     }
 
 

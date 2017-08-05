@@ -7,6 +7,7 @@ const AppMenu = require(path.join(__dirname, './app-menu'));
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 const express = require(path.join(__dirname, './server/app'));
+const config = require(path.join(__dirname, './server/config/environment'));
 let BrowserWindow = electron.BrowserWindow;
 
 //for mac to decide what to do with window object.. to quit or hide...
@@ -40,11 +41,11 @@ startExpress();
 function fsCheck() {
 
   const dataPaths = [
-    'Glossa',
-    'Glossa/storage',
-    'Glossa/image',
-    'Glossa/audio',
-    'Glossa/temp',
+    config.dataRootPath,
+    config.dataRootPath + '/storage',
+    config.dataRootPath + '/image',
+    config.dataRootPath + '/audio',
+    config.dataRootPath + '/temp',
   ];
 
   dataPaths.forEach((p) => {
@@ -83,7 +84,7 @@ function createWindow() {
 
   // and load the index.html of the app.
   win.loadURL(url.format({
-    pathname: 'http://localhost:9000'
+    pathname: 'http://localhost:' + config.port.toString()
   }));
 
   // Open the DevTools.

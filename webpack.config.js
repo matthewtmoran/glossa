@@ -3,10 +3,10 @@ const cleanPlugin = require('clean-webpack-plugin');
 const copyPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
-
 const frontEndRoot = `${__dirname}/src`;
 const backEndRoot = `${__dirname}/server`;
 const dist = `${__dirname}/dist`;
+const config = require(path.join(__dirname, 'server/config/environment'));
 
 const paths = {
   common: {},
@@ -134,7 +134,7 @@ const frontEnd = {
   output: {
     path: paths.frontEnd.output,
     filename: 'app.bundle.js',
-    publicPath: "http://localhost:9000/", // Development Server
+    publicPath: `http://localhost:${config.port}/`, // Development Server
   },
   module: {
     rules: [

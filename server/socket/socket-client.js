@@ -11,6 +11,23 @@ let connectionList = [];
 
 module.exports = {
 
+  initLocal: function (service, io, win) {
+    console.log('TODO: for local tests, we can probably just ping the port we are trying to connect to every 3 seconds if it does not connect');
+    let nodeClientSocket;
+    //if the service is not in the master list then we connect to it as a client
+    if (connectionList.indexOf(service.name) < 0) {
+      let externalPath = 'http://' + service.addr + ':' + !config.secondInstance ? '9090' : '9000';
+      nodeClientSocket = require('socket.io-client')(externalPath);
+      console.log('nodeClientSocket', nodeClientSocket);
+      //handle the connection to the external socket server
+      this.connect(service, io, win, nodeClientSocket);
+    } else {
+      console.log('test');
+      // we are already connected to this service so just ignore
+      return false;
+    }
+  },
+
   //this occurs when bonjour discovers an external server.
   //we are going to connect to the server as a client so the server can interact with us
   init: function (service, io, win) {

@@ -30,9 +30,6 @@ window.CodeMirror = CodeMirror;
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
   //TODO: change rootUrl to come from server... global.appData.initialstate etc....
-  const rootUrl = 'http://localhost:9000/';
-  angular.module('config').constant('__rootUrl', rootUrl);
-
   const appData = electron.remote.getGlobal('appData');
   angular.module('config').constant('__appData', appData);
 
