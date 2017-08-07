@@ -326,7 +326,7 @@ module.exports = {
       delete data.online;
     }
 
-    console.log('data.avatar',data.avatar);
+    console.log('data.avatar',data.avatar); //path is good at this point
 
     return new Promise((resolve, reject) => {
       Connection.findOne({_id: data._id}, (err, connection) => {
@@ -337,7 +337,8 @@ module.exports = {
         if (!connection) {
           data.following = true;
           Connection.insert(data, (err, newConnection) => {
-            resolve(newConnection)
+            resolve(newConnection);
+            console.log('New connection after save in db', newConnection);
           })
         }
         //if user is found we are no longer following user
@@ -657,7 +658,8 @@ module.exports = {
         buffer: data.bufferString,
         absolutePath: path.join(app.getPath('userData'), 'image', filename),
         path: path.join('image', filename),
-      };
+      }; //path is good at this point
+
 
       this.writeMediaFile(mediaObject)
         .then(()=> {

@@ -311,6 +311,8 @@ export class RootService {
 
   //TODO: Refractor
   toggleFollow(user) {
+    console.log("user: ", user);
+    //we convert to json so we don't deal with angualar's hashing system
     this.ipcSerivce.send('update:following', {user:  angular.toJson(user)})
   }
 

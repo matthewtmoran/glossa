@@ -8,7 +8,6 @@ const main = require('../../main');
 const app = require('electron').app;
 let localClient = {};
 
-let socketList = [];
 
 
 module.exports = function (io) {
@@ -17,9 +16,6 @@ module.exports = function (io) {
     console.log('');
     console.log('on:: connection');
 
-    socketList.push(socket.id);
-    console.log('socketList.length', socketList.length);
-    console.log('socketList', socketList);
     /////////////
     //handshake//
     /////////////
@@ -52,7 +48,6 @@ module.exports = function (io) {
 
       let win = main.getWindow();
       win.webContents.send('sync-event-start');
-
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
         //update existing connections
@@ -61,7 +56,6 @@ module.exports = function (io) {
           if (connection._id !== client._id) {
             return connection;
           }
-          console.log('found match in connection list... Update data.');
           //update data that we do not store
           connection.online = true;
           connection.socketId = client.socketId;
@@ -115,10 +109,12 @@ module.exports = function (io) {
             type: 'external-client',
             following: false,
             lastSync: null,
-            avatar: null,
+            avatar: client.avatar,
             socketId: client.socketId,
             online: true
           };
+
+          console.log('clientData.avatar', clientData.avatar);
 
           //concat to array
           global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
@@ -288,10 +284,14 @@ module.exports = function (io) {
     }
 
     function onReturnAvatar(data) {
-      console.log('on:: return:avatar ', data.path);
+      console.log('on:: return:avatar ', data.path); // the path is good at this point;
+      let win = main.getWindow();
         socketUtil.writeAvatar(data)
           .then(() => {
+
             console.log('Avatar written');
+            console.log('send:: update-connection-list')
+            win.webContents.send('update-connection-list');
           })
     }
 

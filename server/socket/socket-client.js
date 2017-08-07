@@ -90,6 +90,8 @@ module.exports = {
     //recievs event from an external server and emits the end-handshake
     nodeClientSocket.on('begin-handshake', () => {
       console.log('--- on:: begin-handshake');
+
+
       const basicProfileData = {
         _id: global.appData.initialState.user._id,
         name: global.appData.initialState.user.name,
@@ -157,6 +159,7 @@ module.exports = {
 
     nodeClientSocket.on('send-profile-updates', (data) => {
       console.log('--- on:: send-profile-updates');
+      console.log("data.avatar", data.avatar); // path is good at this point
 
       global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
         if (connection._id === data._id) {
@@ -196,7 +199,7 @@ module.exports = {
 
     //on connection, avatar is different this is where the request is heard
     nodeClientSocket.on('request:avatar', (data) => {
-      console.log('--- on:: request:avatar')
+      console.log('--- on:: request:avatar');
 
       socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
         .then((bufferString) => {
@@ -230,12 +233,9 @@ module.exports = {
 
     function getAvatarData(connection, data) {
       console.log('--- emit:: request:avatar');
-      console.log('data.socketId', data.socketId);
-      console.log('connection.socketId', connection.socketId);
       io.to(connection.socketId).emit('request:avatar');
       connection.avatar = data.avatar;
       connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
-      connection.avatar.path = path.resolve(data.avatar.path);
 
       updateConnectionsAndNotebooks(connection);
 

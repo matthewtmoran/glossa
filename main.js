@@ -19,7 +19,7 @@ let readyToGo = false;
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-// app.setPath('userData', path.join(app.getPath('appData'), 'Glossa'));
+app.setPath('userData', path.join(app.getPath('appData'), config.dataRootPath));
 function startExpress() {
   fsCheck();
   Promise.all([require(path.join(__dirname, './server/config/init')).getInitialState()])
@@ -49,7 +49,7 @@ function fsCheck() {
   ];
 
   dataPaths.forEach((p) => {
-    let storagePath = path.join(app.getPath('appData'), p);
+    let storagePath = path.join(app.getPath('userData'), p);
 
     if (!fs.statSyncNoException(storagePath)) {
       fs.mkdirSync(storagePath);

@@ -45,7 +45,6 @@ module.exports = {
     }
 
     function onUpdateSession(event, session) {
-      console.log("onUpdateSession");
       socketUtil.saveSession(session)
         .then((data) => {
           global.appData.initialState.session = Object.assign({}, data);
@@ -80,7 +79,7 @@ module.exports = {
      * when user toggles follow on an external client
      * @param event
      * @param data
-     * TODO: refractor
+     * TODO: This works locally, need to confirm cross platform
      */
     function onUpdateFollowing(event, data) {
       console.log('');
@@ -88,19 +87,14 @@ module.exports = {
       let user = JSON.parse(data.user);
       //the returned object will not have socketId or online status
 
-      console.log('user.avatar.path', user.avatar.path);
       socketUtil.updateFollow(user)
         .then((toggled) => {
           global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
             if (connection._id !== toggled._id) {
               return connection;
             }
-            console.log('the connection being toggled: ', connection);
             //update connection object with following status
             connection.following = toggled.following;
-
-            console.log('connection.avatar.path', connection.avatar.path);
-
             if (connection.following) {
               socketUtil.syncData(connection, (data) => {
                 console.log('emit:: sync-data to:: a client');
@@ -108,25 +102,22 @@ module.exports = {
               });
 
               if (connection.avatar) {
-                console.log('There is an avatar?', connection.avatar);
                 //sends to connected socket client
                 io.to(connection.socketId).emit('request:avatar');
               }
 
             }
             connection = Object.assign({}, connection);
-            console.log('connection.avatar', connection.avatar);
             return connection;
           }).filter((con) => {
             //only return connection that are online or that we are following
             return con.online || con.following;
           });
-
           event.sender.send('update-connection-list')
         })
         .catch((err) => {
           //TODO: notify user of error....
-          console.log('TODO: Notify user of error')
+          console.log('TODO: Notify user of error', err);
         });
     }
 
