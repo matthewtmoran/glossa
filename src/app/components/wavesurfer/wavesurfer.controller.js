@@ -111,7 +111,7 @@ export class WaveSurferController {
         progressColor: '#757575',
         cursorColor: '#FF5252',
         height: '200',
-        barHeight: 5,
+        barHeight: 4,
         barWidth: 1,
         scrollParent: false,
         container:this.waveElement[0],

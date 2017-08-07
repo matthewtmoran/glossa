@@ -164,7 +164,6 @@ exports.removeAvatar = function (req, res) {
 };
 
 exports.avatar = function (req, res) {
-  console.log('Adding Avatar');
   User.find({}, function (err, user) {
     if (err) {
       return handleError(res, err);
@@ -181,7 +180,6 @@ exports.avatar = function (req, res) {
       if (err) {
         return handleError(res, err);
       }
-
       normalizeNotebooks(updatedDoc);
       global.appData.initialState.user = Object.assign({}, updatedDoc);
       User.persistence.compactDatafile(); // concat db

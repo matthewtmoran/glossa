@@ -423,7 +423,6 @@ export const appComponent = {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
           this.cfpLoadingBar.complete();
-
           this.ipcSerivce.send('broadcast:profile-updates')
 
         });
@@ -435,6 +434,8 @@ export const appComponent = {
         .then((data) => {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.cfpLoadingBar.complete();
+          this.ipcSerivce.send('broadcast:profile-updates')
         })
     }
 

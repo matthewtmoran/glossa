@@ -17,25 +17,19 @@ module.exports = {
   initLocal: function (io, win) {
     devObject.io = io;
     devObject.win = win;
-    console.log('running local dev connection');
     let service = {
       name: 'Glossa-' + global.appData.initialState.user._id,
       addr: ip.address()
     };
-
-    console.log('TODO: for local tests, we can probably just ping the port we are trying to connect to every 3 seconds if it does not connect');
     let port = !config.secondInstance ? '9090' : '9000';
     let externalPath = 'http://' + service.addr + ':' + port;
-    console.log('external path we are trying to connect to: ', externalPath);
     //if the service is not in the master list then we connect to it as a client
     if (connectionList.indexOf(service.name) < 0) {
-      console.log('We are not connected to this server yet');
-        let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
-        this.connect(service, io, win, nodeClientSocket);
+      let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
+      this.connect(service, io, win, nodeClientSocket);
       //handle the connection to the external socket server
     } else {
       // we are already connected to this service so just ignore
-      console.log('we are already connected to this server');
       return false;
     }
   },
@@ -91,7 +85,6 @@ module.exports = {
     nodeClientSocket.on('begin-handshake', () => {
       console.log('--- on:: begin-handshake');
 
-
       const basicProfileData = {
         _id: global.appData.initialState.user._id,
         name: global.appData.initialState.user.name,
@@ -110,7 +103,7 @@ module.exports = {
       console.log('--- on:: sync-data');
 
       //send sync notificatio to local window
-      console.log("--- send:: sync-event-start local-window");
+      console.log("--- IPC send:: sync-event-start local-window", 'line 107');
       win.webContents.send('sync-event-start');
 
       socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
@@ -118,9 +111,8 @@ module.exports = {
           console.log('--- emit:: sync-data:return to:: whoever requested it');
           nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend});
 
-
           console.log('TODO: end outside client sync event display');
-          console.log("--- send:: sync-event-end local-window");
+          console.log("--- IPC send:: sync-event-end local-window");
           win.webContents.send('sync-event-end');
         })
     });
@@ -128,10 +120,10 @@ module.exports = {
     nodeClientSocket.on('rt:updates', (data) => {
       console.log('on:: rt:updates');
 
-      global.appData.initialState.connections.forEach((connection)=> {
+      global.appData.initialState.connections.forEach((connection) => {
         if (connection._id === data.user._id && connection.following) {
 
-          console.log("--- send:: sync-event-start local-window");
+          console.log("--- IPC send:: sync-event-start local-window", 'line 128');
           win.webContents.send('sync-event-start');
 
           global.appData.initialState.connections.forEach((connection) => {
@@ -144,9 +136,9 @@ module.exports = {
                   //updating the global object here
                   socketUtil.updateGlobalArrayObject(data, 'notebooks');
 
-                  console.log('--- send:: update-rt-synced-notebooks');
+                  console.log('--- IPC send:: update-rt-synced-notebooks');
                   win.webContents.send('update-rt-synced-notebooks', data);
-                  console.log('--- send:: sync-event-end');
+                  console.log('--- IPC send:: sync-event-end');
                   win.webContents.send('sync-event-end');
 
                 })
@@ -159,7 +151,6 @@ module.exports = {
 
     nodeClientSocket.on('send-profile-updates', (data) => {
       console.log('--- on:: send-profile-updates');
-      console.log("data.avatar", data.avatar); // path is good at this point
 
       global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
         if (connection._id === data._id) {
@@ -167,19 +158,18 @@ module.exports = {
             connection.name = data.name;
           }
           if (connection.following) {
-            win.webContents.send('sync-event-start');
             if (data.avatar && !connection.avatar) {
-              console.log('Updated connection to add avatar');
+              console.log('--- Updated connection to add avatar');
               connection = getAvatarData(connection, data)
             } else if (!data.avatar && connection.avatar) {
-              console.log('Update connection to remove avatar');
+              console.log('--- Update connection to remove avatar');
               connection = removeAvatarData(connection, data)
             } else if (data.avatar && data.avatar.name !== connection.avatar.name) {
-              console.log('Update connection to update avatar');
+              console.log('--- Update connection to update avatar');
               connection = getAvatarData(connection, data)
             } else {
-              console.log('Update something else - NO CONDITIONS MET');
-              console.log('No Changes with avatar most likely');
+              console.log('--- Update something else - NO CONDITIONS MET');
+              console.log('--- No Changes with avatar most likely');
               updateConnectionsAndNotebooks(connection);
             }
           }
@@ -215,12 +205,10 @@ module.exports = {
     });
 
 
-
     //remvoes the event listener
     //TODO: !IMPORTANT - test for multiple connections
     //TODO: refractor to get all events dynamically
     function unbind() {
-      console.log('unbind triggered...');
       nodeClientSocket.removeAllListeners("begin-handshake");
       nodeClientSocket.removeAllListeners("sync-data");
       nodeClientSocket.removeAllListeners("return:avatar");
@@ -236,6 +224,7 @@ module.exports = {
       io.to(connection.socketId).emit('request:avatar');
       connection.avatar = data.avatar;
       connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
+      connection.avatar.path = path.normalize(data.avatar.path);
 
       updateConnectionsAndNotebooks(connection);
 
@@ -250,21 +239,44 @@ module.exports = {
     }
 
     function updateConnectionsAndNotebooks(connection) {
-      socketUtil.followedConnectionUpdate(connection)
-        .then((updatedConnection) => {
-          // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
-          console.log('--- send:: update-connection-list to:: local window');
-          win.webContents.send('update-connection-list');
-          win.webContents.send('sync-event-end');
-        });
+      console.log('--- IPC send:: sync-event-start to:: local-window', 'line 245');
+      win.webContents.send('sync-event-start');
 
-      socketUtil.normalizeNotebooks(connection)
-        .then((updatedNotebooks) => {
-          socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
-          console.log('--- send:: update-synced-notebooks to:: local window');
-          win.webContents.send('update-synced-notebooks');
-          win.webContents.send('sync-event-end');
-        });
+
+      let promises = [];
+      promises.push(
+
+        new Promise((resolve, reject) => {
+          socketUtil.followedConnectionUpdate(connection)
+            .then((updatedConnection) => {
+              // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+              resolve(updatedConnection)
+            })
+            .catch((err) => {
+              reject(err);
+            })
+        }),
+
+        new Promise((resolve, reject) => {
+          socketUtil.normalizeNotebooks(connection)
+            .then((updatedNotebooks) => {
+              socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+              resolve(updatedNotebooks)
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
+      );
+
+      Promise.all(promises).then((results) => {
+        console.log('--- IPC send:: update-connection-list to:: local-window');
+        win.webContents.send('update-connection-list');
+        console.log('--- IPC send:: update-synced-notebooks to:: local-window');
+        win.webContents.send('update-synced-notebooks');
+        console.log('--- IPC send:: sync-event-end to:: local-window');
+        win.webContents.send('sync-event-end');
+      })
     }
   }
 

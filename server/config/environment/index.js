@@ -34,8 +34,6 @@ var all = {
     userRoles: ['guest', 'user', 'admin'],
     dataRootPath: process.env.SECOND_INSTANCE ? '/Glossa2' : 'Glossa',
 };
-console.log('process.env.LOCAL', process.env.LOCAL);
-console.log('process.env.BYPASS_UDP', process.env.BYPASS_UDP);
 // Export the config object based on the NODE_ENV
 // ==============================================
 

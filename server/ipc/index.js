@@ -56,6 +56,7 @@ module.exports = {
       socketUtil.createTranscription(data)
         .then((transcription) => {
           global.appData.initialState.transcriptions = [transcription, ...global.appData.initialState.transcriptions];
+          console.log("IPC send:: update-transcription-list to:: local-window");
           event.sender.send('update-transcription-list', {selectedFileId: transcription._id});
         })
         .catch((err) => {
@@ -67,6 +68,7 @@ module.exports = {
       socketUtil.removeTranscription(data.transcriptionId)
         .then((numRemoved) => {
           global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(trans => trans._id !== data.transcriptionId);
+          console.log('IPC send:: update-transcription-list to:: local-window');
           event.sender.send('update-transcription-list');
         })
         .catch((err) => {
@@ -83,7 +85,7 @@ module.exports = {
      */
     function onUpdateFollowing(event, data) {
       console.log('');
-      console.log('on:: update:following ipc');
+      console.log('IPC on:: update:following');
       let user = JSON.parse(data.user);
       //the returned object will not have socketId or online status
 
@@ -103,6 +105,7 @@ module.exports = {
 
               if (connection.avatar) {
                 //sends to connected socket client
+                console.log('emit:: request:avatar; from:: ipc; to:: connection we clicked');
                 io.to(connection.socketId).emit('request:avatar');
               }
 
@@ -113,6 +116,7 @@ module.exports = {
             //only return connection that are online or that we are following
             return con.online || con.following;
           });
+          console.log('IPC send:: update-connection-list to:: local-window');
           event.sender.send('update-connection-list')
         })
         .catch((err) => {
@@ -121,11 +125,11 @@ module.exports = {
         });
     }
 
+    //broadcast updates to all users when basic profile information changes
+    //all clients will hear this event and act accordingly depending on if they are following this client or not
     function onBroadcastProfileUpdates() {
       console.log('');
-      console.log('broadcast:profile-updates ipc');
-
-
+      console.log('IPC on:: broadcast:profile-updates');
 
       const basicProfileData = {
         _id: global.appData.initialState.user._id,
@@ -134,27 +138,8 @@ module.exports = {
         avatar: global.appData.initialState.user.avatar
       };
 
-      console.log('basicProfileData', basicProfileData);
-
+      console.log("broadcast:: send-profile-updates to:: externalClientsRoom");
       io.to('externalClientsRoom').emit('send-profile-updates', basicProfileData)
-
-
-
-      //
-      // console.log('');
-      // console.log('on:: broadcast:profile-updates ipc');
-      // console.log('TODO: update to include phone numbers');
-      // console.log('TODO: update to include avatar');
-      //
-      // socketUtil.getUser()
-      //   .then(function(user) {
-      //     let limitedUser = {};
-      //     limitedUser._id = user._id;
-      //     limitedUser.name = user.name;
-      //     limitedUser.socketId = user.socketId;
-      //     socketUtil.broadcastToExternalClients(io, 'rt:profile-updates', limitedUser);
-      //   });
-
     }
 
 
@@ -168,7 +153,7 @@ module.exports = {
      */
     function onBroadcastUpdates(event, notebook) {
       console.log('');
-      console.log('broadcast:Updates ipc');
+      console.log('IPC on:: broadcast:Updates');
 
       let mediaPromises = [];
       //encode image
@@ -203,14 +188,8 @@ module.exports = {
           updateObject.notebooks = [];
           updateObject.notebooks.push(notebook);
 
+          console.log('broadcast:: rt:updates to:: externalClientsRoom');
           io.to('externalClientsRoom').emit('rt:updates', updateObject)
-
-          // global.appData.initialState.connections.forEach((connection) => {
-          //   console.log('emit:: rt:updates');
-          //   console.log('connection.socketId', connection.socketId);
-          //   io.to(connection.socketId).emit('rt:updates', updateObject);
-          // });
-
 
         });
       } else {
@@ -235,7 +214,7 @@ module.exports = {
     //data is boolean
     function toggleSharing(event, data) {
       console.log('');
-      console.log('toggle:sharing ipc');
+      console.log('IPC on:: toggle:sharing');
 
       if (data.isSharing) {
         config.localDev ? socketClient.initLocal(io, win) : udp.init(server, io, win);
@@ -247,9 +226,11 @@ module.exports = {
 
     function onCombineNotebooks(event, data) {
       console.log('');
-      console.log('combine:notebooks ipc');
+      console.log('IPC on:: combine:notebooks');
 
+      console.log('IPC send:: update-synced-notebooks to:: local-window');
       event.sender.send('update-synced-notebooks');
+      console.log('IPC send:: update-rt-synced-notebooks to:: local-window');
       event.sender.send('update-rt-synced-notebooks', []);
 
     }
