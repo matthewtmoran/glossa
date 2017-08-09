@@ -314,10 +314,10 @@ function resolveAndUpdateTranscriptions() {
       //update notebooks array
       transcriptions = transcriptions.map((transcription) => {
         if (transcription.audio) {
-          transcriptions.audio.absolutePath = resolvePath(transcription.audio.absolutePath, 'audio');
+          transcription.audio.absolutePath = resolvePath(transcription.audio.absolutePath, 'audio');
         }
         if (transcription.image) {
-          transcriptions.image.absolutePath = resolvePath(transcription.image.absolutePath, 'image');
+          transcription.image.absolutePath = resolvePath(transcription.image.absolutePath, 'image');
         }
         return transcription;
       });
@@ -379,7 +379,12 @@ function resolveAndUpdateUser() {
         reject(err);
       }
       if (user.avatar) {
-        user.avatar.absolutePath = resolvePath(user.avatar.absolutePath, 'image');
+        if (!user.avatar.absolutePath) {
+          console.log(' may be old data???????');
+         user.avatar.absolutePath =  path.join(config.dataRootPath, 'image');
+        } else {
+          user.avatar.absolutePath = resolvePath(user.avatar.absolutePath, 'image');
+        }
       }
       let options = {returnUpdatedDocs: true};
       User.update({_id: user._id}, user, options, (err, updatedCount, updatedDoc) => {

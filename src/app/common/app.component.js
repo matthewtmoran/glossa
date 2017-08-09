@@ -19,7 +19,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce, CorpusService, $stateParams) {
+    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce, CorpusService, $stateParams) {
       'ngInject';
       this.$scope = $scope;
       this.$state = $state;
@@ -29,6 +29,7 @@ export const appComponent = {
       this.notebookService = NotebookService;
       this.ipcSerivce = IpcSerivce;
       this.$stateParams = $stateParams;
+      this.$timeout = $timeout;
 
       this.__appData = __appData;
 
@@ -92,6 +93,21 @@ export const appComponent = {
           action: action
         });
       });
+
+      this.ipcSerivce.on('import:project', (event, data) => {
+        this.isLoading = true;
+        this.rootService.ipcImportProject()
+          .then((response) => {
+            console.log('response is here:', response);
+            this.$timeout(() => {
+              this.isLoading = false;
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+          })
+      });
+
 
       //removes sync-display
       this.ipcSerivce.on('sync-event-end', (event, data) => {
@@ -390,17 +406,22 @@ export const appComponent = {
     }
 
     exportProject(event) {
-      this.cfpLoadingBar.start();
       let options = {};
       options.title = "Are you sure you want to export all your project data?";
       options.textContent = "This may take a few minutes...";
       this.dialogService.confirmDialog(options)
         .then((result) => {
           if (!result) {
+            this.isLoading = false;
             return;
           }
+
+          this.isLoading = true;
+          this.cfpLoadingBar.start();
+
           this.settingsService.exportProject(event.project)
             .then((data) => {
+              this.isLoading = false;
               this.cfpLoadingBar.complete();
             });
         });

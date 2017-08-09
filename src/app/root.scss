@@ -8,6 +8,30 @@
 
 .glossa-app {
 
+  #full-screen-loader-overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 81;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: .48;
+    background-color: rgba(33,33,33,1.0);
+
+  }
+  .full-screen-loader-spinner {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 82;
+    margin: auto;
+  }
+
   &.fancy-frame {
     border: 1px solid #444444;
 

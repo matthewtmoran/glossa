@@ -20,7 +20,7 @@ export class RootService {
     //TODO: move ipc listeners to their own service
     //@electron-run
     ipc.on('navigateToState', this.navigateToState.bind(this));
-    ipc.on('import:project', this.ipcImportProject.bind(this));
+
 
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
 
@@ -92,25 +92,36 @@ export class RootService {
 
   //electron event
   ipcImportProject(event, message) {
-    let options = {
-      filters: [{name: 'Glossa File (.glossa)', extensions: ['glossa']}]
-    };
+    console.log('ipcImportProject');
+    return new Promise((resolve, reject) => {
+      console.log('test1');
+      let options = {
+        filters: [{name: 'Glossa File (.glossa)', extensions: ['glossa']}]
+      };
 
-    dialog.showOpenDialog(options, (selectedFiles) => {
+      return dialog.showOpenDialog(options, (selectedFiles) => {
+        console.log('showOpenDialog');
+          if (selectedFiles) {
+            console.log('file was selected');
+            this.$http.post('/api/project/import', {projectPath: selectedFiles[0]})
+              .then((response) => {
+                console.log('response was success');
+                this.$window.location.reload();
+                resolve(response);
+              })
+              .catch((err) => {
 
-        if (selectedFiles) {
-
-          this.$http.post('/api/project/import', {projectPath: selectedFiles[0]})
-            .then((response) => {
-              this.$window.location.reload();
-            })
-            .catch((response) => {
-              console.log('There was an error', response);
-              this.$window.location.reload();
-            });
+                console.log('There was an error', err);
+                this.$window.location.reload();
+                reject(err);
+              });
+          } else {
+            console.log('no file selected');
+            resolve('Nothing selected');
+          }
         }
-      }
-    );
+      );
+    });
   }
 
 

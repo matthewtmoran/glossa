@@ -20,39 +20,10 @@ module.exports = function() {
 
 module.exports = {
 
-  initBrowserWindow: () => {
-    mainBrowserWindow = BrowserWindow.getFocusedWindow();
-  },
-
   on: (eventName, callback) => {
     ipc.on(eventName,(...args) => {
       callback.apply(ipc, args);
     })
   },
 
-  send:(eventName, data, callback) => {
-    mainBrowserWindow
-  }
-
-
 };
-
-
-// module.exports =  {
-//
-//   initIpcListeners: () => {
-//
-//     if (!mainBrowserWindow) {
-//       mainBrowserWindow = BrowserWindow.getFocusedWindow()
-//     }
-//
-//   },
-//
-//
-//   sendToClient: (event, data) => {
-//     mainBrowserWindow.webContents.send(event, data)
-//   },
-//
-//
-//
-// };

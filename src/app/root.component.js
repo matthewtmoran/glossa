@@ -11,33 +11,7 @@ export const rootComponent = {
       this.appData = __appData;
       this.ipcSerivce = IpcSerivce;
       this.$scope = $scope;
-
-      this.ipcSerivce.on('application:data', (event, data) => {
-        console.log('');
-        console.log('application:data');
-        console.log('data', data);
-      });
-
-      // this.$scope.$watch(() => this.appData.initialState, this.stateWatcher.bind(this))
-
     }
-
-    stateWatcher(currentValue, previousValue) {
-      console.log('');
-      console.log('APP_STATE has changed');
-      console.log('currentValue', currentValue);
-      console.log('previousValue', previousValue);
-      console.log('');
-    }
-
-    $onChanges(changes) {
-
-    }
-
-    $onInit() {
-
-    }
-
 
     minimize() {
       BrowserWindow.minimize();

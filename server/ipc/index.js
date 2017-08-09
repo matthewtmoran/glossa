@@ -34,6 +34,7 @@ module.exports = {
       win = main.getWindow();
       //if we are sharing
       if (global.appData.initialState.settings.isSharing) {
+        console.log(' We are sharing');
         //if it's not merely a refresh
         if (!isRefresh) {
           isRefresh = true;
