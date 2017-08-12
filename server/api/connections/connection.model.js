@@ -6,7 +6,7 @@ var Datastore = require('nedb'),
   connectionsDb = new Datastore({
     filename: path.join(app.getPath('userData'), '/storage/glossa-connections'),
     autoload: true,
-    timestampData: true
+    timestampData: false
   });
 
 module.exports = connectionsDb;

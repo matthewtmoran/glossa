@@ -37,5 +37,9 @@ export const rootComponent = {
       this.ipcSerivce.send('popupAppMenuEvent');
     }
 
+    sendTest() {
+      this.ipcSerivce.send('test:event');
+    }
+
   },
 };

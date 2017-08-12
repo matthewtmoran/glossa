@@ -81,7 +81,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist && webpack --bail --progress --profile",
     "start": "electron .",
-    "start-local": "SET LOCAL=true && SET BYPASS_UDP=true && SET PORT=9000 && npm run start",
+    "start-local": "SET DEBUG=true && SET LOCAL=true && SET BYPASS_UDP=true && SET PORT=9000 && npm run start",
     "start-local-second": "SET LOCAL=true && SET BYPASS_UDP=true && SET PORT=9090 && SET SECOND_INSTANCE=true && npm run start",
     "package-mac": "electron-packager . --overwrite --ignore=src --platform=darwin --arch=x64 --icon=dist/img/glossa-logo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds",

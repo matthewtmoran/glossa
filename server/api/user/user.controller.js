@@ -45,6 +45,8 @@ exports.show = function (req, res) {
 // Creates a new thing in the DB.
 exports.create = function (req, res) {
   var user = req.body;
+  user.createdAt = Date.now();
+  user.updatedAt = Date.now();
   User.insert(user, function (err, c) {
     if (err) {
       return handleError(res, err);
@@ -68,6 +70,7 @@ exports.update = function (req, res) {
     }
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(user, req.body);
+    updated.updatedAt = Date.now();
     User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) {
         return handleError(res, err);

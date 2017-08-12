@@ -7,7 +7,7 @@ var Datastore = require('nedb'),
   transcriptionDb = new Datastore({
     filename: path.join(app.getPath('userData'), '/storage/glossa-transcription'),
     autoload: true,
-    timestampData: true
+    timestampData: false
   });
 
 module.exports = transcriptionDb;

@@ -47,6 +47,9 @@ exports.show = function (req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function (req, res) {
+  let transcription = req.body;
+  transcription.createdAt = Date.now();
+  transcription.updatedAt = Date.now();
   Transcription.insert(req.body, function (err, file) {
     if (err) {
       return handleError(res, err);
@@ -70,7 +73,7 @@ exports.update = function (req, res) {
     }
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(file, req.body.dataObj);
-
+    updated.updatedAt = Date.now();
 
     if (!req.body.dataObj.notebookId) {
       delete updated.notebookId

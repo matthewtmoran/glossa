@@ -41,6 +41,9 @@ exports.show = function (req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function (req, res) {
+  let newNotebook = req.body.dataObj;
+  newNotebook.createdAt = Date.now();
+  newNotebook.updatedAt = Date.now();
   Notebook.insert(req.body.dataObj, function (err, notebook) {
     if (err) {
       return handleError(res, err);
@@ -65,6 +68,7 @@ exports.update = function (req, res) {
     }
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(notebook, req.body.dataObj);
+    updated.updatedAt = Date.now();
     // hashtags will either be array of tags or an empty array
     updated.hashtags = req.body.dataObj.hashtags || [];
     Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {

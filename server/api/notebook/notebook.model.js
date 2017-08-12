@@ -6,7 +6,7 @@ var Datastore = require('nedb'),
   notebookDb = new Datastore({
     filename: path.join(app.getPath('userData'), '/storage/glossa-notebooks'),
     autoload: true,
-    timestampData: true
+    timestampData: false
   });
 
 module.exports = notebookDb;

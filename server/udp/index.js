@@ -43,9 +43,11 @@ module.exports = {
   },
 
   stop: () => {
-    let interval = 5000
-    userData.available = false;
-    discover.update(serviceName, userData, interval, false);
+    let interval = 5000;
+    if (userData) {
+      userData.available = false;
+      discover.update(serviceName, userData, interval, false);
+    }
   }
 };
 

@@ -90,6 +90,7 @@ exports.showTerm = function(req, res) {
                 realTitle: tagName,
                 canEdit: true,
                 createdAt: Date.now(),
+                updatedAt: Date.now(),
                 occurrence: 1
             };
             return Hashtag.insert(newTag, function(err, createdTag) {
@@ -98,6 +99,7 @@ exports.showTerm = function(req, res) {
             });
         }
         var options = {returnUpdatedDocs: true};
+        tag.updatedAt = Date.now();
         Hashtag.update({"_id": tag._id}, tag, options, function(err, updatedCount, updatedTag) {
             if(err) { return handleError(res, err); }
             return res.status(200).json(updatedTag);
@@ -117,6 +119,7 @@ exports.decreaseCount = function(req, res) {
             hashtag.occurrence--
         }
         var options = {returnUpdatedDocs: true};
+        hashtag.updatedAt = Date.now();
         Hashtag.update({_id: hashtag._id}, hashtag, options, function (err, updatedCount, updatedTag) {
             if (err) { return handleError(res, err); }
             return res.status(200).json(updatedTag);

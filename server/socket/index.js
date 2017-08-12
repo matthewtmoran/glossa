@@ -7,12 +7,16 @@ const socketUtil = require('./socket-util');
 const main = require('../../main');
 const app = require('electron').app;
 let localClient = {};
+let connectedClients = {};
 
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
     console.log('');
+    console.log('');
     console.log('on:: connection');
+    console.log('socket.id:', socket.id);
+    console.log('');
 
     /////////////
     //handshake//
@@ -44,9 +48,12 @@ module.exports = function (io) {
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
 
+      connectedClients[socket.id] = {};
+      connectedClients[socket.id].disconnected = false;
+
       let win = main.getWindow();
       console.log('IPC send:: sync-event-start to:: local-window', 'line 49');
-      win.webContents.send('sync-event-start');
+      // win.webContents.send('sync-event-start');
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
         //update existing connections
@@ -122,10 +129,19 @@ module.exports = function (io) {
       }
     }
 
-    function disconnect() {
+    function disconnect(reason, test) {
       let win = main.getWindow();
       console.log('');
+      console.log('');
+      console.log('');
       console.log('on:: disconnect');
+      console.log('Server disconnect data:', reason);
+      console.log('test:', test);
+      console.log("socket.id", socket.id);
+      console.log('');
+      console.log('');
+      console.log('');
+
       //get connection from list
       let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
 

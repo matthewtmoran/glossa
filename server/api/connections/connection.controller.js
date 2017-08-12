@@ -42,6 +42,8 @@ exports.show = function (req, res) {
 // Creates a new thing in the DB.
 exports.create = function (req, res) {
   var connection = req.body;
+  connection.createdAt = Date.now();
+  connection.updatedAt = Date.now();
   Connection.insert(connection, function (err, c) {
     if (err) {
       return handleError(res, err);
@@ -67,6 +69,7 @@ exports.update = function (req, res) {
     }
     var options = {returnUpdatedDocs: true};
     var updated = _.merge(connection, req.body);
+    updated.updatedAt = Date.now();
     Connection.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) {
         return handleError(res, err);

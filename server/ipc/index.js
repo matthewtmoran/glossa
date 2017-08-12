@@ -27,6 +27,9 @@ module.exports = {
 
     ipcUtil.on('create:transcription', onCreateTranscription);
     ipcUtil.on('remove:transcription', onRemoveTranscription);
+    ipcUtil.on('test:event', (event, data) => {
+      io.to('externalClientsRoom').emit('test:event', {fromUser: global.appData.initialState.user.name});
+    });
 
 
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly

@@ -33,6 +33,8 @@ exports.show = function(req, res) {
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
     var settings = req.body;
+    settings.createdAt = Date.now();
+    settings.updatedAt = Date.now();
     Settings.insert(settings, function(err, c) {
         if(err) { return handleError(res, err); }
         return res.status(201).json(c);
@@ -48,6 +50,7 @@ exports.update = function(req, res) {
         if(!settings) { return res.status(404).send('Not Found'); }
         var options = {returnUpdatedDocs: true};
         var updated = _.merge(settings, req.body);
+        updated.updatedAt = Date.now();
         Settings.update({_id: settings._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
             global.appData.initialState.settings = Object.assign({}, updatedDoc);

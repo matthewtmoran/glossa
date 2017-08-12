@@ -7,7 +7,7 @@ var Datastore = require('nedb'),
   projectDb = new Datastore({
     filename: path.join(app.getPath('userData'), '/storage/glossa-project'),
     autoload: true,
-    timestampData: true
+    timestampData: false
   });
 
 module.exports = projectDb;

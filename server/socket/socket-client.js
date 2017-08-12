@@ -2,7 +2,6 @@
 var socketUtil = require('./socket-util');
 var path = require('path');
 var fs = require('fs');
-var Notebooks = require('./../api/notebook/notebook.model.js');
 const main = require('../../main');
 const app = require('electron').app;
 const config = require('../config/environment');
@@ -25,6 +24,8 @@ module.exports = {
     let externalPath = 'http://' + service.addr + ':' + port;
     //if the service is not in the master list then we connect to it as a client
     if (connectionList.indexOf(service.name) < 0) {
+      // let nodeClientSocket = ioClient(externalPath, {transports: ['websocket'], upgrade: false});
+      // let nodeClientSocket = ioClient.connect(externalPath, {reconnection: true, reconnectionDelay: 1000});
       let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
       this.connect(service, io, win, nodeClientSocket);
       //handle the connection to the external socket server
@@ -70,15 +71,28 @@ module.exports = {
 
     });
 
+    nodeClientSocket.on('test:event', (data) => {
+      console.log('Heard test:event');
+    })
+
     nodeClientSocket.on('disconnect', (reason) => {
       console.log('');
+      console.log('');
+      console.log('');
       console.log('--- on:: disconnect');
+      console.log('--- reason:', reason);
+      console.log('');
+      console.log('');
       console.log('');
       //when the socket disconnects, we remove the service name from the list
       connectionList.splice(connectionList.indexOf(service.name), 1);
       //unbind listeners so they are not duplicated
       unbind();
-      this.initLocal(devObject.io, devObject.win);
+
+      //if its' lcal dev start again...
+      if (config.localDev) {
+        // this.initLocal(devObject.io, devObject.win);
+      }
     });
 
     //recievs event from an external server and emits the end-handshake
