@@ -129,6 +129,11 @@ module.exports = {
           console.log("--- IPC send:: sync-event-end local-window");
           win.webContents.send('sync-event-end');
         })
+        .catch((err) => {
+          console.log('The was an error getNewAndUpdatedNotebooks: ', err);
+          console.log("--- IPC send:: sync-event-end local-window");
+          win.webContents.send('sync-event-end');
+        })
     });
 
     nodeClientSocket.on('rt:updates', (data) => {

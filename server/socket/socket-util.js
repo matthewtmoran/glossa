@@ -355,6 +355,8 @@
       })
     },
 
+    //client is the person we are syncing data with
+    //we are now extracting the data we currently have from this client to check to see if we need new data from him
     //called when we follow someone or when someone we follow comes online
     //we get our data then send back
     syncData(client, callback) {
@@ -456,13 +458,14 @@
 
           let query = {_id: notebook._id};
           //becuase nedb auto time stamp does not work
-          let manualTimeEntry = new Date(notebook.updatedAt);
-          notebook.updatedAt = new Date(manualTimeEntry.getTime());
+          // let manualTimeEntry = new Date(notebook.updatedAt);
+          // notebook.updatedAt = new Date(manualTimeEntry.getTime());
           Notebooks.update(query, notebook, options, (err, updateCount, updatedDoc) => {
             if (err) {
               console.log('Error inserting new notebooks', err);
               reject(err);
             }
+            console.log('udpatedDoc', updatedDoc);
           });
 
         });
@@ -500,7 +503,6 @@
         let notebooksToSend = [];
         let allPotentialNotebooks = global.appData.initialState.notebooks.filter(notebook => notebook.createdBy._id === global.appData.initialState.user._id);
 
-
         if (oldData.length === 0) {
 
           notebooksToSend = allPotentialNotebooks.map((notebook) => {
@@ -529,22 +531,19 @@
             let notebookExists = false;
             let notebookNeedsUpdate = false;
 
-
             //run through the data we have
             oldData.forEach((oldNotebook) => {
               //if we have the data set the exist flag to true
               if (oldNotebook._id === notebook._id) {
                 notebookExists = true;
-                //get the updatedAt data object for the existing notebook
-                let externalUpdatedAtDateObject = new Date(oldNotebook.updatedAt);
 
                 //check if notebook needs to be updated.
                 //if the times are note equal
-                if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
+                if (notebook.updatedAt !== oldNotebook.updatedAt) {
                   //and if the time of the new notebook is greater than the oldData notebook match
                   //we know there must be an update to this specific notebook;
                   //TODO: maybe to a deep object comparison...
-                  if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
+                  if (notebook.updatedAt > oldNotebook.updatedAt) {
                     notebookNeedsUpdate = true;
                   }
                 }

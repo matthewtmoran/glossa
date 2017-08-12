@@ -44,15 +44,18 @@ module.exports = function (io) {
 
     //client returns 'end-handshake with data'
     function onEndHandshake(client) {
-      console.log('on:: endHandShake');
+      console.log('on:: end-handshake');
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
 
+      //keep track of connections
       connectedClients[socket.id] = {};
       connectedClients[socket.id].disconnected = false;
 
+      //get main window object
       let win = main.getWindow();
-      console.log('IPC send:: sync-event-start to:: local-window', 'line 49');
+
+      // console.log('IPC send:: sync-event-start to:: local-window', 'line 49');
       // win.webContents.send('sync-event-start');
       //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
@@ -65,15 +68,22 @@ module.exports = function (io) {
           //update data that we do not store
           connection.online = true;
           connection.socketId = client.socketId;
+          connection.name = client.name;
 
           //i already know it's following here but just in case and for consitency sake
           if (connection.following) {
-            //if client has avatar exists
+            //if client has avatar object exist and client avatar name exists as a field
+            //and
+            //connection.avatar does not exist or if the connection.avatar.name field does not exist
             if ((client.avatar && client.avatar.name) && (!connection.avatar || !connection.avatar.name)) {
               console.log("client has avatar connection does not have avatar");
               //this means connection is null but client is not null
               //client has an avatar image we need
               getNewAvatarData(connection, client, win)
+            //  if client.avatar does not exist or if client.avatar.name field does not exist
+            //  and
+            //  connection.avatar exists and connection.avatar.name field exists,
+            //  remove the file and remove the avatar data on the connection object
             } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
               //this means client is null but connection is not null
               //client has removed his avatar image
@@ -84,14 +94,20 @@ module.exports = function (io) {
                 }
               });
               delete connection.avatar;
+            //  if client avatar exists and client avatar.name exists and connection.avatar exists and connection.avatar.name eixsts and client .avatar.name is not the same as connection.avatar.name
             } else if (client.avatar && client.avatar.name && connection.avatar && connection.avatar.name && client.avatar.name !== connection.avatar.name) {
               //this means client has changed his avatar image to a new avatar
-              console.log('TODO: remove the data we hold and get the new data');
+              console.log('TODO: remove the data we hold and get the new data')
+              //remove the image attached to the connection object and get new data
               fs.unlink(connection.avatar.absolutePath);
               getNewAvatarData(connection, client, win)
             }
 
+            //sync data
             socketUtil.syncData(connection, (data) => {
+
+              console.log('IPC send:: sync-event-start to:: local-window', 'line 108');
+              win.webContents.send('sync-event-start');
               console.log('emit:: sync-data to:: a client');
               io.to(client.socketId).emit('sync-data', data)
             });
@@ -119,6 +135,7 @@ module.exports = function (io) {
           global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
         }
 
+        //join the externalClientRoom
         socket.join('externalClientsRoom');
         console.log('IPC send:: update-connection-list');
         win.webContents.send('update-connection-list');
