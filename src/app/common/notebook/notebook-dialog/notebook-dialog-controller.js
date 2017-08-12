@@ -36,14 +36,12 @@ export class NotebookDialogController {
   }
 
   $onInit() {
-    console.log('$onInit');
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();
   }
 
   init() {
-    console.log('init')
     this.removedMedia = [];
     this.findDetailType();
     this.setDynamicItems();
@@ -88,12 +86,14 @@ export class NotebookDialogController {
     this.currentNotebook.description = angular.copy(event.value);
   }
 
+  //determines if it's a new notebook or existing notebook
   findDetailType() {
     if (!this.currentNotebook._id) {
       this.isNewPost = true;
     }
   }
 
+  //defines the buttons and functionality of buttons
   setDynamicItems() {
     if (this.isNewPost) {
       this.postDetails = {

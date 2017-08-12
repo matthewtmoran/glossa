@@ -20,7 +20,9 @@ export class SettingsHashtagsComponent {
 
   //TODO: find a away to add loading dialog while dom loads data
   toggleFilter(item) {
+    console.log('loader begin');
     this.cfpLoadingBar.start();
+    console.log('loader end');
     this.cfpLoadingBar.complete();
   }
 

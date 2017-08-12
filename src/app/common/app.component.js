@@ -80,7 +80,9 @@ export const appComponent = {
       //TODO: consider removal and updateing sync display to be only client side...
       this.ipcSerivce.on('sync-event-start', (event, data) => {
         console.log('on:: sync-event-start');
+        console.log('..this event needs to be followed by sync-event-end');
 
+        console.log('loader begin');
         this.cfpLoadingBar.start();
 
         let msg = `Syncing Data`;
@@ -112,6 +114,7 @@ export const appComponent = {
       //removes sync-display
       this.ipcSerivce.on('sync-event-end', (event, data) => {
         console.log('on:: sync-event-end');
+        console.log('loader end');
         this.cfpLoadingBar.complete();
       });
 
@@ -129,6 +132,7 @@ export const appComponent = {
         } else {
           this.selectInitialFile(); //set to the first file in the list...
         }
+        console.log('loader end');
         this.cfpLoadingBar.complete();
       });
 
@@ -255,6 +259,7 @@ export const appComponent = {
 
 
     createTranscription(event) {
+      console.log('loader begin');
       this.cfpLoadingBar.start();
 
       let file = {
@@ -283,6 +288,7 @@ export const appComponent = {
           if (!response) {
             return;
           }
+          console.log('loader begin');
           this.cfpLoadingBar.start();
           this.ipcSerivce.send('remove:transcription', {transcriptionId: event.fileId});
         });
@@ -292,7 +298,7 @@ export const appComponent = {
 
       this.corpusService.updateFile(event.file)
         .then((data) => {
-
+          console.log('loader end');
           this.cfpLoadingBar.complete();
 
           //update selected file
@@ -381,7 +387,7 @@ export const appComponent = {
           if (!result) {
             return;
           }
-
+          console.log('loader begin');
           this.cfpLoadingBar.start();
           this.selectedFile.removeItem = []; //create this temp property to send to server
           this.selectedFile.removeItem.push(event.media);
@@ -417,32 +423,38 @@ export const appComponent = {
           }
 
           this.isLoading = true;
+          console.log('loader begin');
           this.cfpLoadingBar.start();
 
           this.settingsService.exportProject(event.project)
             .then((data) => {
               this.isLoading = false;
+              console.log('loader end');
               this.cfpLoadingBar.complete();
             });
         });
     }
 
     updateProject(event) {
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.settingsService.updateProject(event.project)
         .then((data) => {
           this.project = angular.copy(this.__appData.initialState.project);
           // this.project = angular.copy(data);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
         })
     }
 
     updloadAvatar(event) {
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.$q.when(this.rootService.uploadAvatar(event.file))
         .then((data) => {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
 
@@ -450,11 +462,13 @@ export const appComponent = {
     }
 
     removeAvatar(event) {
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.removeAvatar(event.file)
         .then((data) => {
           this.currentUser = angular.copy(this.__appData.initialState.user);
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
         })
@@ -462,6 +476,7 @@ export const appComponent = {
 
     //update 'profile' information.
     updateUserInfo(event) {
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       //http request
       this.rootService.updateUserInfo(event.currentUser)
@@ -470,6 +485,7 @@ export const appComponent = {
           this.currentUser = angular.copy(this.__appData.initialState.user); //copy data to ensure $onchnages triggered across application
           //copy new notebook data to update across application
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
           console.log('TODO: emit to external socket that user data has been updated?????? or bradcast when db is updated.....  ');
         })
@@ -604,6 +620,7 @@ export const appComponent = {
     //new notebook
     saveNotebook(event) {
       this.$mdDialog.hide();
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       event.notebook.createdBy = {
         _id: this.currentUser._id,
@@ -615,10 +632,12 @@ export const appComponent = {
       this.notebookService.createNotebook(event.notebook)
         .then((data) => {
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
         })
         .catch((data) => {
           console.log('There was an error ', data);
+          console.log('loader end');
           this.cfpLoadingBar.complete();
         });
     }
@@ -626,6 +645,7 @@ export const appComponent = {
     // update notebook
     updateNotebook(event) {
       console.log('update event');
+      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.notebookService.updateNotebook(event.notebook)
         .then((data) => {
@@ -633,11 +653,7 @@ export const appComponent = {
 
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
 
-          // this.notebooks.map((notebook, index) => {
-          //   if (notebook._id === data._id) {
-          //     this.notebooks[index] = data;
-          //   }
-          // });
+          console.log('loader end');
           this.cfpLoadingBar.complete();
         })
     }
@@ -660,6 +676,7 @@ export const appComponent = {
           if (!result) {
             this.viewDetails(event);
           } else {
+            console.log('loader begin');
             this.cfpLoadingBar.start();
             this.notebookService.deleteNotebook(event.notebook)
               .then((data) => {
@@ -669,7 +686,7 @@ export const appComponent = {
                 if (data) {
 
                   this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-
+                  console.log('loader end');
                   this.cfpLoadingBar.complete();
                 }
               });

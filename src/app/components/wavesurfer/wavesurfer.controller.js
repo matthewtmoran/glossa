@@ -26,6 +26,13 @@ export class WaveSurferController {
     this.$scope.$on('adjustPlaySpeedDown', this.adjustPlaySpeedDown.bind(this));
     this.$scope.$on('playPause', this.playPause.bind(this));
 
+    this.$onDestroy = () => {
+      console.log('loader end');
+      this.cfpLoadingBar.complete();
+    }
+
+
+
   }
 
   stopInterval() {
@@ -56,6 +63,10 @@ export class WaveSurferController {
     this.speedIndex = 1;
   }
 
+  $onDestroy() {
+    console.log(' on destroy event');
+  }
+
   responsiveWave() {
     this.surfer.empty();
     this.surfer.drawBuffer();
@@ -73,6 +84,7 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
+    console.log('loader begin');
     this.cfpLoadingBar.start();
     this.isReady = false;
     this.loading = true;
@@ -139,6 +151,7 @@ export class WaveSurferController {
         if (this.autoPlay) {
           this.surfer.play();
         }
+        console.log('loader end');
         this.cfpLoadingBar.complete();
       });
 
@@ -151,6 +164,10 @@ export class WaveSurferController {
         // }
         // this.cfpLoadingBar.complete();
       });
+
+      this.surfer.on('error', ()=>{
+        console.log('on error');
+      })
 
     }
 
@@ -187,6 +204,7 @@ export class WaveSurferController {
   }
 
   finish() {
+    console.log('finish');
     if (this.surfer) {
       this.stopInterval();
     }
