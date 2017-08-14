@@ -40,6 +40,7 @@ module.exports = (appData) => {
 
     if (options.cleanup) {
       console.log('cleaning...');
+
       return config.localDev ? false : udp.stop();
     }
 

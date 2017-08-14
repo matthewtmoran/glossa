@@ -273,14 +273,48 @@ function getInitialNotebooks() {
 
 function getInitialConnections() {
   return new Promise((resolve, reject) => {
-    Connections.find({}, (err, connections) => {
-      if (err) {
-        console.log('Error getting initial connections', err);
+    return resetConnectionData()
+      .then(()=>{
+        Connections.find({}, (err, connections) => {
+          if (err) {
+            console.log('Error getting initial connections', err);
+            reject(err);
+          }
+          resolve(connections);
+        });
+      })
+      .catch((err)=> {
         reject(err);
-      }
+      })
+  });
+}
+
+function resetConnectionData() {
+  return new Promise((resolve, reject) => {
+    Connections.find({}, (err, connections) => {
+      if(err){reject(err)}
+
+      let removable = connections.filter(connection => !connection.following);
+      removable.forEach((connection) => {
+        Connections.remove({_id: connection._id}, (err, count) => {
+          if(err){reject(err)}
+        })
+      });
+
+      connections = connections.filter(connection => connection.following).map((connection) => {
+        delete connection.socketId;
+        connection.online = false;
+        return connection;
+      });
+
+      connections.forEach((connection) => {
+        Connections.update({_id: connection._id}, connection, {}, (err, count) => {
+          if (err) {reject(err)}
+        })
+      });
       resolve(connections);
     });
-  });
+  })
 }
 
 function getInitialTranscriptions() {
