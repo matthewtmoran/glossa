@@ -1,0 +1,13 @@
+<!--windows title bar - only exist on windows... -->
+<windows-titlebar ng-if="$ctrl.appData.isWindows"
+                  class="windows-titlebar"
+                  on-popup-app-menu-event="$ctrl.popupAppMenuEvent($event)"
+                  on-minimize="$ctrl.minimize($event)"
+                  on-maximize="$ctrl.maximize($event)"
+                  on-unmaximize="$ctrl.unmaximize($event)"
+                  on-close="$ctrl.close($event)"
+                  on-is-maximized="$ctrl.maximized($event)">
+</windows-titlebar>
+<div class="root" flex layout="column">
+  <div ui-view class="fade-transition" flex search-text="$ctrl.searchText" layout="column"></div>
+</div>

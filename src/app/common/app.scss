@@ -1,0 +1,29 @@
+app {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+
+	//used in notebooks users and settings user-cards
+	.online-status {
+		height:15px;
+		width: 15px;
+		border-radius: 50px;
+		//position: absolute;
+		//bottom: 0;
+		//top: 0;
+		//margin: auto;
+		z-index: 61;
+
+		&.offline-notification {
+			background: #FF5607;
+		}
+
+		&.online-notification {
+			background: #CDDE20;
+		}
+	}
+}
+
+.app {
+  //margin-left: 250px;
+}

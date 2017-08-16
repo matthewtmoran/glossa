@@ -1,0 +1,102 @@
+@import "colors";
+.post-dialog {
+	form {
+		.media-container {
+			.top-actions {
+				.audio-container{
+					wave-surfer-preview {
+						&.full-preview {
+							wave {
+								canvas {
+									top: 0!important;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.transparent {
+	background-color: transparent !important;
+}
+
+.animated.ng-move,
+.animated.ng-enter,
+.animated.ng-leave {
+	-webkit-animation-duration: 0s;
+	animation-duration: 0s;
+}
+
+.waveSurferWave {//container of wave surfer
+	background-size: cover;
+	min-height: 200px;
+	background: $white; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(white 24%, $white 46%, $lGrey ); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(white 24%, $white 46%, $lGrey); /* Standard syntax */
+
+
+	wave {
+		overflow: hidden !important;
+		wave {
+
+		}
+	}
+
+	md-progress-linear {
+		margin-top: 97px;
+		position: absolute;
+
+		&.ng-hide, &.ng-leave {
+			transition: none;
+		}
+	}
+
+	&:after {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		box-shadow: inset 0 8px 8px -8px #696868;
+	}
+}
+
+.audioPlayerWrapper {
+	position: relative;
+
+	.md-player-controls {
+		position: absolute;
+		bottom: -20px;
+		right: 12px;
+	}
+
+	&.wave-preview {
+		.md-fab-bottom-right {
+			top: 175px !important;
+			z-index: 101;
+		}
+	}
+
+}
+
+.current-speed {
+	position: absolute;
+	top: -15px;
+	right: 15px;
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+	font-size: 1em;
+	z-index: 99;
+	text-shadow: 1px 1px 2px black;
+	color: white;
+
+}
+
+
+
+

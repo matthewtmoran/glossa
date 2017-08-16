@@ -1,335 +1,360 @@
-var Project = require('../api/project/project.model');
-var User = require('../api/user/user.model');
-var Session = require('../api/session/session.model');
-var Settings = require('../api/settings/settings.model');
-var currentUser;
+const path = require('path');
+const fs = require('fs');
+const Project = require(path.join(__dirname, '../api/project/project.model'));
+const User = require(path.join(__dirname, '../api/user/user.model'));
+const Notebook = require(path.join(__dirname, '../api/notebook/notebook.model'));
+const Session = require(path.join(__dirname, '../api/session/session.model'));
+const Settings = require(path.join(__dirname, '../api/settings/settings.model'));
+const Connections = require(path.join(__dirname, '../api/connections/connection.model'));
+const Transcriptions = require(path.join(__dirname, '../api/transcription/transcription.model'));
+const Hashtags = require(path.join(__dirname, '../api/hashtag/hashtag.model'));
+const q = require('q');
 
 module.exports = {
-    checkForSession: checkForSession,
-    getGlossaUser: getGlossaUser,
-    checkForApplicationData: checkForApplicationData
+  getInitialState: getInitialState
 };
 
-// var defaultUser = {
-//     name: 'glossa user'
-// };
-var defaultSession = {
-    currentState: 'corpus.meta'
-};
-var defualtProject = {
-    name: 'glossa project'
-};
+let isFirstRun = false;
 
-var defaultSettings = {
-    media: {
-        waveColor: '#BDBDBD',
-        skipLength: 2
+function getInitialState() {
+  return new Promise((resolve, reject) => {
+    let statePromises = [];
+    const initialState = {};
+    statePromises.push(
+
+      getInitialUser()
+        .then((data) => {
+          initialState.user = data;
+        }),
+
+      getInitialSession()
+        .then((data) => {
+          initialState.session = data;
+        }),
+
+      getInitialProject()
+        .then((data) => {
+          initialState.project = data;
+        }),
+      getInitialSettings()
+        .then((data) => {
+          initialState.settings = data
+        }),
+
+      getInitialNotebooks()
+        .then((data) => {
+          initialState.notebooks = data
+        }),
+
+      getInitialConnections()
+        .then((data) => {
+          initialState.connections = data
+        }),
+
+      getInitialTranscriptions()
+        .then((data) => {
+          initialState.transcriptions = data
+        }),
+
+      getInitialHashtags()
+        .then((data) => {
+          initialState.hashtags = data
+        })
+    );
+
+    Promise.all(statePromises)
+      .then((results) => {
+        if (isFirstRun) {
+          resolve(normalizeInitialData(initialState))
+        } else {
+          resolve(initialState);
+        }
+      })
+
+
+
+  })
+}
+
+function normalizeInitialData(initialState) {
+  // initialState.session.currentStateParams.user = initialState.user._id;
+  // initialState.session.projectId = initialState.project._id;
+
+  const query = {_id: initialState.session._id};
+  const update = initialState.session;
+  const options = {};
+
+  Session.update(query, update, options, (err, updatedSessionCount) => {
+    if(err) {
+       return console.log('update session error');
     }
-};
+  });
 
+  initialState.project.createdBy = initialState.user._id;
 
-function checkForApplicationData() {
-    return new Promise(function(resolve, reject) {
-        User.findOne({}, function(err, user) {
-            if (err) {
-                console.log('There was an error loading session.', err);
-                reject(err);
-            }
-            if (!user) {
-                console.log('No application data exists');
-                resolve(defaultAppData());
-            } else {
-                console.log('When app begins, set connections.online to false');
-                resolve(user);
-            }
-        });
-    })
+  Project.update({_id: initialState.project._id}, initialState.project, {}, (err, updatedProjectCount) => {
+    if(err) {
+      return console.log('update project error');
+    }
+  });
+
+  // console.log('returning initialState', initialState);
+
+  return initialState;
 }
 
-function defaultAppData() {
-    console.log('Creating application data');
+/**
+ * Look for initial user
+ * If it does not exist, build new user
+ * @returns {Promise} = user object either existing, or a newly created user
+ */
+function getInitialUser() {
+  return new Promise((resolve, reject) => {
+    User.findOne({}, (err, user) => {
+      if (err) {
+        reject(err)
+      }
+      if (!user) {
+        isFirstRun = true;
+        resolve(buildInitialUser())
+      }
+      resolve(user)
+    })
+  })
+}
+/**
+ *  Builds initial user
+ *  Called if no user exists
+ */
+function buildInitialUser() {
+  const user = {
+    name: 'New Glossa User',
+    createdAt: Date.now(),
+  };
+  return new Promise((resolve, reject) => {
+    User.insert(user, (err, user) => {
+      if (err) {
+        console.log('Error creating initial user', err);
+        reject(err)
+      }
+      resolve(user)
+    })
+  });
 
-    var user = {
-        name: 'glossa user',
-        createdAt: Date.now(),
-        settings: {
-            isSharing: true,
-            waveColor: "#BDBDBD",
-            skipLength: 2
-        },
-        session: {}
-    };
+}
 
-   return createUserData(user)
-       .then(function(userData) {
-        console.log("createUserData promise resolved ");
-       return createProjectData(userData)
-           .then(function(projectData) {
-            console.log("createProjectData promise resolved ");
-           return createSessionData(userData, projectData)
-               .then(function(updatedUserData) {
-                console.log('createSessionData promise resolved');
-                return updatedUserData;
-            })
+/**
+ * Look for initial session
+ * If it does not exist, build new session object
+ * @returns {Promise} = session object either existing, or a newly created session
+ */
+function getInitialSession() {
+  return new Promise((resolve, reject) => {
+    Session.findOne({}, (err, session) => {
+      if (err) {
+        reject(err)
+      }
+      if (!session) {
+        resolve(buildInitialSession())
+      }
+      resolve(session)
+    })
 
-        })
+  })
+}
+/**
+ *  Builds initial session
+ *  Called if no user exists
+ */
+function buildInitialSession() {
+  const session = {
+    start: Date.now(),
+    currentState: 'notebook',
+    projectId: '',
+    currentStateParams: {}
+  };
+
+
+  // session.currentStateParams.user = '';
+  // session.currentStateParams.corpus = 'default';
+
+
+  return new Promise((resolve, reject) => {
+    Session.insert(session, (err, data) => {
+      if (err) {
+        console.log('Error creating initial session', err);
+        reject(err)
+      }
+      resolve(data)
+    })
+  });
+
+}
+
+function getInitialProject() {
+  return new Promise((resolve, reject) => {
+    Project.findOne({}, (err, project) => {
+      if (err) {
+        reject(err)
+      }
+      if (!project) {
+        isFirstRun = true;
+        resolve(buildInitialProject())
+      }
+      resolve(project)
+    })
+  })
+}
+function buildInitialProject() {
+  const project = {
+    name: 'New Glossa Project',
+    createdBy: ''
+  };
+  return new Promise((resolve, reject) => {
+    Project.insert(project, (err, data) => {
+      if (err) {
+        console.log('Error creating initial project', err);
+        reject(err)
+      }
+      resolve(data)
+    })
+  });
+
+}
+
+function getInitialSettings() {
+  return new Promise((resolve, reject) => {
+    Settings.findOne({}, (err, settings) => {
+      if (err) {
+        reject(err)
+      }
+      if (!settings) {
+        isFirstRun = true;
+        resolve(buildInitialSettings())
+      }
+      resolve(settings)
+    })
+  })
+}
+function buildInitialSettings() {
+  const settings = {
+    media: {
+      waveColor: '#BDBDBD',
+      skipLength: 2
+    },
+    isSharing: false,
+    waveColor: "#BDBDBD",
+    skipLength: 2
+  };
+
+  return new Promise((resolve, reject) => {
+    Settings.insert(settings, (err, data) => {
+      if (err) {
+        console.log('Error creating initial settings', err);
+        reject(err)
+      }
+      resolve(data)
+    })
+  });
+
+}
+
+function getInitialNotebooks() {
+  return new Promise((resolve, reject) => {
+    Notebook.find({}, (err, notebooks) => {
+      if (err) {
+        console.log('Error getting initial notebooks', err);
+        reject(err);
+      }
+      resolve(notebooks);
     });
+  });
 }
 
-function createUserData(user) {
-    console.log('createUserData');
-    return new Promise(function(resolve, reject) {
-        User.insert(user, function (err, createdUser) {
-            if (err) {
-                console.log('There was an Error creating User', err);
-                reject(err);
-            }
-            console.log('Created default user', createdUser);
-            resolve(createdUser);
+function getInitialConnections() {
+  return new Promise((resolve, reject) => {
+    return resetConnectionData()
+      .then(()=>{
+        Connections.find({}, (err, connections) => {
+          if (err) {
+            console.log('Error getting initial connections', err);
+            reject(err);
+          }
+          resolve(connections);
         });
-    })
+      })
+      .catch((err)=> {
+        reject(err);
+      })
+  });
 }
 
-function createProjectData(userData) {
-    console.log('createProjectData');
-    var project = {
-        name: 'glossa project',
-        createdBy: userData._id
-    };
-    return new Promise(function(resolve, reject) {
-        Project.insert(project, function(err, createdProject) {
-            if (err) {
-                console.log('There was an Error creating Project', err);
-                reject(err);
-            }
-            console.log('Created default project', createdProject);
-            resolve(createdProject);
+function resetConnectionData() {
+  return new Promise((resolve, reject) => {
+    Connections.find({}, (err, connections) => {
+      if(err){reject(err)}
+
+      let removable = connections.filter(connection => !connection.following);
+      removable.forEach((connection) => {
+        Connections.remove({_id: connection._id}, (err, count) => {
+          if(err){reject(err)}
         })
-    })
-}
+      });
 
-function createSessionData(userData, projectData) {
-    console.log('createSessionData');
-    var options = {returnUpdatedDocs: true};
-    return new Promise(function(resolve, reject) {
+      connections = connections.filter(connection => connection.following).map((connection) => {
+        delete connection.socketId;
+        connection.online = false;
+        return connection;
+      });
 
-        userData.session.start = Date.now();
-        userData.session.currentState = 'corpus.meta';
-        userData.session.projectId = projectData._id;
-        userData.session.currentStateParams = {};
-        userData.session.currentStateParams.user = userData._id;
-        userData.session.currentStateParams.corpus = 'default';
-
-        User.update({_id: userData._id}, userData, options, function(err, updatedCount, updatedUser) {
-            if (err) {
-                console.log('There was an error updating user', err);
-                reject(err);
-            }
-            console.log('Updated user data', updatedUser);
-            resolve(updatedUser);
+      connections.forEach((connection) => {
+        Connections.update({_id: connection._id}, connection, {}, (err, count) => {
+          if (err) {reject(err)}
         })
-    })
-}
-
-function createApplicationData() {
-    var defaultApplicationData = {
-        name: 'glossa user',
-        session: {}
-    };
-
-   return createDefaultUser(defaultApplicationData)
-        .then(function(userData) {
-            return projectCheck(userData)
-                .then(function(projectData) {
-                    return createDefaultSettings(userData, projectData)
-                        .then(function() {
-                            var options = {
-                                returnUpdatedDocs: true
-                            };
-
-                            userData.session.start = Date.now();
-                            userData.session.currentState = 'corpus.meta';
-                            userData.session.projectId = projectData._id;
-                            userData.session.currentStateParams = {user: userData._id, corpus: 'default'};
-
-                            return new Promise(function (resolve, reject) {
-                                User.update({_id: userData._id}, userData, options, function (err, numUpdated, updatedUser) {
-                                    if (err) {
-                                        console.log('Error Creating Session', err);
-                                        reject(err);
-                                    }
-                                    User.persistence.stopAutocompaction();
-                                    resolve(updatedUser);
-                                });
-                            });
-                        });
-                });
-        })
-}
-
-
-//check for session
-    //if false check for user
-    //if true return session
-//check for user as extra measure
-    //if user does not exist create new project
-
-function checkForSession() {
-
-    return new Promise(function(resolve, reject) {
-        Session.find({}, function(err, sessions) {
-            if (err) {
-                console.log('There was an error loading session.', err);
-                reject(err);
-            }
-            if (sessions.length < 1) {
-                console.log('No Session exists; check for user');
-                resolve(validateAll());
-            }
-            resolve(sessions[0]);
-        });
-    })
-
-}
-
-
-function validateAll() {
-    userCheck()
-        .then(function(userData) {
-           return projectCheck(userData)
-               .then(function(projectData) {
-                   return createDefaultSettings(userData, projectData)
-                       .then(function(sessionData) {
-                          return createDefaultSession(userData, projectData);
-                    })
-               });
-        })
-}
-
-function getGlossaUser() {
-    return new Promise(function(resolve, reject) {
-        User.find({}, function(err, user) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(user);
-            }
-        })
-    })
-}
-
-
-
-function userCheck() {
-    return new Promise(function(resolve, reject) {
-        User.find({}, function(err, user) {
-            if (err) {
-                // return console.log('Error Counting users', err);
-                reject(err);
-            }
-            //if no users exist
-            if (user.length < 1) {
-                //data should be session
-
-                return createDefaultUser().then(function(user) {
-                    console.log('Created user: ', user);
-                    resolve(user);
-                    // return user
-                });
-
-            } else {
-                console.log('Resolving user data needs to be normalized...');
-                resolve(user);
-                // return user;
-            }
-        })
-    })
-}
-
-function projectCheck(user) {
-    return new Promise(function(resolve, reject) {
-        Project.find({}, function(err, project) {
-            if (err) {
-                // return console.log('Error Counting users', err);
-                reject(err);
-            }
-            //if no users exist
-            if (project.length < 1) {
-                //data should be session
-
-                return createDefaultProject(user).then(function(project) {
-                    console.log('Created project: ', project);
-                    resolve(project);
-                    // return user
-                });
-
-            } else {
-                console.log('Returning existing project.... data needs to be normalized');
-                resolve(project);
-                // return user;
-            }
-        })
-    })
-}
-
-//count users if none exists create a new one and save results somewhere
-function createDefaultUser(defaultUser) {
-    defaultUser.createdAt = Date.now();
-    return new Promise(function(resolve, reject) {
-        return User.insert(defaultUser, function (err, createdUser) {
-            if (err) {
-                console.log('There was an Error creating User', err);
-                reject(err);
-            }
-
-            console.log('created default user', createdUser);
-            resolve(createdUser);
-        });
-    })
-}
-
-function createDefaultProject(user) {
-
-    defualtProject.createdAt = Date.now();
-    defualtProject.createdById = user._id;
-
-    return new Promise(function (resolve, reject) {
-       Project.insert(defualtProject, function(err, createdProject) {
-            if (err) {
-                console.log('Error Creating Project');
-                reject(err);
-            }
-            resolve(createdProject);
-        })
-    })
-}
-
-function createDefaultSession(user, project) {
-    defaultSession.start = Date.now();
-    defaultSession.projectId = project._id;
-    defaultSession.userId = user._id;
-    defaultSession.currentStateParams = {user: user._id, corpus:'default'};
-
-    return new Promise(function (resolve, reject) {
-       return Session.insert(defaultSession, function(err, createdSession) {
-            if (err) {
-                console.log('Error Creating Session', err);
-                reject(err);
-            }
-            resolve(createdSession);
-        })
+      });
+      resolve(connections);
     });
+  })
 }
 
-function createDefaultSettings() {
-    return new Promise(function (resolve, reject) {
-        Settings.insert(defaultSettings, function (err, createdSettings) {
-            if (err) {
-                console.log('Error Creating Session', err);
-                reject(err);
-            }
-            console.log('created default settings');
-            resolve(createdSettings);
-        });
+function getInitialTranscriptions() {
+  return new Promise((resolve, reject) => {
+    Transcriptions.find({}, (err, transcriptions) => {
+      if (err) {
+        console.log('Error getting initial connections', err);
+        reject(err);
+      }
+      resolve(transcriptions);
     });
+  });
+}
+
+function getInitialHashtags() {
+  return new Promise((resolve, reject) => {
+    Hashtags.find({}, (err, hashtags) => {
+      if (err) {
+        console.log('Error getting initial hashtags', err);
+        reject(err);
+      }
+      if (!hashtags.length) {
+
+        fs.readFile(path.join(__dirname, '../../hashtags.json'), 'utf8', (err, contents) => {
+          if (err) {
+            return console.log('Error hashtag file... ', err)
+          }
+          let defaultHashtags = JSON.parse(contents);
+
+          Hashtags.insert(defaultHashtags.hashtags, (err, insertedDocs)=> {
+            if (err) {
+              return console.log('error inserting default hashtags');
+            }
+
+            resolve(insertedDocs);
+          });
+        })
+      } else {
+        resolve(hashtags);
+      }
+    });
+  });
 }

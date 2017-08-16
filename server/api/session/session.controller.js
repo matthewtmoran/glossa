@@ -42,6 +42,8 @@ exports.show = function(req, res) {
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
     var session = req.body;
+    session.createdAt = Date.now();
+    session.updatedAt = Date.now();
     Session.insert(session, function(err, c) {
         if(err) { return handleError(res, err); }
         return res.status(201).json(c);
@@ -57,8 +59,10 @@ exports.update = function(req, res) {
         if(!session) { return res.status(404).send('Not Found'); }
         var options = {returnUpdatedDocs: true};
         var updated = _.merge(session, req.body);
+        updated.updatedAt = Date.now();
         Session.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
             if (err) { return handleError(res, err); }
+            global.appData.initialState.session = Object.assign({}, updatedDoc);
             Session.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });

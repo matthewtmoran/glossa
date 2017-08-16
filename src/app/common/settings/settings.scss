@@ -1,0 +1,114 @@
+@import "colors";
+
+settings {
+	flex-direction: row;
+	display: flex;
+	-webkit-box-flex: 1;
+	height:100%;
+}
+
+.settings-component {
+	input, textarea {
+		color: #333 !important;
+	}
+
+	.left-side {
+
+		.material-icons {
+			color: $red;
+		}
+
+		.license-button {
+			margin: 0 auto;
+			width: 98%;
+			max-width: 250px;
+		}
+
+		.image-container {
+			//padding-left: 35px;
+			//padding-right: 35px;
+
+
+			&.profile-image-container {
+				background-size: cover;
+				min-height: 250px;
+				position: relative;
+				overflow: hidden;
+
+				.upload-button {
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					right: 0;
+					left: 0;
+					height: 40px;
+					width: 200px;
+					opacity: .8;
+					margin: auto;
+				}
+
+				.image-preview {
+					position: absolute;
+					top: 100%;
+					bottom: 100%;
+					margin: auto;
+					width: 100%;
+					transform: scale(1.5);
+				}
+
+				h2 {
+					color: white;
+					position: absolute;
+					bottom: 15px;
+					left: 15px;
+				}
+				.options-button {
+					position: absolute;
+					top: 15px;
+					right: 15px;
+					color: white;
+
+					md-icon {
+						color: white;
+					}
+				}
+			}
+
+			.settings-image {
+				display: block;
+				width: 100%;
+
+				margin: 0 auto;
+
+				&.logo {
+					max-width: 210px;
+				}
+			}
+		}
+
+	}
+	.row-full-height {
+		height: 100%;
+	}
+
+	.contact-section-left {
+		padding-top: 20px;
+	}
+
+}
+
+.light-toolbar {
+	background: transparent !important;
+	color: #333;
+
+	h2, md-icon  {
+		color: #333 !important;
+	}
+
+	.close-button  {
+		position: absolute;
+		right: 12px;
+		top: 12px;
+	}
+
+}

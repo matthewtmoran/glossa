@@ -1,12 +1,5 @@
-client/bower_components
 node_modules
 .idea/
-client/app/*.css
-ToDo.md
-client/app/audioSandbox/*
-
-# server/data/audio/*
-# server/data/database/*
-# server/data/image/*
-# server/data/markdown/*
-# server/data/tmp/*
+dist/
+src/server/
+release-builds/

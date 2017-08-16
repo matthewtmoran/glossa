@@ -9,79 +9,154 @@
 
 'use strict';
 
+
+
 const _ = require('lodash');
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 const AdmZip = require('adm-zip');
-
 const config = require('./../../config/environment/index');
 
 const Projects = require('./project.model');
 const User = require('./../user/user.model');
 const Notebooks = require('./../notebook/notebook.model');
 const Transcriptions = require('./../transcription/transcription.model');
-const Hashtags = require('./../hashtag/hashtag.model');
-const Corporia = require('./../corpus/corpus.model');
+const Hashtag = require('./../hashtag/hashtag.model');
+const Settings = require('./../settings/settings.model');
+const Session = require('./../session/session.model');
 const Connections = require('./../connections/connection.model');
-// let Connections = require('./../connections/connections.model');
 
+const electron = require('electron');
+const app = electron.app;
+let allDataBaseItems = [
+  {
+    database: Connections,
+    name: 'connections'
+  },
+  {
+    database: User,
+    name: 'user'
+  },
+  {
+    database: Transcriptions,
+    name: 'transcriptions'
+  },
+  {
+    database: Notebooks,
+    name: 'notebooks'
+  },
+  {
+    database: Hashtag,
+    name: 'hashtags'
+  },
 
-// let globalPaths = require('electron').remote.getGlobal('userPaths');
+  {
+    database: Projects,
+    name: 'project'
+  },
+  {
+    database: Session,
+    name: 'session'
+  },
+  {
+    database: Settings,
+    name: 'settings'
+  },
+]
+
+let dataBaseItems = [
+  {
+    database: Projects,
+    name: 'project'
+  },
+  {
+    database: Session,
+    name: 'session'
+  },
+  {
+    database: Settings,
+    name: 'settings'
+  },
+];
 
 // Get list of things
 exports.index = (req, res) => {
-    Projects.find({}, function (err, project) {
-        if(err) { return handleError(res, err); }
-        return res.status(200).json(project);
-    });
+  Projects.find({}, function (err, project) {
+    if (err) {
+      return handleError(res, err);
+    }
+    return res.status(200).json(project);
+  });
 };
 
 // Get a single thing
 exports.show = (req, res) => {
-    Projects.findOne({_id:req.params.id}, function (err, project) {
-        if(err) { return handleError(res, err); }
-        if(!project) { return res.status(404).send('Not Found'); }
-        return res.json(project);
-    });
+  Projects.findOne({_id: req.params.id}, function (err, project) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!project) {
+      return res.status(404).send('Not Found');
+    }
+    return res.json(project);
+  });
 };
 
 // Creates a new thing in the DB.
 exports.create = (req, res) => {
-    let project = req.body;
-    Projects.insert(project, function(err, c) {
-        if(err) { return handleError(res, err); }
-        return res.status(201).json(c);
-    });
+  let project = req.body;
+  Projects.insert(project, function (err, c) {
+    if (err) {
+      return handleError(res, err);
+    }
+    return res.status(201).json(c);
+  });
 };
 
 // Updates an existing project in the DB.
 //becuase this could potentially have uploaded files, the body object is, dataObj instead of project...
-exports.update = function(req, res) {
-    if(req.body._id) { delete req.body._id; }
-    Projects.findOne({_id:req.params.id}, function (err, project) {
-        if (err) { return handleError(res, err); }
-        if(!project) { return res.status(404).send('Not Found'); }
-        let options = {returnUpdatedDocs: true};
-        let updated = _.merge(project, req.body);
-        Projects.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
-            if (err) { return handleError(res, err); }
-            Projects.persistence.compactDatafile(); // concat db
-            return res.status(200).json(updatedDoc);
-        });
+exports.update = function (req, res) {
+  if (req.body._id) {
+    delete req.body._id;
+  }
+  Projects.findOne({_id: req.params.id}, function (err, project) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!project) {
+      return res.status(404).send('Not Found');
+    }
+    let options = {returnUpdatedDocs: true};
+    let updated = _.merge(project, req.body);
+    Projects.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+      if (err) {
+        return handleError(res, err);
+      }
+      global.appData.initialState.project = Object.assign({}, updatedDoc);
+      Projects.persistence.compactDatafile(); // concat db
+      return res.status(200).json(updatedDoc);
     });
+  });
 };
 
 // Deletes a thing from the DB.
-exports.destroy = function(req, res) {
-    Projects.findById(req.params.id, function (err, thing) {
-        if(err) { return handleError(res, err); }
-        if(!thing) { return res.status(404).send('Not Found'); }
-        thing.remove(function(err) {
-            if(err) { return handleError(res, err); }
-            return res.status(204).send('No Content');
-        });
+exports.destroy = function (req, res) {
+  Projects.findById(req.params.id, function (err, thing) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!thing) {
+      return res.status(404).send('Not Found');
+    }
+    thing.remove(function (err) {
+      if (err) {
+        return handleError(res, err);
+      }
+      return res.status(204).send('No Content');
     });
+  });
 };
 
 /**
@@ -90,39 +165,248 @@ exports.destroy = function(req, res) {
  * @param res
  */
 exports.importProject = (req, res) => {
-    console.log('TODO: REMOVE ALL MEDIA FILES FROM FILE SYSTEM!!!!!!!!!');
-    let newProjectData;
+  console.log('TODO: REMOVE ALL MEDIA FILES FROM FILE SYSTEM!!!!!!!!!');
+
+  let rootPath = app.getPath('userData');
+  fse.remove(path.join(rootPath, 'storage'), (err) => {
     let zip = new AdmZip(req.body.projectPath);
-    let zipEntries = zip.getEntries();
-    zipEntries.forEach((zipEntry) => {
-        newProjectData = JSON.parse(zip.readAsText(zipEntry));
-        let replacePromises = [];
+    zip.extractAllToAsync(rootPath, true, () => {
 
-        replacePromises.push(replaceUser(newProjectData.user));
-        replacePromises.push(replaceProject(newProjectData.project));
-        replacePromises.push(replaceNotebooks(newProjectData.notebooks));
-        replacePromises.push(replaceConnections(newProjectData.connections));
-        replacePromises.push(replaceTranscriptions(newProjectData.transcriptions));
-        replacePromises.push(replaceHashtags(newProjectData.hashtags));
-        replacePromises.push(replaceCorporia(newProjectData.corporia));
+      User.loadDatabase();
+      Notebooks.loadDatabase();
+      Transcriptions.loadDatabase();
+      Hashtag.loadDatabase();
+      Settings.loadDatabase();
+      Session.loadDatabase();
+      Connections.loadDatabase();
+      Projects.loadDatabase();
 
-        Promise.all(replacePromises).then((results) => {
+      resolvePathsAndReset()
+        .then(() => {
+          return res.status(200).send(true);
+        })
+    });
+  });
 
-            let updatedData = {
-                user: results[0],
-                project: results[1],
-                notebooks: results[2],
-                connections: results[3],
-                transcriptions: results[4],
-                hashtags: results[5],
-                corporia: results[6],
-            };
+};
 
-            return res.status(200).send(updatedData);
-        });
+
+function resolvePathsAndReset() {
+  let promiseArray = [];
+  return new Promise((resolve, reject) => {
+    promiseArray.push(
+
+      resolveAndUpdateUser()
+        .then((data) => {
+          global.appData.initialState.user = Object.assign({}, data);
+        }),
+
+      resolveAndUpdateNotebooks()
+        .then((data) => {
+          global.appData.initialState.notebooks = data.map((nb) => {
+            return nb;
+          });
+        }),
+
+      resolveAndUpdateTranscriptions()
+        .then((data) => {
+          global.appData.initialState.transcriptions = data.map((tr) => {
+            return tr;
+          });
+        }),
+
+      resolveAndUpdateConnections()
+        .then((data) => {
+          global.appData.initialState.connections = data.map((co) => {
+            return co;
+          });
+        }),
+
+      updateHashtag()
+        .then((data) => {
+          global.appData.initialState.hashtags = data.map((tag) => {
+            return tag;
+          });
+        })
+
+    );
+
+    dataBaseItems.forEach((item) => {
+      promiseArray.push(
+
+        updateSingleObject(item)
+          .then((data) => {
+            global.appData.initialState[item.name] = Object.assign({}, data);
+          })
+
+      )
+    });
+
+
+    Promise.all(promiseArray)
+      .then((results) => {
+        resolve(true);
+      })
+
+
+  });
+}
+
+function updateSingleObject(item) {
+  return new Promise((resolve, reject) => {
+    item.database.findOne({}, (err, project) => {
+      if (err) {
+        console.log('Error resetting app data', err);
+        reject(err);
+      }
+      resolve(project);
+    });
+  });
+}
+
+
+function updateHashtag() {
+  return new Promise((resolve, reject) => {
+    Hashtag.find({}, (err, hashtags) => {
+      if (err) {
+        console.log('Error resetting app data', err);
+        reject(err)
+      }
+      resolve(hashtags)
+    });
+  })
+}
+
+function resolveAndUpdateConnections() {
+  return new Promise((resolve, reject) => {
+    Connections.find({}, (err, connections) => {
+      if (err) {
+        console.log('error resolving paths', err);
+        reject(err);
+      }
+      connections = connections.map((connection) => {
+        if (connection.avatar) {
+          connection.avatar = resolvePath(connection.avatar.absolutePath, 'image');
+        }
+        return connection;
+      });
+
+      connections.forEach((n) => {
+        Connections.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+
+      resolve(connections);
+    });
+  })
+}
+
+function resolveAndUpdateTranscriptions() {
+  return new Promise((resolve, reject) => {
+    Transcriptions.find({}, (err, transcriptions) => {
+      if (err) {
+        console.log('error resolving notebook paths');
+      }
+
+      //update notebooks array
+      transcriptions = transcriptions.map((transcription) => {
+        if (transcription.audio) {
+          transcription.audio.absolutePath = resolvePath(transcription.audio.absolutePath, 'audio');
+        }
+        if (transcription.image) {
+          transcription.image.absolutePath = resolvePath(transcription.image.absolutePath, 'image');
+        }
+        return transcription;
+      });
+
+      //update each notebook
+      transcriptions.forEach((n) => {
+        Transcriptions.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+
+      resolve(transcriptions);
 
     });
-};
+  })
+}
+
+function resolveAndUpdateNotebooks() {
+  return new Promise((resolve, reject) => {
+    Notebooks.find({}, (err, notebooks) => {
+      if (err) {
+        console.log('error resolving notebook paths', err);
+        reject(err);
+      }
+
+      //update notebooks array
+      notebooks = notebooks.map((notebook) => {
+        if (notebook.audio) {
+          notebook.audio.absolutePath = resolvePath(notebook.audio.absolutePath, 'audio');
+        }
+        if (notebook.image) {
+          notebook.image.absolutePath = resolvePath(notebook.image.absolutePath, 'image');
+        }
+        return notebook;
+      });
+
+      //update each notebook
+      notebooks.forEach((n) => {
+        Notebooks.update({_id: n._id}, n, {}, (err, updatedCount) => {
+          if (err) {
+            console.log('error resolveing file paths... ');
+          }
+        })
+      });
+      resolve(notebooks);
+
+
+    });
+  })
+}
+
+function resolveAndUpdateUser() {
+  return new Promise((resolve, reject) => {
+    User.findOne({}, (err, user) => {
+      if (err) {
+        console.log('Error importing project data', err)
+        reject(err);
+      }
+      if (user.avatar) {
+        if (!user.avatar.absolutePath) {
+          console.log(' may be old data???????');
+         user.avatar.absolutePath =  path.join(config.dataRootPath, 'image');
+        } else {
+          user.avatar.absolutePath = resolvePath(user.avatar.absolutePath, 'image');
+        }
+      }
+      let options = {returnUpdatedDocs: true};
+      User.update({_id: user._id}, user, options, (err, updatedCount, updatedDoc) => {
+        if (err) {
+          console.log('Error importing Project data');
+        }
+        resolve(updatedDoc);
+      })
+    });
+  })
+}
+
+function resolvePath(oldPath, type) {
+  let rootPath = app.getPath('userData');
+  let fileName = getBaseName(oldPath);
+  return path.join(rootPath, type, fileName);
+
+}
+
+function getBaseName(p) {
+  return process.platform === 'win32' ? path.win32.basename(p) :  path.posix.basename(p);
+}
 
 /**
  * Export all project data
@@ -130,103 +414,132 @@ exports.importProject = (req, res) => {
  *  req.body = {userId: string, projectId: string}
  * @param res
  */
-exports.exportProject = function(req, res) {
-    let userId = req.params.userId;
-    let projectId = req.params.projectId;
-    let projectData = {};//initiate project data object
-    let databasePromises = [];//initiate promise array
+exports.exportProject = function (req, res) {
+  let archive = archiver('zip'); // Sets the compression level.
 
-    //TODO: queries need to be refractored
-    //push application data(promises) to array
-    databasePromises.push(getUser());
-    databasePromises.push(getProject(userId));
-    databasePromises.push(getNotebooks(userId));
-    databasePromises.push(getConnections());
-    databasePromises.push(getTranscriptions());
-    databasePromises.push(getHashtags());
-    databasePromises.push(getCorporia());
+  let rootPath = app.getPath('userData');
+  let imagePath = path.join(rootPath, 'image');
+  let audioPath = path.join(rootPath, 'audio');
+  let dataPath = path.join(rootPath, 'storage');
+  archive.directory(imagePath, 'image');
+  archive.directory(audioPath, 'audio');
+  archive.directory(dataPath, 'storage');
 
-    Promise.all(databasePromises).then((results) => {//once all the promises have resolved
+  let projectNameNoSpace = global.appData.initialState.project.name.replace(/\s/g, '');
 
-        let archive = archiver('zip'); // Sets the compression level.
+  res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
+  res.set('Content-Type', 'application/zip');
+  archive.pipe(res); //pipe the response
+  // //add file to archive
+  //
+  // archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
+  //
+  archive.on('error', (err) => { ///if there is an error....
+    console.error(err);
+    throw err;
+  });
+  //
+  res.on('close', () => { //when the response is done
+    return res.status(200).send('OK').end(); //send response to client
+  });
 
-        //update the application data object
-        projectData.user = results[0];
-        projectData.project = results[1];
-        projectData.notebooks = results[2];
-        projectData.connections = results[3]; //TODO: get avatars
-        projectData.transcriptions = results[4]; //TODO: get media files
-        projectData.hashtags = results[5];
-        projectData.corporia = results[6];
-
-        //create and stream zip file
-
-        // console.log('notebooks being exported: ', projectData.notebooks.length);
-        // console.log('Image buffer?', !!projectData.notebooks[0].imageBuffer);
-        // console.log('Image buffer?', !!projectData.notebooks[1].imageBuffer);
+  archive.finalize();
 
 
-        res.set('Content-disposition', `attachment; filename=project-${projectData.project._id}.glossa`); //set header info / project name
-        res.set('Content-Type', 'application/zip');
+  /*
+   let userId = req.params.userId;
+   let projectId = req.params.projectId;
+   let projectData = {};//initiate project data object
+   let databasePromises = [];//initiate promise array
+
+   //TODO: queries need to be refractored
+   //push application data(promises) to array
+   databasePromises.push(getUser());
+   databasePromises.push(getProject(userId));
+   databasePromises.push(getNotebooks(userId));
+   databasePromises.push(getConnections());
+   databasePromises.push(getTranscriptions());
+   databasePromises.push(getHashtag());
+   databasePromises.push(getSettings());
+   databasePromises.push(getSession());
+
+   Promise.all(databasePromises).then((results) => {//once all the promises have resolved
+
+   let archive = archiver('zip'); // Sets the compression level.
+
+   //update the application data object
+   projectData.user = results[0];
+   projectData.project = results[1];
+   projectData.notebooks = results[2];
+   projectData.connections = results[3]; //TODO: get avatars
+   projectData.transcriptions = results[4]; //TODO: get media files
+   projectData.hashtags = results[5];
+   projectData.settings = results[6];
+   projectData.session = results[7];
+
+   //create and stream zip file
+
+   let projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
+
+   res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
+   res.set('Content-Type', 'application/zip');
 
 
-        archive.pipe(res); //pipe the response
-        //add file to archive
+   archive.pipe(res); //pipe the response
+   //add file to archive
 
-        archive.append(JSON.stringify(projectData), { name: `project-${projectData.project._id}.json`});
+   archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
 
-        archive.on('error', (err) => { ///if there is an error....
-            console.error(err);
-            throw err;
-        });
+   archive.on('error', (err) => { ///if there is an error....
+   console.error(err);
+   throw err;
+   });
 
-        res.on('close', () => { //when the response is done
-            return res.status(200).send('OK').end(); //send response to client
-        });
+   res.on('close', () => { //when the response is done
+   return res.status(200).send('OK').end(); //send response to client
+   });
 
-        archive.finalize();
-
-    })
+   archive.finalize();
+   })
+   */
 };
-
 
 
 /**
  * Query for user
  */
 function getUser() {
-    return new Promise((resolve, reject) => {
-        User.findOne({}, (err, user) => {
-            if (err) {
-                console.log('There was an error finding user', err);
-                reject(err)
-            }
-            if (user.avatar) {
-                encodeBase64(user.avatar).then((imageBufferString) => {
-                    user.imageBufferString = imageBufferString;
-                    resolve(user);
-
-                });
-            } else {
-                resolve(user);
-            }
+  return new Promise((resolve, reject) => {
+    User.findOne({}, (err, user) => {
+      if (err) {
+        console.log('There was an error finding user', err);
+        reject(err)
+      }
+      if (user.avatar) {
+        encodeBase64(user.avatar).then((imageBufferString) => {
+          user.imageBufferString = imageBufferString;
+          resolve(user);
         });
-    })
+      } else {
+        resolve(user);
+      }
+    });
+  })
 }
 /**
  * Query for project
  * @param userId - the user _id
  */
 function getProject(userId) {
-    return new Promise((resolve, reject) => {
-        Projects.find({createdBy: userId}, (err, project) => {
-            if (err) {
-                console.log('There was an error finding project', err);
-                reject(err);
-            }
-            resolve(project[0]);
-        });
+  return new Promise((resolve, reject) => {
+    Projects.find({createdBy: userId}, (err, project) => {
+      if (err) {
+        console.log('There was an error finding project', err);
+        reject(err);
+      }
+      resolve(project[0]);
     });
+  });
 }
 /**
  * Query for all user created notebooks
@@ -234,87 +547,112 @@ function getProject(userId) {
  * TODO: need to update query to include project id
  */
 function getNotebooks(userId) {
-    return new Promise(function(resolve, reject) {
-        let query = {'createdBy._id': userId};
-        Notebooks.find(query, function(err, myNotebooks) {
-            if (err) {
-                console.log('There was an error finding notebooks', err);
-                reject(err);
-            }
-            encodeMediaFiles(myNotebooks).then(function(notebooksWithBuffer) { //encode all media files and attache buffer as property
-                resolve(notebooksWithBuffer);
-            });
+  return new Promise(function (resolve, reject) {
+    let query = {'createdBy._id': userId};
+    Notebooks.find(query, function (err, myNotebooks) {
+      if (err) {
+        console.log('There was an error finding notebooks', err);
+        reject(err);
+      }
+      encodeMediaFiles(myNotebooks).then(function (notebooksWithBuffer) { //encode all media files and attache buffer as property
+        resolve(notebooksWithBuffer);
+      });
 
-        });
-    })
+    });
+  })
 }
 /**
  * Query for connections that are being followed.
  * TODO: need to take into account avatars
  */
 function getConnections() {
-    return new Promise((resolve, reject) => {
-        let query = {following: true};
-        Connections.find(query, (err, connections) => {
-            if (err) {
-                console.log('There was an error finding connections', err);
-                reject(err);
-            }
+  return new Promise((resolve, reject) => {
+    let query = {following: true};
+    Connections.find(query, (err, connections) => {
+      if (err) {
+        console.log('There was an error finding connections', err);
+        reject(err);
+      }
 
-            connections.forEach((connection) => {
-                connection.online = false; //set online to false for consistency.
-                if (connection.avatar) {
-                    encodeBase64(connection.avatar).then(function(imageBufferString) {
-                        connection.imageBufferString = imageBufferString;
-                    })
-                }
-            });
+      connections.forEach((connection) => {
+        connection.online = false; //set online to false for consistency.
+        if (connection.avatar) {
+          encodeBase64(connection.avatar).then(function (imageBufferString) {
+            connection.imageBufferString = imageBufferString;
+          })
+        }
+      });
 
-            resolve(connections);
-        });
-    })
+      resolve(connections);
+    });
+  })
 }
 /**
  * Query for all transcription files.
  * TODO: need to update function to take into account media files (independent vs attached notebooks)
  */
 function getTranscriptions() {
-    return new Promise((resolve, reject) => {
-        Transcriptions.find({}, (err, transcriptions) => {
-            if (err) {
-                console.log('There was an error finding transcriptions', err);
-                reject(err);
-            }
-            encodeMediaFiles(transcriptions).then((transcriptionsWithBuffer) => {
-                resolve(transcriptionsWithBuffer);
-            });
-        });
+  return new Promise((resolve, reject) => {
+    Transcriptions.find({}, (err, transcriptions) => {
+      if (err) {
+        console.log('There was an error finding transcriptions', err);
+        reject(err);
+      }
+      encodeMediaFiles(transcriptions).then((transcriptionsWithBuffer) => {
+        resolve(transcriptionsWithBuffer);
+      });
     });
+  });
 }
 
-function getHashtags() {
-    return new Promise((resolve, reject) => {
-        let query = {canEdit: true};
-        Hashtags.find(query, (err, hashtags) => {
-            if (err) {
-                console.log('There was an error finding hashtags', err);
-                reject(err)
-            }
-            resolve(hashtags);
-        });
-    })
+function getHashtag() {
+  return new Promise((resolve, reject) => {
+    let query = {canEdit: true};
+    Hashtag.find(query, (err, hashtags) => {
+      if (err) {
+        console.log('There was an error finding hashtags', err);
+        reject(err)
+      }
+      resolve(hashtags);
+    });
+  })
 }
+
+function getSettings() {
+  return new Promise((resolve, reject) => {
+    Settings.findOne({}, (err, settings) => {
+      if (err) {
+        console.log('There was an error finding settings', err);
+        reject(err)
+      }
+      resolve(settings);
+    });
+  })
+}
+
+function getSession() {
+  return new Promise((resolve, reject) => {
+    Session.findOne({}, (err, session) => {
+      if (err) {
+        console.log('There was an error finding settings', err);
+        reject(err)
+      }
+      resolve(session);
+    });
+  })
+}
+
 
 function getCorporia() {
-    return new Promise((resolve, reject) => {
-        Corporia.find({}, (err, corporia) => {
-            if (err) {
-                console.log('There was an error finding corporia', err);
-                reject(err)
-            }
-            resolve(corporia);
-        });
-    })
+  return new Promise((resolve, reject) => {
+    Corporia.find({}, (err, corporia) => {
+      if (err) {
+        console.log('There was an error finding corporia', err);
+        reject(err)
+      }
+      resolve(corporia);
+    });
+  })
 }
 
 
@@ -322,78 +660,82 @@ function getCorporia() {
  * Replace the user data (writes avatar)
  */
 function replaceUser(newUser) {
-    return new Promise((resolve, reject) => {
-        User.remove({}, {multi: true}, (err, numRemoved) => {
-            if (err) {
-                console.log('Error removing user', err);
-                reject(err);
-            }
+  return new Promise((resolve, reject) => {
+    User.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing user', err);
+        reject(err);
+      }
 
-            if (newUser.avatar) {
+      if (newUser.avatar) {
 
-                let userAvatarData = {
-                    path: newUser.avatar,
-                    buffer: newUser.imageBufferString
-                };
+        let pathToWrite = path.join(app.getPath('userData'), 'image', process.platform === 'win32' ? path.win32.basename(newUser.avatar) :  path.posix.basename(newUser.avatar));
 
-                writeMediaFile(userAvatarData);
+        console.log(' pathToWrite: ', pathToWrite);
 
-                delete newUser.imageBufferString;
-            }
+        let userAvatarData = {
+          path: pathToWrite,
+          buffer: newUser.imageBufferString
+        };
+
+        writeMediaFile(userAvatarData);
+
+        delete newUser.imageBufferString;
+      }
 
 
-            User.insert(newUser, (err, user) => {
-                if (err) {
-                    console.log('Error inserting new user ', err);
-                    reject(err);
-                }
-                resolve(user);
-            })
-        })
+      User.insert(newUser, (err, user) => {
+        if (err) {
+          console.log('Error inserting new user ', err);
+          reject(err);
+        }
+        resolve(user);
+      })
     })
+  })
 }
 
 function replaceProject(newProject) {
-    return new Promise((resolve, reject) => {
-        Projects.remove({}, {multi: true}, (err, numRemoved) => {
-            if (err) {
-                console.log('Error removing project', err);
-                reject(err);
-            }
+  return new Promise((resolve, reject) => {
+    Projects.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing project', err);
+        reject(err);
+      }
 
-            Projects.insert(newProject, (err, project) => {
-                if (err) {
-                    console.log('Error inserting new user ', err);
-                    reject(err);
-                }
-                resolve(project);
-            })
-        })
+      Projects.insert(newProject, (err, project) => {
+        if (err) {
+          console.log('Error inserting new user ', err);
+          reject(err);
+        }
+        resolve(project);
+      })
     })
+  })
 }
 /**
  * Replaces all notebooks with imported notebook data
  * @param newNotebooks = an array of imported notebooks
  */
 function replaceNotebooks(newNotebooks) {
-    return new Promise(function(resolve, reject) {
-        Notebooks.remove({}, {multi: true}, function(err, numRemoved) {//remove all notebooks
-            if (err) {
-                console.log('Error removing notebooks', err);
-                reject(err);
-            }
+  return new Promise(function (resolve, reject) {
+    Notebooks.remove({}, {multi: true}, function (err, numRemoved) {//remove all notebooks
+      if (err) {
+        console.log('Error removing notebooks', err);
+        reject(err);
+      }
 
-            decodeMediaFiles(newNotebooks).then(function(notebooksWithoutBuffer) { //decode, write, and remove buffer property of notebooks
-                Notebooks.insert(notebooksWithoutBuffer, function(err, notebooks) {//insert notebooks without buffer string
-                    if (err) {
-                        console.log('Error inserting new notebooks', err);
-                        reject(err);
-                    }
-                    resolve(notebooks);
-                })
-            })
+      decodeMediaFiles(newNotebooks).then(function (notebooksWithoutBuffer) { //decode, write, and remove buffer property of notebooks
+        Notebooks.insert(notebooksWithoutBuffer, function (err, notebooks) {//insert notebooks without buffer string
+          if (err) {
+            console.log('Error inserting new notebooks', err);
+            reject(err);
+          }
+          resolve(notebooks);
         })
+      })
     })
+  })
 }
 /**
  * Replace all connections with imported connections
@@ -401,30 +743,30 @@ function replaceNotebooks(newNotebooks) {
  * TODO: need to take into account avatars
  */
 function replaceConnections(newConnections) {
-    return new Promise(function(resolve, reject) {
-        Connections.remove({}, {multi: true}, function(err, numRemoved) {
-            if (err) {
-                console.log('Error removing connections', err);
-                reject(err);
-            }
+  return new Promise(function (resolve, reject) {
+    Connections.remove({}, {multi: true}, function (err, numRemoved) {
+      if (err) {
+        console.log('Error removing connections', err);
+        reject(err);
+      }
 
-            newConnections.forEach((connection) =>{
-               if (connection.avatar) {
-                   writeMediaFile({path:connection.avatar,buffer:connection.imageBufferString});
-                   delete connection.imageBufferString;
-               }
-            });
+      newConnections.forEach((connection) => {
+        if (connection.avatar) {
+          writeMediaFile({path: connection.avatar, buffer: connection.imageBufferString});
+          delete connection.imageBufferString;
+        }
+      });
 
-            Connections.insert(newConnections, function(err, connections) {
-                if (err) {
-                    console.log('Error inserting new connections connections', err);
-                    reject(err);
-                }
-                resolve(connections);
-            })
+      Connections.insert(newConnections, function (err, connections) {
+        if (err) {
+          console.log('Error inserting new connections connections', err);
+          reject(err);
+        }
+        resolve(connections);
+      })
 
-        })
     })
+  })
 }
 /**
  * Replace all transcriptions data with imported transcriptions
@@ -432,61 +774,77 @@ function replaceConnections(newConnections) {
  * TODO: take into account media files.
  */
 function replaceTranscriptions(newTranscriptions) {
-    return new Promise((resolve, reject) => {
-        Transcriptions.remove({}, {multi: true}, (err, numRemoved) => {
-            if (err) {
-                console.log('Error removing transcriptions', err);
-                reject(err);
-            }
-            decodeMediaFiles(newTranscriptions).then((transWithouBuffer) => {
-                Transcriptions.insert(transWithouBuffer, (err, transcriptions) => {
-                    if (err) {
-                        console.log('Error inserting new transcriptions', err);
-                        reject(err);
-                    }
-                    resolve(transcriptions);
-                })
-            });
+  return new Promise((resolve, reject) => {
+    Transcriptions.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing transcriptions', err);
+        reject(err);
+      }
+      decodeMediaFiles(newTranscriptions).then((transWithouBuffer) => {
+        Transcriptions.insert(transWithouBuffer, (err, transcriptions) => {
+          if (err) {
+            console.log('Error inserting new transcriptions', err);
+            reject(err);
+          }
+          resolve(transcriptions);
         })
+      });
     })
+  })
 }
 
-function replaceHashtags(newHashtags) {
-    return new Promise((resolve, reject) => {
-        Hashtags.remove({}, {multi: true}, (err, numRemoved) => {
-            if (err) {
-                console.log('Error removing hashtags', err);
-                reject(err);
-            }
-            Hashtags.insert(newHashtags, (err, hashtags) => {
-                if (err) {
-                    console.log('Error inserting new user ', err);
-                    reject(err);
-                }
-                resolve(hashtags);
-            })
-        })
+function replaceHashtag(newHashtag) {
+  return new Promise((resolve, reject) => {
+    Hashtag.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing hashtags', err);
+        reject(err);
+      }
+      Hashtag.insert(newHashtag, (err, hashtags) => {
+        if (err) {
+          console.log('Error inserting new user ', err);
+          reject(err);
+        }
+        resolve(hashtags);
+      })
     })
+  })
 }
 
-function replaceCorporia(newCorpus) {
-    return new Promise((resolve, reject) => {
-        Corporia.remove({}, {multi: true}, (err, numRemoved) => {
-            if (err) {
-                console.log('Error removing corpus', err);
-                reject(err);
-            }
-            Corporia.insert(newCorpus, (err, corpus) => {
-                if (err) {
-                    console.log('Error inserting new corpus ', err);
-                    reject(err);
-                }
-                resolve(corpus);
-            })
-        })
+function replaceSettings(newSettings) {
+  return new Promise((resolve, reject) => {
+    Settings.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing settings', err);
+        reject(err);
+      }
+      Settings.insert(newSettings, (err, settings) => {
+        if (err) {
+          console.log('Error inserting new settings ', err);
+          reject(err);
+        }
+        resolve(settings);
+      })
     })
+  })
 }
-
+function replaceSession(newSession) {
+  return new Promise((resolve, reject) => {
+    Session.remove({}, {multi: true}, (err, numRemoved) => {
+      if (err) {
+        console.log('Error removing session', err);
+        reject(err);
+      }
+      Session.insert(newSession, (err, session) => {
+        if (err) {
+          console.log('Error inserting new session ', err);
+          reject(err);
+        }
+        resolve(session);
+      })
+    })
+  })
+}
 
 
 /**
@@ -495,74 +853,76 @@ function replaceCorporia(newCorpus) {
  * @param array - array of notebooks
  */
 function encodeMediaFiles(array) {
-    let mediaPromises = []; //create array t ohold promises
-    return new Promise(function(resolve, reject) { //create new promise and return
-        array.map(function(object) { //iterate through array an modify array
-            if (object.image) {// if there is an image
-                mediaPromises.push( //push the enodeBase64 promise
-                    encodeBase64(object.image.path).then(function(imageBufferString) {
-                        object.imageBufferString = imageBufferString; //add image buffer string as property
-                    })
-                )
-            }
+  let mediaPromises = []; //create array t ohold promises
+  return new Promise(function (resolve, reject) { //create new promise and return
+    array.map(function (object) { //iterate through array an modify array
+      if (object.image) {// if there is an image
+        mediaPromises.push( //push the enodeBase64 promise
+          encodeBase64(object.image.absolutePath).then(function (imageBufferString) {
+            object.imageBufferString = imageBufferString; //add image buffer string as property
+          })
+        )
+      }
 
-            if (object.audio) { //if there is an audio file
-                mediaPromises.push(
-                    encodeBase64(object.audio.path).then(function(audioBufferString) {
-                        object.audioBufferString = audioBufferString;
-                    })
-                )
-            }
-        });
-
-        Promise.all(mediaPromises).then(function() { //once all promises are resolved
-            resolve(array); // resolve with the modified array
-        })
+      if (object.audio) { //if there is an audio file
+        mediaPromises.push(
+          encodeBase64(object.audio.absolutePath).then(function (audioBufferString) {
+            object.audioBufferString = audioBufferString;
+          })
+        )
+      }
     });
+
+    Promise.all(mediaPromises).then(function () { //once all promises are resolved
+      resolve(array); // resolve with the modified array
+    })
+  });
 }
 /**
  * Takes all notebooks, decodes, writes, and deletes buffer property.
  * @param array
  */
 function decodeMediaFiles(array) {
-    let mediaPromises = []; //store promises
-    return new Promise((resolve, reject) => {
-        array.map((object) => { //iterate through array
-            if (object.imageBufferString) { //if there is an image buffer string
+  let mediaPromises = []; //store promises
+  return new Promise((resolve, reject) => {
+    array.map((object) => { //iterate through array
+      if (object.imageBufferString) { //if there is an image buffer string
+        let pathToWrite = path.join(app.getPath('userData'), 'image', process.platform === 'win32' ? path.win32.basename(object.image.path) :  path.posix.basename(object.image.path));
+        let imageData = { //create an object with the path and buffer string to pass to wrtie media file function
+          buffer: object.imageBufferString,
+          absolutePath: pathToWrite,
+          path: path.join('image', object.name),
+          name: object.name
+        };
 
-                let imageData = { //create an object with the path and buffer string to pass to wrtie media file function
-                    buffer: object.imageBufferString,
-                    path: object.image.path
-                };
+        mediaPromises.push( //push write media file promise
+          writeMediaFile(imageData).then(() => {
+            delete object.imageBufferString; //delete the imagebuffer string
+          })
+        )
+      }
+      if (object.audioBufferString) {
+        let pathToWrite = path.join(app.getPath('userData'), 'audio', process.platform === 'win32' ? path.win32.basename(object.audio.path) :  path.posix.basename(object.audio.path));
+        let audioData = {
+          buffer: object.audioBufferString,
+          absolutePath: pathToWrite,
+          path: path.join('audio', object.name),
+          name: object.name
+        };
 
-                mediaPromises.push( //push write media file promise
-                    writeMediaFile(imageData).then(() => {
-                        delete object.imageBufferString; //delete the imagebuffer string
-                    })
-                )
-            }
-            if (object.audioBufferString) {
-
-                let audioData = {
-                    buffer: object.audioBufferString,
-                    path: object.audio.path
-                };
-
-                mediaPromises.push(
-                    writeMediaFile(audioData).then(() => {
-                        delete object.audioBufferString
-                    })
-                )
-            }
-        });
-
-        Promise.all(mediaPromises).then((results) => { //once the promises are finished
-            resolve(array); //resolve(array);
-        })
+        mediaPromises.push(
+          writeMediaFile(audioData).then(() => {
+            delete object.audioBufferString
+          })
+        )
+      }
     });
+
+    Promise.all(mediaPromises).then((results) => { //once the promises are finished
+      resolve(array); //resolve(array);
+    })
+  });
 }
-
-
 
 
 /**
@@ -571,43 +931,43 @@ function decodeMediaFiles(array) {
  * @param data - A single object containing media buffer and media path - {buffer: String, path: String}
  */
 function writeMediaFile(data) {
-    return new Promise(function(resolve, reject) {
-        let mediaPath = path.join(config.root, '/server/data/', data.path); //the root path
+  return new Promise(function (resolve, reject) {
 
-        let buffer = new Buffer(data.buffer, 'base64', function(err) { //decode buffer bas364
-            if (err) {
-                console.log('issue decoding base64 data');
-                reject(err);
-            }
-        });
+    // let mediaPath = path.join(config.root, '/server/data/', data.path); //the root path
 
-        fs.writeFile(mediaPath, buffer, function(err) { //write the file to the file system
-            if (err) {
-                console.log('There was an error writing file to filesystem', err);
-                reject(err);
-            }
-            resolve('success');
-        })
+    let buffer = new Buffer(data.buffer, 'base64', function (err) { //decode buffer bas364
+      if (err) {
+        console.log('issue decoding base64 data');
+        reject(err);
+      }
     });
+
+    fs.writeFile(data.path, buffer, function (err) { //write the file to the file system
+      if (err) {
+        console.log('There was an error writing file to filesystem', err);
+        reject(err);
+      }
+      resolve('success');
+    })
+  });
 }
 /**
  * Encodes a file to a base64 buffer string
  * @param mediaPath - String that is a relative path to a file.
  */
 function encodeBase64(mediaPath) {
-    let myPath = path.join(config.root, '/server/data/', mediaPath); //build a more 'absolute' path to the file
-    return new Promise(function(resolve, reject){
-        fs.readFile(myPath, function(err, data){
-            if (err) {
-                console.log('there was an error encoding media...', err);
-                reject(err);
-            }
-            resolve(data.toString('base64')); //return a buffer string
-        });
+  return new Promise(function (resolve, reject) {
+    fs.readFile(mediaPath, function (err, data) {
+      if (err) {
+        console.log('there was an error encoding media...', err);
+        reject(err);
+      }
+      resolve(data.toString('base64')); //return a buffer string
     });
+  });
 }
 
 
 function handleError(res, err) {
-    return res.status(500).send(err);
+  return res.status(500).send(err);
 }

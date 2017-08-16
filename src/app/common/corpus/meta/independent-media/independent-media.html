@@ -1,0 +1,24 @@
+<md-card>
+	<md-card-content class="media-content">
+		<md-card-title class="media-title" layout-align="center space-between">
+			<md-card-title-text>
+				<span class="md-headline">{{$ctrl.file.name}}</span>
+				<span class="md-subhead">Independent Media File</span>
+			</md-card-title-text>
+		</md-card-title>
+
+
+		<div ng-if="!$ctrl.isAudio" class="media-image">
+			<img ng-src="{{$ctrl.file.path}}" alt="">
+		</div>
+
+		<audio-preview ng-if="$ctrl.isAudio" url-src="$ctrl.file.path"></audio-preview>
+
+
+	</md-card-content>
+	<span flex></span>
+	<md-divider></md-divider>
+	<md-card-actions layout="row" layout-align="start center">
+		<md-button ng-click="$ctrl.removeMedia($ctrl.file)">Delete</md-button>
+	</md-card-actions>
+</md-card>

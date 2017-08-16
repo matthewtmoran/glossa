@@ -1,316 +1,302 @@
-var config = require('./../config/environment/index');
-var bonjour = require('bonjour')();
-var ioClient = require('socket.io-client');
-var User = require('./../api/user/user.model.js');
-var Notebooks = require('./../api/notebook/notebook.model.js');
-var fs = require('fs');
-var path = require('path');
+// var ioClient = require('socket.io-client');
 var socketUtil = require('./socket-util');
-var nodeClientSocket = '';
-
+var path = require('path');
+var fs = require('fs');
+const main = require('../../main');
+const app = require('electron').app;
+const config = require('../config/environment');
+const ioClient = require('socket.io-client');
+//master list of active socket connections
+let connectionList = [];
+const ip = require('ip');
+let devObject = {};
 
 module.exports = {
-    initNodeClient: function(service, me, io) {
-        var externalPath = 'http://' + service.referer.address + ':' + service.port.toString();
-        nodeClientSocket = ioClient.connect(externalPath);
 
-        nodeClientSocket.on('connect', function() {
-            console.log('');
-            console.log('server to server connection made');
-            console.log('I am client', nodeClientSocket.id);
-
-            initNodeClientListeners(nodeClientSocket, me, io);
-
-        })
+  initLocal: function (io, win) {
+    devObject.io = io;
+    devObject.win = win;
+    let service = {
+      name: 'Glossa-' + global.appData.initialState.user._id,
+      addr: ip.address()
+    };
+    let port = !config.secondInstance ? '9090' : '9000';
+    let externalPath = 'http://' + service.addr + ':' + port;
+    //if the service is not in the master list then we connect to it as a client
+    if (connectionList.indexOf(service.name) < 0) {
+      // let nodeClientSocket = ioClient(externalPath, {transports: ['websocket'], upgrade: false});
+      // let nodeClientSocket = ioClient.connect(externalPath, {reconnection: true, reconnectionDelay: 1000});
+      let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
+      this.connect(service, io, win, nodeClientSocket);
+      //handle the connection to the external socket server
+    } else {
+      // we are already connected to this service so just ignore
+      return false;
     }
-};
+  },
 
-function initNodeClientListeners(socketClient, me, io) {
+  //this occurs when bonjour discovers an external server.
+  //we are going to connect to the server as a client so the server can interact with us
+  init: function (service, io, win) {
+    let nodeClientSocket;
+    //if the service is not in the master list then we connect to it as a client
+    if (connectionList.indexOf(service.name) < 0) {
+      let externalPath = 'http://' + service.addr + ':' + config.port;
+      nodeClientSocket = require('socket.io-client')(externalPath);
+      //handle the connection to the external socket server
+      this.connect(service, io, win, nodeClientSocket);
+    } else {
+      // we are already connected to this service so just ignore
+      return false;
+    }
+  },
 
-    socketClient.on('request:SocketType', function(data) {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - request:SocketType Listener %%');
+  connect: function (service, io, win, nodeClientSocket) {
+    console.log('');
+    console.log('--- socketClient.connect called');
 
-        console.log('External application requesting handshake');
+    //initial connection to another server
+    //.once solve the problem however I'm not sure this will work with more than one connection
+    //the other issue will be removing event listeners
+    //TODO: !IMPORTANT - test for multiple connections
 
-        socketUtil.getUser().then(function(user) {
+    // //initial connection to another server
+    nodeClientSocket.on('connect', () => {
+      console.log('');
+      console.log('--- on:: connect');
+      console.log('');
 
-            var socketData = {
-                name: user.name,
-                _id: user._id,
-                type: 'external-client',
-                socketId: data.socketId,
-                avatar: user.avatar
-            };
-
-            //return socket type to outside application
-            console.log('%% EXTERNAL-CLIENT - return:SocketType EMITTER %%');
-
-            socketClient.emit('return:SocketType', socketData);
-        });
-    });
-
-    //listen from external-server
-    //Emit to external-server
-    //When outside application disconnects this listener is triggered
-    socketClient.on('notify:userDisconnected', function(data) {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - notify:userDisconnected listener %%');
-        // console.log('... outside application disconnected');
-
-        console.log('%% EXTERNAL-CLIENT - update:userlist EMITTER %%');
-        socketClient.emit('update:userlist', data);
-    });
-
-    socketClient.on('request:avatar', function() {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - request:avatar Listener %%');
-        socketUtil.getUser().then(function(user) {
-            socketUtil.encodeBase64(user.avatar).then(function(data) {
-
-                var persistedData = {
-                    name: user.name,
-                    avatar: user.avatar,
-                    _id: user._id
-                };
-
-                var avatarString = data;
-
-                socketClient.emit('return:avatar', {avatarString: avatarString, imagePath: user.avatar, userData: persistedData});
-            });
-        });
-    });
-
-
-    //Listen from external-server
-    socketClient.on('disconnect', function() {
-        console.log('');
-        console.log('socketClient disconnect');
-
-        // console.log('external-client disconnect listener');
-
-        //disconnect socket.... this occurs when the server this socket is connected to closes.
-        socketClient.disconnect(true);
+      //when the connection is truly established, we add the service name ot the list.
+      connectionList.push(service.name);
 
     });
 
-    //event comes from external-server
-    //Emits back to external-server
-    //data = has last sync attached to it....
-
-    //data should be a list of notebook ids and updatedAt that the requesting user already has in his db
-    //@data = {_id: String, updatedAt: Date}
-    socketClient.on('request:updates', function(data) {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - request:updates listener %%');
-        //get me
-        socketUtil.getUser().then(function(user) {
-            return user._id;
-        }).then(function(userId) {
-            var newNotebookEntries = [];
-            var mediaPromises = [];
-
-            console.log('looking for the notebooks i created.... ');
-            Notebooks.find({"createdBy._id": userId}, function (err, notebooks) {
-                if (err) {
-                    return console.log('There was an Error', err);
-                }
-
-                //if no data... get all notebooks
-                if (!data) {
-                    console.log('no data sent to compare against');
-                    // notebooks.forEach(function (notebook) {
-                    //     if (notebook.image) {
-                    //         console.log('Notebook has image');
-                    //         mediaPromises.push(
-                    //             socketUtil.encodeBase64(notebook.image.path).then(function (imageString) {
-                    //                 console.log('Encoded notebook image.');
-                    //                 notebook.imageBuffer = imageString;
-                    //             })
-                    //         );
-                    //     }
-                    //     if (notebook.audio) {
-                    //         mediaPromises.push(
-                    //             socketUtil.encodeBase64(notebook.audio.path).then(function (audioString) {
-                    //                 console.log('Encoded notebook audio.');
-                    //                 notebook.audioBuffer = audioString;
-                    //             })
-                    //         )
-                    //     }
-                    //     newNotebookEntries.push(notebook);
-                    // });
-                } else {
-                    console.log('some data sent to compare against: ', data.length);
-                    //if there is data compare so we can get updates to notebooks...
-
-                    notebooks.forEach(function(notebook) {
-                        var exists = false;
-                        var updates = false;
-
-                        data.forEach(function(d) {
-                            if (d._id === notebook._id) {
-                                console.log('');
-                                console.log('This notebook entry already exists.');
-                                console.log('...checking if updates have been made.');
-
-                                exists = true;
-
-                                var externalUpdatedAtDateObject = new Date(d.updatedAt);
-
-                                console.log('local notebook update time:', notebook.updatedAt.getTime());
-                                console.log('external notebook update time:', externalUpdatedAtDateObject.getTime());
-
-                                //TODO: when manual timestamp is implemented - change this to be more simple
-                                if (notebook.updatedAt.getTime() !== externalUpdatedAtDateObject.getTime()) {
-                                    if (notebook.updatedAt.getTime() > externalUpdatedAtDateObject.getTime()) {
-                                        updates = true;
-                                        console.log('my update is more recent....');
-                                    } else {
-                                        console.log('my update is NOT more recent....');
-                                    }
-
-                                    console.log('Dates are not equal.');
-                                    console.log('TODO: send this notebook to user....');
-                                }
-                            }
-                        });
-
-                        if (!exists || updates) {
-                            console.log('Notebook is new or has un-synced updates...');
-                            if (notebook.image) {
-                                console.log('Notebook has image');
-                                mediaPromises.push(
-                                    socketUtil.encodeBase64(notebook.image.path).then(function (imageString) {
-                                        console.log('Encoded notebook image.');
-                                        notebook.imageBuffer = imageString;
-                                    })
-                                );
-                            }
-                            if (notebook.audio) {
-                                mediaPromises.push(
-                                    socketUtil.encodeBase64(notebook.audio.path).then(function (audioString) {
-                                        console.log('Encoded notebook audio.');
-                                        notebook.audioBuffer = audioString;
-                                    })
-                                )
-                            }
-                            console.log('notebook.updatedAt', notebook.updatedAt);
-                            console.log('notebook.updatedAt.getTime()', notebook.updatedAt.getTime());
-                            newNotebookEntries.push(notebook);
-                        }
-                    });
-                }
-
-                //these promises will be media promises
-                Promise.all(mediaPromises).then(function (data) {
-                    console.log('');
-                    console.log('all media promises have resolved');
-                    socketClient.emit('return:updates', {updates: newNotebookEntries});
-                });
-            });
-        });
-    });
-
-
-    //Listen from external-server
-    //Emit to local-client
-    socketClient.on('return:data-changes', function(dataChanges) {
-        socketUtil.addExternalData(dataChanges.updatedData).then(function(updatedDocs) {
-            var updatedConnection;
-            var timeStamp = Date.now();
-
-
-            socketUtil.getConnection(dataChanges.connectionId).then(function(connection) {
-                connection.lastSync = timeStamp;
-                socketUtil.updateConnection(connection).then(function() {
-                    socketUtil.emitToLocalClient(localClient.socketId, 'notify:externalChanges', {connection: updatedConnection, updatedData: updatedDocs});
-                })
-
-            });
-        });
-    });
-
-    //@dataChanges = {update: object, user: object}
-    //Listen from external-server
-    //Emit to external-server (if following)
-    socketClient.on('onlineUser:updatesMade', function(dataChanges) {
-
-        console.log('%%  onlineUser:updatesMade  %%');
-
-        var externalUser = dataChanges.user;
-
-        socketUtil.getConnection(externalUser._id).then(function(connection) {
-            if (connection.following) {
-
-                var mediaPromises = [];
-                if (dataChanges.update.imageBuffer) {
-                    var imageMediaObject = {
-                        path: dataChanges.update.image.path,
-                        buffer: dataChanges.update.imageBuffer
-                    };
-                    mediaPromises.push(socketUtil.writeMediaFile(imageMediaObject));
-                    // delete dataChanges.update.imageBuffer;
-                }
-                if (dataChanges.update.audioBuffer) {
-                    var audioMediaObject = {
-                        path: dataChanges.update.audio.path,
-                        buffer: dataChanges.update.audioBuffer
-                    };
-                    mediaPromises.push(socketUtil.writeMediaFile(audioMediaObject));
-                    // delete dataChanges.update.audioBuffer;
-                }
-
-                Promise.all(mediaPromises).then(function(result) {
-
-                    var options = {returnUpdatedDocs: true, upsert: true};
-                    var query = {_id: dataChanges.update._id};
-
-                    console.log('dataChanges.update.updatedAt', dataChanges.update.updatedAt);
-
-                    Notebooks.update(query, dataChanges.update, options, function(err, updatedCount, updatedDocs) {
-                        if (err) {
-                            return console.log('Error inserting external Updates');
-                        }
-
-                        console.log('Inserted notebook success');
-
-                        Notebooks.persistence.compactDatafile();
-                        socketUtil.getUser().then(function(user) {
-                            socketUtil.emitToLocalClient(io, user.localSocketId, 'notify:externalChanges', {connection: connection, updatedData: updatedDocs});
-                        })
-
-
-                    });
-
-                });
-            }
-        });
-    });
-
-
-    //data = {connection: {_id: String, name: String, avatar: String}
-    socketClient.on('update:toConnectionData', function(data) {
-        console.log('');
-        console.log('%% EXTERNAL-CLIENT - update:toConnectionData %%');
-        socketUtil.getConnection(data._id).then(function(connection) {
-
-            connection.name = data.name;
-            connection.avatar = data.avatar;
-
-            socketUtil.getUser().then(function(user) {
-                socketUtil.updateConnection(connection).then(function(updatedConnection) {
-
-                    socketUtil.emitToLocalClient(io, user.localSocketId, 'update:connectionInfo', {connection: updatedConnection})
-
-                });
-                socketUtil.normalizeNotebooks(connection).then(function(changeObject) {
-
-                    socketUtil.emitToLocalClient(io, user.localSocketId, 'normalize:notebooks', changeObject)
-
-                });
-
-            });
-
-        });
+    nodeClientSocket.on('test:event', (data) => {
+      console.log('Heard test:event');
     })
-}
+
+    nodeClientSocket.on('disconnect', (reason) => {
+      console.log('');
+      console.log('');
+      console.log('');
+      console.log('--- on:: disconnect');
+      console.log('--- reason:', reason);
+      console.log('');
+      console.log('');
+      console.log('');
+      //when the socket disconnects, we remove the service name from the list
+      connectionList.splice(connectionList.indexOf(service.name), 1);
+      //unbind listeners so they are not duplicated
+      unbind();
+
+      //if its' lcal dev start again...
+      if (config.localDev) {
+        // this.initLocal(devObject.io, devObject.win);
+      }
+    });
+
+    //recievs event from an external server and emits the end-handshake
+    nodeClientSocket.on('begin-handshake', () => {
+      console.log('--- on:: begin-handshake');
+
+      const basicProfileData = {
+        _id: global.appData.initialState.user._id,
+        name: global.appData.initialState.user.name,
+        type: 'external-client',
+        socketId: nodeClientSocket.id,
+        avatar: global.appData.initialState.user.avatar
+      };
+
+      console.log('--- emit:: end-handshake');
+      nodeClientSocket.emit('end-handshake', basicProfileData)
+    });
+
+    //a server is requesting data from a connected client
+    //@data = {notebooks: Array}
+    nodeClientSocket.on('sync-data', (data) => {
+      console.log('--- on:: sync-data');
+
+      //send sync notificatio to local window
+      console.log("--- IPC send:: sync-event-start local-window", 'line 107');
+      win.webContents.send('sync-event-start');
+
+      socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
+        .then(notebooksToSend => {
+          console.log('--- emit:: sync-data:return to:: whoever requested it');
+          nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend});
+
+          console.log('TODO: end outside client sync event display');
+          console.log("--- IPC send:: sync-event-end local-window");
+          win.webContents.send('sync-event-end');
+        })
+        .catch((err) => {
+          console.log('The was an error getNewAndUpdatedNotebooks: ', err);
+          console.log("--- IPC send:: sync-event-end local-window");
+          win.webContents.send('sync-event-end');
+        })
+    });
+
+    nodeClientSocket.on('rt:updates', (data) => {
+      console.log('on:: rt:updates');
+
+      global.appData.initialState.connections.forEach((connection) => {
+        if (connection._id === data.user._id && connection.following) {
+
+          console.log("--- IPC send:: sync-event-start local-window", 'line 128');
+          win.webContents.send('sync-event-start');
+
+          global.appData.initialState.connections.forEach((connection) => {
+            //if the user matches and we are following the user...
+            if (data.user._id === connection._id && connection.following) {
+
+              socketUtil.syncDataReturn(data)
+                .then((data) => {
+
+                  //updating the global object here
+                  socketUtil.updateGlobalArrayObject(data, 'notebooks');
+
+                  console.log('--- IPC send:: update-rt-synced-notebooks');
+                  win.webContents.send('update-rt-synced-notebooks', data);
+                  console.log('--- IPC send:: sync-event-end');
+                  win.webContents.send('sync-event-end');
+
+                })
+            }
+          });
+        }
+
+      });
+    });
+
+    nodeClientSocket.on('send-profile-updates', (data) => {
+      console.log('--- on:: send-profile-updates');
+
+      global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+        if (connection._id === data._id) {
+          if (connection.name !== data.name) {
+            connection.name = data.name;
+          }
+          if (connection.following) {
+            if (data.avatar && !connection.avatar) {
+              console.log('--- Updated connection to add avatar');
+              connection = getAvatarData(connection, data)
+            } else if (!data.avatar && connection.avatar) {
+              console.log('--- Update connection to remove avatar');
+              connection = removeAvatarData(connection, data)
+            } else if (data.avatar && data.avatar.name !== connection.avatar.name) {
+              console.log('--- Update connection to update avatar');
+              connection = getAvatarData(connection, data)
+            } else {
+              console.log('--- Update something else - NO CONDITIONS MET');
+              console.log('--- No Changes with avatar most likely');
+              updateConnectionsAndNotebooks(connection);
+            }
+          }
+          return connection;
+        }
+        return connection;
+      });
+    });
+
+    nodeClientSocket.on('return:avatar', (data) => {
+      socketUtil.writeAvatar(data)
+        .then(() => {
+          console.log('Avatar written');
+        })
+    });
+
+
+    //on connection, avatar is different this is where the request is heard
+    nodeClientSocket.on('request:avatar', (data) => {
+      console.log('--- on:: request:avatar');
+
+      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
+        .then((bufferString) => {
+
+          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
+          avatarData.bufferString = bufferString;
+          console.log('--- avatarData.path', avatarData.path);
+          console.log('--- emit:: return:avatar to:: server that is connected (that made request)');
+          nodeClientSocket.emit('return:avatar', avatarData);
+        })
+
+
+    });
+
+
+    //remvoes the event listener
+    //TODO: !IMPORTANT - test for multiple connections
+    //TODO: refractor to get all events dynamically
+    function unbind() {
+      nodeClientSocket.removeAllListeners("begin-handshake");
+      nodeClientSocket.removeAllListeners("sync-data");
+      nodeClientSocket.removeAllListeners("return:avatar");
+      nodeClientSocket.removeAllListeners("request:avatar");
+      nodeClientSocket.removeAllListeners("send-profile-updates");
+      nodeClientSocket.removeAllListeners("rt:updates");
+      nodeClientSocket.removeAllListeners("connect");
+      nodeClientSocket.removeAllListeners("disconnect");
+    }
+
+    function getAvatarData(connection, data) {
+      console.log('--- emit:: request:avatar');
+      io.to(connection.socketId).emit('request:avatar');
+      connection.avatar = data.avatar;
+      connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
+      connection.avatar.path = path.normalize(data.avatar.path);
+
+      updateConnectionsAndNotebooks(connection);
+
+      return connection;
+    }
+
+    function removeAvatarData(connection, data) {
+      fs.unlink(connection.avatar.absolutePath);
+      connection.avatar = data.avatar;
+      updateConnectionsAndNotebooks(connection);
+      return connection;
+    }
+
+    function updateConnectionsAndNotebooks(connection) {
+      console.log('--- IPC send:: sync-event-start to:: local-window', 'line 245');
+      win.webContents.send('sync-event-start');
+
+
+      let promises = [];
+      promises.push(
+
+        new Promise((resolve, reject) => {
+          socketUtil.followedConnectionUpdate(connection)
+            .then((updatedConnection) => {
+              // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+              resolve(updatedConnection)
+            })
+            .catch((err) => {
+              reject(err);
+            })
+        }),
+
+        new Promise((resolve, reject) => {
+          socketUtil.normalizeNotebooks(connection)
+            .then((updatedNotebooks) => {
+              socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+              resolve(updatedNotebooks)
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
+      );
+
+      Promise.all(promises).then((results) => {
+        console.log('--- IPC send:: update-connection-list to:: local-window');
+        win.webContents.send('update-connection-list');
+        console.log('--- IPC send:: update-synced-notebooks to:: local-window');
+        win.webContents.send('update-synced-notebooks');
+        console.log('--- IPC send:: sync-event-end to:: local-window');
+        win.webContents.send('sync-event-end');
+      })
+    }
+  }
+
+};

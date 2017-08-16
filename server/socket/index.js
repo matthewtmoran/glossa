@@ -1,498 +1,319 @@
 'use strict';
 
-const socketUtil = require('./socket-util');
-const bonjourService = require('./bonjour-service');
-const Notebooks = require('./../api/notebook/notebook.model.js');
-const externalSocketClient = require('./socket-client');
 const path = require('path');
 const fs = require('fs');
 const config = require('./../config/environment/index');
-const AdmZip = require('adm-zip');
-let browser = null;
+const socketUtil = require('./socket-util');
+const main = require('../../main');
+const app = require('electron').app;
 let localClient = {};
+let connectedClients = {};
 
 
-module.exports = function (glossaUser, mySession, io, browser, bonjour) {
+module.exports = function (io) {
+  io.on('connection', function (socket) {
+    console.log('');
+    console.log('');
+    console.log('on:: connection');
+    console.log('socket.id:', socket.id);
+    console.log('');
 
-    io.sockets.on('connection', function (socket) {
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log('%% SOCKET-SERVER - New socket connection');
-        console.log('...begin handshake');
+    /////////////
+    //handshake//
+    /////////////
 
+    console.log('emit:: begin-handshake');
+    //every socket connection, ask for some data
+    socket.emit('begin-handshake');
 
-        ///////////////////////
-        //Universal listeners//
-        //////////////////////
+    //this should be the return of the data we asked for
+    socket.on('end-handshake', onEndHandshake);
+    // when a socket disconnects remove from connection list
+    socket.on('disconnect', disconnect);
+    //when client sends data back to us
+    socket.on('sync-data:return', syncDataReturn);
+    //when a client has requested the actual avatar image file.
+    socket.on('request:avatar', onRequestAvatar);
 
-
-        //////////////
-        // handshake //
-        /**
-         * Request the kind of socket
-         * Will return event: 'return:SocketType'
-         * Will return either 'local-client' or 'external-client'
-         */
-        socket.emit('request:SocketType', {socketId: socket.id});
-
-
-        /**
-         * Return listener
-         * @clientData - {socketType: String}
-         */
-        socket.on('return:SocketType', function (clientData) {
-            //if socket is a local client
-            if (clientData.type === 'local-client') {
-
-                localClientConnection(socket, glossaUser, io, browser, bonjour);
-
-            } else if (clientData.type === 'external-client') {
-
-                externalClientConnection(socket, io, glossaUser, clientData);
-
-            }
-        });
-
-        socket.on('disconnect', function () {
-            console.log('');
-            console.log('#### disconnect ####');
-
-            // externalSocketClient.destroyNodeClient();
-            if (socket.id === localClient.socketId) {
-                console.log('The local-client electron window has closed or app has quit');
-                localClient.disconnect = true;
-
-                setTimeout(function () {
-                    if (localClient.disconnect) {
-                        // localClient = {};
-
-                        console.log('Im not sure we should try to disconnect here');
-
-                        // socketUtil.resetClientData().then(function() {
-                        //
-                        //     bonjourService.destroy();
-                        //
-                        //     setTimeout(function() {
-                        //         process.exit();
-                        //     }, 1000)
-                        //
-                        // });
-
-                    }
-                }, 2000);
-
-            } else {
-
-                socketUtil.getConnectionBySocketId(socket.id).then(function (currentClient) {
-                    currentClient.disconnect = true;
-                    setTimeout(function () {
-                        if (currentClient.disconnect) {
-
-                            if (!currentClient.following) {
-                                socketUtil.removeConnection(currentClient).then(function () {
-                                    socketUtil.getConnections().then(function (data) {
-
-                                        socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                                    })
-                                })
-                            } else {
-                                currentClient.online = false;
-                                delete currentClient.socketId;
-
-                                socketUtil.updateConnection(currentClient).then(function (data) {
-                                    socketUtil.getConnections().then(function (data) {
-                                        socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                                    })
-                                });
-                            }
-
-                            console.log('browser.services.length', browser.services.length)
-
-                        }
-                    }, 3000);
-                });
+    socket.on('return:avatar', onReturnAvatar);
 
 
-            }
-            console.log('');
-        });
+    ////////////////////
+    //socket functions//
+    ////////////////////
 
-        //////////////////////////
-        //local-Client listeners//
-        //////////////////////////
+    //client returns 'end-handshake with data'
+    function onEndHandshake(client) {
+      console.log('on:: end-handshake');
+      console.log(`User ${client.name} just connected. ID = ${client._id}`);
+      console.log(`User ${client.name} socketID = ${client.socketId}`);
 
+      //keep track of connections
+      connectedClients[socket.id] = {};
+      connectedClients[socket.id].disconnected = false;
 
-        socket.on('update:following', function (data) {
-            console.log('');
-            console.log('%% update:following Listener %%');
+      //get main window object
+      let win = main.getWindow();
 
-            let client = JSON.parse(data.connection);
-            console.log('client', client);
+      // console.log('IPC send:: sync-event-start to:: local-window', 'line 49');
+      // win.webContents.send('sync-event-start');
+      //dumb check just to make sure it's a client we want...
+      if (client.type === 'external-client') {
+        //update existing connections
+        let connectionExists = false;
+        global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
+          if (connection._id !== client._id) {
+            return connection;
+          }
+          //update data that we do not store
+          connection.online = true;
+          connection.socketId = client.socketId;
+          connection.name = client.name;
 
-            socketUtil.getConnection(client._id).then(function (clientPersistedData) {
-                clientPersistedData.following = client.following;
-
-                if (!clientPersistedData.following) {
-                    console.log('no longer follwoing user....');
-                    if (clientPersistedData.avatar) {
-                        console.log('user has avatar... need to remove');
-                        socketUtil.removeAvatarImage(clientPersistedData.avatar).then(function () {
-                            console.log('remove avatar promise resolved');
-                            clientPersistedData.avatar = null;
-                        });
-                    }
+          //i already know it's following here but just in case and for consitency sake
+          if (connection.following) {
+            //if client has avatar object exist and client avatar name exists as a field
+            //and
+            //connection.avatar does not exist or if the connection.avatar.name field does not exist
+            if ((client.avatar && client.avatar.name) && (!connection.avatar || !connection.avatar.name)) {
+              console.log("client has avatar connection does not have avatar");
+              //this means connection is null but client is not null
+              //client has an avatar image we need
+              getNewAvatarData(connection, client, win)
+            //  if client.avatar does not exist or if client.avatar.name field does not exist
+            //  and
+            //  connection.avatar exists and connection.avatar.name field exists,
+            //  remove the file and remove the avatar data on the connection object
+            } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
+              //this means client is null but connection is not null
+              //client has removed his avatar image
+              console.log('TODO: get rid of the stored avatar data we hold');
+              fs.unlink(connection.avatar.absolutePath, (err) => {
+                if (err) {
+                 return console.log("There was an error trying to remove avatar file", err);
                 }
+              });
+              delete connection.avatar;
+            //  if client avatar exists and client avatar.name exists and connection.avatar exists and connection.avatar.name eixsts and client .avatar.name is not the same as connection.avatar.name
+            } else if (client.avatar && client.avatar.name && connection.avatar && connection.avatar.name && client.avatar.name !== connection.avatar.name) {
+              //this means client has changed his avatar image to a new avatar
+              console.log('TODO: remove the data we hold and get the new data')
+              //remove the image attached to the connection object and get new data
+              fs.unlink(connection.avatar.absolutePath);
+              getNewAvatarData(connection, client, win)
+            }
 
-                console.log('about to update connection', clientPersistedData);
-                socketUtil.updateConnection(clientPersistedData).then(function (updatedConnection) {
-                    if (updatedConnection.following) {
-                        console.log('we are following user');
-                        socketUtil.getUserSyncedData(updatedConnection).then(function (data) {
-                            console.log('got current data:', data.length);
-                            console.log('requesting updates...');
-                            socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:updates', data);
-                            console.log("requesting avatar.... ");
-                            socketUtil.emitToExternalClient(io, updatedConnection.socketId, 'request:avatar', {});
-                        });
-                    }
-                    console.log('updating user list.... ');
-                    socketUtil.emitToLocalClient(io, localClient, 'update:connection', {connection: updatedConnection});
-                })
+            //sync data
+            socketUtil.syncData(connection, (data) => {
+
+              console.log('IPC send:: sync-event-start to:: local-window', 'line 108');
+              win.webContents.send('sync-event-start');
+              console.log('emit:: sync-data to:: a client');
+              io.to(client.socketId).emit('sync-data', data)
             });
+          }
+          connection = Object.assign({}, connection);
+          connectionExists = true;
+          return connection;
         });
 
-        /**
-         * Called when user navigates to network settings state
-         * Emits the current list of online users to client
-         */
-        //TODO: change this to user other event and verify we even need this listener
-        socket.on('get:networkUsers', function (data) {
-            socketUtil.getConnections().then(function (data) {
-                console.log('data should be array.', Array.isArray(data));
-                socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList',  {onlineUsers: data});
-            })
-        });
+        //if client still does not exist it means its a new client
+        if (!connectionExists) {
 
+          const clientData = {
+            name: client.name,
+            _id: client._id,
+            type: 'external-client',
+            following: false,
+            lastSync: null,
+            avatar: client.avatar,
+            socketId: client.socketId,
+            online: true
+          };
 
-        //data = {userProfile: String, avatarString: String}
-        socket.on('update:userProfile', function (data) {
+          //concat to array
+          global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
+        }
 
-            let userProfile = JSON.parse(data.userProfile);
+        //join the externalClientRoom
+        socket.join('externalClientsRoom');
+        console.log('IPC send:: update-connection-list');
+        win.webContents.send('update-connection-list');
 
-            socketUtil.getUser().then(function (user) {
-                user = userProfile;
-                socketUtil.updateUser(user).then(function (updatedUser) {
+      } else {
+        //if it's not its probably someone at the coffee shop
+        console.log('********SOMEONE IS SNOOPING*********')
+      }
+    }
 
-                    let completeConnectionData = {
-                        name: user.name,
-                        avatar: user.avatar,
-                        _id: user._id
-                    };
+    function disconnect(reason, test) {
+      let win = main.getWindow();
+      console.log('');
+      console.log('');
+      console.log('');
+      console.log('on:: disconnect');
+      console.log('Server disconnect data:', reason);
+      console.log('test:', test);
+      console.log("socket.id", socket.id);
+      console.log('');
+      console.log('');
+      console.log('');
 
-                    //here we update the notebooks in our db with our updated profile information.
-                    socketUtil.normalizeNotebooks(updatedUser).then(function (changeObject) {
-                        socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
-                    });
+      //get connection from list
+      let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
 
-                    console.log('TODO: broadcast to connections updated user data (and have them normalize the data)');
-                    console.log('TODO: normalize our data');
+      if (!connection) {
+        return console.log("no connection in global object.  Am going to throw an error")
+      }
 
-                    socketUtil.broadcastToExternalClients(io, 'update:toConnectionData', completeConnectionData);
-
-                })
-            })
-        });
-
-
-        /**
-         * When local-client changes are made, this broadcasts to every online user that changes are made
-         *
-         */
-        //TODO: Should only broadcast to users that are following...
-        //Listen from local-client
-        //Emit to all external-clients
-        socket.on('broadcast:Updates', function (data) {
-            let mediaPromises = [];
-            //encode image
-            if (data.image) {
-                mediaPromises.push(
-                    socketUtil.encodeBase64(data.image.path).then(function (imageString) {
-                        data.imageBuffer = imageString;
-                    })
-                )
-            }
-            //encode audio
-            if (data.audio) {
-                mediaPromises.push(
-                    socketUtil.encodeBase64(data.audio.path).then(function (audioString) {
-                        data.audioBuffer = audioString;
-                    })
-                )
-            }
-
-            //once image and audio has been encoded...
-            Promise.all(mediaPromises).then(function (result) {
-                console.log('all media promises have resolved');
-                console.log('');
-
-                let updateObject = {
-                    update: data,
-                    user: {
-                        _id: glossaUser._id,
-                        name: glossaUser.name
-                    }
-                };
-
-                //send to clients
-                socketUtil.broadcastToExternalClients(io, 'onlineUser:updatesMade', updateObject);
-            });
-
-        });
-
-
-        socket.on('get:connections', function () {
-            console.log('%% get:connections Heard in index.js %%');
-            socketUtil.getConnections().then(function (data) {
-                console.log('data should be array.', Array.isArray(data));
-                socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data})
-            })
-        });
-
-
-        socket.on('import:project', function (data) {
-
-            // fs.readFile(data.projectPath, 'utf8', function(err, data) {
-            //    if (err) {
-            //        return console.log('Error reading file', err);
-            //    }
-            //    console.log('data', data);
-            // });
-
-
-        });
-
-
-        /////////////////////////////
-        //external-client listeners//
-        /////////////////////////////
-
-
-        //data: {avatarString: Base64, imagePath: String, userData: object}
-        socket.on('return:avatar', function (data) {
-            console.log('%% return:avatar listener %%');
-
-            console.log('return:avatar data', data.userData);
-
-            let avatarData = {
-                buffer: data.avatarString,
-                path: data.imagePath
-            };
-
-            socketUtil.writeMediaFile(avatarData).then(function () {
-                console.log('Avatar Image updated.... .');
-
-                socketUtil.getConnection(data.userData._id).then(function (connection) {
-                    if (connection.name != data.userData.name) {
-                        connection.name = data.userData.name
-                    }
-                    if (connection.avatar != data.userData.avatar) {
-                        connection.avatar = data.userData.avatar
-                    }
-
-                    socketUtil.updateConnection(connection).then(function (updatedConnection) {
-                        socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connection', {connection: updatedConnection})
-                    })
-                });
-            });
-        });
-
-        //@data = {updates: Array, clientId: String}
-        socket.on('return:updates', function (data) {
-            console.log('');
-            console.log('%% return:updates Listener %%');
-            //store media promises in array
-            let mediaPromises = [];
-            //if there are updates...
-            if (data.updates.length) {
-
-                data.updates.forEach(function (update) {
-                    //if imageBuffer exists then an image exists
-                    if (update.imageBuffer) {
-                        //create an object  with the buffer and the path of the iamge
-                        let imageUpdateObject = {
-                            path: update.image.path,
-                            buffer: update.imageBuffer
-                        };
-                        //store promise of image file in array
-                        mediaPromises.push(
-                            socketUtil.writeMediaFile(imageUpdateObject)
-                        );
-                        //delete image buffer from object.
-                        delete update.imageBuffer;
-                    }
-                    if (update.audioBuffer) {
-                        let audioUpdateObject = {
-                            path: update.audio.path,
-                            buffer: update.audioBuffer
-                        };
-                        
-                        mediaPromises.push(
-                            socketUtil.writeMediaFile(audioUpdateObject)
-                        );
-                        
-                        delete update.audioBuffer
-                    }
-                });
-
-                //once all media promises have resolved
-                Promise.all(mediaPromises).then(function (result) {
-                    //made this into a promise because I need to all to resolve.....
-                    //TODO:Refractor this........ to many callbacks
-                    socketUtil.updateOrInsert(data.updates).then(function(updates) {
-                        socketUtil.getConnectionBySocketId(socket.id).then((connection) => {
-                            connection.lastSync = Date.now(); //modify lastSync for client/connection
-                            //update connection
-                            socketUtil.updateConnection(connection).then((updatedConnection) => {
-                                //emit changes to local-client
-                                socketUtil.emitToLocalClient(io, localClient.socketId, 'notify:externalChanges', {
-                                    connection: updatedConnection,
-                                    updatedData: updates
-                                });
-                            })
-                        });
-                    });
-                })
-            }
-        });
-    });
-
-
-    function localClientConnection(socket, glossaUser, io, browser, bonjour) {
-        console.log('');
-        console.log('local-client connecting');
-
-        localClient = {
-            socketId: socket.id,
-            name: glossaUser.name,
-            _id: glossaUser._id,
-            disconnect: false
-        };
-
-        console.log('CURRENT LOCAL-CLIENT SOCKET ID: ', localClient.socketId);
-
-        //basically keeps the socketId up-to-date in persisted data
-        updatePersistedSocketConnection(localClient.socketId);
-
-        console.log('initiate bonjour service');
-
-        //publish our bonjour service
-        //TODO: not sure we need this callback for anything but maybe it will be good if we actually pass errors
-        console.log('publishing our bonjour service');
-        bonjourService.publish(glossaUser, browser, bonjour, function (err) {
-            if (err) {
-                return console.log('There was an error publishing bonjour service...');
-            }
-        });
+      if (!connection.following) {
+        //remove non-followed users from connection array
+        global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
+        console.log('global.appData.initialState.connections', global.appData.initialState.connections);
+      } else {
+        //if we are following, updated data don't remove
+        global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
+          if (con._id !== connection._id) {
+            return con;
+          }
+          //reset dynamic data;
+          con.online = false;
+          delete con.socketId;
+          con = Object.assign({}, con);
+          return con;
+        })
+      }
+      console.log('IPC send: update-connection-list');
+      win.webContents.send('update-connection-list');
 
     }
 
-    //when an external client comes online...
-    function externalClientConnection(socket, io, glossaUser, externalClient) {
+    function getNewAvatarData(connection, client, win) {
+      //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
+      console.log('emit:: request:avatar to:: server that sent us basic changes');
+      io.to(client.socketId).emit('request:avatar');
 
-        console.log('DEALING WITH CLIENT...');
-        //check persisted data for client
-        socketUtil.getConnection(externalClient._id).then(function (persistedClientData) {
-            //if we are following the user
-            if (persistedClientData.following) {
-                console.log('DEALING WITH CLIENT - we are following');
-                let changesMade = false; //flag 
+      //resolve path
+      //resolve absolutePath
 
-                persistedClientData.online = true; // update data that toggles when user comes online
-                persistedClientData.socketId = externalClient.socketId;
-                persistedClientData.disconnect = false;
+      connection.avatar = client.avatar;
+      connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
+      connection.avatar.path = path.normalize(client.avatar.path);
+      connection.avatar = Object.assign({}, connection.avatar);
 
-                //if name changes update user at the ends
-                if (externalClient.name != persistedClientData.name) {
-                    persistedClientData.name = externalClient.name;
-                    changesMade = true;
-                }
 
-                //TODO: might need ot be more indepth
-                //if avatar is different and it exists in the user connection
-                if (externalClient.avatar && externalClient.avatar !== persistedClientData.avatar) {
-                    persistedClientData.avatar = externalClient.avatar;
-                    socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:avatar', {});
-                    changesMade = true;
-                }
+      socketUtil.followedConnectionUpdate(connection)
+        .then((updatedConnection) => {
+          // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
+          global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
+            return con;
+          });
+        });
 
-                if (changesMade) {
-                    console.log('DEALING WITH CLIENT - changes made in client data');
-                    //normalize notebooks
-                    socketUtil.normalizeNotebooks(persistedClientData).then(function (changeObject) {
-                        console.log('DEALING WITH CLIENT - normalized notebooks now emitting to local-client');
-                        socketUtil.emitToLocalClient(io, localClient.socketId, 'normalize:notebooks', changeObject)
-                    });
-                }
-                //get data we have already synced with user
-                socketUtil.getUserSyncedData(persistedClientData).then(function (data) {
-                    console.log('DEALING WITH CLIENT - requesting updates from external-client');
-                    socketUtil.emitToExternalClient(io, persistedClientData.socketId, 'request:updates', data);
-                });
-
-            } else {
-                console.log('DEALING WITH CLIENT - we are NOT following');
-                // if we are not following user the create new object to cache
-                persistedClientData = {
-                    name: externalClient.name,
-                    _id: externalClient._id,
-                    type: 'external-client',
-                    following: false,
-                    lastSync: null,
-                    avatar: null,
-                    socketId: socket.id,
-                    online: true
-                };
-            }
-
-            console.log('DEALING WITH CLIENT - updating data with new state details');
-            //store information in database
-            socketUtil.updateConnection(persistedClientData).then(function (updatedClient) {
-
-                console.log('DEALING WITH CLIENT - we sending updated connection info to local client');
-                console.log('updated connection: ', updatedClient);
-                //send updated connection data to local-client
-                console.log('');
-                console.log('localClient', localClient);
-
-                socketUtil.emitToLocalClient(io, localClient.socketId, 'update:connectionInfo', {connection: updatedClient});
-
-                console.log('DEALING WITH CLIENT - we are getting the most recent list of clients...');
-                //get most recent list of clients and send to local-client;
-                socketUtil.getConnections().then(function (data) {
-                    console.log('DEALING WITH CLIENT - sending that list of clients to local-client');
-                    console.log('this is the list of connections: ', data);
-                    console.log('data should be array.', Array.isArray(data));
-                    socketUtil.emitToExternalClient(io, localClient.socketId, 'send:connections', {connections: data});
-                    // socketUtil.emitToLocalClient(io, localClient.socketId, 'send:updatedUserList', {onlineUsers: data});
-                })
-            });
-
-            console.log('DEALING WITH CLIENT - are making client join a socket room');
-            //join the external room so we can broadcast events to all connections
-            socket.join('externalClientsRoom');
+      socketUtil.normalizeNotebooks(connection)
+        .then((updatedNotebooks) => {
+          socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
+          console.log('IPC send:: update-synced-notebooks to:: local window');
+          win.webContents.send('update-synced-notebooks');
         });
     }
 
+    //socket client returns data
+    function syncDataReturn(data) {
+      console.log('on:: sync-data:return');
+      let win = main.getWindow();
 
-    //keeps the socketId up-to-date
-    function updatePersistedSocketConnection(socketId) {
-        socketUtil.getUser().then(function (user) {
-            user.localSocketId = socketId;
-            socketUtil.updateUser(user);
+      //if there is actually data to update...
+      //TODO: at the very least update the last sync time
+      if (data.notebooks.length) {
+        socketUtil.syncDataReturn(data)
+          .then((data) => {
+
+            socketUtil.updateGlobalArrayObject(data, 'notebooks');
+            console.log('IPC send:: update-synced-notebooks to:: local-window');
+            win.webContents.send('update-synced-notebooks');
+            console.log('IPC send:: sync-event-end to:: local-window');
+            win.webContents.send('sync-event-end');
+
+
+          })
+      } else {
+        console.log('IPC send:: sync-event-end to:: local-window');
+        win.webContents.send('sync-event-end');
+        console.log('no new data from this connection');
+      }
+      //
+      // //if there is actually data to update...
+      // //TODO: at the very least update the last sync time
+      // if (data.notebooks.length) {
+      //   //write the media buffers to the file system
+      //   socketUtil.writeSyncedMedia(data.notebooks)
+      //     .then((notebooks) => {
+      //     console.log('writeSyncedMedia has resolved');
+      //       //when that is complete, update the database
+      //       socketUtil.updateOrInsertNotebooks(notebooks)
+      //         .then((notebooks) => {
+      //           notebooks.forEach((notebook) => {
+      //             let notebookExists = false;
+      //
+      //             //update the global object
+      //             global.appData.initialState.notebooks.forEach((nb, index) => {
+      //               if (nb._id === notebook._id) {
+      //                 notebookExists = true;
+      //                 //update the object
+      //                 global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
+      //               }
+      //             });
+      //
+      //             if (!notebookExists) {
+      //               global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
+      //             }
+      //           });
+      //
+      //           main.getWindow(function(err, window) {
+      //             if (err) {
+      //               return console.log('error getting window...');
+      //             }
+      //             window.webContents.send('update-synced-notebooks');
+      //           });
+      //
+      //           //tell client to update notebooks
+      //           // win.webContents.send('update-synced-notebooks');
+      //         })
+      //     })
+      // } else {
+      //   console.log('no new data from this connection');
+      // }
+      // console.log('TODO: end display sync-event');
+      // console.log('TODO: update last sync time');
+    }
+
+    function onRequestAvatar() {
+      console.log('on:: request:avatar');
+
+      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
+        .then((bufferString) => {
+
+          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
+          avatarData.bufferString = bufferString;
+          console.log('avatarData.path', avatarData.path);
+          console.log('emit:: return:avatar');
+          io.to(socket.id).emit('return:avatar', avatarData);
+
         })
     }
 
-};
+    function onReturnAvatar(data) {
+      console.log('on:: return:avatar ');
+      let win = main.getWindow();
+      socketUtil.writeAvatar(data)
+        .then(() => {
+          console.log('IPC send:: update-connection-list');
+          win.webContents.send('update-connection-list');
+        })
+    }
 
+  });
+
+
+};

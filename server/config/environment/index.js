@@ -2,15 +2,14 @@
 
 var path = require('path');
 var _ = require('lodash');
-
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
 function requiredProcessEnv(name) {
     if (!process.env[name]) {
         throw new Error('You must set the ' + name + ' environment variable');
     }
     return process.env[name];
 }
+
 
 // All configurations will extend these options
 // ============================================
@@ -28,19 +27,13 @@ var all = {
 
     // Should we populate the DB with sample data?
     seedDB: false,
+    localDev: process.env.LOCAL || false,
+    secondInstance: process.env.SECOND_INSTANCE || false,
 
     // List of user roles
     userRoles: ['guest', 'user', 'admin'],
-
-    dataRoot: '/data',
-    dbPath: 'server/data/database/',
-    imagePath: 'server/data/image',
-    audioPath: 'server/data/audio',
-    markdownPath: 'server/data/markdown'
-
-
+    dataRootPath: process.env.SECOND_INSTANCE ? '/Glossa2' : 'Glossa',
 };
-
 // Export the config object based on the NODE_ENV
 // ==============================================
 

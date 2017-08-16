@@ -1,0 +1,16 @@
+<div layout="column" class="audioPlayerWrapper wave-preview">
+	<md-content flex class="wave-content-wrapper">
+		<div class="waveSurferWave">
+			<md-progress-linear ng-if="$ctrl.loading" class="md-warn"
+			                    md-mode="indeterminate"
+			                    value="{{$ctrl.wavesurferProgress}}">
+			</md-progress-linear>
+		</div>
+	</md-content>
+	<md-button class="md-button md-fab md-mini md-fab-bottom-right"
+	           ng-disabled="!$ctrl.isReady"
+	           type="button"
+	           ng-click="$ctrl.surfer.playPause()">
+		<md-icon class="material-icons">{{$ctrl.surfer.isPlaying() ? 'pause' : 'play_arrow' }}</md-icon>
+	</md-button>
+</div>

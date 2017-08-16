@@ -1,0 +1,40 @@
+@import 'colors';
+
+settings-sharing {
+	flex-direction: column;
+	display: flex;
+	-webkit-box-flex: 1;
+	height:100%;
+
+	.avatar-button {
+		box-shadow: none !important;
+	}
+}
+
+.user-card-items {
+	width: 100% !important;
+}
+
+.user-online {
+	background: green;
+}
+
+.user-offline {
+	font-style: italic;
+	color: lightgrey !important;
+}
+
+.sub-text {
+	color: rgba(158,158,158, 1);
+	font-size: .9em;
+	padding-left: 25px;
+	font-style: italic;
+}
+
+.user-list {
+	padding-top: 0;
+}
+
+.bottom-border {
+	border-bottom: 1px solid rgba(0,0,0,0.12);
+}

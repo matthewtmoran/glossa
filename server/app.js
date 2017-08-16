@@ -1,129 +1,67 @@
 /**
  * Main application file
  */
-
 'use strict';
 
-module.exports = function() {
+module.exports = (appData) => {
+  const path = require('path');
+  const express = require('express');
+  const config = require(path.join(__dirname, './config/environment'));
+  // Setup server
+  const app = express();
+  const server = require('http').createServer(app);
+  const io = require('socket.io')(server);
+  // io.set('transports', ['websocket']);
+  const ipc = require('./ipc');
+  const udp = require('./udp');
+  const socketServer = require('./socket');
 
+  require(path.join(__dirname, './config/express'))(app); //configuration for express
+  require(path.join(__dirname, './routes'))(app); //routes
 
-    var express = require('express');
-    var config = require('./config/environment');
-    var path = require('path');
-
-    // Populate DB with sample data
-    if(config.seedDB) { require('./config/seed'); }
-
-    // Setup server
-    var app = express();
-    var server = require('http').createServer(app);
-    var io = require('socket.io')(server);
-    var bonjour = require('bonjour')();
-
-    var browser = null;
-    var myBonjourService = null;
-    var bonjourService = require('./socket/bonjour-service');
-    var externalSocketClient = require('./socket/socket-client');
-
-    require('./config/express')(app);
-    require('./routes')(app);
-
-
-    Promise.all([require('./config/init').checkForApplicationData()])
-        .then(function(appData) {
-
-            console.log('Application has created data and is ready to go...');
-
-            var bonjourSocket;
-            var glossaUser = appData[0];
-            var mySession = appData[0].session;
-
-
-            server.listen(config.port, config.ip, function () {
-            // server.listen(config.port, config.ip, function () {
-
-                console.log('Listening on Port.');
-                console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
-
-                browser = bonjour.find({type: 'http'});
-
-                browser.on('down', function(service) {
-                    console.log('');
-                    console.log('Service went down.......', service.name);
-                    console.log('Service on network:', browser.services.length);
-                });
-
-                browser.on('up', function(service) {
-                    console.log('');
-                    console.log('Service went/is live........', service.name);
-                    console.log('Services on network:', browser.services.length);
-
-                    //make sure network service is a glossa instance....
-                    if (service.name.indexOf('glossaApp') > -1) {
-                        console.log('A glossa Application is online');
-                        if (service.name === 'glossaApp-' + glossaUser._id) {
-                            console.log('...Local service found IGNORE');
-                        } else if (service.name !== 'glossaApp-' + glossaUser._id) {
-                            console.log('...External service found CONNECT');
-
-                            externalSocketClient.initNodeClient(service, glossaUser, io)
-
-                        }
-                    }
-                });
-
-                bonjourSocket = require('./socket')(glossaUser, mySession, io, browser, bonjour);
-
-            });
-
-            function exitHandler(options, err) {
-                console.log('exit handler from: ', options.from);
-
-
-                if (options.cleanup) {
-                    console.log('cleaning...');
-                    console.log('browser.services.length', browser.services.length);
-
-                    myBonjourService = bonjourService.getMyBonjourService();
-
-                    if (myBonjourService) {
-                        console.log('Bonjour process exists');
-                        myBonjourService.stop(function() {
-                            console.log('Service Stop Success! called from app.js');
-                        });
-                    }
-
-                    console.log('browser.services.length', browser.services.length);
-                    console.log('cleaning done...');
-                }
-                if (err) {
-                    console.log(err.stack);
-                }
-                if (options.exit) {
-
-                    console.log('Exit is true');
-                    console.log('....3 seconds delay start');
-
-                    setTimeout(function() {
-                        console.log('Delay over.  Exiting.');
-                        process.exit();
-                    }, 3000);
-                }
-
-            }
-
-    //do something when app is closing
-            process.on('exit', exitHandler.bind(null, {cleanup:true, exit:true, from: 'exit'}));
-
-    //catches ctrl+c event
-            process.on('SIGINT', exitHandler.bind(null, {cleanup:false, exit:true, from: 'SIGINT'}));
-
-            // process.stdin.resume();
+  server.listen(config.port, config.ip, function () {
+    console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
+    config.secondInstance ? console.log("Glossa running as secondary dev instance") : console.log('Glossa Running as main dev instance');
+    config.localDev ?  console.log('Bypassing udp discovery') : console.log('Using udp discovery for external applications') ;
+    // require ipc event...
+    ipc.init(server, io); //ipc event for communication between renderer / main process
+    socketServer(io);
+  });
 
 
 
-            //catches uncaught exceptions
-            // process.on('uncaughtException', exitHandler.bind(null, {exit:true, from: 'uncaughtException'}));
+  function exitHandler(options, err) {
+    console.log('exit handler from: ', options.from);
 
-        });
+    if (err) {
+      console.log(err.stack);
+    }
+
+
+    if (options.cleanup) {
+      console.log('cleaning...');
+
+      return config.localDev ? false : udp.stop();
+    }
+
+
+    if (options.exit) {
+
+      console.log('Exit is true');
+      console.log('....3 seconds delay start');
+
+      setTimeout(function () {
+        console.log('Delay over.  Exiting.');
+        process.exit();
+      }, 3000);
+    }
+
+  }
+
+  //do something when app is closing
+  process.on('exit', exitHandler.bind(null, {cleanup: true, exit: true, from: 'exit'}));
+
+  //catches ctrl+c event
+  process.on('SIGINT', exitHandler.bind(null, {cleanup: false, exit: true, from: 'SIGINT'}));
+
 };

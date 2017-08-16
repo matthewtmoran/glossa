@@ -1,0 +1,55 @@
+@import 'colors';
+user-card {
+	.user-card {
+		border-top: 1px solid rgba(0,0,0,0.12);
+
+		.user-avatar-container {
+			position: relative;
+			
+			> div {
+				display: inline-block;
+				vertical-align: middle;
+			}
+		}
+
+		.user-sync-containaer {
+			font-size: .9em;
+			font-style: italic;
+			color: $lGrey;
+		};
+
+		.user-name-container {
+			margin-left: 20px;
+		}
+
+		.md-avatar {
+			position: relative;
+
+			.letter {
+				display: block;
+				margin: auto;
+
+				line-height: 40px;
+				text-align: center;
+
+				top: 100%;
+				bottom:100%;
+				left: 100%;
+				right: 100%;
+
+				color: white;
+			}
+		}
+		.md-button {
+			&.is-following {
+				color: rgba(158,158,158, 1);
+			}
+
+			md-icon {
+				position: absolute;
+				top: 3px;
+				right: 20px;
+			}
+		}
+	}
+}

@@ -1,0 +1,28 @@
+<md-list-item class="user-card md-padding" >
+	<div class="user-avatar-container">
+		<div class="online-status" ng-class="$ctrl.user.online ? 'online-notification' : 'offline-notification'"></div>
+
+		<div ng-if="!$ctrl.user.following || !$ctrl.user.avatar"  class="md-avatar" ng-style="{'background-color': $ctrl.user.color }">
+			<span class="letter">{{$ctrl.user.name[0]}}</span>
+		</div>
+
+		<div ng-if="$ctrl.user.avatar && $ctrl.user.following" >
+			<img ng-src="{{$ctrl.user.avatar.path}}" class="md-avatar">
+		</div>
+	</div>
+	<div class="user-name-container">
+		<span>{{$ctrl.user.name}}</span>
+	</div>
+	<span flex></span>
+	<div class="user-sync-containaer">
+		<p ng-if="$ctrl.user.lastSync">Last Sync: {{$ctrl.user.lastSync | date:"MM/dd/yyyy 'at' h:mma"}}</p>
+	</div>
+	<div class="user-follow-container">
+		<md-button  ng-click="$ctrl.toggleFollow($ctrl.user._id)"
+		            ng-class="{'md-raised not-following': !$ctrl.user.following, 'is-following': $ctrl.user.following}"
+		            class=" md-large-btn">
+			{{$ctrl.user.following ? "Following" : "Follow"}}
+			<md-icon ng-if="$ctrl.user.following">check</md-icon>
+		</md-button>
+	</div>
+</md-list-item>
