@@ -286,7 +286,7 @@ function resolveAndUpdateConnections() {
       }
       connections = connections.map((connection) => {
         if (connection.avatar) {
-          connection.avatar = resolvePath(connection.avatar, 'image');
+          connection.avatar = resolvePath(connection.avatar.absolutePath, 'image');
         }
         return connection;
       });
