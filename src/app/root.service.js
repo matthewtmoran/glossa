@@ -25,7 +25,7 @@ export class RootService {
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
 
 
-    //this overwrites events even if input/codemirror/siimplemde is focused...
+    //this overwrites events even if input/codemirror/simplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
 
       if (combo ===
