@@ -65,33 +65,36 @@ export const simplemdeComponent = {
         //defined here so we can potentially move back to the original source code
         //TODO: consider using original source code rather than custom fork
         this.cm.registerHelper('hint', 'hashtagHints', (editor) => {
-          let cur = editor.getCursor(), curLine = editor.getLine(cur.line);
-          let start = cur.ch, end = start;
+          let cur = editor.getCursor(),
+            curLine = editor.getLine(cur.line),
+            start = cur.ch,
+            end = start,
+            tagText;
+
           while (end < curLine.length && /[\w-#]+/.test(curLine.charAt(end))) ++end;
           while (start && /[\w-#]+/.test(curLine.charAt(start - 1))) --start;
+
           let curWord = start != end && curLine.slice(start, end); //this includes hash
-          let tag;
+
+          // if there is a current word
           if (curWord) {
-            tag = curWord.charAt(0) === '#' ? curWord.slice(1) : '';
+            //if the first character of the word starts with #
+            //slice the word at the first index
+            if (curWord.charAt(0) === '#') {
+              tagText = curWord.slice(1);
+            } else {
+              tagText = '';
+            }
+            // tag = curWord.charAt(0) === '#' ? curWord.slice(1) : '';
           }
-          //TODO: might want to change for more specific regex for accuracy
-          let regex = new RegExp('^' + tag, 'i'); //this is just the word
           let result = {
-            list: (!tag ? [] : this.hashtagList.filter((item) => {
-             // looking for whatever is typed in certain parameters in taglist
-             return item.text.toLowerCase().indexOf(tag.toLowerCase()) > -1 || item.description.toLowerCase().indexOf(tag.toLowerCase()) > -1
+            list: (!tagText ? [] : this.hashtagList.filter((item) => {
+              // looking for whatever is typed in certain parameters in taglist
+              return item.text.toLowerCase().indexOf(tagText.toLowerCase()) > -1 || item.description.toLowerCase().indexOf(tagText.toLowerCase()) > -1
             })).sort(),
-            from: this.cm.Pos(cur.line, start),
+            from: this.cm.Pos(cur.line, start + 1), //add one here to move cursor to the right one taking into account # character
             to: this.cm.Pos(cur.line, end)
           };
-          if (result) {
-            //wrapper for pick event; customized for our needs
-            this.cm.on(result, "pick", (item) => {
-              //get the length of the tag
-              let lengthOfTag = {line:result.to.line, ch: item.tag.length + 1 }; //the length of the tag plus the # char
-              editor.replaceRange('#' + item.tag + ' ', result.from, lengthOfTag); //replace the tag with the # char plus a space to close the hint
-            });
-          }
           return result;
         });
       });
@@ -139,7 +142,7 @@ export const simplemdeComponent = {
     showHashtagHints(instance, object) {
       //show if editor is focused and origin is not complete
       if (this.editor.hasFocus() && object.origin !== 'complete') {
-        instance.showHint({ hint: this.cm.hint.hashtagHints, completeSingle: false, closeOnUnfocus: true });
+        instance.showHint({hint: this.cm.hint.hashtagHints, completeSingle: false, closeOnUnfocus: true});
       }
     };
 

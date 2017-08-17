@@ -167,7 +167,15 @@ export class WaveSurferController {
 
       this.surfer.on('error', ()=>{
         console.log('on error');
-      })
+      });
+
+      //on pause event
+      //seek to 2 seconds previously
+      this.surfer.on('pause', () => {
+        let pauseTime = this.surfer.getCurrentTime(); //get current time
+        let seekTo = pauseTime - 2 < 0 ? 0 : pauseTime - 2; //seekTo 0 or 2 seconds previously
+        this.surfer.seekTo( seekTo / this.surfer.getDuration());
+      });
 
     }
 
