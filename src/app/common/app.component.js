@@ -33,8 +33,6 @@ export const appComponent = {
 
       this.__appData = __appData;
 
-      console.log('this.__appData', this.__appData);
-
       this.rootService = RootService;
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
@@ -66,12 +64,6 @@ export const appComponent = {
         this.notebooks = angular.copy(this.__appData.initialState.notebooks);
       });
 
-      this.ipcSerivce.on('update-hashtag-data', (event, data) => {
-        console.log('on:: update-hashtag-data');
-        this.hashtags = angular.copy(this.__appData.initialState.hashtags);
-        console.log("this.hashtags.length", this.hashtags.length);
-      });
-
       //called when new external notebooks are made in real-time
       //adds the notebooks to a holding array before they just populate
       this.ipcSerivce.on('update-rt-synced-notebooks', (event, data) => {
@@ -87,7 +79,6 @@ export const appComponent = {
       //TODO: consider removal and updateing sync display to be only client side...
       this.ipcSerivce.on('sync-event-start', (event, data) => {
         console.log('on:: sync-event-start');
-        console.log('..this event needs to be followed by sync-event-end');
 
         console.log('loader begin');
         this.cfpLoadingBar.start();
@@ -632,8 +623,13 @@ export const appComponent = {
       this.notebookService.createNotebook(event.notebook)
         .then((data) => {
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          console.log('loader end');
-          this.cfpLoadingBar.complete();
+          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+          this.rootService.getCommonHashtags()
+            .then((result) => {
+              this.commonTags = angular.copy(result);
+              console.log('loader end');
+              this.cfpLoadingBar.complete();
+            });
         })
         .catch((data) => {
           console.log('There was an error ', data);
@@ -645,6 +641,7 @@ export const appComponent = {
     // update notebook
     updateNotebook(event) {
       console.log('update event');
+      console.log('this.commonTags.length', this.commonTags.length);
       console.log('loader begin');
       this.cfpLoadingBar.start();
       this.notebookService.updateNotebook(event.notebook)
@@ -652,9 +649,16 @@ export const appComponent = {
           this.$mdDialog.hide();
 
           this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
 
-          console.log('loader end');
-          this.cfpLoadingBar.complete();
+          this.rootService.getCommonHashtags()
+            .then((result) => {
+              console.log('Now we have common tags...');
+              this.commonTags = angular.copy(result);
+              console.log('this.commonTags.length', this.commonTags.length);
+              console.log('loader end');
+              this.cfpLoadingBar.complete();
+            });
         })
     }
 

@@ -43,21 +43,12 @@ export class ParseService {
       }
       //tag must have been found in the text.
     });
-
     //be unbiased and grab the most up to data for every tag found in the text
     return this.queryForNewTags(tagsFoundInText)
       .then((data) => {
         notebook.hashtags = data;
-
-        console.log('queryingForNewTags', data);
-        // data.forEach((tag) => {
-        //   notebook.hashtags.push(tag);
-        // });
-        console.log('notebook.hashtags.length', notebook.hashtags.length);
         return notebook.hashtags;
       });
-
-
   }
   
     //get hashtags
@@ -114,31 +105,15 @@ export class ParseService {
   
     //new tags is an array of tags new to this notebooks;
   queryForNewTags(tagsInText) {
-    // let promises = [];
-
     return new Promise((resolve, reject) => {
       return this.$http.post('/api/hashtags/search/', tagsInText)
         .then((response) => {
-          console.log("response from term query:", response);
           resolve(response.data);
         }).catch((response) => {
           console.log('There was an error', response);
           reject(response.data);
         });
     });
-
-    // tagsInText.forEach((tag, index) => {
-    //   //push this query to promises array
-    //   promises.push(this.termQuery(tag)
-    //     .then((data)=> {
-    //     //update the notebooks model property
-    //       tagsInText[index] = data;
-    //       return data;
-    //     }))
-    // });
-    // return this.$q.all(promises).then((data) => {
-    //   return data;
-    // });
   }
   
     //Parses the title or return first 16 characters of text

@@ -44,6 +44,7 @@ exports.create = function (req, res) {
     if (err) {
       return handleError(res, err);
     }
+    global.appData.initialState.hashtags = [global.appData.initialState.hashtags, ...thing];
     return res.status(201).json(thing);
   });
 };
@@ -206,21 +207,17 @@ exports.destroy = function (req, res) {
 // Get a single hashtag by term
 exports.showTerm = function (req, res) {
   let tagTerms = req.body;
-  console.log('tagTerms', tagTerms);
-
   let promises = [];
-  let hashtagObjects = [];
 
   tagTerms.forEach((tagName) => {
     promises.push(
       findTag(tagName)
     )
   });
-
-    Promise.all(promises)
-      .then((results) => {
-        return res.status(200).json(results);
-      })
+  Promise.all(promises)
+    .then((results) => {
+      return res.status(200).json(results);
+    })
 
 };
 
@@ -252,6 +249,7 @@ function createNewTag(name) {
     };
     Hashtag.insert(newTag, (err, createdTag) => {
       if (err) reject(err);
+      global.appData.initialState.hashtags = [...global.appData.initialState.hashtags, createdTag];
       resolve(createdTag);
     });
   })

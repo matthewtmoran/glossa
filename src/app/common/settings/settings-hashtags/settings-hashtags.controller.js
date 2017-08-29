@@ -18,9 +18,6 @@ export class SettingsHashtagsComponent {
       this.hashtags = angular.copy(changes.hashtags.currentValue);
       console.log('this.hashtags.length', this.hashtags.length);
 
-
-
-
       // this.filteredItems = this.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}
     }
   }
