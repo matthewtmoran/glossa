@@ -302,6 +302,19 @@ export class RootService {
       })
   }
 
+  removeTag(tag) {
+    return this.$http.post(`/api/hashtags/remove/${tag._id}`)
+      .then((response) => {
+        console.log('removeTag response');
+        return response.data
+      })
+      .catch((response) => {
+        console.log('There was an error', response);
+        return response.data;
+      })
+  }
+
+
   //tunnels event to broadcast across application
   tunnelEvent(name, data) {
     this.$rootScope.$broadcast(name, data);

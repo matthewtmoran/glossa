@@ -8,7 +8,8 @@ export const settingsHashtagsComponent = {
     allConnections: '<',
     onlineConnections: '<',
     currentUser: '<',
-    onUpdateTag: '&'
+    onUpdateTag: '&',
+    onRemoveTag: '&'
   },
   templateUrl,
   controller: SettingsHashtagsComponent

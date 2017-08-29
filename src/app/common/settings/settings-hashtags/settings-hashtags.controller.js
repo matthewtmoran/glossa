@@ -14,7 +14,14 @@ export class SettingsHashtagsComponent {
 
   $onChanges(changes) {
     if (changes.hashtags) {
-      // this.hashtags = angular.copy(changes.hashtags.currentValue);
+      console.log('change in hashtags in setting-hashtags.... ');
+      this.hashtags = angular.copy(changes.hashtags.currentValue);
+      console.log('this.hashtags.length', this.hashtags.length);
+
+
+
+
+      // this.filteredItems = this.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}
     }
   }
 
@@ -40,15 +47,15 @@ export class SettingsHashtagsComponent {
     };
 
     this.selected = [];
-
     this.selectedFilters = [];
-
     this.filterOptions = {
       userTags: true,
       systemTags: false,
       usedTags: false,
       unusedTags: false
     };
+
+    // ($ctrl.filteredItems = ($ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))
 
   }
 
@@ -94,22 +101,19 @@ export class SettingsHashtagsComponent {
   }
 
   updateTag(item) {
-    console.log('updateTag', item);
     this.onUpdateTag({
       $event: {
         tag: item
       }
     });
-    // HashtagService.update(item).then(function(result) {
-    //   HashtagService.normalizeHashtag(result.data).then(function(result) {
-    //     changesMade = true;
-    //
-    //   }).catch(function(err) {
-    //     console.log('there was an error',err);
-    //   });
-    // }).catch(function(err) {
-    //   console.log('there was an error', err)
-    // });
+  }
+
+  removeTag(event, item) {
+    this.onRemoveTag({
+      $event: {
+        tag: item
+      }
+    });
   }
 
 

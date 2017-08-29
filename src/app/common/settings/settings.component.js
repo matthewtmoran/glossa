@@ -17,7 +17,8 @@ export const settingsComponent = {
     onRemoveAvatar: '&',
     onUpdateTag: '&',
     onConfirmToggleSharing:'&',
-    onToggleFollow: '&'
+    onToggleFollow: '&',
+    onRemoveTag: '&'
   },
   templateUrl,
   controller: class SettingsComponent {
@@ -52,7 +53,9 @@ export const settingsComponent = {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
       if (changes.hashtags) {
+        console.log('changes in hashtag in settgings.component');
         this.hashtags = angular.copy(changes.hashtags.currentValue);
+        console.log('this.hashtags.length');
       }
     }
 
@@ -175,6 +178,14 @@ export const settingsComponent = {
 
     updateTag(event) {
       this.onUpdateTag({
+        $event: {
+          tag: event.tag
+        }
+      })
+    }
+
+    removeTag(event) {
+      this.onRemoveTag({
         $event: {
           tag: event.tag
         }

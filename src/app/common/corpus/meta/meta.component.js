@@ -25,6 +25,9 @@ export const metaComponent = {
       if (changes.selectedFile) {
         this.currentFile = angular.copy(changes.selectedFile.currentValue);
       }
+      if (changes.hashtags) {
+        this.hashtags = angular.copy(changes.hashtags.currentValue);
+      }
       if (changes.notebookAttachment) {
         this.notebookAttachment = angular.copy(changes.notebookAttachment.currentValue);
       }

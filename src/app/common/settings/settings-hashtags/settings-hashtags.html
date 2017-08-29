@@ -31,13 +31,14 @@
 			<!--<md-checkbox ng-model="$ctrl.filterOptions.usedTags">Used Tags</md-checkbox>-->
 			<!--<md-checkbox ng-model="$ctrl.filterOptions.unusedTags">Unused Tags</md-checkbox>-->
 		</div>
-		<div ng-hide="true">
-			{{($ctrl.filteredItems = ($ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}
-		</div>
+		<!--<div ng-hide="true">-->
+			<!--{{($ctrl.filteredItems = ($ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}-->
+		<!--</div>-->
 	</md-card>
 
 	<!--<pre>{{$ctrl | json}}</pre>-->
 </div>
+{{$ctrl.hashtags.length}}
 <md-divider></md-divider>
 
 <md-content class="table-container" >
@@ -47,7 +48,8 @@
 		       multiple="{{$ctrl.tableOptions.multiSelect}}"
 		       ng-model="$ctrl.selected"
 		       md-progress="promise">
-			<thead md-head md-order="query.order" md-on-reorder="getDesserts">
+			<!--<thead md-head md-order="query.order" md-on-reorder="getDesserts">-->
+			<thead md-head >
 			<tr md-row>
 				<th md-column >Tag</th>
 				<th md-column >Description</th>
@@ -64,9 +66,8 @@
 			    ng-diabled="!item.canEdit"
 			    class="table-row"
 			    ng-class="{'disabled-row': !item.canEdit }"
-			    ng-repeat="item in $ctrl.filteredItems | orderBy: '-canEdit'">
-			    <!--md-virtual-repeat="item in $ctrl.filteredItems | orderBy: '-canEdit'">-->
-			    <!--ng-repeat="item in $ctrl.filteredItems | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions">-->
+			    ng-repeat="item in $ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions | orderBy: '-canEdit'">
+
 				<td md-cell
 				    class="table-cell"
 				    ng-click="!item.canEdit || $ctrl.editField($event, item, item.tag, 'tag');"

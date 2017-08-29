@@ -1,6 +1,5 @@
 const ipcUtil = require('./util');
 const socketUtil = require('../socket/socket-util');
-const socketServer = require('../socket');
 const udp = require('../udp');
 const main = require('../../main');
 const config = require('../config/environment');
@@ -25,12 +24,65 @@ module.exports = {
 
     ipcUtil.on('update:session', onUpdateSession);
 
-    ipcUtil.on('create:transcription', onCreateTranscription);
-    ipcUtil.on('remove:transcription', onRemoveTranscription);
-    ipcUtil.on('test:event', (event, data) => {
-      io.to('externalClientsRoom').emit('test:event', {fromUser: global.appData.initialState.user.name});
-    });
+    ipcUtil.on('update:hashtags', onUpdateHashtags);
 
+    ipcUtil.on('update:notebook-hashtags-transcriptions', onUpdateNnHtT);
+
+    ipcUtil.on('create:transcription', onCreateTranscription);
+
+    ipcUtil.on('remove:transcription', onRemoveTranscription);
+
+
+    function onUpdateNnHtT(event) {
+      let promises = [];
+
+      promises.push(
+
+        socketUtil.findHashtags()
+          .then((data) =>{
+            global.appData.initialState.hashtags = data;
+          })
+          .catch((err) => {
+            console.log('error with finding hashtags', err)
+          }),
+
+        socketUtil.findNotebooks()
+          .then((data) =>{
+            global.appData.initialState.notebooks = data;
+          })
+          .catch((err) => {
+            console.log('error with finding notebooks', err)
+          }),
+
+        socketUtil.findTranscriptions()
+          .then((data) =>{
+            global.appData.initialState.transcriptions = data;
+          })
+          .catch((err) => {
+            console.log('error with finding transcriptions', err)
+          })
+      );
+
+      Promise.all(promises)
+        .then((result) => {
+          event.sender.send('update-notebook-hashtags-transcriptions-data');
+        })
+        .catch((err) => {
+            console.log('Error:', err);
+        })
+    }
+
+    function onUpdateHashtags(event) {
+      socketUtil.findHashtags()
+        .then((data) => {
+          global.appData.initialState.hashtags = data;
+          console.log('send:: update-hashtag-data');
+          event.sender.send('update-hashtag-data');
+        })
+        .catch((err) => {
+          cosnole.log('There was an error', err);
+        })
+    }
 
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
     function windowLoaded() {

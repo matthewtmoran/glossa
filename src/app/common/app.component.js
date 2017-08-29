@@ -4,7 +4,7 @@ import NotebookNormalTemplate from './notebook/notebook-dialog/notebook-dialog-n
 import NotebookPreviewTemplate from './notebook/notebook-dialog/notebook-dialog-preview.html';
 import NotebookImageTemplate from './notebook/notebook-dialog/notebook-dialog-image.html';
 import NotebookAudioTemplate from './notebook/notebook-dialog/notebook-dialog-audio.html';
-import { NotebookDialogController } from './notebook/notebook-dialog/notebook-dialog-controller';
+import {NotebookDialogController} from './notebook/notebook-dialog/notebook-dialog-controller';
 
 export const appComponent = {
   bindings: {
@@ -33,6 +33,8 @@ export const appComponent = {
 
       this.__appData = __appData;
 
+      console.log('this.__appData', this.__appData);
+
       this.rootService = RootService;
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
@@ -46,7 +48,6 @@ export const appComponent = {
 
       //broadcasted from hot-key event
       this.$scope.$on('newNotebook', this.viewNotebookDetails.bind(this));
-
 
 
       //called whne the connection list need to be updated
@@ -63,6 +64,12 @@ export const appComponent = {
       this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
         console.log('on:: update-synced-notebooks');
         this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+      });
+
+      this.ipcSerivce.on('update-hashtag-data', (event, data) => {
+        console.log('on:: update-hashtag-data');
+        this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+        console.log("this.hashtags.length", this.hashtags.length);
       });
 
       //called when new external notebooks are made in real-time
@@ -119,7 +126,7 @@ export const appComponent = {
       });
 
       this.ipcSerivce.on('export:project', (event, data) => {
-        this.exportProject({project:this.__appData.initialState.project});
+        this.exportProject({project: this.__appData.initialState.project});
       });
 
 
@@ -225,8 +232,6 @@ export const appComponent = {
     }
 
 
-
-
     //////////
     //Corpus//
     //////////
@@ -237,7 +242,7 @@ export const appComponent = {
         this.selectedFile = null;
         this.notebookAttachment = null;
       } else {
-        let latestFile = this.transcriptions.sort((a,b) => {
+        let latestFile = this.transcriptions.sort((a, b) => {
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
         this.selectFile({fileId: latestFile[0]._id});
@@ -307,7 +312,6 @@ export const appComponent = {
           //update atat
           this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
 
-
           this.transcriptions = this.transcriptions.map((file, index) => {
             if (file._id !== this.selectedFile._id) {
               return file;
@@ -315,10 +319,11 @@ export const appComponent = {
             return this.selectedFile;
           });
 
+
+          this.ipcSerivce.send('update:hashtags', {transcriptionId: event.fileId});
+
+
         })
-        .catch((data) => {
-          console.log('there was an issue', data)
-        });
     }
 
     disconnectNotebook(event) {
@@ -346,7 +351,7 @@ export const appComponent = {
             console.log('result', result);
 
 
-            this.updateTranscription({file:result})
+            this.updateTranscription({file: result})
 
 
             // this.corpusService.updateFile(result)
@@ -368,8 +373,6 @@ export const appComponent = {
             //   .catch((data) => {
             //     console.log('there was an issue', data)
             //   });
-
-
 
 
           }
@@ -396,8 +399,6 @@ export const appComponent = {
           this.updateTranscription({file: this.selectedFile})
         })
     }
-
-
 
 
     ////////////
@@ -616,7 +617,6 @@ export const appComponent = {
     ////////////
 
 
-
     //new notebook
     saveNotebook(event) {
       this.$mdDialog.hide();
@@ -680,7 +680,7 @@ export const appComponent = {
             this.cfpLoadingBar.start();
             this.notebookService.deleteNotebook(event.notebook)
               .then((data) => {
-                if(!data) {
+                if (!data) {
                   return;
                 }
                 if (data) {
@@ -694,6 +694,10 @@ export const appComponent = {
         })
     }
 
+    ////////////
+    //hashtags//
+    ////////////
+
     updateTag(event) {
       this.rootService.updateTag(event.tag)
         .then((data) => {
@@ -702,6 +706,23 @@ export const appComponent = {
               this.hashtags[index] = data;
             }
           });
+        })
+    }
+
+    removeTag(event) {
+      this.rootService.removeTag(event.tag)
+        .then((data) => {
+
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+          this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
+
+          this.selectInitialFile();
+
+          this.rootService.getCommonHashtags()
+            .then((result) => {
+              this.commonTags = angular.copy(result);
+            });
         })
     }
 
@@ -716,7 +737,7 @@ export const appComponent = {
 
       let state = {};
 
-      switch(event.notebook.postType) {
+      switch (event.notebook.postType) {
         case 'image':
           this.editorOptions = {
             toolbar: false,
@@ -866,7 +887,6 @@ export const appComponent = {
     }
 
 
-
     //I believe this is called when connection connect and the data changes.
     //TODO: refractor to use global object
     normalizeNnotebooks(event, data) {
@@ -891,7 +911,7 @@ export const appComponent = {
 
           let isUpdate = false;
 
-          for(let i = 0, len = this.notebooks.length; i < len; i++) {
+          for (let i = 0, len = this.notebooks.length; i < len; i++) {
             if (this.notebooks[i]._id === notebook._id) {
               isUpdate = true;
               this.notebooks[i] = notebook;
@@ -916,7 +936,7 @@ export const appComponent = {
       } else {
 
         let isUpdate = false;
-        for(let i = 0, len = this.notebooks.length; i < len; i++) {
+        for (let i = 0, len = this.notebooks.length; i < len; i++) {
           if (this.notebooks[i]._id === data.updatedData._id) {
             isUpdate = true;
             this.notebooks[i] = data.updatedData;
@@ -942,9 +962,6 @@ export const appComponent = {
     clearSearch(event) {
       this.searchText = angular.copy(event.text);
     }
-
-
-
 
 
     //need to sort//
