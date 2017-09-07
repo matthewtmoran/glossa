@@ -33,6 +33,7 @@ module.exports = {
       //announce our service
       discover.announce(serviceName, userData, interval, true);
       discover.on('available', function (name, data, reason) {
+        console.log('service available')
         //if it's a glossa application and the name is not the same as our name...
         if (data.data.app === 'Glossa' && name !== serviceName) {
           //Init socket-client

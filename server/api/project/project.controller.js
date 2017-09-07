@@ -134,7 +134,6 @@ exports.update = function (req, res) {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.project = Object.assign({}, updatedDoc);
       Projects.persistence.compactDatafile(); // concat db
       return res.status(200).json(updatedDoc);
     });
@@ -445,63 +444,6 @@ exports.exportProject = function (req, res) {
 
   archive.finalize();
 
-
-  /*
-   let userId = req.params.userId;
-   let projectId = req.params.projectId;
-   let projectData = {};//initiate project data object
-   let databasePromises = [];//initiate promise array
-
-   //TODO: queries need to be refractored
-   //push application data(promises) to array
-   databasePromises.push(getUser());
-   databasePromises.push(getProject(userId));
-   databasePromises.push(getNotebooks(userId));
-   databasePromises.push(getConnections());
-   databasePromises.push(getTranscriptions());
-   databasePromises.push(getHashtag());
-   databasePromises.push(getSettings());
-   databasePromises.push(getSession());
-
-   Promise.all(databasePromises).then((results) => {//once all the promises have resolved
-
-   let archive = archiver('zip'); // Sets the compression level.
-
-   //update the application data object
-   projectData.user = results[0];
-   projectData.project = results[1];
-   projectData.notebooks = results[2];
-   projectData.connections = results[3]; //TODO: get avatars
-   projectData.transcriptions = results[4]; //TODO: get media files
-   projectData.hashtags = results[5];
-   projectData.settings = results[6];
-   projectData.session = results[7];
-
-   //create and stream zip file
-
-   let projectNameNoSpace = projectData.project.name.replace(/\s/g, '');
-
-   res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
-   res.set('Content-Type', 'application/zip');
-
-
-   archive.pipe(res); //pipe the response
-   //add file to archive
-
-   archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
-
-   archive.on('error', (err) => { ///if there is an error....
-   console.error(err);
-   throw err;
-   });
-
-   res.on('close', () => { //when the response is done
-   return res.status(200).send('OK').end(); //send response to client
-   });
-
-   archive.finalize();
-   })
-   */
 };
 
 

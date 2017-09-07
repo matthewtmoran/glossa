@@ -91,6 +91,16 @@ export const corpusComponent = {
       })
     }
 
+    updateTranscription(event) {
+      this.onUpdateTranscription({
+        $event: event
+      })
+    }
+
+    removeTranscription(event) {
+      this.onRemoveTranscription({$event: event})
+    }
+
     removeMedia(event) {
       this.onDisconnectMedia({
         $event: event
@@ -102,15 +112,9 @@ export const corpusComponent = {
       this.onSelectFile({$event: event});
     }
 
-    updateTranscription(event) {
-      this.onUpdateTranscription({
-        $event: event
-      })
-    }
 
-    removeTranscription(event) {
-      this.onRemoveTranscription({$event: event})
-    }
+
+
 
     viewDetails(event) {
       this.editorOptions = {
@@ -120,20 +124,6 @@ export const corpusComponent = {
         autoDownloadFontAwesome: false,
         autoPreview: true
       };
-
-      // this.$mdDialog.show({
-      //   templateUrl: NotebookPreviewTemplate,
-      //   targetEvent: event,
-      //   clickOutsideToClose: true,
-      //   controller: () => this,
-      //   controllerAs: '$ctrl',
-      // }).then((data) => {
-      //   console.log('dialog closed',data);
-      //   delete this.notebook;
-      // }).catch(() => {
-      //   delete this.notebook;
-      //   console.log('negative');
-      // })
 
       this.$mdDialog.show({
         templateUrl: NotebookPreviewTemplate,

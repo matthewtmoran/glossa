@@ -10,26 +10,17 @@ module.exports = {
   init: function (server, io) {
     //called on window load
     ipcUtil.on('window:loaded', windowLoaded);
-
     ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
-
     //called when sharing is toggled
     ipcUtil.on('toggle:sharing', toggleSharing);
     //called when follow user is toggled
     ipcUtil.on('update:following', onUpdateFollowing);
-
     ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
-
     ipcUtil.on('combine:notebooks', onCombineNotebooks);
-
     ipcUtil.on('update:session', onUpdateSession);
-
     ipcUtil.on('update:hashtags', onUpdateHashtags);
-
     ipcUtil.on('update:notebook-hashtags-transcriptions', onUpdateNnHtT);
-
     ipcUtil.on('create:transcription', onCreateTranscription);
-
     ipcUtil.on('remove:transcription', onRemoveTranscription);
 
 

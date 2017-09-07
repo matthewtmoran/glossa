@@ -30,11 +30,13 @@ window.CodeMirror = CodeMirror;
 //when the window load, call project data then bootstrap the angular application once promise resolves.
 window.onload = () => {
   //TODO: change rootUrl to come from server... global.appData.initialstate etc....
+
+  //initial data for the app to load
   const appData = electron.remote.getGlobal('appData');
   angular.module('config').constant('__appData', appData);
 
   //handles click events on links that should open with default browser
-  angular.element(document).on('click', 'a[href^="http"]', function(event) {
+  angular.element(document).on('click', 'a[href^="http"]', (event) => {
     event.preventDefault();
     shell.openExternal(this.href);
   });

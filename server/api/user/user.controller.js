@@ -9,14 +9,11 @@
 
 'use strict';
 
-var _ = require('lodash');
-var User = require('./user.model');
-var Notebooks = require('./../notebook/notebook.model');
-var path = require('path');
-var config = require('../../config/environment');
-var fs = require('fs');
-
-// var globalPaths = require('electron').remote.getGlobal('userPaths');
+const path = require('path');
+const fs = require('fs');
+const _ = require('lodash');
+const User = require('./user.model');
+const Notebooks = require('./../notebook/notebook.model');
 
 // Get list of things
 exports.index = function (req, res) {
@@ -61,25 +58,33 @@ exports.update = function (req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
-  User.findOne({_id: req.params.id}, function (err, user) {
+  User.findOne({_id: req.params.id}, (err, user) => {
     if (err) {
       return handleError(res, err);
     }
     if (!user) {
       return res.status(404).send('Not Found');
     }
-    var options = {returnUpdatedDocs: true};
-    var updated = _.merge(user, req.body);
+    const options = {returnUpdatedDocs: true};
+    let updated = _.merge(user, req.body);
+    let returnObject = {};
     updated.updatedAt = Date.now();
-    User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+    User.update({_id: updated._id}, updated, options, (err, updatedNum, updatedDoc) => {
       if (err) {
         return handleError(res, err);
       }
 
-      global.appData.initialState.user = Object.assign({}, updatedDoc);
-      normalizeNotebooks(updatedDoc);
-      User.persistence.compactDatafile(); // concat db
-      return res.status(200).json(updatedDoc);
+      returnObject.user = updatedDoc;
+
+      normalizeNotebooks(updatedDoc)
+        .then((notebooks) => {
+            returnObject.notebooks = notebooks;
+            User.persistence.compactDatafile(); // concat db
+            return res.status(200).json(returnObject);
+        })
+        .catch((err) => {
+          return handleError(res, err);
+        })
     });
   });
 };
@@ -104,7 +109,6 @@ exports.updateSession = function (req, res) {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.user = Object.assign({}, updatedDoc);
       User.persistence.compactDatafile(); // concat db
       return res.status(200).json(updatedDoc);
     });
@@ -131,7 +135,6 @@ exports.updateSettings = function (req, res) {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.user = Object.assign({}, updatedDoc);
       User.persistence.compactDatafile(); // concat db
       return res.status(200).json(updatedDoc);
     });
@@ -146,47 +149,59 @@ exports.removeAvatar = function (req, res) {
     if (!user) {
       return res.status(404).send('Not Found');
     }
-    var options = {returnUpdatedDocs: true};
-
-    var updated = user[0];
+    const options = {returnUpdatedDocs: true};
+    let updated = user[0];
+    let returnObject = {};
     delete updated.avatar;
 
-    User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+    User.update({_id: updated._id}, updated, options, (err, updatedNum, updatedDoc) => {
       if (err) {
         return handleError(res, err);
       }
-      console.log('Updated User');
-      normalizeNotebooks(updatedDoc);
-      global.appData.initialState.user = Object.assign({}, updatedDoc);
-      User.persistence.compactDatafile(); // concat db
-      return res.status(200).json(updatedDoc);
+
+      returnObject.user = updatedDoc;
+
+      normalizeNotebooks(updatedDoc)
+        .then((notebooks) => {
+          returnObject.notebooks = notebooks;
+          User.persistence.compactDatafile(); // concat db
+          return res.status(200).json(returnObject);
+        })
+        .catch((err) => {
+          return handleError(res, err);
+        })
     });
   });
-
-
 };
 
 exports.avatar = function (req, res) {
-  User.find({}, function (err, user) {
+  User.find({}, (err, user) => {
     if (err) {
       return handleError(res, err);
     }
     if (!user) {
       return res.status(404).send('Not Found');
     }
-    var options = {returnUpdatedDocs: true};
+    const options = {returnUpdatedDocs: true};
+    let returnObject = {};
 
-    var updated = user[0];
+    let updated = user[0];
     updated.avatar = req.body.dataObj.image;
 
-    User.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
+    User.update({_id: updated._id}, updated, options, (err, updatedNum, updatedDoc) => {
       if (err) {
         return handleError(res, err);
       }
-      normalizeNotebooks(updatedDoc);
-      global.appData.initialState.user = Object.assign({}, updatedDoc);
-      User.persistence.compactDatafile(); // concat db
-      return res.status(200).json(updatedDoc);
+      returnObject.user = updatedDoc;
+      normalizeNotebooks(updatedDoc)
+        .then((notebooks) => {
+          returnObject.notebooks = notebooks;
+          User.persistence.compactDatafile(); // concat db
+          return res.status(200).json(returnObject);
+        })
+        .catch((err) => {
+          return handleError(res, err);
+        });
     });
   });
 };
@@ -210,36 +225,31 @@ exports.destroy = function (req, res) {
 };
 
 function normalizeNotebooks(updateDetails) {
-  console.log("...normalizing notebooks.  Triggered by http request");
+  return new Promise((resolve, reject) => {
+    //query specific notebooks
+    const query = {
+      "createdBy._id": updateDetails._id
+    };
+    //the update we are making
+    const update = {
+      $set: {
+        "createdBy.name": updateDetails.name,
+        "createdBy.avatar": updateDetails.avatar
+      }
+    };
+    //options for nedb
+    const options = {
+      returnUpdatedDocs: true, multi: true
+    };
 
-  //query specific notebooks
-  const query = {
-    "createdBy._id": updateDetails._id
-  };
-  //the update we are making
-  const update = {
-    $set: {
-      "createdBy.name": updateDetails.name,
-      "createdBy.avatar": updateDetails.avatar
-    }
-  };
-  //options for nedb
-  const options = {
-    returnUpdatedDocs: true, multi: true
-  };
-
-  Notebooks.update(query, update, options, (err, updatedCount, updatedDocs) => {
-    if (err) {
-      return console.log('Error normalizing notebook data', err);
-    }
-    Notebooks.persistence.compactDatafile();
-
-    if (!!updatedDocs) {
-      updatedDocs.forEach((updatedDoc) => {
-        global.appData.initialState.notebooks = global.appData.initialState.notebooks.map(notebook => notebook._id === updatedDoc._id ? updatedDoc : notebook )
-      });
-    }
-
+    Notebooks.update(query, update, options, (err, updatedCount, updatedDocs) => {
+      if (err) {
+        console.log('Error normalizing notebook data', err);
+        reject(err);
+      }
+      Notebooks.persistence.compactDatafile();
+      resolve(updatedDocs);
+    });
   });
 }
 

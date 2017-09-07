@@ -12,34 +12,26 @@ export const rootComponent = {
       this.ipcSerivce = IpcSerivce;
       this.$scope = $scope;
     }
-
+    //Window functionality
     minimize() {
       BrowserWindow.minimize();
     };
-
     maximize() {
       BrowserWindow.maximize();
     }
-
     unmaximize() {
       BrowserWindow.isFullScreen() ? BrowserWindow.setFullScreen(false) : BrowserWindow.unmaximize();
     }
-
     close() {
       BrowserWindow.close();
     }
-
     isMaximized() {
         return BrowserWindow.isMaximized()
     }
 
+    //native menu event
     popupAppMenuEvent() {
       this.ipcSerivce.send('popupAppMenuEvent');
     }
-
-    sendTest() {
-      this.ipcSerivce.send('test:event');
-    }
-
   },
 };

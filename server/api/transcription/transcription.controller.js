@@ -14,7 +14,7 @@ var Transcription = require('./transcription.model');
 
 // Get list of things
 exports.index = function (req, res) {
-  Transcription.find(function (err, things) {
+  Transcription.find({}, (err, things) =>{
     if (err) {
       return handleError(res, err);
     }
@@ -100,7 +100,7 @@ exports.update = function (req, res) {
 
 // Deletes a thing from the DB.
 exports.destroy = function (req, res) {
-  Transcription.findOne({_id: req.params.id}, function (err, file) {
+  Transcription.findOne({_id: req.params.id}, (err, file) => {
     if (err) {
       return handleError(res, err);
     }
@@ -108,12 +108,11 @@ exports.destroy = function (req, res) {
       return res.status(404).send('Not Found');
     }
 
-    Transcription.remove({_id: file._id}, function (err) {
+    Transcription.remove({_id: file._id}, {}, (err, removedCount) => {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(transcription => transcription._id !== transcription._id);
-      return res.status(204).send(file);
+      return res.status(204).send({id:file._id});
     });
   });
 };

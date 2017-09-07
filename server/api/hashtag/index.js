@@ -4,7 +4,7 @@ const express = require('express');
 const controller = require('./hashtag.controller');
 const router = express.Router();
 
-router.get('/', controller.findOccurrence, controller.index);
+router.get('/', controller.index);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.post('/remove/:id', controller.removeTag);

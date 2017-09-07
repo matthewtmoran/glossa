@@ -29,38 +29,28 @@ module.exports = (appData) => {
   });
 
 
-
   function exitHandler(options, err) {
     console.log('exit handler from: ', options.from);
 
     if (err) {
       console.log(err.stack);
     }
-
-
     if (options.cleanup) {
       console.log('cleaning...');
-
       return config.localDev ? false : udp.stop();
     }
-
-
     if (options.exit) {
-
       console.log('Exit is true');
       console.log('....3 seconds delay start');
-
       setTimeout(function () {
         console.log('Delay over.  Exiting.');
         process.exit();
       }, 3000);
     }
-
   }
 
   //do something when app is closing
   process.on('exit', exitHandler.bind(null, {cleanup: true, exit: true, from: 'exit'}));
-
   //catches ctrl+c event
   process.on('SIGINT', exitHandler.bind(null, {cleanup: false, exit: true, from: 'SIGINT'}));
 

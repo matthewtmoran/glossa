@@ -18,7 +18,6 @@ export const tagListComponent = {
         this.selectedHashtags = angular.copy(changes.selectedHashtags.currentValue);
       }
       if (changes.commonTags) {
-        console.log("commongTagsChanged......");
         this.commonTags = angular.copy(changes.commonTags.currentValue);
       }
     }

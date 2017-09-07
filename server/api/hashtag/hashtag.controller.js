@@ -40,12 +40,31 @@ exports.show = function (req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function (req, res) {
-  Hashtag.create(req.body, function (err, thing) {
+
+  Hashtag.find({tag: req.body.tag}, (err, tag) => {
     if (err) {
       return handleError(res, err);
     }
-    global.appData.initialState.hashtags = [global.appData.initialState.hashtags, ...thing];
-    return res.status(201).json(thing);
+    if (!tag || tag.length < 1) {
+
+      const hashtag = {
+        tag: req.body.tag,
+        tagColor: '#4285f4',
+        realTitle: req.body.tag,
+        canEdit: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        occurrence: 1
+      };
+
+      Hashtag.insert(hashtag, (err, createdTag) => {
+        if (err) {
+          return handleError(res, err);
+        }
+        return res.status(201).json(createdTag);
+      });
+    }
+
   });
 };
 
@@ -54,6 +73,9 @@ exports.update = function (req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
+
+  console.log('update');
+
   Hashtag.findOne({_id: req.params.id}, function (err, tag) {
     if (err) {
       return handleError(res, err);
@@ -61,8 +83,8 @@ exports.update = function (req, res) {
     if (!tag) {
       return res.status(404).send('Not Found');
     }
-    var updated = _.merge(tag, req.body);
-    var options = {returnUpdatedDocs: true};
+    let updated = _.merge(tag, req.body);
+    let options = {returnUpdatedDocs: true};
     Hashtag.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
       if (err) {
         return handleError(res, err);
@@ -112,22 +134,133 @@ exports.removeTag = function (req, res) {
   })
 };
 
-function normalizeTranscriptions(query, tag) {
-  return new Promise((resolve, reject) => {
-    let promises = [];
-    Transcription.find(query, (err, transcriptions) => {
-      transcriptions.forEach((transcription) => {
-        transcription.description = transcription.description.replace('#' + tag.tag, tag.tag);
-        transcription.hashtags = transcription.hashtags.filter((t) => t._id !== tag._id);
-        promises.push(updateTranscription(transcription));
-        return transcription;
-      });
+// Deletes a thing from the DB.
+exports.destroy = function (req, res) {
+  Hashtag.findById(req.params.id, function (err, thing) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!thing) {
+      return res.status(404).send('Not Found');
+    }
+    thing.remove(function (err) {
+      if (err) {
+        return handleError(res, err);
+      }
+      return res.status(204).send('No Content');
     });
-    Promise.all(promises)
-      .then((results) => {
-        resolve(results);
-      })
   });
+};
+
+// Get a single hashtag by term
+exports.showTerm = function (req, res) {
+  let tagTerms = req.body;
+  let promises = [];
+
+  tagTerms.forEach((tagName) => {
+    promises.push(
+      findTag(tagName)
+    )
+  });
+  Promise.all(promises)
+    .then((results) => {
+      return res.status(200).json(results);
+    })
+};
+
+exports.decreaseCount = function (req, res) {
+  if (req.body._id) {
+    delete req.body._id;
+  }
+  Hashtag.findOne({_id: req.params.id}, function (err, hashtag) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!hashtag) {
+      return res.status(404).send('Not Found');
+    }
+
+    if (!hashtag.occurrence) {
+      hashtag.occurrence = 0;
+    } else {
+      hashtag.occurrence--
+    }
+    const options = {returnUpdatedDocs: true};
+    hashtag.updatedAt = Date.now();
+    Hashtag.update({_id: hashtag._id}, hashtag, options, function (err, updatedCount, updatedTag) {
+      if (err) {
+        return handleError(res, err);
+      }
+      return res.status(200).json(updatedTag);
+    });
+  });
+};
+
+exports.findOccurrence = function (req, res, next) {
+  req.commonTags = [];
+  let promises = [];
+  findNotebooksWithTags()
+    .then(function (data) {
+
+      if (data.uniqueHashtags) {
+        data.uniqueHashtags.forEach(function (tag) {
+          promises.push(updateExistingOccurrence(data.allHashtags, tag))
+        });
+      }
+
+
+      Promise.all(promises)
+        .then(function (results) {
+          updateNonExistingOccurrence(data)
+            .then(function () {
+              next();
+            })
+        });
+
+    })
+};
+
+exports.findCommonTags = function (req, res) {
+  Hashtag.find({occurrence: {$gt: 0}}, function (err, tags) {
+    if (err) {
+      return handleError(res, err);
+    }
+    return res.status(200).json(tags);
+  })
+};
+
+function findTag(name) {
+  return new Promise((resolve, reject) => {
+    Hashtag.findOne({"tag": name}, (err, tag) => {
+      if (err) {
+        reject(err);
+      }
+      //if there is no tag, create a new one...
+      if (!tag) {
+        resolve(createNewTag(name));
+      }
+      resolve(tag);
+    })
+  });
+}
+
+function createNewTag(name) {
+  return new Promise((resolve, reject) => {
+    let newTag = {
+      tag: name,
+      tagColor: '#4285f4',
+      realTitle: name,
+      canEdit: true,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      occurrence: 1
+    };
+    Hashtag.insert(newTag, (err, createdTag) => {
+      if (err) reject(err);
+      global.appData.initialState.hashtags = [...global.appData.initialState.hashtags, createdTag];
+      resolve(createdTag);
+    });
+  })
 }
 
 function updateTranscription(transcription) {
@@ -186,149 +319,27 @@ function updateNotebook(notebook, tag) {
   })
 }
 
-// Deletes a thing from the DB.
-exports.destroy = function (req, res) {
-  Hashtag.findById(req.params.id, function (err, thing) {
-    if (err) {
-      return handleError(res, err);
-    }
-    if (!thing) {
-      return res.status(404).send('Not Found');
-    }
-    thing.remove(function (err) {
-      if (err) {
-        return handleError(res, err);
-      }
-      return res.status(204).send('No Content');
-    });
-  });
-};
-
-// Get a single hashtag by term
-exports.showTerm = function (req, res) {
-  let tagTerms = req.body;
-  let promises = [];
-
-  tagTerms.forEach((tagName) => {
-    promises.push(
-      findTag(tagName)
-    )
-  });
-  Promise.all(promises)
-    .then((results) => {
-      return res.status(200).json(results);
-    })
-
-};
-
-function findTag(name) {
+function normalizeTranscriptions(query, tag) {
   return new Promise((resolve, reject) => {
-    Hashtag.findOne({"tag": name}, (err, tag) => {
-      if (err) {
-        reject(err);
-      }
-      //if there is no tag, create a new one...
-      if (!tag) {
-        resolve(createNewTag(name));
-      }
-      resolve(tag);
-    })
+    let promises = [];
+    Transcription.find(query, (err, transcriptions) => {
+      transcriptions.forEach((transcription) => {
+        transcription.description = transcription.description.replace('#' + tag.tag, tag.tag);
+        transcription.hashtags = transcription.hashtags.filter((t) => t._id !== tag._id);
+        promises.push(updateTranscription(transcription));
+        return transcription;
+      });
+    });
+    Promise.all(promises)
+      .then((results) => {
+        resolve(results);
+      })
   });
 }
-
-function createNewTag(name) {
-  return new Promise((resolve, reject) => {
-    let newTag = {
-      tag: name,
-      tagColor: '#4285f4',
-      realTitle: name,
-      canEdit: true,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      occurrence: 1
-    };
-    Hashtag.insert(newTag, (err, createdTag) => {
-      if (err) reject(err);
-      global.appData.initialState.hashtags = [...global.appData.initialState.hashtags, createdTag];
-      resolve(createdTag);
-    });
-  })
-}
-
-// function getHashtags() {
-//
-//   Hashtag.find({}, (err, hashtags) => {
-//
-//     global.appData.initialState.hashtags = Object.assign({}, hashtags);
-//
-//   })
-//
-// }
-
-exports.decreaseCount = function (req, res) {
-  if (req.body._id) {
-    delete req.body._id;
-  }
-  Hashtag.findOne({_id: req.params.id}, function (err, hashtag) {
-    if (err) {
-      return handleError(res, err);
-    }
-    if (!hashtag) {
-      return res.status(404).send('Not Found');
-    }
-
-    if (!hashtag.occurrence) {
-      hashtag.occurrence = 0;
-    } else {
-      hashtag.occurrence--
-    }
-    var options = {returnUpdatedDocs: true};
-    hashtag.updatedAt = Date.now();
-    Hashtag.update({_id: hashtag._id}, hashtag, options, function (err, updatedCount, updatedTag) {
-      if (err) {
-        return handleError(res, err);
-      }
-      return res.status(200).json(updatedTag);
-    });
-  });
-};
-
-exports.findOccurrence = function (req, res, next) {
-  req.commonTags = [];
-  var promises = [];
-  findNotebooksWithTags()
-    .then(function (data) {
-
-      if (data.uniqueHashtags) {
-        data.uniqueHashtags.forEach(function (tag) {
-          promises.push(updateExistingOccurrence(data.allHashtags, tag))
-        });
-      }
-
-
-      Promise.all(promises)
-        .then(function (results) {
-          updateNonExistingOccurrence(data)
-            .then(function () {
-              next();
-            })
-        });
-
-    })
-};
-
-exports.findCommonTags = function (req, res) {
-  Hashtag.find({occurrence: {$gt: 0}}, function (err, tags) {
-    if (err) {
-      return handleError(res, err);
-    }
-    return res.status(200).json(tags);
-  })
-};
 
 function normalizeNotebooks(modifiedTag) {
   return new Promise(function (resolve, reject) {
-    var query = {"hashtags._id": modifiedTag._id};
+    let query = {"hashtags._id": modifiedTag._id};
 
     Notebook.find(query, function (err, notebooks) {
       if (err) {
@@ -338,7 +349,7 @@ function normalizeNotebooks(modifiedTag) {
 
 
       notebooks.forEach(function (notebook) {
-        var oldTagText = '';
+        let oldTagText = '';
 
         notebook.hashtags.map(function (oldTag, index) {
           if (oldTag._id === modifiedTag._id) {
@@ -364,14 +375,13 @@ function normalizeNotebooks(modifiedTag) {
 
 function findNotebooksWithTags() {
   return new Promise(function (resolve, reject) {
-    var allHashtags = [];
-    var uniqueHashtags = [];
-    var query = {$not: {"hashtags": {$size: 0}}};
+    let allHashtags = [];
+    let uniqueHashtags = [];
+    const query = {$not: {"hashtags": {$size: 0}}};
     Notebook.find(query, function (err, notebooks) {
       if (err) {
         reject(err);
       }
-
       //look for all notebooks
       notebooks.forEach(function (notebook) {
 
@@ -388,7 +398,7 @@ function findNotebooksWithTags() {
 
       });
 
-      var data = {allHashtags: allHashtags, uniqueHashtags: uniqueHashtags};
+      let data = {allHashtags: allHashtags, uniqueHashtags: uniqueHashtags};
 
       resolve(data);
     });
@@ -414,10 +424,8 @@ function updateExistingOccurrence(allHashtags, tag) {
 
 function updateNonExistingOccurrence(data) {
   return new Promise(function (resolve, reject) {
-
-    var promises = [];
-
-    var updatedTagIdQuery = [];
+    let promises = [];
+    let updatedTagIdQuery = [];
 
     //add the id of the already updated tags to an array
     data.uniqueHashtags.forEach(function (usedTag) {
@@ -427,15 +435,15 @@ function updateNonExistingOccurrence(data) {
     });
 
     //if occurrence is greater than 0
-    var occurenceQuery = {
+    let occurenceQuery = {
       occurrence: {$gt: 0}
     };
     //if its not one of the previously updated tags
-    var notQuery = {
+    let notQuery = {
       $not: {$or: updatedTagIdQuery}
     };
     //if it fits both criteria
-    var masterQuery = {
+    let masterQuery = {
       $and: [occurenceQuery, notQuery]
     };
 
@@ -449,7 +457,7 @@ function updateNonExistingOccurrence(data) {
       }
 
 
-      var updatedTags = [];
+      let updatedTags = [];
       //update each tag that is found......
       hashtags.forEach(function (t) {
 
@@ -457,7 +465,7 @@ function updateNonExistingOccurrence(data) {
           new Promise(function (resolve, reject) {
             t.occurrence = countInArray(data.allHashtags, t);
 
-            var options = {returnUpdatedDocs: true};
+            let options = {returnUpdatedDocs: true};
             Hashtag.update({_id: t._id}, t, options, function (err, updatedCount, updatedDoc) {
               if (err) {
                 reject(err)
@@ -478,8 +486,8 @@ function updateNonExistingOccurrence(data) {
 }
 
 function countInArray(array, tag) {
-  var count = 0;
-  for (var i = 0; i < array.length; i++) {
+  let count = 0;
+  for (let i = 0; i < array.length; i++) {
     if (array[i]._id === tag._id) {
       count++;
     }

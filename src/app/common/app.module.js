@@ -32,14 +32,14 @@ export const app = angular
           requiredAuth: false,
         },
         resolve: {
-          allConnections: (__appData) => __appData.initialState.connections,
+          currentUser: (RootService) => RootService.getUser(),
+          allConnections: (RootService) => RootService.getConnections(),
+          hashtags: (RootService) => RootService.getHashtags(),
           commonTags: (RootService) => RootService.getCommonHashtags(),
-          currentUser: (__appData) => __appData.initialState.user,
-          hashtags: (__appData) => __appData.initialState.hashtags,
-          project: (__appData) => __appData.initialState.project,
-          settings: (__appData) => __appData.initialState.settings,
-          notebooks: (__appData) => __appData.initialState.notebooks,
-          transcriptions: (__appData) => __appData.initialState.transcriptions,
+          project: (RootService) => RootService.getProject(),
+          settings: (RootService) => RootService.getSettings(),
+          notebooks: (RootService) => RootService.getNotebooks(),
+          transcriptions: (RootService) => RootService.getTranscriptions()
         },
         component: 'app',
       });

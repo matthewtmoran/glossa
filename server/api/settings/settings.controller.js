@@ -9,9 +9,9 @@
 
 'use strict';
 
-var _ = require('lodash');
-var Settings = require('./settings.model');
-var path = require('path');
+const _ = require('lodash');
+const Settings = require('./settings.model');
+const path = require('path');
 
 // Get list of things
 exports.index = function(req, res) {
@@ -45,15 +45,14 @@ exports.create = function(req, res) {
 //becuase this could potentially have uploaded files, the body object is, dataObj instead of settings...
 exports.update = function(req, res) {
     if(req.body._id) { delete req.body._id; }
-    Settings.findOne({}, function (err, settings) {
+    Settings.findOne({}, (err, settings) => {
         if (err) { return handleError(res, err); }
         if(!settings) { return res.status(404).send('Not Found'); }
-        var options = {returnUpdatedDocs: true};
-        var updated = _.merge(settings, req.body);
+        const options = {returnUpdatedDocs: true};
+        let updated = _.merge(settings, req.body);
         updated.updatedAt = Date.now();
-        Settings.update({_id: settings._id}, updated, options, function (err, updatedNum, updatedDoc) {
+        Settings.update({_id: settings._id}, updated, options, (err, updatedNum, updatedDoc) => {
             if (err) { return handleError(res, err); }
-            global.appData.initialState.settings = Object.assign({}, updatedDoc);
             Settings.persistence.compactDatafile(); // concat db
             return res.status(200).json(updatedDoc);
         });

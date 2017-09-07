@@ -44,7 +44,6 @@ export const metaComponent = {
       this.editorOptions.updateFunction = this.update.bind(this)
     }
 
-
     //called on blur
     //passed down to simplemde as well
     update(event) {

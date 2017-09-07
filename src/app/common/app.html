@@ -29,7 +29,7 @@
 		     transcriptions="$ctrl.transcriptions"
 		     new-notebooks="$ctrl.newNotebooks"
 
-		     on-upload-avatar="$ctrl.updloadAvatar($event)"
+		     on-upload-avatar="$ctrl.uploadAvatar($event)"
 		     on-export-project="$ctrl.exportProject($event)"
 		     on-save-media-settings="$ctrl.saveMediaSettings($event)"
 		     on-update-project="$ctrl.updateProject($event)"
@@ -64,5 +64,3 @@
 </md-content>
 
 <div ng-if="$ctrl.isLoading" id="full-screen-loader-overlay"></div>
-<!--<div ng-if="$ctrl.isLoading" class="loading-spinner">Loading...</div>-->
-<!--<md-progress-circular  class="full-screen-loader-spinner md-warn md-hue-3" md-diameter="70">></md-progress-circular>-->

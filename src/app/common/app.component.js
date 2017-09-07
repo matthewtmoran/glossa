@@ -19,14 +19,13 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, NotebookService, IpcSerivce, CorpusService, $stateParams) {
+    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, IpcSerivce, $stateParams) {
       'ngInject';
       this.$scope = $scope;
       this.$state = $state;
       this.$q = $q;
       this.cfpLoadingBar = cfpLoadingBar;
       this.$mdDialog = $mdDialog;
-      this.notebookService = NotebookService;
       this.ipcSerivce = IpcSerivce;
       this.$stateParams = $stateParams;
       this.$timeout = $timeout;
@@ -37,7 +36,6 @@ export const appComponent = {
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
-      this.corpusService = CorpusService;
 
       this.$scope.$on('update:connections', this.updateConnections.bind(this));
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
@@ -46,8 +44,6 @@ export const appComponent = {
 
       //broadcasted from hot-key event
       this.$scope.$on('newNotebook', this.viewNotebookDetails.bind(this));
-
-
       //called whne the connection list need to be updated
       this.ipcSerivce.on('update-connection-list', (event, data) => {
         console.log('on:: update-connection-list');
@@ -57,13 +53,11 @@ export const appComponent = {
         console.log('this.allConnections', this.allConnections);
 
       });
-
       //called when notebooks need to be object - usually when external notebook are added
       this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
         console.log('on:: update-synced-notebooks');
         this.notebooks = angular.copy(this.__appData.initialState.notebooks);
       });
-
       //called when new external notebooks are made in real-time
       //adds the notebooks to a holding array before they just populate
       this.ipcSerivce.on('update-rt-synced-notebooks', (event, data) => {
@@ -74,7 +68,6 @@ export const appComponent = {
           this.newNotebooks = [...this.newNotebooks, ...data];
         }
       });
-
       //listener for when something is syncing...
       //TODO: consider removal and updateing sync display to be only client side...
       this.ipcSerivce.on('sync-event-start', (event, data) => {
@@ -93,7 +86,6 @@ export const appComponent = {
           action: action
         });
       });
-
       this.ipcSerivce.on('import:project', (event, data) => {
         this.isLoading = true;
         this.rootService.ipcImportProject()
@@ -107,20 +99,15 @@ export const appComponent = {
             console.log("error", err);
           })
       });
-
-
       //removes sync-display
       this.ipcSerivce.on('sync-event-end', (event, data) => {
         console.log('on:: sync-event-end');
         console.log('loader end');
         this.cfpLoadingBar.complete();
       });
-
       this.ipcSerivce.on('export:project', (event, data) => {
         this.exportProject({project: this.__appData.initialState.project});
       });
-
-
       this.ipcSerivce.on('update-transcription-list', (event, data) => {
         console.log('update-transcription-list');
         this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
@@ -133,11 +120,6 @@ export const appComponent = {
         console.log('loader end');
         this.cfpLoadingBar.complete();
       });
-
-      // this.ipcSerivce.on('update-session-data', (event, data) => {
-      //   this.__appData.initialState.session = angular.copy(data);
-      // });
-
     }
 
     $onChanges(changes) {
@@ -239,7 +221,6 @@ export const appComponent = {
         this.selectFile({fileId: latestFile[0]._id});
       }
     }
-
     //select file event for new files and other events
     selectFile(event) {
       //set the selected file
@@ -253,25 +234,19 @@ export const appComponent = {
       }
     }
 
-
     createTranscription(event) {
       console.log('loader begin');
       this.cfpLoadingBar.start();
-
-      let file = {
-        displayName: event && event.name ? event.name : 'untitled',
-        description: '',
-        content: '',
-        corpus: this.$stateParams.corpus,
-        createdAt: Date.now(),
-        createdBy: this.__appData.initialState.user._id,
-        projectId: this.__appData.initialState.project._id
-      };
-
-      this.ipcSerivce.send('create:transcription', file);
+      this.rootService.createTranscription(event, this.currentUser, this.project, this.$stateParams.corpus)
+        .then((data) => {
+          this.transcriptions = [data, ...this.transcriptions];
+          this.selectFile({fileId: data._id});
+        })
+        .catch((err) => {
+          console.log('returned error', err)
+        })
 
     }
-
     removeTranscription(event) {
       let options = {
         title: 'Are you sure you want to delete this text?',
@@ -286,37 +261,55 @@ export const appComponent = {
           }
           console.log('loader begin');
           this.cfpLoadingBar.start();
-          this.ipcSerivce.send('remove:transcription', {transcriptionId: event.fileId});
+
+          this.rootService.deleteTranscription(event.fileId)
+            .then((data) =>{
+              this.transcriptions = this.transcriptions.filter(trans => trans._id !== event.fileId)
+              this.selectInitialFile();
+            })
+            .catch((err)=> {
+              console.log('There was an error removing transcirption file', err);
+            });
         });
     }
-
     updateTranscription(event) {
-
-      this.corpusService.updateFile(event.file)
+      this.rootService.updateTranscription(event.file)
         .then((data) => {
-          console.log('loader end');
-          this.cfpLoadingBar.complete();
 
-          //update selected file
-          this.selectedFile = Object.assign({}, data);
+        console.log('data returning:', data);
 
-          //update atat
-          this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
-
-          this.transcriptions = this.transcriptions.map((file, index) => {
-            if (file._id !== this.selectedFile._id) {
-              return file;
+          //keep selected file updated
+          this.selectedFile = Object.assign({}, data.transcription);
+          //update transcriptions
+          this.transcriptions = this.transcriptions.map((trans) => {
+            if (trans._id !== data.transcription._id) {
+              return trans;
             }
-            return this.selectedFile;
+            return data.transcription;
           });
 
+          //update notebook attachment
+          this.notebookAttachment = this.notebooks.find(notebook => notebook._id === data.transcription.notebookId);
 
-          this.ipcSerivce.send('update:hashtags', {transcriptionId: event.fileId});
+          //if hashtags return update hashtags
+          if(data.hashtags) {
+            this.hashtags = [...this.hashtags, ...data.hashtags];
+          }
 
+          //calculate common hashtags
+          this.rootService.getCommonHashtags()
+            .then((result) => {
+              this.commonTags = angular.copy(result);
+              console.log('loader end');
+              this.cfpLoadingBar.complete();
+            });
 
+          console.log('loader end');
+          this.cfpLoadingBar.complete();
         })
     }
 
+    //disconnects the attache notebook then calls updateTranscription
     disconnectNotebook(event) {
       let options = {
         title: 'Are you sure you want to disconnect this notebooks?',
@@ -331,45 +324,17 @@ export const appComponent = {
           this.updateTranscription(event);
         })
     }
-
+    //attached notebook to transcription file then calls updateTranscription
     attachNotebook(event) {
       event.settings = this.settings;
-
       this.dialogService.mediaAttachment(event, this.selectedFile)
         .then((result) => {
           if (result) {
-
-            console.log('result', result);
-
-
             this.updateTranscription({file: result})
-
-
-            // this.corpusService.updateFile(result)
-            //   .then((data) => {
-            //     this.cfpLoadingBar.complete();
-            //
-            //     this.selectedFile = Object.assign({}, data);
-            //
-            //     this.notebookAttachment = this.notebooks.find(notebook => notebook._id === this.selectedFile.notebookId);
-            //
-            //     this.transcriptions = this.transcriptions.map((file, index) => {
-            //       if (file._id !== this.selectedFile._id) {
-            //         return file;
-            //       }
-            //       return this.selectedFile;
-            //     });
-            //
-            //   })
-            //   .catch((data) => {
-            //     console.log('there was an issue', data)
-            //   });
-
-
           }
         });
     }
-
+    //removes independent media then calls updateTranscription
     disconnectMedia(event) {
       let options = {
         title: 'Are you sure you want to disconnect this media attachment?',
@@ -396,13 +361,26 @@ export const appComponent = {
     //Settings//
     ////////////
 
-    saveMediaSettings(event) {
-      this.rootService.saveSettings(event.settings)
+    //update project data
+    updateProject(event) {
+      this.cfpLoadingBar.start();
+      this.rootService.updateProject(event.project)
         .then((data) => {
-          this.settings = angular.copy(this.__appData.initialState.settings);
+          this.project = angular.copy(data);
+          this.cfpLoadingBar.complete();
         })
     }
-
+    //update settings
+    //TODO: refractor as updateSettings()
+    saveMediaSettings(event) {
+      this.cfpLoadingBar.start();
+      this.rootService.updateSettings(event.settings, this.currentUser)
+        .then((data) => {
+          this.cfpLoadingBar.complete();
+          this.settings = angular.copy(data);
+        })
+    }
+    //export all project data
     exportProject(event) {
       let options = {};
       options.title = "Are you sure you want to export all your project data?";
@@ -418,7 +396,7 @@ export const appComponent = {
           console.log('loader begin');
           this.cfpLoadingBar.start();
 
-          this.settingsService.exportProject(event.project)
+          this.rootService.exportProject(event.project)
             .then((data) => {
               this.isLoading = false;
               console.log('loader end');
@@ -426,46 +404,69 @@ export const appComponent = {
             });
         });
     }
-
-    updateProject(event) {
+    //upload an avatar image; also normalizes notebooks
+    uploadAvatar(event) {
       console.log('loader begin');
       this.cfpLoadingBar.start();
-      this.settingsService.updateProject(event.project)
+      this.rootService.uploadAvatar(event.file)
         .then((data) => {
-          this.project = angular.copy(this.__appData.initialState.project);
-          // this.project = angular.copy(data);
-          console.log('loader end');
-          this.cfpLoadingBar.complete();
-        })
-    }
+          this.currentUser = angular.copy(data.user);
+          this.notebooks = this.notebooks.map((notebook) => {
+            let exists = false;
+            let updated = {};
+            data.notebooks.forEach((nb) => {
+              if (nb._id === notebook._id) {
+                exists = true;
+                updated = nb;
+              }
+            });
 
-    updloadAvatar(event) {
-      console.log('loader begin');
-      this.cfpLoadingBar.start();
-      this.$q.when(this.rootService.uploadAvatar(event.file))
-        .then((data) => {
-          this.currentUser = angular.copy(this.__appData.initialState.user);
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+            if (exists) {
+              return updated;
+            } else {
+              return notebook;
+            }
+          });
           console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
-
+        })
+        .catch((err) => {
+          console.log('Error:', err);
         });
     }
-
+    //remove avatar image; also normalizes notebooks
     removeAvatar(event) {
       console.log('loader begin');
       this.cfpLoadingBar.start();
-      this.rootService.removeAvatar(event.file)
+      this.rootService.removeAvatar(event.file, this.currentUser)
         .then((data) => {
-          this.currentUser = angular.copy(this.__appData.initialState.user);
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.currentUser = angular.copy(data.user);
+
+          this.notebooks = this.notebooks.map((notebook) => {
+            let exists = false;
+            let updated = {};
+            data.notebooks.forEach((nb) => {
+              if (nb._id === notebook._id) {
+                exists = true;
+                updated = nb;
+              }
+            });
+
+            if (exists) {
+              return updated;
+            } else {
+              return notebook;
+            }
+          });
           console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
         })
+        .catch((err) => {
+          console.log('Error:', err);
+        });
     }
-
     //update 'profile' information.
     updateUserInfo(event) {
       console.log('loader begin');
@@ -473,15 +474,79 @@ export const appComponent = {
       //http request
       this.rootService.updateUserInfo(event.currentUser)
         .then((data) => {
-          //copy new user data to update across application
-          this.currentUser = angular.copy(this.__appData.initialState.user); //copy data to ensure $onchnages triggered across application
-          //copy new notebook data to update across application
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.currentUser = angular.copy(data.user);
+          this.notebooks = this.notebooks.map((notebook) => {
+            let exists = false;
+            let updated = {};
+            data.notebooks.forEach((nb) => {
+              if (nb._id === notebook._id) {
+                exists = true;
+                updated = nb;
+              }
+            });
+
+            if (exists) {
+              return updated;
+            } else {
+              return notebook;
+            }
+          });
+
+          this.ipcSerivce.send('broadcast:profile-updates');
           console.log('loader end');
           this.cfpLoadingBar.complete();
-          console.log('TODO: emit to external socket that user data has been updated?????? or bradcast when db is updated.....  ');
         })
     }
+    //TODO: remove dialog service and just create it here for simplicity
+    //handles event after user chooses  to toggle sharing or not
+    confirmToggleSharing(event) {
+      let options = {};
+      if (this.settings.isSharing) {
+        options.title = 'Are you sure you want to turn OFF sharing?';
+        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
+      } else {
+        options.title = 'Are you sure you want to turn ON sharing?';
+        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
+      }
+
+      this.dialogService.confirmDialog(options)
+        .then((result) => {
+          if (!result) {
+            //trigger changes back down the child components
+            this.settings = angular.copy(this.settings)
+          } else {
+            //this updates the persisted data and the global.initialState object
+            this.rootService.updateSettings({isSharing: event.isSharing}, this.currentUser)
+              .then((data) => {
+                //data should be the correct object (unless there are errors), however, for consistency sake, becuase __appData is electron global object that we update with the put request on the api server, we can set it to the __appData object as we do in the resolve of the app route
+                //this ensures all our data is normalized for each session and persisted over multiple sessions and at each moment.
+                //essential our one source of truth will be from __appData which will be updated through express.
+                //this should be done with all api calls
+                //on this copy specifically, it updates all child components twice, I belive this is because of md-switch's internal state
+
+                this.settings = angular.copy(data);
+
+                this.rootService.toggleSharing(this.settings.isSharing)
+
+
+              })
+          }
+        })
+    }
+
+    //follow an online user
+    toggleFollow(event) {
+      this.rootService.toggleFollow(event.user)
+        .then((data) => {
+          this.connections = angular.copy(data);
+        })
+        .catch((err) => {
+          console.log('Error:', err);
+        })
+    }
+
+
+
 
     /**
      * called when a single connection is updated
@@ -508,43 +573,6 @@ export const appComponent = {
       //copy to trigger changes
       this.allConnections = angular.copy(this.allConnections);
 
-    }
-
-    //TODO: remove dialog service and just create it here for simplicity
-    confirmToggleSharing(event) {
-      let options = {};
-      if (this.settings.isSharing) {
-        options.title = 'Are you sure you want to turn OFF sharing?';
-        options.textContent = 'By clicking yes, you will not be able to sync data with other users...';
-      } else {
-        options.title = 'Are you sure you want to turn ON sharing?';
-        options.textContent = 'By clicking yes, you will automatically sync data with other users...';
-      }
-
-      this.dialogService.confirmDialog(options)
-        .then((result) => {
-          if (!result) {
-            console.log(result);
-            //trigger changes back down the child components
-            this.settings = angular.copy(this.settings)
-          } else {
-            //this updates the persisted data and the global.initialState object
-            this.rootService.updateSettings({isSharing: event.isSharing})
-              .then((data) => {
-                //data should be the correct object (unless there are errors), however, for consistency sake, becuase __appData is electron global object that we update with the put request on the api server, we can set it to the __appData object as we do in the resolve of the app route
-                //this ensures all our data is normalized for each session and persisted over multiple sessions and at each moment.
-                //essential our one source of truth will be from __appData which will be updated through express.
-                //this should be done with all api calls
-                //TODO: update all api routes to update global appData object
-                //TODO: update all setting of objects to reference global appData object
-                //on this copy specifically, it updates all child components twice, I belive this is because of md-switch's internal state
-                this.settings = angular.copy(this.__appData.initialState.settings);
-                this.rootService.toggleSharing(this.settings.isSharing)
-
-
-              })
-          }
-        })
     }
 
     updateConnections(event, data) {
@@ -597,71 +625,59 @@ export const appComponent = {
 
     }
 
-    //follow an online user
-    toggleFollow(event) {
-      this.rootService.toggleFollow(event.user);
-    }
+
 
 
     ////////////
     //Notebook//
     ////////////
 
-
     //new notebook
     saveNotebook(event) {
-      this.$mdDialog.hide();
-      console.log('loader begin');
-      this.cfpLoadingBar.start();
-      event.notebook.createdBy = {
-        _id: this.currentUser._id,
-        avatar: this.currentUser.avatar || null,
-        name: this.currentUser.name
-      };
-      event.notebook.projectId = this.project._id;
 
-      this.notebookService.createNotebook(event.notebook)
+      this.rootService.createNotebook(event.notebook, this.currentUser, this.project._id, this.hashtags)
         .then((data) => {
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+          this.notebooks = [data.notebook, ...this.notebooks];
+          if(data.hashtags) {
+            this.hashtags = [...this.hashtags, ...data.hashtags];
+          }
           this.rootService.getCommonHashtags()
             .then((result) => {
               this.commonTags = angular.copy(result);
               console.log('loader end');
               this.cfpLoadingBar.complete();
             });
-        })
-        .catch((data) => {
-          console.log('There was an error ', data);
-          console.log('loader end');
-          this.cfpLoadingBar.complete();
+          this.$mdDialog.hide();
         });
-    }
 
+
+    }
     // update notebook
     updateNotebook(event) {
-      console.log('update event');
-      console.log('this.commonTags.length', this.commonTags.length);
       console.log('loader begin');
       this.cfpLoadingBar.start();
-      this.notebookService.updateNotebook(event.notebook)
+      this.rootService.updateNotebook(event.notebook, this.hashtags)
         .then((data) => {
           this.$mdDialog.hide();
 
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+          this.notebooks = this.notebooks.map((notebook) => {
+            if (notebook._id !== data.notebook._id) {
+              return notebook;
+            }
+            return data.notebook;
+          });
 
+          if(data.hashtags) {
+            this.hashtags = [...this.hashtags, ...data.hashtags];
+          }
           this.rootService.getCommonHashtags()
             .then((result) => {
-              console.log('Now we have common tags...');
               this.commonTags = angular.copy(result);
-              console.log('this.commonTags.length', this.commonTags.length);
               console.log('loader end');
               this.cfpLoadingBar.complete();
             });
         })
     }
-
     //remove notebook
     deleteNotebook(event) {
       let options = {
@@ -671,7 +687,6 @@ export const appComponent = {
 
       this.$mdDialog.show({
         controller: () => this,
-
       });
 
 
@@ -682,65 +697,36 @@ export const appComponent = {
           } else {
             console.log('loader begin');
             this.cfpLoadingBar.start();
-            this.notebookService.deleteNotebook(event.notebook)
+            this.rootService.deleteNotebook(event.notebook)
               .then((data) => {
-                if (!data) {
-                  return;
+                //if transcriptions were modified....
+                if (data.transcriptions) {
+                  data.transcriptions.forEach((t) => {
+                    this.transcriptions = this.transcriptions.map((trans) => {
+                      if (t._id !== trans._id) {
+                        return trans
+                      }
+                      return t;
+                    })
+                  });
                 }
-                if (data) {
 
-                  this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-                  console.log('loader end');
-                  this.cfpLoadingBar.complete();
-                }
+                this.notebooks = this.notebooks.filter((notebook) => notebook._id !== data.notebookId);
+                console.log('loader end');
+                this.cfpLoadingBar.complete();
               });
           }
         })
     }
 
-    ////////////
-    //hashtags//
-    ////////////
-
-    updateTag(event) {
-      this.rootService.updateTag(event.tag)
-        .then((data) => {
-          this.hashtags.map((tag, index) => {
-            if (tag._id === data._id) {
-              this.hashtags[index] = data;
-            }
-          });
-        })
-    }
-
-    removeTag(event) {
-      this.rootService.removeTag(event.tag)
-        .then((data) => {
-
-          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
-          this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
-
-          this.selectInitialFile();
-
-          this.rootService.getCommonHashtags()
-            .then((result) => {
-              this.commonTags = angular.copy(result);
-            });
-        })
-    }
-
     //view notebook details
     viewNotebookDetails(event) {
-
       if (!event.notebook) {
         event.notebook = {
           postType: event.type || 'normal'
         }
       }
-
       let state = {};
-
       switch (event.notebook.postType) {
         case 'image':
           this.editorOptions = {
@@ -848,6 +834,33 @@ export const appComponent = {
         });
     }
 
+    ////////////
+    //hashtags//
+    ////////////
+
+    updateTag(event) {
+      this.rootService.updateTag(event.tag)
+        .then((data) => {
+          this.hashtags.map((tag, index) => {
+            if (tag._id === data._id) {
+              this.hashtags[index] = data;
+            }
+          });
+        })
+    }
+    removeTag(event) {
+      this.rootService.removeTag(event.tag)
+        .then((data) => {
+          this.notebooks = angular.copy(this.__appData.initialState.notebooks);
+          this.hashtags = angular.copy(this.__appData.initialState.hashtags);
+          this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
+          this.selectInitialFile();
+          this.rootService.getCommonHashtags()
+            .then((result) => {
+              this.commonTags = angular.copy(result);
+            });
+        })
+    }
     //manage hashtags with dialog at notebooks
     tagManaageDialog() {
       this.$mdDialog.show({
@@ -872,25 +885,10 @@ export const appComponent = {
         return data;
       })
     }
-
     //TODO: refractor to use global object
     showNewNotebookUpdates() {
-
-
       this.ipcSerivce.send('combine:notebooks')
-
-      // console.log('TODO: NEED TO REFRACTOR');
-      // console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
-      // this.externalNotebooks.forEach((newNotebook) => {
-      //   newNotebook.isNew = true;
-      //   if (this.notebooks.indexOf(newNotebook) < 0) {
-      //     this.notebooks.push(newNotebook);
-      //   }
-      // });
-      // this.externalNotebooks = [];
     }
-
-
     //I believe this is called when connection connect and the data changes.
     //TODO: refractor to use global object
     normalizeNnotebooks(event, data) {
@@ -903,7 +901,6 @@ export const appComponent = {
         }
       })
     }
-
     //TODO: refractor to use global object
     updateExternalData(event, data) {
       console.log('TODO: NEED TO REFRACTOR');
@@ -954,7 +951,6 @@ export const appComponent = {
       }
     }
 
-
     //////////
     //Global//
     //////////
@@ -962,11 +958,9 @@ export const appComponent = {
     searchSubmit(event) {
       this.searchText = event.searchText;
     }
-
     clearSearch(event) {
       this.searchText = angular.copy(event.text);
     }
-
 
     //need to sort//
     ///////////////
@@ -975,7 +969,6 @@ export const appComponent = {
     cancel() {
       this.$mdDialog.cancel();
     }
-
     hide() {
       this.$mdDialog.hide();
     }

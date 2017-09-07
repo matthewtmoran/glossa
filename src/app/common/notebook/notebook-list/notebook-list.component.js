@@ -25,6 +25,9 @@ export const notebookListComponent = {
       if (changes.settings) {
         this.settings = angular.copy(changes.settings.currentValue);
       }
+      if (changes.settings) {
+        this.selectedHashtags = angular.copy(changes.selectedHashtags.currentValue);
+      }
       // if (changes.selected) {
       //   this.selected = angular.copy(changes.selected.currentValue);
       // }

@@ -1,24 +1,16 @@
 export class SettingsHashtagsComponent {
   constructor($q, RootService, DialogService, cfpLoadingBar, $mdEditDialog, $scope) {
     'ngInject';
-
     this.$q = $q;
     this.$scope = $scope;
     this.rootService = RootService;
     this.dialogService = DialogService;
     this.cfpLoadingBar = cfpLoadingBar;
     this.$mdEditDialog = $mdEditDialog;
-
-
   }
-
   $onChanges(changes) {
     if (changes.hashtags) {
-      console.log('change in hashtags in setting-hashtags.... ');
       this.hashtags = angular.copy(changes.hashtags.currentValue);
-      console.log('this.hashtags.length', this.hashtags.length);
-
-      // this.filteredItems = this.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))}}
     }
   }
 
@@ -31,7 +23,6 @@ export class SettingsHashtagsComponent {
   }
 
   $onInit() {
-
     this.tableOptions = {
       rowSelection: false,
       multiSelect: true,
@@ -51,9 +42,6 @@ export class SettingsHashtagsComponent {
       usedTags: false,
       unusedTags: false
     };
-
-    // ($ctrl.filteredItems = ($ctrl.hashtags | filter: $ctrl.searchText | tagFilter: $ctrl.filterOptions))
-
   }
 
   selectedRowCallback(rows) {
@@ -112,6 +100,4 @@ export class SettingsHashtagsComponent {
       }
     });
   }
-
-
 }

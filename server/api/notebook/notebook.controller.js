@@ -85,42 +85,59 @@ exports.update = function (req, res) {
 
 // Deletes a thing from the DB.
 exports.destroy = function (req, res) {
-  Notebook.findOne({_id: req.params.id}, function (err, notebook) {
+  Notebook.findOne({_id: req.params.id}, (err, notebook) => {
     if (err) {
       return handleError(res, err);
     }
-    Transcriptions.find({notebookId: req.params.id}, function (err, transcriptions) {
+    let transcriptionPromises = [];
+    Transcriptions.find({notebookId: req.params.id}, (err, transcriptions) => {
       if (err) {
         return handleError(res, err);
       }
       if (transcriptions.length > 0) {
-        transcriptions.forEach(function (file) {
+        transcriptions.forEach((file) => {
+          //make notebooks images independent media files
           if (notebook.image) {
             file.image = notebook.image;
           }
           if (notebook.audio) {
             file.audio = notebook.audio;
           }
+          //remove the notebook connection
           delete file.notebookId;
-          Transcriptions.update({_id: file._id}, file, function (err, updatedFile) {
-            if (err) {
-              return handleError(res, err);
-            }
-
-            global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.filter(trans => trans._id !== updatedFile._id);
-          })
+          transcriptionPromises.push(updateTranscription(file))
         })
       }
     });
-    Notebook.remove({_id: req.params.id}, function (err, numRemoved) {
+    Notebook.remove({_id: req.params.id}, (err, numRemoved) => {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.notebooks = global.appData.initialState.notebooks.filter(nb => nb._id !== notebook._id);
-      return res.status(204).send('No Content');
+      if (transcriptionPromises.length) {
+        Promise.all(transcriptionPromises)
+          .then((results) => {
+            return res.status(204).send({notebookId: req.params.id, transcriptions: results});
+          })
+          .catch((err) => {
+            return console.log('error normalizeing transcriptiosn: ', err);
+          })
+      }
+      return res.status(204).send({notebookId: req.params.id});
     });
   });
 };
+
+function updateTranscription(transcription) {
+  return new Promise((resolve, reject) => {
+    const options = {returnUpdatedDocs: true};
+    Transcriptions.update({_id: transcription._id}, transcription, options, (err, updatedCount, updatedDoc) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(updatedDoc);
+    })
+  })
+}
 
 function handleError(res, err) {
   return res.status(500).send(err);
