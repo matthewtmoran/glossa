@@ -1,319 +1,324 @@
 'use strict';
-
 const path = require('path');
 const fs = require('fs');
 const config = require('./../config/environment/index');
-const socketUtil = require('./socket-util');
 const main = require('../../main');
 const app = require('electron').app;
-let localClient = {};
+
+const User = require('./../api/user/user.model.js');
+const Connection = require('./../api/connections/connection.model');
+
+const notebookController = require('../api/notebook/notebook.controller');
+const userController = require('../api/user/user.controller');
+
+
 let connectedClients = {};
 
-
 module.exports = function (io) {
-  io.on('connection', function (socket) {
-    console.log('');
-    console.log('');
+  io.on('connection', (socket) => {
     console.log('on:: connection');
-    console.log('socket.id:', socket.id);
-    console.log('');
 
-    /////////////
-    //handshake//
-    /////////////
-
-    console.log('emit:: begin-handshake');
-    //every socket connection, ask for some data
+    console.log('STEP 1 - emit:: begin-handshake');
     socket.emit('begin-handshake');
-
-    //this should be the return of the data we asked for
     socket.on('end-handshake', onEndHandshake);
-    // when a socket disconnects remove from connection list
     socket.on('disconnect', disconnect);
-    //when client sends data back to us
-    socket.on('sync-data:return', syncDataReturn);
-    //when a client has requested the actual avatar image file.
+    socket.on('return:avatar', onReturnAvatar);
+    socket.on('return:notebook-data', onReturnNotebookData);
+    socket.on('test:test', onTestTest);
+
+    //occurs when profile updates are broad cast and connection responds with request for avatar
     socket.on('request:avatar', onRequestAvatar);
 
-    socket.on('return:avatar', onReturnAvatar);
+
+    function onRequestAvatar() {
+      User.findOne({}, (err, user) => {
+        if (!user.avatar || !user.avatar.absolutePath) {
+          return;
+        }
+        userController.encodeAvatar(user.avatar.absolutePath)
+          .then((bufferString) => {
+
+            let avatarData = user.avatar;
+            avatarData.bufferString = bufferString;
+            avatarData.userId = user._id;
+
+            console.log('--- emit:: return:avatar to:: server that is connected (that made request)');
+            socket.emit('return:avatar', avatarData);
+          })
+          .catch((err) => {
+            console.log('There was an error', err);
+            console.log('TODO: handle error')
+          })
+      });
+    }
 
 
-    ////////////////////
-    //socket functions//
-    ////////////////////
+    function onTestTest(data) {
+      console.log('');
+      console.log('on:: test:test', data);
+      console.log('');
+    }
 
-    //client returns 'end-handshake with data'
+    //handshake response from connected client
     function onEndHandshake(client) {
-      console.log('on:: end-handshake');
+      console.log('');
+      console.log('STEP 2  -  on:: end-handshake');
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
-
       //keep track of connections
       connectedClients[socket.id] = {};
       connectedClients[socket.id].disconnected = false;
-
-      //get main window object
       let win = main.getWindow();
-
-      // console.log('IPC send:: sync-event-start to:: local-window', 'line 49');
-      // win.webContents.send('sync-event-start');
-      //dumb check just to make sure it's a client we want...
       if (client.type === 'external-client') {
-        //update existing connections
-        let connectionExists = false;
-        global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
-          if (connection._id !== client._id) {
-            return connection;
-          }
-          //update data that we do not store
-          connection.online = true;
-          connection.socketId = client.socketId;
-          connection.name = client.name;
+        //look for this conneciton in persisted data
+        Connection.findOne({_id: client._id}, (err, connection) => {
+          if (err) {return console.log('error finding connection');}
+          //if connection is not in persistent data
+          if (!connection) {
+            console.log('STEP 3(c) - new user; we know we are not following at this point');
+            //create new object
+            const clientData = {
+              name: client.name,
+              _id: client._id,
+              type: 'external-client',
+              following: false,
+              lastSync: null,
+              avatar: client.avatar,
+              socketId: client.socketId,
+              online: true
+            };
 
-          //i already know it's following here but just in case and for consitency sake
-          if (connection.following) {
-            //if client has avatar object exist and client avatar name exists as a field
-            //and
-            //connection.avatar does not exist or if the connection.avatar.name field does not exist
-            if ((client.avatar && client.avatar.name) && (!connection.avatar || !connection.avatar.name)) {
-              console.log("client has avatar connection does not have avatar");
-              //this means connection is null but client is not null
-              //client has an avatar image we need
-              getNewAvatarData(connection, client, win)
-            //  if client.avatar does not exist or if client.avatar.name field does not exist
-            //  and
-            //  connection.avatar exists and connection.avatar.name field exists,
-            //  remove the file and remove the avatar data on the connection object
-            } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
-              //this means client is null but connection is not null
-              //client has removed his avatar image
-              console.log('TODO: get rid of the stored avatar data we hold');
-              fs.unlink(connection.avatar.absolutePath, (err) => {
-                if (err) {
-                 return console.log("There was an error trying to remove avatar file", err);
-                }
-              });
-              delete connection.avatar;
-            //  if client avatar exists and client avatar.name exists and connection.avatar exists and connection.avatar.name eixsts and client .avatar.name is not the same as connection.avatar.name
-            } else if (client.avatar && client.avatar.name && connection.avatar && connection.avatar.name && client.avatar.name !== connection.avatar.name) {
-              //this means client has changed his avatar image to a new avatar
-              console.log('TODO: remove the data we hold and get the new data')
-              //remove the image attached to the connection object and get new data
-              fs.unlink(connection.avatar.absolutePath);
-              getNewAvatarData(connection, client, win)
-            }
-
-            //sync data
-            socketUtil.syncData(connection, (data) => {
-
-              console.log('IPC send:: sync-event-start to:: local-window', 'line 108');
-              win.webContents.send('sync-event-start');
-              console.log('emit:: sync-data to:: a client');
-              io.to(client.socketId).emit('sync-data', data)
+            //Add connection to database
+            return Connection.insert(clientData, (err, newConnection) => {
+              if (err) {
+                return console.log('error inserting new connection', err);
+              }
+              console.log('SEND:: new:connection');
+              console.log('TODO: change to socket event');
+              //join the external connection room to listen for broadcasts
+              socket.join('externalClientsRoom');
+              //send local-client new connection
+              return win.webContents.send('new:connection', newConnection);
             });
           }
-          connection = Object.assign({}, connection);
-          connectionExists = true;
-          return connection;
-        });
+          if (connection._id) {
+            console.log("Connection exists in database");
+            //updates dynamic data
+            connection.online = true;
+            connection.socketId = client.socketId;
+            connection.name = client.name;
 
-        //if client still does not exist it means its a new client
-        if (!connectionExists) {
+            if (connection.following) {
+              console.log('STEP 3(a) - we are following this user so get data to sync');
 
-          const clientData = {
-            name: client.name,
-            _id: client._id,
-            type: 'external-client',
-            following: false,
-            lastSync: null,
-            avatar: client.avatar,
-            socketId: client.socketId,
-            online: true
-          };
+              returnUpdateInfo(connection, client)
+                .then((modifiedConnection) => {
 
-          //concat to array
-          global.appData.initialState.connections = [clientData, ...global.appData.initialState.connections]
+                  const options = {returnUpdatedDocs: true};
+                  Connection.update({_id: modifiedConnection._id}, modifiedConnection, options, (err, updatedCount, updatedConnection) => {
+                    if (err) {return err;}
+
+
+                    socket.join('externalClientsRoom');
+                    //send new connection object to local-client
+                    console.log('SEND:: update:connection', updatedConnection);
+                    win.webContents.send('update:connection', updatedConnection);
+
+                    //get notebook data created by user
+                    notebookController.getExistingNotebooks(modifiedConnection)
+                      .then((notebookSummaries) => {
+                        //send notification to local client that we have begun syncing
+                        win.webContents.send('sync-event-start');
+                        //send notebook summary to connection
+                        console.log('emit:: request:notebook-data to:: connected client');
+                        console.log('notebookSummaries.length:', notebookSummaries.length);
+                        io.to(modifiedConnection.socketId).emit('request:notebook-data', notebookSummaries)
+                      })
+                      .catch((err) => {
+                        console.log('Error getting existing notebooks.', err)
+                      });
+
+                    if (updatedCount) {
+                      //normalize existing notebooks with new user data
+                      notebookController.normalizeNotebooks(updatedConnection)
+                        .then((updatedNotebooks) => {
+                          console.log('SEND:: update:synced-notebooks');
+                          //send local-client updated notebooks
+                          console.log('updatedNotebooks.length',updatedNotebooks.length );
+                          win.webContents.send('update:synced-notebooks', updatedNotebooks);
+                        })
+                        .catch((err) => {
+                          console.log('there was an issue normalizing notebooks', err);
+                        });
+                    }
+                  });
+                })
+
+            //  If we are not following the user
+            } else {
+              console.log('STEP 3(b) - not following user, but we store it in the db till it disconnects');
+              const options = {returnUpdatedDocs: true};
+              //update connection
+              Connection.update(connection, options, (err, updatedCount, updatedConnection) => {
+                if (err) {return err;}
+                //join the external client room to listen for broadcasts
+                socket.join('externalClientsRoom');
+                //send new connection object to local-client
+                console.log('SEND:: update:connection', updatedConnection);
+                win.webContents.send('update:connection', updatedConnection);
+              })
+            }
+          }
+        })
+      } else {
+        console.log('SOMEONE IS SNOOPING');
+      }
+    }
+
+    //when a socket disconnects
+    function disconnect(reason) {
+      let win = main.getWindow();
+      console.log('on:: disconnect');
+
+      Connection.findOne({socketId: socket.id}, (err, connection) => {
+        if (err) {return console.log("could not find client on disconnect");}
+        if (!connection) {
+          return console.log('This connection does not exist');
         }
 
-        //join the externalClientRoom
-        socket.join('externalClientsRoom');
-        console.log('IPC send:: update-connection-list');
-        win.webContents.send('update-connection-list');
-
-      } else {
-        //if it's not its probably someone at the coffee shop
-        console.log('********SOMEONE IS SNOOPING*********')
-      }
+        if (!connection.following) {
+          Connection.remove({socketId: socket.id}, (err, count) => {
+            if (err) {
+              return console.log('Error removing connection on disconnect');
+            }
+            console.log('Send:: remove:connection');
+            console.log('TODO: change to socket event');
+            win.webContents.send('remove:connection', connection);
+          })
+        } else {
+          connection.online = false;
+          connection.socketId = false;
+          const options = {returnUpdateDocs: true};
+          Connection.update({_id: connection._id}, connection, options, (err, updatedCount, updatedConnection) => {
+            if (err) {return console.log('Error updating connection on disconnect');}
+            console.log('updatedConnection:', updatedConnection);
+            console.log('SEND:: update:connection');
+            win.webContents.send('update:connection', updatedConnection || connection);
+          })
+        }
+      });
     }
 
-    function disconnect(reason, test) {
-      let win = main.getWindow();
+    //when a client returns avatar data after we have requested it
+    function onReturnAvatar(avatarData) {
       console.log('');
-      console.log('');
-      console.log('');
-      console.log('on:: disconnect');
-      console.log('Server disconnect data:', reason);
-      console.log('test:', test);
-      console.log("socket.id", socket.id);
-      console.log('');
-      console.log('');
-      console.log('');
-
-      //get connection from list
-      let connection = global.appData.initialState.connections.find(con => con.socketId === socket.id);
-
-      if (!connection) {
-        return console.log("no connection in global object.  Am going to throw an error")
-      }
-
-      if (!connection.following) {
-        //remove non-followed users from connection array
-        global.appData.initialState.connections = global.appData.initialState.connections.filter(con => con._id !== connection._id);
-        console.log('global.appData.initialState.connections', global.appData.initialState.connections);
-      } else {
-        //if we are following, updated data don't remove
-        global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
-          if (con._id !== connection._id) {
-            return con;
-          }
-          //reset dynamic data;
-          con.online = false;
-          delete con.socketId;
-          con = Object.assign({}, con);
-          return con;
+      console.log('on:: return:avatar ');
+      //writes the avatar data to the file system
+      //the text data should already be updated by this point
+      userController.writeAvatar(avatarData)
+        .then((avatarDataNoBuffer) => {
+          console.log('The avatar should be updated and written to FS successfully');
+          main.getWindow().webContents.send('avatar-returned', avatarDataNoBuffer.userId);
         })
-      }
-      console.log('IPC send: update-connection-list');
-      win.webContents.send('update-connection-list');
-
+        .catch((err) => {
+          console.log('there was an issue writing avatar image to fs', err)
+        })
     }
 
-    function getNewAvatarData(connection, client, win) {
+    //when a client returns notebook data after we have requested it
+    function onReturnNotebookData(data) {
+      console.log('');
+      console.log('on:: return:notebook-data');
+      let win = main.getWindow();
+
+      notebookController.newDataReturned(data.notebook)
+        .then((notebook) => {
+          console.log('IPC send:: update:synced-notebook');
+          win.webContents.send('update:synced-notebook', notebook);
+        })
+      .catch((err) => {
+          console.log('Error updating new data', err);
+          console.log('IPC send:: sync-event-end to:: local-window');
+          win.webContents.send('sync-event-end');
+        });
+    }
+  });
+
+
+
+
+
+
+  //compares old connection data with new data that has is from client
+  function returnUpdateInfo(connection, client) {
+    console.log('');
+    console.log('returnUpdateInfo');
+    return new Promise((resolve, reject) => {
+
+      //update name if it is not the same
+      if (connection.name !== client.name) {
+        console.log('.. name change');
+        connection.name = client.name;
+      }
+      //if client has avatar object exist and client avatar name exists as a field
+      //and
+      //connection.avatar does not exist or if the connection.avatar.name field does not exist
+      if ((client.avatar && client.avatar.name) && (!connection.avatar || !connection.avatar.name)) {
+        console.log('..avatar data changing');
+        //request avatar, which will is async but modifies connection object with new avatar data
+        connection = getNewAvatarData(connection, client);
+        console.log('resolving connection');
+        resolve(connection);
+        //  if client.avatar does not exist or if client.avatar.name field does not exist
+        //  and
+        //  connection.avatar exists and connection.avatar.name field exists,
+        //  remove the file and remove the avatar data on the connection object
+      } else if ((!client.avatar || !client.avatar.name) && (connection.avatar && connection.avatar.name)) {
+        console.log('..avatar data changing');
+        //this means client is null but connection is not null
+        //client has removed his avatar image
+        console.log('TODO: get rid of the stored avatar data we hold');
+        console.log('unlinking file');
+        fs.unlink(connection.avatar.absolutePath, (err) => {
+          if (err) {
+            return console.log("There was an error trying to remove avatar file", err);
+          }
+        });
+        console.log('removing avatar data');
+        delete connection.avatar;
+        console.log('resolving connection');
+        resolve(connection);
+        //  if client avatar exists and client avatar.name exists and connection.avatar exists and connection.avatar.name eixsts and client .avatar.name is not the same as connection.avatar.name
+      } else if (client.avatar && client.avatar.name && connection.avatar && connection.avatar.name && client.avatar.name !== connection.avatar.name) {
+        console.log('..avatar data changing');
+        //this means client has changed his avatar image to a new avatar
+        //remove the image attached to the connection object and get new data
+        console.log('unlinking file');
+        fs.unlink(connection.avatar.absolutePath);
+
+        connection = getNewAvatarData(connection, client);
+        console.log('resolving connection');
+        resolve(connection);
+      } else {
+        resolve(connection);
+      }
+    })
+  }
+
+  //modifies object with new avatar data
+  function getNewAvatarData(connection, client) {
       //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
       console.log('emit:: request:avatar to:: server that sent us basic changes');
       io.to(client.socketId).emit('request:avatar');
 
       //resolve path
       //resolve absolutePath
-
       connection.avatar = client.avatar;
       connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
       connection.avatar.path = path.normalize(client.avatar.path);
       connection.avatar = Object.assign({}, connection.avatar);
-
-
-      socketUtil.followedConnectionUpdate(connection)
-        .then((updatedConnection) => {
-          // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
-          global.appData.initialState.connections = global.appData.initialState.connections.map((con) => {
-            return con;
-          });
-        });
-
-      socketUtil.normalizeNotebooks(connection)
-        .then((updatedNotebooks) => {
-          socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
-          console.log('IPC send:: update-synced-notebooks to:: local window');
-          win.webContents.send('update-synced-notebooks');
-        });
-    }
-
-    //socket client returns data
-    function syncDataReturn(data) {
-      console.log('on:: sync-data:return');
-      let win = main.getWindow();
-
-      //if there is actually data to update...
-      //TODO: at the very least update the last sync time
-      if (data.notebooks.length) {
-        socketUtil.syncDataReturn(data)
-          .then((data) => {
-
-            socketUtil.updateGlobalArrayObject(data, 'notebooks');
-            console.log('IPC send:: update-synced-notebooks to:: local-window');
-            win.webContents.send('update-synced-notebooks');
-            console.log('IPC send:: sync-event-end to:: local-window');
-            win.webContents.send('sync-event-end');
-
-
-          })
-      } else {
-        console.log('IPC send:: sync-event-end to:: local-window');
-        win.webContents.send('sync-event-end');
-        console.log('no new data from this connection');
-      }
-      //
-      // //if there is actually data to update...
-      // //TODO: at the very least update the last sync time
-      // if (data.notebooks.length) {
-      //   //write the media buffers to the file system
-      //   socketUtil.writeSyncedMedia(data.notebooks)
-      //     .then((notebooks) => {
-      //     console.log('writeSyncedMedia has resolved');
-      //       //when that is complete, update the database
-      //       socketUtil.updateOrInsertNotebooks(notebooks)
-      //         .then((notebooks) => {
-      //           notebooks.forEach((notebook) => {
-      //             let notebookExists = false;
-      //
-      //             //update the global object
-      //             global.appData.initialState.notebooks.forEach((nb, index) => {
-      //               if (nb._id === notebook._id) {
-      //                 notebookExists = true;
-      //                 //update the object
-      //                 global.appData.initialState.notebooks[index] = Object.assign({}, notebook);
-      //               }
-      //             });
-      //
-      //             if (!notebookExists) {
-      //               global.appData.initialState.notebooks = [notebook, ...global.appData.initialState.notebooks]
-      //             }
-      //           });
-      //
-      //           main.getWindow(function(err, window) {
-      //             if (err) {
-      //               return console.log('error getting window...');
-      //             }
-      //             window.webContents.send('update-synced-notebooks');
-      //           });
-      //
-      //           //tell client to update notebooks
-      //           // win.webContents.send('update-synced-notebooks');
-      //         })
-      //     })
-      // } else {
-      //   console.log('no new data from this connection');
-      // }
-      // console.log('TODO: end display sync-event');
-      // console.log('TODO: update last sync time');
-    }
-
-    function onRequestAvatar() {
-      console.log('on:: request:avatar');
-
-      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
-        .then((bufferString) => {
-
-          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
-          avatarData.bufferString = bufferString;
-          console.log('avatarData.path', avatarData.path);
-          console.log('emit:: return:avatar');
-          io.to(socket.id).emit('return:avatar', avatarData);
-
-        })
-    }
-
-    function onReturnAvatar(data) {
-      console.log('on:: return:avatar ');
-      let win = main.getWindow();
-      socketUtil.writeAvatar(data)
-        .then(() => {
-          console.log('IPC send:: update-connection-list');
-          win.webContents.send('update-connection-list');
-        })
-    }
-
-  });
+      return connection;
+  }
 
 
 };

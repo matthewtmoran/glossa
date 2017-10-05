@@ -51,6 +51,7 @@ export class CorpusService {
   //TODO: consider moving this to server?
   //create new md file
   createFile(name) {
+    console.log('created file')
     let file = {
       displayName: name || 'untitled',
       description: '',

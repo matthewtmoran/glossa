@@ -14,6 +14,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const User = require('./user.model');
 const Notebooks = require('./../notebook/notebook.model');
+const app = require('electron').app;
 
 // Get list of things
 exports.index = function (req, res) {
@@ -221,6 +222,67 @@ exports.destroy = function (req, res) {
       }
       return res.status(204).send('No Content');
     });
+  });
+};
+
+//encodes avatar to get ready to send to client
+exports.encodeAvatar = function (mediaPath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(mediaPath, (err, data) => {
+      if (err) {
+        console.log('there was an error encoding media...');
+        reject(err);
+      }
+      resolve(data.toString('base64'));
+    });
+  })
+};
+
+//writes new avatar to fs
+exports.writeAvatar = function(avatarData) {
+  return new Promise((resolve, reject) => {
+    let filename = avatarData.path.replace(/^.*[\\\/]/, '');
+
+    let mediaObject = {
+      type: 'image',
+      name: filename,
+      buffer: avatarData.bufferString,
+      absolutePath: path.join(app.getPath('userData'), 'image', filename),
+      path: path.join('image', filename),
+    }; //path is good at this point
+
+
+    writeMediaFile(mediaObject)
+      .then(() => {
+        delete avatarData.bufferString;
+        resolve(avatarData)
+      })
+      .catch((err) => {
+        console.log('There was an erro writing file to fs', err);
+        reject(err);
+      })
+  });
+};
+
+//does the actual writing of the media file
+function writeMediaFile(data) {
+  return new Promise((resolve, reject) => {
+
+    let buffer = new Buffer(data.buffer, 'base64', (err) => {
+      if (err) {
+        console.log('issue decoding base64 data');
+        reject(err);
+      }
+    });
+
+    fs.writeFile(data.absolutePath, buffer, (err) => {
+      if (err) {
+        console.log('There was an error writing file to filesystem', err);
+        reject(err);
+      }
+      delete data.buffer;
+      resolve(data);
+    })
   });
 };
 

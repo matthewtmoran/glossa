@@ -17,7 +17,7 @@ module.exports = (appData) => {
   const socketServer = require('./socket');
 
   require(path.join(__dirname, './config/express'))(app); //configuration for express
-  require(path.join(__dirname, './routes'))(app); //routes
+  require(path.join(__dirname, './routes'))(app, io); //routes
 
   server.listen(config.port, config.ip, function () {
     console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));

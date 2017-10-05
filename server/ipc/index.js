@@ -1,9 +1,12 @@
 const ipcUtil = require('./util');
-const socketUtil = require('../socket/socket-util');
+const socketUtil = require('../socket-backup/socket-util');
 const udp = require('../udp');
 const main = require('../../main');
 const config = require('../config/environment');
 const socketClient = require('../socket/socket-client');
+
+const User = require('./../api/user/user.model.js');
+
 let isRefresh = false;
 let win;
 module.exports = {
@@ -23,6 +26,69 @@ module.exports = {
     ipcUtil.on('create:transcription', onCreateTranscription);
     ipcUtil.on('remove:transcription', onRemoveTranscription);
 
+
+
+    ipcUtil.on('new:notebook', onNewNotebook);
+
+    //when a new notebook is created ipc sends this event
+    function onNewNotebook(event, data) {
+
+      //deals with encoding the images and audio files
+      parseNotebook(data.notebook)
+        .then((notebook) => {
+
+          io.to('externalClientsRoom').emit('rt:updates', {user: data.user, notebook: notebook})
+
+        });
+
+
+
+      // io.to('externalClientsRoom').emit('new:notebook', data)
+    }
+
+    //encodes the files associated and attaches it to the object.
+    function parseNotebook(notebook) {
+      return new Promise((resolve, reject) => {
+        let promises = [];
+
+        //encode image
+        if (notebook.image) {
+          promises.push(
+            socketUtil.encodeBase64(notebook.image.absolutePath)
+              .then((imageString) => {
+                notebook.imageBuffer = imageString;
+              })
+          )
+        }
+
+        //encode audio
+        if (notebook.audio) {
+          promises.push(
+            socketUtil.encodeBase64(notebook.audio.absolutePath)
+              .then((audioString) => {
+                notebook.audioBuffer = audioString;
+              })
+          )
+        }
+
+        if (promises.length) {
+          Promise.all(promises)
+            .then((result) => {
+              resolve(notebook);
+
+            // io.to('externalClientsRoom').emit('rt:updates', updateObject)
+
+          });
+        } else {
+
+          resolve(notebook);
+          // console.log('broadcast:: rt:updates to:: externalClientsRoom');
+          // io.to('externalClientsRoom').emit('rt:updates', updateObject)
+        }
+
+
+      })
+    }
 
     function onUpdateNnHtT(event) {
       let promises = [];
@@ -178,15 +244,18 @@ module.exports = {
       console.log('');
       console.log('IPC on:: broadcast:profile-updates');
 
-      const basicProfileData = {
-        _id: global.appData.initialState.user._id,
-        name: global.appData.initialState.user.name,
-        type: 'external-client',
-        avatar: global.appData.initialState.user.avatar
-      };
+      User.findOne({}, (err, user) => {
 
-      console.log("broadcast:: send-profile-updates to:: externalClientsRoom");
-      io.to('externalClientsRoom').emit('send-profile-updates', basicProfileData)
+        const basicProfileData = {
+          _id: user._id,
+          name:user.name,
+          type: 'external-client',
+          avatar: user.avatar
+        };
+
+        console.log("broadcast:: send-profile-updates to:: externalClientsRoom");
+        io.to('externalClientsRoom').emit('send-profile-updates', basicProfileData)
+      });
     }
 
 

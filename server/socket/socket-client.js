@@ -1,18 +1,27 @@
-// var ioClient = require('socket.io-client');
-var socketUtil = require('./socket-util');
-var path = require('path');
-var fs = require('fs');
-const main = require('../../main');
+const path = require('path');
+const fs = require('fs');
 const app = require('electron').app;
 const config = require('../config/environment');
 const ioClient = require('socket.io-client');
-//master list of active socket connections
+const main = require('../../main');
+const User = require('./../api/user/user.model.js');
+
+const Notebooks = require('./../api/notebook/notebook.model.js');
+const notebookController = require('../api/notebook/notebook.controller');
+const userController = require('../api/user/user.controller');
+
+const connectionController = require('../api/connections/connection.controller')(null);
+
+
+const Connection = require('./../api/connections/connection.model');
+
 let connectionList = [];
 const ip = require('ip');
 let devObject = {};
 
-module.exports = {
 
+module.exports = {
+  //used for testing local socket events
   initLocal: function (io, win) {
     devObject.io = io;
     devObject.win = win;
@@ -35,268 +44,207 @@ module.exports = {
     }
   },
 
-  //this occurs when bonjour discovers an external server.
-  //we are going to connect to the server as a client so the server can interact with us
-  init: function (service, io, win) {
-    let nodeClientSocket;
-    //if the service is not in the master list then we connect to it as a client
-    if (connectionList.indexOf(service.name) < 0) {
-      let externalPath = 'http://' + service.addr + ':' + config.port;
-      nodeClientSocket = require('socket.io-client')(externalPath);
-      //handle the connection to the external socket server
-      this.connect(service, io, win, nodeClientSocket);
-    } else {
-      // we are already connected to this service so just ignore
-      return false;
-    }
-  },
-
   connect: function (service, io, win, nodeClientSocket) {
-    console.log('');
-    console.log('--- socketClient.connect called');
+    nodeClientSocket.on('connect', onConnect);
+    nodeClientSocket.on('begin-handshake', onBeginHandshake);
+    nodeClientSocket.on('request:avatar', onRequestAvatar);
+    nodeClientSocket.on('request:notebook-data', onRequestNotebookData);
+    nodeClientSocket.on('send-profile-updates', onProfileUpdates);
+    nodeClientSocket.on('return:avatar', onReturnAvatar);
 
-    //initial connection to another server
-    //.once solve the problem however I'm not sure this will work with more than one connection
-    //the other issue will be removing event listeners
-    //TODO: !IMPORTANT - test for multiple connections
+    function onProfileUpdates(user) {
+      console.log('user:', user);
+      let win = main.getWindow();
+      win.webContents.send('sync-event-start');
+      Connection.findOne({_id: user._id}, (err, connection) => {
+        if (err) {
+          return console.log('error finding connection:', err)
+        }
+        //if the name is different update the name whether we are following or not
 
-    // //initial connection to another server
-    nodeClientSocket.on('connect', () => {
-      console.log('');
-      console.log('--- on:: connect');
-      console.log('');
+        console.log('connection:', connection);
+        if (connection.name !== user.name) {
+          connection.name = user.name;
+        }
 
-      //when the connection is truly established, we add the service name ot the list.
-      connectionList.push(service.name);
+        if (connection.following) {
+          if (user.avatar && !connection.avatar) {
+            console.log('--- Updated connection to add avatar');
+            connection = getNewAvatarData(connection, user)
+          } else if (!user.avatar && connection.avatar) {
+            console.log('--- Update connection to remove avatar');
+            connection = removeAvatarData(connection, user)
+          } else if (user.avatar && user.avatar.name !== connection.avatar.name) {
+            console.log('--- Update connection to update avatar');
+            connection = getNewAvatarData(connection, user)
+          }
+          //update data and normalize notebooks
+          updateConnectionsAndNotebooks(connection)
+            .then(() => {
+              console.log('--- IPC send:: sync-event-end to:: local-window');
+              win.webContents.send('sync-event-end');
+            });
+        }
+      })
+    }
 
-    });
-
-    nodeClientSocket.on('test:event', (data) => {
-      console.log('Heard test:event');
-    })
-
-    nodeClientSocket.on('disconnect', (reason) => {
-      console.log('');
-      console.log('');
-      console.log('');
-      console.log('--- on:: disconnect');
-      console.log('--- reason:', reason);
-      console.log('');
-      console.log('');
-      console.log('');
-      //when the socket disconnects, we remove the service name from the list
-      connectionList.splice(connectionList.indexOf(service.name), 1);
-      //unbind listeners so they are not duplicated
-      unbind();
-
-      //if its' lcal dev start again...
-      if (config.localDev) {
-        // this.initLocal(devObject.io, devObject.win);
-      }
-    });
-
-    //recievs event from an external server and emits the end-handshake
-    nodeClientSocket.on('begin-handshake', () => {
+    function onBeginHandshake() {
       console.log('--- on:: begin-handshake');
 
-      const basicProfileData = {
-        _id: global.appData.initialState.user._id,
-        name: global.appData.initialState.user.name,
-        type: 'external-client',
-        socketId: nodeClientSocket.id,
-        avatar: global.appData.initialState.user.avatar
-      };
+      User.findOne({}, (err, user) => {
+        if (err) {return console.log('error finding user');}
 
-      console.log('--- emit:: end-handshake');
-      nodeClientSocket.emit('end-handshake', basicProfileData)
-    });
+        const basicProfileData = {
+          _id: user._id,
+          name: user.name,
+          type: 'external-client',
+          socketId: nodeClientSocket.id,
+          avatar: user.avatar
+        };
 
-    //a server is requesting data from a connected client
-    //@data = {notebooks: Array}
-    nodeClientSocket.on('sync-data', (data) => {
-      console.log('--- on:: sync-data');
+        console.log('--- emit:: end-handshake to:: external node server');
+        nodeClientSocket.emit('end-handshake', basicProfileData);
+        console.log('');
+      });
+    }
 
-      //send sync notificatio to local window
-      console.log("--- IPC send:: sync-event-start local-window", 'line 107');
+    function onRequestAvatar() {
+      User.findOne({}, (err, user) => {
+        if (!user.avatar || !user.avatar.absolutePath) {
+          return;
+        }
+        userController.encodeAvatar(user.avatar.absolutePath)
+          .then((bufferString) => {
+
+            let avatarData = user.avatar;
+            avatarData.bufferString = bufferString;
+            avatarData.userId = user._id;
+
+            console.log('--- emit:: return:avatar to:: server that is connected (that made request)');
+            nodeClientSocket.emit('return:avatar', avatarData);
+          })
+          .catch((err) => {
+            console.log('There was an error', err);
+            console.log('TODO: handle error')
+          })
+      });
+    }
+
+    //when a server returns avatar data after client has requested it
+    function onReturnAvatar(avatarData) {
+      console.log('');
+      console.log('on:: return:avatar ');
+      //writes the avatar data to the file system
+      //the text data should already be updated by this point
+      userController.writeAvatar(avatarData)
+        .then((avatarDataNoBuffer) => {
+          console.log('The avatar should be updated and written to FS successfully');
+          main.getWindow().webContents.send('avatar-returned', avatarDataNoBuffer.userId);
+        })
+        .catch((err) => {
+          console.log('there was an issue writing avatar image to fs', err)
+        })
+    }
+
+    //triggered when a server asks for notebook data
+    //data - array of notebooks that external server already has
+    //can come from a new follow (api from server)
+    //can come from endHandshake function (socket connection)
+    function onRequestNotebookData(notebooks) {
+      console.log('');
+      console.log('--- on:: request:notebook-data');
+      console.log("--- IPC send:: sync-event-start local-window");
       win.webContents.send('sync-event-start');
 
-      socketUtil.getNewAndUpdatedNotebooks(data.notebooks)
-        .then(notebooksToSend => {
-          console.log('--- emit:: sync-data:return to:: whoever requested it');
-          nodeClientSocket.emit('sync-data:return', {notebooks: notebooksToSend});
 
-          console.log('TODO: end outside client sync event display');
+      notebookController.getNewAndUpdatedNotebooks(notebooks)
+        .then((notebooks) => {
+          console.log('--- emit:: return:notebook-data to:: server who requested it');
+
+          nodeClientSocket.emit('test:test', {testData: 'this is a string!'});
+          if (notebooks.length) {
+            notebooks.forEach((notebook) => {
+              console.log('--- emit:: return:notebook-data');
+              nodeClientSocket.emit('return:notebook-data', {notebook: notebook});
+            });
+          }
+
           console.log("--- IPC send:: sync-event-end local-window");
           win.webContents.send('sync-event-end');
         })
         .catch((err) => {
-          console.log('The was an error getNewAndUpdatedNotebooks: ', err);
+          console.log('Error getting new and updated notebooks', err);
           console.log("--- IPC send:: sync-event-end local-window");
           win.webContents.send('sync-event-end');
-        })
-    });
+        });
 
-    nodeClientSocket.on('rt:updates', (data) => {
-      console.log('on:: rt:updates');
-
-      global.appData.initialState.connections.forEach((connection) => {
-        if (connection._id === data.user._id && connection.following) {
-
-          console.log("--- IPC send:: sync-event-start local-window", 'line 128');
-          win.webContents.send('sync-event-start');
-
-          global.appData.initialState.connections.forEach((connection) => {
-            //if the user matches and we are following the user...
-            if (data.user._id === connection._id && connection.following) {
-
-              socketUtil.syncDataReturn(data)
-                .then((data) => {
-
-                  //updating the global object here
-                  socketUtil.updateGlobalArrayObject(data, 'notebooks');
-
-                  console.log('--- IPC send:: update-rt-synced-notebooks');
-                  win.webContents.send('update-rt-synced-notebooks', data);
-                  console.log('--- IPC send:: sync-event-end');
-                  win.webContents.send('sync-event-end');
-
-                })
-            }
-          });
-        }
-
-      });
-    });
-
-    nodeClientSocket.on('send-profile-updates', (data) => {
-      console.log('--- on:: send-profile-updates');
-
-      global.appData.initialState.connections = global.appData.initialState.connections.map((connection) => {
-        if (connection._id === data._id) {
-          if (connection.name !== data.name) {
-            connection.name = data.name;
-          }
-          if (connection.following) {
-            if (data.avatar && !connection.avatar) {
-              console.log('--- Updated connection to add avatar');
-              connection = getAvatarData(connection, data)
-            } else if (!data.avatar && connection.avatar) {
-              console.log('--- Update connection to remove avatar');
-              connection = removeAvatarData(connection, data)
-            } else if (data.avatar && data.avatar.name !== connection.avatar.name) {
-              console.log('--- Update connection to update avatar');
-              connection = getAvatarData(connection, data)
-            } else {
-              console.log('--- Update something else - NO CONDITIONS MET');
-              console.log('--- No Changes with avatar most likely');
-              updateConnectionsAndNotebooks(connection);
-            }
-          }
-          return connection;
-        }
-        return connection;
-      });
-    });
-
-    nodeClientSocket.on('return:avatar', (data) => {
-      socketUtil.writeAvatar(data)
-        .then(() => {
-          console.log('Avatar written');
-        })
-    });
-
-
-    //on connection, avatar is different this is where the request is heard
-    nodeClientSocket.on('request:avatar', (data) => {
-      console.log('--- on:: request:avatar');
-
-      socketUtil.encodeBase64(global.appData.initialState.user.avatar.absolutePath)
-        .then((bufferString) => {
-
-          let avatarData = Object.assign({}, global.appData.initialState.user.avatar);
-          avatarData.bufferString = bufferString;
-          console.log('--- avatarData.path', avatarData.path);
-          console.log('--- emit:: return:avatar to:: server that is connected (that made request)');
-          nodeClientSocket.emit('return:avatar', avatarData);
-        })
-
-
-    });
-
-
-    //remvoes the event listener
-    //TODO: !IMPORTANT - test for multiple connections
-    //TODO: refractor to get all events dynamically
-    function unbind() {
-      nodeClientSocket.removeAllListeners("begin-handshake");
-      nodeClientSocket.removeAllListeners("sync-data");
-      nodeClientSocket.removeAllListeners("return:avatar");
-      nodeClientSocket.removeAllListeners("request:avatar");
-      nodeClientSocket.removeAllListeners("send-profile-updates");
-      nodeClientSocket.removeAllListeners("rt:updates");
-      nodeClientSocket.removeAllListeners("connect");
-      nodeClientSocket.removeAllListeners("disconnect");
     }
 
-    function getAvatarData(connection, data) {
-      console.log('--- emit:: request:avatar');
+
+    function onConnect() {
+     console.log('');
+     console.log('--- on:: connect');
+     console.log('');
+
+     //when the connection is truly established, we add the service name ot the list.
+     connectionList.push(service.name);
+   }
+
+    //modifies object with new avatar data
+    function getNewAvatarData(connection, client) {
+      //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
+      console.log('emit:: request:avatar to:: server that sent us basic changes');
+      console.log('emitting event to : ', client.socketId);
       io.to(connection.socketId).emit('request:avatar');
-      connection.avatar = data.avatar;
-      connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', data.avatar.name);
-      connection.avatar.path = path.normalize(data.avatar.path);
 
-      updateConnectionsAndNotebooks(connection);
-
+      //resolve path
+      //resolve absolutePath
+      connection.avatar = client.avatar;
+      connection.avatar.absolutePath = path.join(app.getPath('userData'), 'image', client.avatar.name);
+      connection.avatar.path = path.normalize(client.avatar.path);
+      connection.avatar = Object.assign({}, connection.avatar);
       return connection;
     }
 
-    function removeAvatarData(connection, data) {
+    function removeAvatarData(connection, user) {
       fs.unlink(connection.avatar.absolutePath);
-      connection.avatar = data.avatar;
+      connection.avatar = user.avatar;
       updateConnectionsAndNotebooks(connection);
       return connection;
     }
 
     function updateConnectionsAndNotebooks(connection) {
-      console.log('--- IPC send:: sync-event-start to:: local-window', 'line 245');
-      win.webContents.send('sync-event-start');
+      console.log('--- IPC send:: sync-event-start to:: local-window');
+      return new Promise((resolve, reject) => {
+
+        connectionController.updateConnection(connection)
+          .then((updatedConnection) => {
+            console.log('--- IPC send:: update:connection');
+            win.webContents.send('update:connection', updatedConnection || connection);
 
 
-      let promises = [];
-      promises.push(
+            notebookController.normalizeNotebooks(connection)
+              .then((updatedNotebooks) => {
+                console.log('--- IPC send:: update:synced-notebooks to:: local-window');
+                win.webContents.send('update:synced-notebooks', updatedNotebooks);
+                resolve(updatedNotebooks)
+              })
+              .catch((err) => {
+                reject(err)
+              });
 
-        new Promise((resolve, reject) => {
-          socketUtil.followedConnectionUpdate(connection)
-            .then((updatedConnection) => {
-              // socketUtil.updateGlobalArrayObject([updatedConnection], 'connection');
-              resolve(updatedConnection)
-            })
-            .catch((err) => {
-              reject(err);
-            })
-        }),
 
-        new Promise((resolve, reject) => {
-          socketUtil.normalizeNotebooks(connection)
-            .then((updatedNotebooks) => {
-              socketUtil.updateGlobalArrayObject(updatedNotebooks, 'notebooks');
-              resolve(updatedNotebooks)
-            })
-            .catch((err) => {
-              reject(err)
-            })
-        })
-      );
+          })
+          .catch((err) => {
+            reject(err)
+          });
 
-      Promise.all(promises).then((results) => {
-        console.log('--- IPC send:: update-connection-list to:: local-window');
-        win.webContents.send('update-connection-list');
-        console.log('--- IPC send:: update-synced-notebooks to:: local-window');
-        win.webContents.send('update-synced-notebooks');
-        console.log('--- IPC send:: sync-event-end to:: local-window');
-        win.webContents.send('sync-event-end');
-      })
+
+      });
     }
   }
+
+
+
 
 };

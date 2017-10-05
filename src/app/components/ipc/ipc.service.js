@@ -6,6 +6,10 @@ export class IpcSerivce {
     this.$rootScope = $rootScope;
   }
 
+  broadcastData(event, data) {
+
+  }
+
   on(eventName, callback) {
     ipcRenderer.on(eventName, (...args) => {
       this.$rootScope.$apply(() => {

@@ -1,9 +1,9 @@
 {
-  "name": "Glossa",
+  "name": "Glossa2",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "productName": "Glossa",
+  "productName": "Glossa2",
   "dependencies": {
     "@uirouter/angularjs": "~1.0.4",
     "adm-zip": "~0.4.7",

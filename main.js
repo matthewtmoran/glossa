@@ -112,11 +112,11 @@ startExpress();
 function fsCheck() {
 
   const dataPaths = [
-    'Glossa',
-    'Glossa/storage',
-    'Glossa/image',
-    'Glossa/audio',
-    'Glossa/temp',
+    'Glossa2',
+    'Glossa2/storage',
+    'Glossa2/image',
+    'Glossa2/audio',
+    'Glossa2/temp',
   ];
 
   dataPaths.forEach((p) => {

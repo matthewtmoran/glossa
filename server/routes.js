@@ -9,12 +9,12 @@ var express = require('express');
 var electronApp = require('electron').app;
 
 
-module.exports = function(app) {
+module.exports = function(app, io) {
   // Insert routes below
   app.use('/api/project', require(path.join(__dirname,'./api/project')));
   app.use('/api/user', require(path.join(__dirname,'./api/user')));
   app.use('/api/notebooks', require(path.join(__dirname,'./api/notebook')));
-  app.use('/api/connections', require(path.join(__dirname,'./api/connections')));
+  app.use('/api/connections', require(path.join(__dirname,'./api/connections'))(io));
   app.use('/api/transcription', require(path.join(__dirname,'./api/transcription')));
   app.use('/api/hashtags', require(path.join(__dirname,'./api/hashtag')));
   app.use('/api/session', require(path.join(__dirname,'./api/session')));

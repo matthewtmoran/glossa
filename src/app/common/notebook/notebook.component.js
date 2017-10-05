@@ -97,81 +97,13 @@ export const notebookComponent = {
 
     }
 
-    initSelected() {
-      this.selected = this.allConnections.map((connection) => {
-        if (connection.following) {
-          return connection._id;
-        }
-      });
-      this.selected = [
-        ...this.selected,
-        this.currentUser._id
-      ]
-    }
-
-    //pass to app.component
-    update(event) {
-      this.onUpdateNotebook({
-        $event: event
-      })
-    }
-
-    //pass to app.component
-    save(event) {
-      this.onSaveNotebook({
-        $event: event
-      })
-    }
-
-    //pass to app.component
-    deleteNotebook(event) {
-      this.onDeleteNotebook({
-        $event: event
-      })
-    }
-
-    //pass to app.component
-    updateTag(event) {
-      this.onUpdateTag({
-        $event: {
-          tag: event.tag
-        }
-      })
-    }
-
-    //pass to app.component
-    viewDetails(event, type) {
-      event.type = type;
-      this.onViewNotebookDetails({
-        $event: event
-      })
-    };
-
-    //pass to app.component
-    tagManageDialog() {
-      this.onTagManageDialog()
-    }
-
-    cancel(event) {
-      this.onCancel({
-        $event: event
-      })
-    }
-
-    hide(event) {
-      this.onHide({
-        $event: event
-      })
-    }
-
     //TODO: deal with updating notebooks
-    //pass to app.component
+    //display notification for updates
     showNewUpdates() {
       this.onShowNewNotebookUpdates({
         $event: {}
       });
     }
-
 
     //TODO: refractro to use same function as viewDetails...
     viewPreview(event) {
@@ -210,7 +142,81 @@ export const notebookComponent = {
 
     }
 
+    //TODO: figure out what this does again
+    isOpenWatch(isOpen) {
+      if (isOpen) {
+        this.$timeout(() => {
+          this.$scope.tooltipVisible = this.isOpen;
+        }, 600);
+      } else {
+        this.$scope.tooltipVisible = this.isOpen;
+      }
+    }
 
+    //update tag with new information
+    //TODO: need to make update tag work in notebook screen
+    updateTag(event) {
+      this.onUpdateTag({
+        $event: {
+          tag: event.tag
+        }
+      })
+    }
+
+
+    //These function hit the api
+    //These function require RT services
+
+    //update existing notebook
+    update(event) {
+      this.onUpdateNotebook({
+        $event: event
+      })
+    }
+    //create new notebook
+    save(event) {
+      this.onSaveNotebook({
+        $event: event
+      })
+    }
+    //delete notebook post
+    deleteNotebook(event) {
+      this.onDeleteNotebook({
+        $event: event
+      })
+    }
+
+
+
+    //view notebook details
+    viewDetails(event, type) {
+      event.type = type;
+      this.onViewNotebookDetails({
+        $event: event
+      })
+    };
+    //open manageTag dialog
+    tagManageDialog() {
+      this.onTagManageDialog()
+    }
+    //close dialog
+    cancel(event) {
+      this.onCancel({
+        $event: event
+      })
+    }
+    //hide dialog
+    hide(event) {
+      this.onHide({
+        $event: event
+      })
+    }
+
+    ///////////////////
+    //local functions//
+    ///////////////////
+
+    //toggle hashtags
     toggleHashtags(event) {
       let idx = event.list.indexOf(event.tag._id);
       // let idx = this.selectedHashtags.indexOf(tag._id);
@@ -224,7 +230,19 @@ export const notebookComponent = {
       }
 
     }
-
+    //select initial user to sort by
+    initSelected() {
+      this.selected = this.allConnections.map((connection) => {
+        if (connection.following) {
+          return connection._id;
+        }
+      });
+      this.selected = [
+        ...this.selected,
+        this.currentUser._id
+      ]
+    }
+    //toggle selected users
     toggle(event) {
       let idx = event.list.indexOf(event.user._id);
       if (idx > -1) {
@@ -235,24 +253,5 @@ export const notebookComponent = {
         this.selected = angular.copy(this.selected);
       }
     };
-
-
-
-    isOpenWatch(isOpen) {
-      if (isOpen) {
-        this.$timeout(() => {
-          this.$scope.tooltipVisible = this.isOpen;
-        }, 600);
-      } else {
-        this.$scope.tooltipVisible = this.isOpen;
-      }
-    }
-
-
-
-
-
-
-
   }
 };

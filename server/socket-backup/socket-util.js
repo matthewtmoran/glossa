@@ -243,7 +243,8 @@ module.exports = {
           console.log('There was an error writing file to filesystem', err);
           reject(err);
         }
-        resolve('success');
+        delete data.buffer;
+        resolve(data);
       })
     });
   },
@@ -440,14 +441,14 @@ module.exports = {
 
   },
 
-  writeAvatar(data) {
+  writeAvatar(user) {
     return new Promise((resolve, reject) => {
-      let filename = data.path.replace(/^.*[\\\/]/, '');
+      let filename = user.avatar.path.replace(/^.*[\\\/]/, '');
 
       let mediaObject = {
         type: 'image',
         name: filename,
-        buffer: data.bufferString,
+        buffer: user.avatar.bufferString,
         absolutePath: path.join(app.getPath('userData'), 'image', filename),
         path: path.join('image', filename),
       }; //path is good at this point
@@ -455,7 +456,8 @@ module.exports = {
 
       this.writeMediaFile(mediaObject)
         .then(() => {
-          resolve('success')
+          delete user.avatar.bufferString;
+          resolve(user)
         })
     });
   },
@@ -505,9 +507,12 @@ module.exports = {
         resolve(removedCount);
       })
     })
+  },
+
+
+  broadcastToAll(data) {
+
   }
-
-
 
   /////////////////////////////////////////////////////
   /////////////////////////////////////////////////////

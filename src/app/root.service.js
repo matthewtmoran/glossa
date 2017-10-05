@@ -419,8 +419,6 @@ export class RootService {
                 console.log('Data returned from ng-upload File creation', data);
                 //sends ipc event to server
                 //TODO: change this to emit from server automatically if the user is sharing.
-                this.broadcastUpdates(data);
-                this.cfpLoadingBar.complete();
                 resolve({transcription: data, hashtags:newTags})
               })
               .catch((err) => {
@@ -455,7 +453,6 @@ export class RootService {
   getNotebooks() {
     return this.$http.get('/api/notebooks/')
       .then((response) => {
-      console.log('Notebook data received');
         return response.data;
       })
       .catch((response) => {
@@ -463,6 +460,7 @@ export class RootService {
         return response.data;
       });
   }
+
   //create new notebook
   createNotebook(notebook, user, projectId, hashtags) {
     return new Promise((resolve, reject) => {
@@ -470,11 +468,7 @@ export class RootService {
         url:'/api/notebooks/',
         method: 'POST'
       };
-      console.log('loader begin');
-      this.cfpLoadingBar.start();
       let hashtagPromises = [];
-
-
       notebook.createdBy = {
         _id: user._id,
         avatar: user.avatar || null,
@@ -485,12 +479,10 @@ export class RootService {
       if (!notebook.hashtags) {
         notebook.hashtags = [];
       }
-
       let tagsInText = this.parseService.findHashtagsInText(notebook.description);
 
       tagsInText.forEach((tag, index) => {
         let isCreated = false;
-        let tagObject;
         hashtags.forEach((hashtag) => {
           if (tag.toLowerCase() === hashtag.tag.toLowerCase()) {
             isCreated = true;
@@ -506,17 +498,13 @@ export class RootService {
       if (hashtagPromises.length > 0) {
         Promise.all(hashtagPromises)
           .then((newTags) => {
-          console.log('newTags:', newTags);
             notebook.hashtags = [...notebook.hashtags, ...newTags];
 
             //make post request through ng-upload
             return this.uploadReq(notebook, options)
               .then((data) => {
-                console.log('Data returned from ng-upload Notebook creation', data);
                 //sends ipc event to server
                 //TODO: change this to emit from server automatically if the user is sharing.
-                this.broadcastUpdates(data);
-                this.cfpLoadingBar.complete();
                 resolve({notebook: data, hashtags:newTags})
               })
               .catch((err) => {
@@ -533,8 +521,6 @@ export class RootService {
             console.log('Data returned from ng-upload Notebook creation', data);
             //sends ipc event to server
             //TODO: change this to emit from server automatically if the user is sharing.
-            this.broadcastUpdates(data);
-            this.cfpLoadingBar.complete();
             resolve({notebook: data})
           })
           .catch((err) => {
@@ -613,8 +599,6 @@ export class RootService {
                 console.log('Data returned from ng-upload Notebook creation', data);
                 //sends ipc event to server
                 //TODO: change this to emit from server automatically if the user is sharing.
-                this.broadcastUpdates(data);
-                this.cfpLoadingBar.complete();
                 resolve({notebook: data, hashtags:newTags})
               })
               .catch((err) => {
@@ -629,8 +613,6 @@ export class RootService {
           .then((data) => {
             //sends ipc event to server
             //TODO: change this to emit from server automatically if the user is sharing.
-            this.broadcastUpdates(data);
-            this.cfpLoadingBar.complete();
             resolve({notebook: data})
           })
           .catch((err) => {
@@ -733,14 +715,14 @@ export class RootService {
 
   //TODO: Refractor
   toggleFollow(user) {
-    console.log("user: ", user);x
-
+    user.following = !user.following;
     return this.$http.post('/api/connections/', angular.toJson(user))
       .then((response) => {
-
+        console.log('response is success', response.data);
+        return response.data;
       })
       .catch((err) => {
-
+        console.log('There was an error following user:', err);
       });
 
     // this.ipcSerivce.send('update:following', {user:  angular.toJson(user)})
