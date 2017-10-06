@@ -7,7 +7,7 @@ const main = require('../../main');
 const User = require('./../api/user/user.model.js');
 
 const Notebooks = require('./../api/notebook/notebook.model.js');
-const notebookController = require('../api/notebook/notebook.controller');
+const notebookController = require('../api/notebook/notebook.controller')();
 const userController = require('../api/user/user.controller');
 
 const connectionController = require('../api/connections/connection.controller')(null);
@@ -51,6 +51,24 @@ module.exports = {
     nodeClientSocket.on('request:notebook-data', onRequestNotebookData);
     nodeClientSocket.on('send-profile-updates', onProfileUpdates);
     nodeClientSocket.on('return:avatar', onReturnAvatar);
+    nodeClientSocket.on('rt:notebook', onRTNotebook);
+
+    function onRTNotebook(notebook) {
+      Connection.findOne({_id: notebook.createdBy._id}, (err, connection) => {
+        if (err) {return console.log('error finding connection')}
+        if (connection && connection.following) {
+         notebookController.newDataReturned(notebook)
+           .then((notebookReady) => {
+             win = main.getWindow();
+             console.log('--- IPC send: update:synced-notebook');
+             return win.webContents.send('update:synced-notebook', notebookReady);
+           })
+           .catch((err) => {
+            console.log('there was an error getting new notebook', err);
+           })
+        }
+      })
+    }
 
     function onProfileUpdates(user) {
       console.log('user:', user);

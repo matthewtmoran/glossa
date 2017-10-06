@@ -8,7 +8,7 @@ const app = require('electron').app;
 const User = require('./../api/user/user.model.js');
 const Connection = require('./../api/connections/connection.model');
 
-const notebookController = require('../api/notebook/notebook.controller');
+const notebookController = require('../api/notebook/notebook.controller')();
 const userController = require('../api/user/user.controller');
 
 
