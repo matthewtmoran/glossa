@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" ng-strict-di>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Glossa</title>
+    <base href="/">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <div class="loading-spinner">Loading...</div>
+
+  <body class="glossa-app" layout="column" style="background-color: #FAFAFA; overflow: hidden;" >
+
+
+
+  <script>
+    document.body.classList.add("platform-" + process.platform);
+
+    if (process.platform === 'win32') {
+      console.log('adding fancy frame');
+      document.body.classList.add("fancy-frame");
+    }
+
+  </script>
+
+    <root layout="column" flex></root>
+
+    <script src="./app.bundle.js"></script>
+  </body>
+</html>

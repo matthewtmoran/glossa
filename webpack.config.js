@@ -3,10 +3,11 @@ const cleanPlugin = require('clean-webpack-plugin');
 const copyPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
-const frontEndRoot = `${__dirname}/src`;
-const backEndRoot = `${__dirname}/server`;
+const fs = require('fs');
+const frontEndRoot = `${__dirname}/renderer/client`;
+const backEndRoot = `${__dirname}/renderer/server`;
 const dist = `${__dirname}/dist`;
-const config = require(path.join(__dirname, 'server/config/environment'));
+
 
 const paths = {
   common: {},
@@ -22,9 +23,18 @@ const paths = {
   },
   backEnd: {
     app: `${backEndRoot}/app.js`,
-    output: `${dist}/backEnd`,
+    output: `${dist}/`,
+    static: {
+      index: `${backEndRoot}/server.html`,
+    }
   },
 };
+
+
+let nodeModules = {};
+fs.readdirSync(path.resolve(__dirname, 'node_modules'))
+  .filter(x => ['.bin'].indexOf(x) === -1)
+  .forEach(mod => { nodeModules[mod] = `commonjs ${mod}`; });
 
 
 
@@ -37,6 +47,10 @@ const prep = {
     {
       from: paths.frontEnd.static.index,
       to: `${paths.frontEnd.output}`,
+    },
+    {
+      from: paths.backEnd.static.index,
+      to: `${paths.backEnd.output}`,
     },
     {
       from: paths.frontEnd.static.images,
@@ -126,7 +140,7 @@ const common = {
     prep.copy,
   ],
 };
-
+//TODO: make external config file
 const frontEnd = {
   entry: [
     paths.frontEnd.app
@@ -134,7 +148,7 @@ const frontEnd = {
   output: {
     path: paths.frontEnd.output,
     filename: 'app.bundle.js',
-    publicPath: `http://localhost:${config.port}/`, // Development Server
+    publicPath: `http://localhost:9000/`, // Development Server
   },
   module: {
     rules: [
@@ -168,6 +182,7 @@ const backEnd = {
     path: paths.backEnd.output,
     filename: 'server.bundle.js',
   },
+  externals: nodeModules,
   module: {
     rules: [
       backEndScripts,
@@ -177,4 +192,7 @@ const backEnd = {
 };
 
 
-module.exports = Object.assign({}, common, frontEnd);
+module.exports = [
+  Object.assign({}, common, frontEnd),
+  Object.assign({}, backEnd)
+];

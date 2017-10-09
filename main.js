@@ -1,6 +1,6 @@
 const fs = require('fs');
-const electron = require('electron');
 const path = require('path');
+const electron = require('electron');
 const app = electron.app;
 if(require('electron-squirrel-startup')) return;
 // this should be placed at top of main.js to handle setup events quickly
@@ -73,60 +73,23 @@ function handleSquirrelEvent() {
 
 
 const url = require('url');
-const AppMenu = require(path.join(__dirname, './app-menu'));
+const AppMenu = require(path.join(__dirname, './main/app-menu'));
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
-const express = require(path.join(__dirname, './server/app'));
-const config = require(path.join(__dirname, './server/config/environment'));
 let BrowserWindow = electron.BrowserWindow;
-
+let serverWindow;
 
 
 //for mac to decide what to do with window object.. to quit or hide...
 let forceQuit = false;
 //flag to ensure server is running before electron creates window - this fixes mac wsod issue when err_connection refused is thrown
-let readyToGo = false;
+let readyToGo = true;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var win;
 var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
-function startExpress() {
-  fsCheck();
-  Promise.all([require(path.join(__dirname, './server/config/init')).getInitialState()])
-    .then(function (appData) {
-      readyToGo = true; // set flag to true so electron can create window
-      // here we set the global state for the entire app.
-      //we also pass this data to the express server
-      global.appData = {
-        initialState: appData[0],
-        isWindows: process.platform === 'win32'
-      };
 
-      express(appData[0]);
-    });
-}
-startExpress();
-
-
-function fsCheck() {
-
-  const dataPaths = [
-    'Glossa',
-    'Glossa/storage',
-    'Glossa/image',
-    'Glossa/audio',
-    'Glossa/temp',
-  ];
-
-  dataPaths.forEach((p) => {
-    let storagePath = path.join(app.getPath('appData'), p);
-
-    if (!fs.statSyncNoException(storagePath)) {
-      fs.mkdirSync(storagePath);
-    }
-  });
-}
 
 function createWindow() {
   // Create the browser window.
@@ -153,10 +116,17 @@ function createWindow() {
   //build the menu...
   AppMenu.buildMenu(win);
 
+  serverWindow = new BrowserWindow({show: true});
+  serverWindow.webContents.openDevTools();
+  serverWindow.loadURL(path.join('file://', __dirname, '/dist/server.html'));
+
+  //TODO: make external config file for electron...
   // and load the index.html of the app.
   win.loadURL(url.format({
-    pathname: 'http://localhost:' + config.port.toString()
+    pathname: 'http://localhost:9000'
   }));
+
+  // win.loadURL(path.join('file://', __dirname, '/dist/index.html'));
 
   // Open the DevTools.
   win.webContents.openDevTools();
