@@ -7,12 +7,10 @@
  * DELETE  /things/:id          ->  destroy
  */
 
-
-'use strict';
-
-const _ = require('lodash');
-const path = require('path');
-const Connection = require('./connection.model');
+import _ from 'lodash';
+import path from 'path';
+import Connection from './connection.model';
+console.log('TODO: remove socketUtil');
 const socketUtil = require('../../socket-backup/socket-util');
 module.exports = (io) => {
   let index = (req, res) => {

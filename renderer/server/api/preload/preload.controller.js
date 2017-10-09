@@ -1,22 +1,15 @@
-console.log('preload being called');
-const path = require('path');
-const fs = require('fs');
-const Project = require('../project/project.model');
-const User = require('../user/user.model');
-console.log('preload debug 1');
-const Notebook = require('../notebook/notebook.model');
-const Session = require('../session/session.model');
-const Settings = require('../settings/settings.model');
-const Connections = require('../connections/connection.model');
-console.log('preload debug 2');
-const Transcriptions = require('../transcription/transcription.model');
-const Hashtags = require('../hashtag/hashtag.model');
-const q = require('q');
+import path from 'path';
+import fs from 'fs';
+import Project from '../project/project.model';
+import User from '../user/user.model';
+import Notebook from '../notebook/notebook.model';
+import Session from '../session/session.model';
+import Settings from '../settings/settings.model';
+import Connections from '../connections/connection.model';
+import Transcriptions from '../transcription/transcription.model';
+import Hashtags from '../hashtag/hashtag.model';
+
 const {app} = require('electron').remote;
-console.log('preload debug 3');
-
-
-console.log('preload debug 4');
 
 let isFirstRun = false;
 

@@ -1,6 +1,5 @@
-'use strict';
-const Datastore = require('nedb');
-const path = require('path');
+import Datastore from 'nedb';
+import path from 'path';
 const {app} = require('electron').remote;
 
 const connectionsDb = new Datastore({

@@ -6,24 +6,17 @@
  * PUT     /things/:id          ->  update
  * DELETE  /things/:id          ->  destroy
  */
+import path from 'path';
+import fs from 'fs';
+import _ from 'lodash';
+import Notebook from './notebook.model';
+import Transcriptions from '../transcription/transcription.model';
+import User from '../user/user.model';
+import Setting from '../settings/settings.model';
 
-'use strict';
-const path = require('path');
-const fs = require('fs');
-const _ = require('lodash');
 const { app } = require('electron').remote;
-console.log('notebook cont. 1');
-const Notebook = require('./notebook.model');
-console.log('notebook cont. 2');
-const Transcriptions = require('../transcription/transcription.model');
-const User = require('../user/user.model');
-const Setting = require('../settings/settings.model');
-console.log('notebook cont. 3');
-
 
 module.exports = function(io) {
-console.log('notebook cont. 3.5');
-
   let index = function (req, res) {
     Notebook.find({}, function (err, notebooks) {
       if (err) {
@@ -32,7 +25,6 @@ console.log('notebook cont. 3.5');
       return res.status(200).json(notebooks);
     });
   };
-  console.log('notebook cont. 4');
   let show = function (req, res) {
     Notebook.findOne({_id: req.params.id}, (err, notebook) => {
       if (err) {
@@ -44,7 +36,6 @@ console.log('notebook cont. 3.5');
       return res.json(notebook);
     });
   };
-  console.log('notebook cont. 5');
   let create = function (req, res) {
     console.log('notebook being created');
     let newNotebook = req.body.dataObj;
@@ -81,7 +72,6 @@ console.log('notebook cont. 3.5');
 
     });
   };
-  console.log('notebook cont. 6');
 
   let update = function (req, res) {
     if (req.body._id) {
@@ -125,7 +115,6 @@ console.log('notebook cont. 3.5');
       });
     });
   };
-  console.log('notebook cont. 7');
   let destroy = function (req, res) {
     Notebook.findOne({_id: req.params.id}, (err, notebook) => {
       if (err) {
@@ -168,7 +157,6 @@ console.log('notebook cont. 3.5');
       });
     });
   };
-  console.log('notebook cont. 8');
   let normalizeNotebooks = function (user) {
     return new Promise((resolve, reject) => {
       const query = {"createdBy._id": user._id};
@@ -189,7 +177,6 @@ console.log('notebook cont. 3.5');
       });
     });
   };
-  console.log('notebook cont. 9');
   let getExistingNotebooks = function (user) {
     console.log('looking for noteooks created by user:', user);
     return new Promise((resolve, reject) => {
@@ -214,7 +201,6 @@ console.log('notebook cont. 3.5');
       })
     })
   };
-
   let getNewAndUpdatedNotebooks = function (existingNotebooks) {
     console.log('existingNotebooks: ', existingNotebooks);
     return new Promise((resolve, reject) => {
@@ -306,7 +292,6 @@ console.log('notebook cont. 3.5');
       });
     })
   };
-
   let newDataReturned = function (notebook) {
     return new Promise((resolve, reject) => {
       //write the media buffers to the file system
@@ -327,7 +312,6 @@ console.log('notebook cont. 3.5');
         })
     });
   };
-  console.log('notebook cont. 10');
   return {
     index: index,
     show: show,

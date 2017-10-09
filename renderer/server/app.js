@@ -3,11 +3,11 @@
  */
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const express = require('express');
-const config = require('./config/environment');
-const preload = require('./config/init');
+import path from 'path';
+import fs from 'fs';
+import express from 'express';
+import config from './config/environment';
+
 const ejs = require("ejs").__express;
 // Setup server
 const app = express();

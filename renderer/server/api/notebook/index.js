@@ -1,16 +1,7 @@
-'use strict';
-
-  console.log('debug notebook index 1')
+import express from 'express';
+import fileUpload from '../../middleware/uploads';
 module.exports = function(io) {
-  console.log('debug notebook index 1.5')
-  const express = require('express');
-  console.log('debug notebook index 2')
   const controller = require('./notebook.controller')(io);
-  console.log('debug notebook index 3')
-  const hashtag = require('../../middleware/hashtag');
-  console.log('debug notebook index 4')
-  const fileUpload = require('../../middleware/uploads');
-  console.log('debug notebook index 5')
   const router = express.Router();
 
   router.get('/', controller.index);
@@ -19,7 +10,6 @@ module.exports = function(io) {
   router.put('/:id', fileUpload.type, fileUpload.validateFilename, controller.update);
   router.patch('/:id', controller.update);
   router.delete('/:id', controller.destroy);
-
 
   return router
 };

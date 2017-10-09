@@ -1,17 +1,7 @@
-'use strict';
-
-var express = require('express');
-var controller = require('./preload.controller');
-
-var router = express.Router();
+import express from 'express';
+import controller from './preload.controller';
+const router = express.Router();
 
 router.get('/', controller.index);
-// router.get('/:id', controller.show);
-// router.post('/', controller.create);
-// router.put('/:id', controller.update);
-// router.put('/:id/session', controller.updateSession);
-// router.put('/:id/settings', controller.updateSettings);
-// router.patch('/:id', controller.update);
-// router.delete('/:id', controller.destroy);
 
 module.exports = router;

@@ -1,9 +1,8 @@
-'use strict';
+import express from 'express';
 module.exports = function(io) {
 
-  let express = require('express');
-  let controller = require('./connection.controller')(io);
-  let router = express.Router();
+  const controller = require('./connection.controller')(io);
+  const router = express.Router();
 
   router.get('/', controller.index);
   router.get('/:id', controller.show);
