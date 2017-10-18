@@ -26,6 +26,7 @@ const paths = {
     output: `${dist}/`,
     static: {
       index: `${backEndRoot}/server.html`,
+      assets: `${backEndRoot}/components/assets/img/`
     }
   },
 };
@@ -51,6 +52,10 @@ const prep = {
     {
       from: paths.backEnd.static.index,
       to: `${paths.backEnd.output}`,
+    },
+    {
+      from: paths.backEnd.static.assets,
+      to: `${paths.backEnd.output}/img/`,
     },
     {
       from: paths.frontEnd.static.images,

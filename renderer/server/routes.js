@@ -22,9 +22,8 @@ module.exports = function(app, io) {
   app.use('/api/preload', require('./api/preload'));
 
   app.use('/image', express.static(path.join(remote.app.getPath('userData'), 'image')));
-  app.use('/assets', express.static( './components/assets/img/'));
+  app.use('/assets', express.static(path.resolve(remote.app.getAppPath(), 'dist/img/')));
   app.use('/audio', express.static(path.join(remote.app.getPath('userData'), 'audio')));
-  // app.use('/assets', express.static( 'audio')));
 
 
   // All undefined asset or api routes should return a 404
@@ -36,13 +35,4 @@ module.exports = function(app, io) {
     .get(function(req, res) {
       res.sendFile(path.resolve(remote.app.getAppPath(), 'dist/index.html'));
     });
-
-
-  // serve angular front end files from root path
-  // app.use('/', express.static('app', { redirect: false }));
-//
-// // rewrite virtual urls to angular app to enable refreshing of internal pages
-//   app.get('*', function (req, res, next) {
-//     res.sendFile(path.resolve('app/index.html'));
-//   });
 };
