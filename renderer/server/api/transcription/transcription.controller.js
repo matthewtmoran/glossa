@@ -9,8 +9,8 @@
 
 'use strict';
 
-var _ = require('lodash');
-var Transcription = require('./transcription.model');
+const _ = require('lodash');
+const Transcription = require('./transcription.model');
 
 // Get list of things
 exports.index = function (req, res) {
@@ -23,7 +23,7 @@ exports.index = function (req, res) {
 };
 
 exports.corpusIndex = function (req, res) {
-  var corpus = req.params.name;
+  let corpus = req.params.name;
   Transcription.find({corpus: corpus}, function (err, files) {
     if (err) {
       return handleError(res, err);
@@ -54,7 +54,6 @@ exports.create = function (req, res) {
     if (err) {
       return handleError(res, err);
     }
-    global.appData.initialState.transcriptions = [...global.appData.initialState.transcriptions, file];
     return res.status(201).json(file);
   });
 };
@@ -71,8 +70,8 @@ exports.update = function (req, res) {
     if (!file) {
       return res.status(404).send('Not Found');
     }
-    var options = {returnUpdatedDocs: true};
-    var updated = _.merge(file, req.body.dataObj);
+    let options = {returnUpdatedDocs: true};
+    let updated = _.merge(file, req.body.dataObj);
     updated.updatedAt = Date.now();
 
     if (!req.body.dataObj.notebookId) {
@@ -91,7 +90,6 @@ exports.update = function (req, res) {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.map((transcription) => transcription._id === updatedDoc._id ? updatedDoc : transcription);
       Transcription.persistence.compactDatafile();
       return res.status(200).json(updatedDoc);
     });
