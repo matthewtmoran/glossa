@@ -932,13 +932,28 @@ export const appComponent = {
         })
     }
     removeTag(event) {
-      consoel.log('removeTag');
-      console.log('TODO: worked to be done in this function');
       this.rootService.removeTag(event.tag)
         .then((data) => {
-          // this.notebooks = angular.copy(this.__appData.initialState.notebooks);
-          // this.hashtags = angular.copy(this.__appData.initialState.hashtags);
-          // this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
+          this.hashtags = this.hashtags.filter((tag) => tag._id !== event.tag._id);
+
+          data.notebooks.forEach((notebook) => {
+            this.notebooks = this.notebooks.map((nb) => {
+              if (nb._id !== notebook._id) {
+                return nb;
+              }
+              return notebook;
+            })
+          });
+
+          data.transcriptions.forEach((transcription) => {
+            this.transcriptions = this.transcriptions.map((tr) => {
+              if (tr._id !== transcription._id) {
+                return tr;
+              }
+              return transcription;
+            })
+          });
+
           this.selectInitialFile();
           this.rootService.getCommonHashtags()
             .then((result) => {

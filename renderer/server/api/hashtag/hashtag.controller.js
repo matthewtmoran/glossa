@@ -112,25 +112,35 @@ exports.removeTag = function (req, res) {
       return res.status(404).send('Not Found');
     }
 
-    let promises = [];
 
     Hashtag.remove({_id: tag._id}, {}, (err, count) => {
       if (err) {
         return handleError(res, err);
       }
-      global.appData.initialState.hashtags = global.appData.initialState.hashtags.filter((t) => t._id !== tag._id);
       const query = {"hashtags._id": tag._id};
-      promises.push(
-        normalizeTranscriptions(query, tag),
-        normalizeNotebooksFromRemoval(query, tag)
-      );
+      let updatedObject = {};
+      normalizeTranscriptions(query, tag)
+        .then((updatedTranscriptions) => {
+          console.log('transcriptions normalized');
+          updatedObject.transcriptions = updatedTranscriptions;
+
+          normalizeNotebooksFromRemoval(query, tag)
+            .then((updatedNotebooks) => {
+              console.log('notebooks normalized');
+              updatedObject.notebooks = updatedNotebooks;
+
+              return res.status(200).send(updatedObject);
+            })
+            .catch((err) => {
+              console.log('error normalizing notebooks', err);
+              return handleError(res, err);
+            })
+        })
+        .catch((err) => {
+          console.log('error transcriptions', err);
+          return handleError(res, err);
+        })
     });
-
-    Promise.all(promises)
-      .then((results) => {
-        return res.status(200).send('Updated global object');
-      })
-
   })
 };
 
@@ -257,7 +267,6 @@ function createNewTag(name) {
     };
     Hashtag.insert(newTag, (err, createdTag) => {
       if (err) reject(err);
-      global.appData.initialState.hashtags = [...global.appData.initialState.hashtags, createdTag];
       resolve(createdTag);
     });
   })
@@ -266,19 +275,11 @@ function createNewTag(name) {
 function updateTranscription(transcription) {
   return new Promise((resolve, reject) => {
     const options = {returnUpdatedDocs: true};
-    Transcription.update({_id: transcription._id}, transcription, options, (err, updatedCount, updatedDoc) => {
+   return Transcription.update({_id: transcription._id}, transcription, options, (err, updatedCount, updatedDoc) => {
       if (err) {
         reject(err)
       }
-
-      global.appData.initialState.transcriptions = global.appData.initialState.transcriptions.map((trans) => {
-        if (trans._id !== updatedDoc._id) {
-          return trans;
-        }
-        return updatedDoc;
-      });
-
-      resolve(updatedCount)
+      return resolve(updatedDoc)
     })
   })
 }
@@ -288,52 +289,48 @@ function normalizeNotebooksFromRemoval(query, tag) {
   return new Promise((resolve, reject) => {
     let promises = [];
     Notebook.find(query, (err, notebooks) => {
-      notebooks.forEach((notebook) => {
+
+      let newPromises = notebooks.map((notebook) => {
         notebook.description = notebook.description.replace('#' + tag.tag, tag.tag);
         notebook.hashtags = notebook.hashtags.filter((t) => t._id !== tag._id);
-        promises.push(updateNotebook(notebook, tag));
-        return notebook
+        return updateNotebook(notebook, tag);
       });
+
+      Promise.all(newPromises)
+        .then((results) => {
+          console.log('promises:', promises);
+          console.log("notebook results:", results);
+          resolve(results);
+        })
     });
-    Promise.all(promises)
-      .then((results) => {
-        resolve(results);
-      })
+
   });
 }
 
 function updateNotebook(notebook, tag) {
   return new Promise((resolve, reject) => {
     const options = {returnUpdatedDocs: true};
-    Notebook.update({_id: notebook._id}, notebook, options, (err, updatedCount, updatedDoc) => {
-      if (err) reject(err);
-
-      global.appData.initialState.notebooks = global.appData.initialState.notebooks.map((note) => {
-        if (note._id !== updatedDoc._id) {
-          return note;
-        }
-        return updatedDoc;
-      });
-      resolve(updatedCount)
-    })
+     return Notebook.update({_id: notebook._id}, notebook, options, (err, updatedCount, updatedDoc) => {
+        if (err) reject(err);
+        console.log('resolving notebook');
+        return resolve(updatedDoc)
+      })
   })
 }
 
 function normalizeTranscriptions(query, tag) {
   return new Promise((resolve, reject) => {
-    let promises = [];
     Transcription.find(query, (err, transcriptions) => {
-      transcriptions.forEach((transcription) => {
+      let promises = transcriptions.map((transcription) => {
         transcription.description = transcription.description.replace('#' + tag.tag, tag.tag);
         transcription.hashtags = transcription.hashtags.filter((t) => t._id !== tag._id);
-        promises.push(updateTranscription(transcription));
-        return transcription;
+        return updateTranscription(transcription);
       });
+      Promise.all(promises)
+        .then((results) => {
+          resolve(results);
+        })
     });
-    Promise.all(promises)
-      .then((results) => {
-        resolve(results);
-      })
   });
 }
 

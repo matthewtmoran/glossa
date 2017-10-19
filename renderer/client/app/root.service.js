@@ -758,6 +758,7 @@ export class RootService {
   removeTag(tag) {
     return this.$http.post(`/api/hashtags/remove/${tag._id}`)
       .then((response) => {
+        console.log('response:', response);
         return response.data
       })
       .catch((response) => {
