@@ -8,7 +8,7 @@
 				flex
 				settings="$ctrl.settings"
 				image-src="$ctrl.currentFile.image ? $ctrl.currentFile.image.path : $ctrl.notebookAttachment.image.path"
-				url-src="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path"
+				url-src="$ctrl.notebookAttachment.audio.path || $ctrl.currentFile.audio.path">
 		</wave-surfer-full>
 	</div>
 	<md-progress-circular class="loading-circular fade-out" ng-hide="!$ctrl.isLoadingCodeMirror" md-diameter="50"></md-progress-circular>
