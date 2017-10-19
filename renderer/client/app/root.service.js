@@ -41,9 +41,7 @@ export class RootService {
         'ctrl+left' ||
         'ctrl+space' ||
         'command+space') {
-        console.log('should prevent default');
-        // e.preventDefault();
-        // return false;
+        e.preventDefault();
       }
 
     });
