@@ -22,6 +22,7 @@ export const notebookComponent = {
     project: '<',
     newNotebooks: '<',
     onUpdateTag: '&',
+    onRemoveTag: '&',
     onSaveNotebook:'&',
     onUpdateNotebook:'&',
     onDeleteNotebook:'&',

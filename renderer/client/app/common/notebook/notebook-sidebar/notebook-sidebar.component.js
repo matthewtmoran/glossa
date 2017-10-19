@@ -10,7 +10,7 @@ export const notebookSidebarComponent = {
     onToggleHashtags: '&',
     onExists: '&',
     onToggle: '&',
-    onTagManage: '&'
+    onTagManage: '&',
   },
   templateUrl,
   controller: class NotebookSidebarComponent {

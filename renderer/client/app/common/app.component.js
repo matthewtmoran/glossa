@@ -968,7 +968,7 @@ export const appComponent = {
         controllerAs: '$ctrl',
         template: `<md-dialog class="hashtag-dialog" flex-xs="90" flex-sm="80" flex-gt-sm="80">
                         <md-content>
-                            <settings-hashtags on-update-tag="$ctrl.updateTag($event)" hashtags="$ctrl.hashtags"></settings-hashtags>
+                            <settings-hashtags on-remove-tag="$ctrl.removeTag($event)" on-update-tag="$ctrl.updateTag($event)" hashtags="$ctrl.hashtags"></settings-hashtags>
                         </md-content>
                         <span flex></span>
                         <md-dialog-actions>
