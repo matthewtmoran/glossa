@@ -136,6 +136,7 @@ export class WaveSurferController {
 
       this.options = angular.extend({}, defaults, this.options);
       this.surfer = Object.create(WaveSurfer);
+
       this.surfer.init(this.options);
 
       this.$window.addEventListener('resize', this.surfer.util.debounce(this.responsiveWave.bind(this), 150));
@@ -146,17 +147,23 @@ export class WaveSurferController {
 
       //occurs after waveform is drawn
       this.surfer.on('waveform-ready', () => {
+        // this.loading = false;
+        // this.isReady = true;
+        // if (this.autoPlay) {
+        //   this.surfer.play();
+        // }
+        // console.log('loader end');
+        this.cfpLoadingBar.complete();
+      });
+
+
+      this.surfer.on('ready', () => {
         this.loading = false;
         this.isReady = true;
         if (this.autoPlay) {
           this.surfer.play();
         }
         console.log('loader end');
-        this.cfpLoadingBar.complete();
-      });
-
-
-      this.surfer.on('ready', () => {
         // this.loading = false;
         // this.isReady = true;
         // if (this.autoPlay) {

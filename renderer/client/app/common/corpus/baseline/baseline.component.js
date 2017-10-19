@@ -55,14 +55,23 @@ export const baselineComponent = {
 
 
     codemirrorLoaded(_editor) {
+      //new keymaps so moustrap keymaps hotkeys work
+      const newKeymaps = {
+        "Ctrl-Left": false,
+        "Ctrl-Right": false,
+        "Cmd-Right": false,
+        "Cmd-Left": false,
+      };
+      const existingKeymaps = {
+        Enter: this.enterEvent,
+      };
       this.isLoadingCodeMirror = false;
       this._doc = _editor.getDoc();
       this.isDoubleClick = false;
       _editor.setOption('lineNumbers', true);
       _editor.setOption('lineWrapping', true);
-      _editor.setOption('extraKeys', {
-        Enter: this.enterEvent
-      });
+      _editor.setOption('extraKeys', existingKeymaps);
+      _editor.addKeyMap(newKeymaps);
       this.timestampOverlay(_editor);
     }
 
@@ -107,6 +116,7 @@ export const baselineComponent = {
     }
 
     enterEvent(cm) {
+      console.log('enter event called');
       let doc = cm.getDoc();
       if(!this.isDoubleClick) {
         this.isDoubleClick = true;

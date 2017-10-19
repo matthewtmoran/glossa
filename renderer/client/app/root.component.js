@@ -9,7 +9,6 @@ export const rootComponent = {
       this.$window = $window;
       this.$timeout = $timeout;
       this.appData = __appData;
-      console.log('this.appData', this.appData);
       this.ipcSerivce = IpcSerivce;
       this.$scope = $scope;
     }

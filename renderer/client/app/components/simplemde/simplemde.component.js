@@ -56,7 +56,6 @@ export const simplemdeComponent = {
         this.mde = new SimpleMDE(this.editorOptions);
         this.cm = this.mde.myCodeMirror; //should be codeMirror global object
         this.editor = this.mde.codemirror; //from text area codemirror object
-
         this.render(this.valueBinding.description);
         this.editor.on('change', this.changeEvent.bind(this));
         this.editor.on('blur', this.blurEvent.bind(this));

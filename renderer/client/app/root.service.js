@@ -35,9 +35,15 @@ export class RootService {
         'command+up' ||
         'command+right' ||
         'command+left' ||
+        'ctrl+down' ||
+        'ctrl+up' ||
+        'ctrl+right' ||
+        'ctrl+left' ||
         'ctrl+space' ||
         'command+space') {
-        e.preventDefault();
+        console.log('should prevent default');
+        // e.preventDefault();
+        // return false;
       }
 
     });
@@ -57,13 +63,13 @@ export class RootService {
       }
       return false
     });
-    Mousetrap.bind(['command+right'], () => {
+    Mousetrap.bind(['ctrl+right'], () => {
       this.$rootScope.$broadcast('scrubRight');
-      return false
+      // return false
     });
-    Mousetrap.bind(['command+left'], () => {
+    Mousetrap.bind(['ctrl+left'], () => {
       this.$rootScope.$broadcast('scrubLeft');
-      return false
+      // return false
     });
     Mousetrap.bind(['command+t', 'ctrl+t'], () => {
       this.$rootScope.$broadcast('addTimeStamp');
