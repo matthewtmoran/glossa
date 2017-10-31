@@ -10,12 +10,14 @@ import ngFileUpload from 'ng-file-upload';
 import CodeMirror from 'codemirror';
 import ngCodeMirror from 'ngCodemirror'
 import {rootComponent} from './root.component';
+import {SocketService} from './components/socket/socket.service';
 import {common} from './common/common.module';
 import {RootService} from './root.service';
 import {NotificationService} from './components/notification/notification.service';
 import {components} from './components/components.module';
 import './root.scss';
 import 'angular-material/angular-material.scss';
+import io from 'socket.io-client';
 
 const electron = window.require('electron');
 var ipcRenderer = window.require('electron').ipcRenderer;
@@ -42,10 +44,25 @@ window.onload = () => {
     appData.initialState = res.data;
     appData.isWindows = window.process.platform === 'win32';
     angular.module('config').constant('__appData', appData);
+
+    let ioRoom = window.location.origin;
+    window.socket = io(ioRoom);
+
+    window.socket.on('begin-handshake', (test)=> {
+      let localObject = {
+        name: 'Client Renderer',
+        _id: null,
+        socketId: window.socket.id,
+        type: 'local-client'
+      };
+      window.socket.emit('end-handshake', localObject)
+    });
+
+
     //bootstrap angular
     angular.bootstrap(document, [root]);
   }).catch((err) => {
-    console.log('preload data failed', err);
+    return err;
   });
 
   //handles click events on links that should open with default browser
@@ -79,6 +96,7 @@ export const root = angular
   ])
   .component('root', rootComponent)
   .service('RootService', RootService)
+  .service('SocketService', SocketService)
   .service('NotificationService', NotificationService)
   .config(($locationProvider, $urlRouterProvider, $mdThemingProvider, $compileProvider, cfpLoadingBarProvider) => {
     'ngInject';
@@ -135,6 +153,13 @@ export const root = angular
   .run(($rootScope, $state, $injector, $window, RootService, $mdUtil, $compile, IpcSerivce, $transitions, __appData) => {
     'ngInject';
 
+    // SocketService.init();
+    if (!$window.socket) {
+      // SocketService.init();
+      console.log('initializing socket listeners');
+      RootService.initListeners();
+    }
+
     if (__appData.initialState.session.currentState && __appData.initialState.session.currentState.length > 0) {
       $state.go(__appData.initialState.session.currentState);
     } else {
@@ -142,27 +167,22 @@ export const root = angular
     }
 
     $transitions.onStart({to: '*', from: '*'}, (trans) => {
-      console.log('$transitions onStart');
       let toState = trans.$to();
       //This keeps the state from redirecting away from the child state when that same child state is clicked.
       let redirect = toState.redirectTo;
       if (redirect) {
-        console.log('Redirect is happening');
         if (angular.isString(redirect)) {
           // event.preventDefault();
           $state.go(redirect, toState.params);
         }
         else {
-          console.log('no redirect...');
           let newState = $injector.invoke(redirect, null, {toState: toState.name, toParams: toState.params});
           if (newState) {
             if (angular.isString(newState)) {
-              console.log('going to newstate');
               $state.go(newState);
             }
             else if (newState.state) {
               // event.preventDefault();
-              console.log('going to some other state');
               $state.go(toState.name, toState.params);
             }
           }

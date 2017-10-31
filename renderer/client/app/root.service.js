@@ -18,14 +18,13 @@ export class RootService {
     this.__appData = __appData;
     this.parseService = ParseService;
     this.$q = $q;
+    // this.socketService = SocketService;
 
     //TODO: move ipc listeners to their own service
     //@electron-run
     ipc.on('navigateToState', this.navigateToState.bind(this));
 
-
     ipc.on('reloadCurrentState', this.reloadCurrentState.bind(this));
-
 
     //this overwrites events even if input/codemirror/simplemde is focused...
     Mousetrap.prototype.stopCallback = ((e, element, combo) => {
@@ -96,33 +95,38 @@ export class RootService {
   }
 
 
-  //electron event
+  initListeners() {
+    // hand shake
+    // this.socketService.on('begin:handshake', (data) => {
+    //
+    //   let socketData = {
+    //     type: 'local-client',
+    //     socketId: data.socketId
+    //   };
+    //   this.socketService.emit('end:handshake', socketData);
+    // });
+  }
+
+
+    //electron event
   ipcImportProject(event, message) {
-    console.log('ipcImportProject');
     return new Promise((resolve, reject) => {
-      console.log('test1');
       let options = {
         filters: [{name: 'Glossa File (.glossa)', extensions: ['glossa']}]
       };
 
       return dialog.showOpenDialog(options, (selectedFiles) => {
-        console.log('showOpenDialog');
           if (selectedFiles) {
-            console.log('file was selected');
             this.$http.post('/api/project/import', {projectPath: selectedFiles[0]})
               .then((response) => {
-                console.log('response was success');
                 this.$window.location.reload();
                 resolve(response);
               })
               .catch((err) => {
-
-                console.log('There was an error', err);
                 this.$window.location.reload();
                 reject(err);
               });
           } else {
-            console.log('no file selected');
             resolve('Nothing selected');
           }
         }
@@ -145,7 +149,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -157,11 +160,9 @@ export class RootService {
   getUser() {
     return this.$http.get('/api/user/')
       .then((response) => {
-        console.log("User data received");
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -173,11 +174,9 @@ export class RootService {
   getConnections() {
     return this.$http.get('/api/connections/')
       .then((response) => {
-        console.log("connection data received");
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -185,11 +184,9 @@ export class RootService {
   getHashtags() {
     return this.$http.get('/api/hashtags/')
       .then((response) => {
-        console.log("Hashtag data received");
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -197,11 +194,9 @@ export class RootService {
   createHashtag(text) {
     return this.$http.post('/api/hashtags/', {tag: text})
       .then((response) => {
-        console.log("Hashtag data received");
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -221,7 +216,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -234,11 +228,9 @@ export class RootService {
   getProject() {
     return this.$http.get('/api/project/')
       .then((response) => {
-        console.log("Project data received");
         return response.data[0];
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -249,7 +241,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -260,7 +251,6 @@ export class RootService {
         return response.data[0];
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -271,13 +261,12 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
   //exports all project data as .glossa file (zip)
   exportProject(project) {
-    return this.$http.post(`/api/project/${project.createdBy}/${project._id}/export`, {}, {
+    return this.$http.post(`/api/project/export`, {}, {
       responseType: "arraybuffer",
       cache: false,
       headers: {
@@ -298,7 +287,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -316,11 +304,9 @@ export class RootService {
   getTranscriptions() {
     return this.$http.get('/api/transcription/')
       .then((response) => {
-        console.log("transcription data received");
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -341,7 +327,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -352,7 +337,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -420,7 +404,6 @@ export class RootService {
             //make post request through ng-upload
             return this.uploadReq(file, options)
               .then((data) => {
-                console.log('Data returned from ng-upload File creation', data);
                 //sends ipc event to server
                 //TODO: change this to emit from server automatically if the user is sharing.
                 resolve({transcription: data, hashtags:newTags})
@@ -430,7 +413,6 @@ export class RootService {
               })
           })
           .catch((err) => {
-            console.log('There was an error creating new hashtags', err);
           });
       } else {
         return this.uploadReq(file, options)
@@ -460,7 +442,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -517,12 +498,10 @@ export class RootService {
 
           })
           .catch((err) => {
-            console.log('There was an error createing new hashtags', err);
           });
       } else {
         return this.uploadReq(notebook, options)
           .then((data) => {
-            console.log('Data returned from ng-upload Notebook creation', data);
             //sends ipc event to server
             //TODO: change this to emit from server automatically if the user is sharing.
             resolve({notebook: data})
@@ -600,7 +579,6 @@ export class RootService {
             //make post request through ng-upload
             return this.uploadReq(notebook, options)
               .then((data) => {
-                console.log('Data returned from ng-upload Notebook creation', data);
                 //sends ipc event to server
                 //TODO: change this to emit from server automatically if the user is sharing.
                 resolve({notebook: data, hashtags:newTags})
@@ -610,7 +588,6 @@ export class RootService {
               })
           })
           .catch((err) => {
-            console.log('There was an error creating new hashtags', err);
           });
       } else {
         return this.uploadReq(notebook, options)
@@ -632,7 +609,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return false;
       })
   }
@@ -643,9 +619,7 @@ export class RootService {
 
 
   getUserIpc() {
-    console.log('getUserIpc');
     this.ipcSerivce.send('get:user', (data) => {
-      console.log('get:userIpc callback', data);
         return data;
       }
     )
@@ -668,7 +642,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
 
@@ -686,7 +659,6 @@ export class RootService {
         resolve(response.data);
       })
         .catch((err) => {
-        console.log('Error: ',err);
         reject(err)
       });
     });
@@ -700,7 +672,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -711,7 +682,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -722,11 +692,9 @@ export class RootService {
     user.following = !user.following;
     return this.$http.post('/api/connections/', angular.toJson(user))
       .then((response) => {
-        console.log('response is success', response.data);
         return response.data;
       })
       .catch((err) => {
-        console.log('There was an error following user:', err);
       });
 
     // this.ipcSerivce.send('update:following', {user:  angular.toJson(user)})
@@ -750,7 +718,6 @@ export class RootService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -761,7 +728,6 @@ export class RootService {
         return response.data
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -821,7 +787,6 @@ export class RootService {
     }).then((response) => {
       return response.data;
     }).catch((response) => {
-      console.log('Error with upload', response);
       return response.data;
     });
   }

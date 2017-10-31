@@ -16,7 +16,6 @@ export class CorpusService {
       .then((response) => {
         return response.data;
       }).catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -43,7 +42,6 @@ export class CorpusService {
       .then((response) => {
         return response.data;
       }).catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       })
   }
@@ -69,7 +67,6 @@ export class CorpusService {
       .then((response) => {
         return response.data;
       }).catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -110,7 +107,6 @@ export class CorpusService {
     }).then((response) => {
       return response.data;
     }).catch((response) =>{
-      console.log('Error with upload', response);
       return response.data;
     });
   }

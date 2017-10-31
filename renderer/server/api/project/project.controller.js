@@ -423,25 +423,28 @@ exports.exportProject = function (req, res) {
   archive.directory(audioPath, 'audio');
   archive.directory(dataPath, 'storage');
 
-  let projectNameNoSpace = global.appData.initialState.project.name.replace(/\s/g, '');
 
-  res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
-  res.set('Content-Type', 'application/zip');
-  archive.pipe(res); //pipe the response
-  // //add file to archive
-  //
-  // archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
-  //
-  archive.on('error', (err) => { ///if there is an error....
-    console.error(err);
-    throw err;
-  });
-  //
-  res.on('close', () => { //when the response is done
-    return res.status(200).send('OK').end(); //send response to client
-  });
+  Projects.findOne({}, (err, project) => {
+    let projectNameNoSpace = project.name.replace(/\s/g, '');
 
-  archive.finalize();
+    res.set('Content-disposition', `attachment; filename=Project-${projectNameNoSpace}.glossa`); //set header info / project name
+    res.set('Content-Type', 'application/zip');
+    archive.pipe(res); //pipe the response
+    // //add file to archive
+    //
+    // archive.append(JSON.stringify(projectData), {name: `project-${projectData.project._id}.json`});
+    //
+    archive.on('error', (err) => { ///if there is an error....
+      console.error(err);
+      throw err;
+    });
+    //
+    res.on('close', () => { //when the response is done
+      return res.status(200).send('OK').end(); //send response to client
+    });
+
+    archive.finalize();
+  });
 
 };
 

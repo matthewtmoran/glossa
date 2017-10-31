@@ -20,7 +20,6 @@ export const drawerLinkComponent = {
     }
 
     focusSection() {
-      console.log('focusSection');
       this.onFocusSection({
         $event: {
           autoFocusContent: false

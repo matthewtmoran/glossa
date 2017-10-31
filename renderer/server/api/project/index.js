@@ -1,9 +1,7 @@
-'use strict';
+const express = require('express');
+const controller = require('./project.controller');
 
-var express = require('express');
-var controller = require('./project.controller');
-
-var router = express.Router();
+const router = express.Router();
 
 router.get('/', controller.index);
 router.get('/:id', controller.show);
@@ -12,6 +10,6 @@ router.put('/:id', controller.update);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 router.post('/import', controller.importProject);
-router.post('/:userId/:projectId/export', controller.exportProject);
+router.post('/export', controller.exportProject);
 
 module.exports = router;

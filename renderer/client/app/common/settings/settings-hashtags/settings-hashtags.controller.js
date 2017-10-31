@@ -43,7 +43,6 @@ export class SettingsHashtagsComponent {
   }
 
   selectedRowCallback(rows) {
-    console.log('selectedRowCallback', rows);
   }
 
   editField(event, tag, value, field) {
@@ -92,7 +91,6 @@ export class SettingsHashtagsComponent {
   }
 
   removeTag(event, item) {
-    console.log('removeTag');
     this.onRemoveTag({
       $event: {
         tag: item

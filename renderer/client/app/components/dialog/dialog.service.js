@@ -63,7 +63,6 @@ export class DialogService {
 
     }).then((data) => {
     }).catch((data) => {
-      console.log('close on cancel or hide?', data);
     });
   }
 
@@ -122,7 +121,6 @@ export class DialogService {
   }
 
   viewDetails(event, options) {
-    console.log('viewDetails in dialog.service', event);
     return this.$mdDialog.show({
       controller: 'notebookDialogController',
       controllerAs: '$ctrl',

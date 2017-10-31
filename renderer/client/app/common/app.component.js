@@ -19,7 +19,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, IpcSerivce, $stateParams) {
+    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, IpcSerivce, $stateParams, SocketService) {
       'ngInject';
       this.$scope = $scope;
       this.$state = $state;
@@ -33,6 +33,7 @@ export const appComponent = {
       this.__appData = __appData;
 
       this.rootService = RootService;
+      this.socketService = SocketService;
       this.notificationService = NotificationService;
       this.settingsService = SettingsService;
       this.dialogService = DialogService;
@@ -41,27 +42,20 @@ export const appComponent = {
       this.$scope.$on('update:connection', this.updateConnection.bind(this));
       this.$scope.$on('normalize:notebooks', this.normalizeNnotebooks.bind(this));
       this.$scope.$on('update:externalData', this.updateExternalData.bind(this));
-
       //broadcasted from hot-key event
       this.$scope.$on('newNotebook', this.viewNotebookDetails.bind(this));
-      //called whne the connection list need to be updated
+        //called whne the connection list need to be updated
       this.ipcSerivce.on('update-connection-list', (event, data) => {
-        console.log('on:: update-connection-list');
-
         // this.allConnections = angular.copy(this.__appData.initialState.connections);
-
-        console.log('this.allConnections', this.allConnections);
 
       });
       //called when notebooks need to be object - usually when external notebook are added
       this.ipcSerivce.on('update-synced-notebooks', (event, data) => {
-        console.log('on:: update-synced-notebooks');
         // this.notebooks = angular.copy(this.__appData.initialState.notebooks);
       });
       //called when new external notebooks are made in real-time
       //adds the notebooks to a holding array before they just populate
       this.ipcSerivce.on('update-rt-synced-notebooks', (event, data) => {
-        console.log('on:: update-rt-synced-notebooks');
         if (!this.newNotebooks || !this.newNotebooks.length || !data.length) {
           this.newNotebooks = angular.copy(data);
         } else {
@@ -71,9 +65,6 @@ export const appComponent = {
       //listener for when something is syncing...
       //TODO: consider removal and updateing sync display to be only client side...
       this.ipcSerivce.on('sync-event-start', (event, data) => {
-        console.log('on:: sync-event-start');
-
-        console.log('loader begin');
         this.cfpLoadingBar.start();
 
         let msg = `Syncing Data`;
@@ -90,26 +81,32 @@ export const appComponent = {
         this.isLoading = true;
         this.rootService.ipcImportProject()
           .then((response) => {
-            console.log('response is here:', response);
             this.$timeout(() => {
               this.isLoading = false;
             });
           })
           .catch((err) => {
-            console.log("error", err);
           })
       });
       //removes sync-display
       this.ipcSerivce.on('sync-event-end', (event, data) => {
-        console.log('on:: sync-event-end');
-        console.log('loader end');
         this.cfpLoadingBar.complete();
       });
       this.ipcSerivce.on('export:project', (event, data) => {
-        // this.exportProject({project: this.__appData.initialState.project});
+        console.log('export:project from ipc event');
+
+
+
+
+
+        this.exportProject({project: this.__appData.initialState.project});
       });
+
+      this.socketService.on('export:project', (data) => {
+        console.log('export:project');
+      });
+
       this.ipcSerivce.on('update-transcription-list', (event, data) => {
-        console.log('update-transcription-list');
         // this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
         //if a new file was created, data contains the id of the new file
         if (data && data.selectedFileId) {
@@ -117,13 +114,11 @@ export const appComponent = {
         } else {
           this.selectInitialFile(); //set to the first file in the list...
         }
-        console.log('loader end');
         this.cfpLoadingBar.complete();
       });
 
 
       this.ipcSerivce.on('update:synced-notebooks', (event, notebooks) => {
-        console.log('IPC EVENT - ON:: update:synced-notebooks');
         let newNotebooks = [];
         notebooks.forEach((notebook) => {
           let exists = false;
@@ -142,7 +137,6 @@ export const appComponent = {
       });
 
       this.ipcSerivce.on('update:connection', (event, connection) => {
-        console.log('IPC EVENT - ON:: update:connection', connection);
         this.allConnections = this.allConnections.map((con) => {
           if (con._id !== connection._id) {
             return con;
@@ -153,7 +147,6 @@ export const appComponent = {
       });
 
       this.ipcSerivce.on('update:synced-notebook', (event, notebook) => {
-        console.log('IPC EVENT - ON:: update:synced-notebook', notebook);
         let exists = false;
         this.notebooks = this.notebooks.map((nb) => {
           if (notebook._id === nb._id) {
@@ -171,19 +164,16 @@ export const appComponent = {
       //only occurs when avatar is returned
       //meant to only update the user so image is displayed
       this.ipcSerivce.on('avatar-returned', (event, connection) => {
-        console.log('IPC EVENT - ON:: avatar-returned', connection);
         this.allConnections = this.allConnections.map((con) => {
           return con;
         })
       });
 
       this.ipcSerivce.on('new:connection', (event, connection) => {
-        console.log('IPC EVENT - ON:: new:connection');
         this.allConnections = [connection, ...this.allConnections];
       });
 
       this.ipcSerivce.on('remove:connection', (event, connection) => {
-        console.log('IPC EVENT - ON:: remove:connection', connection);
         this.allConnections = this.allConnections.filter(c => c._id !== connection._id)
       })
     }
@@ -301,7 +291,6 @@ export const appComponent = {
     }
 
     createTranscription(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.createTranscription(event, this.currentUser, this.project, this.$stateParams.corpus)
         .then((data) => {
@@ -325,7 +314,6 @@ export const appComponent = {
           if (!response) {
             return;
           }
-          console.log('loader begin');
           this.cfpLoadingBar.start();
 
           this.rootService.deleteTranscription(event.fileId)
@@ -334,15 +322,12 @@ export const appComponent = {
               this.selectInitialFile();
             })
             .catch((err)=> {
-              console.log('There was an error removing transcirption file', err);
             });
         });
     }
     updateTranscription(event) {
       this.rootService.updateTranscription(event.file)
         .then((data) => {
-
-        console.log('data returning:', data);
 
           //keep selected file updated
           this.selectedFile = Object.assign({}, data.transcription);
@@ -366,11 +351,8 @@ export const appComponent = {
           this.rootService.getCommonHashtags()
             .then((result) => {
               this.commonTags = angular.copy(result);
-              console.log('loader end');
               this.cfpLoadingBar.complete();
             });
-
-          console.log('loader end');
           this.cfpLoadingBar.complete();
         })
     }
@@ -412,7 +394,6 @@ export const appComponent = {
           if (!result) {
             return;
           }
-          console.log('loader begin');
           this.cfpLoadingBar.start();
           this.selectedFile.removeItem = []; //create this temp property to send to server
           this.selectedFile.removeItem.push(event.media);
@@ -459,20 +440,17 @@ export const appComponent = {
           }
 
           this.isLoading = true;
-          console.log('loader begin');
           this.cfpLoadingBar.start();
 
           this.rootService.exportProject(event.project)
             .then((data) => {
               this.isLoading = false;
-              console.log('loader end');
               this.cfpLoadingBar.complete();
             });
         });
     }
     //upload an avatar image; also normalizes notebooks
     uploadAvatar(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.uploadAvatar(event.file)
         .then((data) => {
@@ -493,17 +471,14 @@ export const appComponent = {
               return notebook;
             }
           });
-          console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
         })
         .catch((err) => {
-          console.log('Error:', err);
         });
     }
     //remove avatar image; also normalizes notebooks
     removeAvatar(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.removeAvatar(event.file, this.currentUser)
         .then((data) => {
@@ -525,17 +500,14 @@ export const appComponent = {
               return notebook;
             }
           });
-          console.log('loader end');
           this.cfpLoadingBar.complete();
           this.ipcSerivce.send('broadcast:profile-updates')
         })
         .catch((err) => {
-          console.log('Error:', err);
         });
     }
     //update 'profile' information.
     updateUserInfo(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       //http request
       this.rootService.updateUserInfo(event.currentUser)
@@ -559,7 +531,6 @@ export const appComponent = {
           });
 
           this.ipcSerivce.send('broadcast:profile-updates');
-          console.log('loader end');
           this.cfpLoadingBar.complete();
         })
     }
@@ -626,7 +597,6 @@ export const appComponent = {
      * @param data = {connection: object}
      */
     updateConnection(event, data) {
-      console.log('ng-on:: update:connection', data);
       let doesExist = false;
       //connection should already exist in array
       this.allConnections.map((connection, index) => {
@@ -704,7 +674,6 @@ export const appComponent = {
 
     //new notebook
     saveNotebook(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.createNotebook(event.notebook, this.currentUser, this.project._id, this.hashtags)
         .then((data) => {
@@ -715,12 +684,10 @@ export const appComponent = {
           this.rootService.getCommonHashtags()
             .then((result) => {
               this.commonTags = angular.copy(result);
-              console.log('loader end');
               this.cfpLoadingBar.complete();
             });
           this.$mdDialog.hide();
           if (this.currentUser.isSharing) {
-            console.log('broadcast data');
             this.ipcSerivce.send('new:notebook', {notebook: data.notebook, user: this.currentUser});
           }
         });
@@ -729,7 +696,6 @@ export const appComponent = {
     }
     // update notebook
     updateNotebook(event) {
-      console.log('loader begin');
       this.cfpLoadingBar.start();
       this.rootService.updateNotebook(event.notebook, this.hashtags)
         .then((data) => {
@@ -748,7 +714,6 @@ export const appComponent = {
           this.rootService.getCommonHashtags()
             .then((result) => {
               this.commonTags = angular.copy(result);
-              console.log('loader end');
               this.cfpLoadingBar.complete();
             });
 
@@ -774,7 +739,6 @@ export const appComponent = {
           if (!result) {
             this.viewDetails(event);
           } else {
-            console.log('loader begin');
             this.cfpLoadingBar.start();
             this.rootService.deleteNotebook(event.notebook)
               .then((data) => {
@@ -791,10 +755,8 @@ export const appComponent = {
                 }
 
                 this.notebooks = this.notebooks.filter((notebook) => notebook._id !== data.notebookId);
-                console.log('loader end');
                 this.cfpLoadingBar.complete();
                 if (this.currentUser.isSharing) {
-                  console.log('broadcast data');
                   this.broadcastData('remove:notebook', {notebookId:data.notebookId})
                 }
               });
@@ -905,7 +867,6 @@ export const appComponent = {
 
           break;
         case 'default':
-          console.log('error');
       }
 
       this.$mdDialog.show(state)
@@ -992,8 +953,6 @@ export const appComponent = {
     //I believe this is called when connection connect and the data changes.
     //TODO: refractor to use global object
     normalizeNnotebooks(event, data) {
-      console.log('TODO: NEED TO REFRACTOR');
-      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
       this.notebooks.forEach((notebook) => {
         if (notebook.createdBy._id === data._id) {
           notebook.createdBy.name = data.name;
@@ -1003,8 +962,6 @@ export const appComponent = {
     }
     //TODO: refractor to use global object
     updateExternalData(event, data) {
-      console.log('TODO: NEED TO REFRACTOR');
-      console.log('TODO: Refractor this function!!!!!!!!!!!!!!!!!!!!!!!!!!1');
 
       if (Array.isArray(data.updatedData)) {
 

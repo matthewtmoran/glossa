@@ -22,7 +22,7 @@ export const notebookCardComponent = {
 
 
       this.isCorpus = false;
-      // console.log('SimpleMDE.markdown', SimpleMDE.markdown);
+      //
 
     }
 

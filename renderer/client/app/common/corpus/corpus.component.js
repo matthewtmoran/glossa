@@ -144,9 +144,7 @@ export const corpusComponent = {
           onSave: this.createTranscription.bind(this)
         }
       }).then((data) => {
-        console.log('dialog closed',data);
       }).catch(() => {
-        console.log('negative');
       })
     }
 

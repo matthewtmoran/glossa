@@ -27,7 +27,6 @@ export class WaveSurferController {
     this.$scope.$on('playPause', this.playPause.bind(this));
 
     this.$onDestroy = () => {
-      console.log('loader end');
       this.cfpLoadingBar.complete();
     }
 
@@ -64,7 +63,6 @@ export class WaveSurferController {
   }
 
   $onDestroy() {
-    console.log(' on destroy event');
   }
 
   responsiveWave() {
@@ -84,7 +82,6 @@ export class WaveSurferController {
   }
 
   initWaveSurfer() {
-    console.log('loader begin');
     this.cfpLoadingBar.start();
     this.isReady = false;
     this.loading = true;
@@ -152,7 +149,7 @@ export class WaveSurferController {
         // if (this.autoPlay) {
         //   this.surfer.play();
         // }
-        // console.log('loader end');
+        //
         this.cfpLoadingBar.complete();
       });
 
@@ -163,7 +160,6 @@ export class WaveSurferController {
         if (this.autoPlay) {
           this.surfer.play();
         }
-        console.log('loader end');
         // this.loading = false;
         // this.isReady = true;
         // if (this.autoPlay) {
@@ -173,7 +169,6 @@ export class WaveSurferController {
       });
 
       this.surfer.on('error', ()=>{
-        console.log('on error');
       });
 
       //on pause event
@@ -194,7 +189,6 @@ export class WaveSurferController {
     this.surfer.on('finish', this.finish.bind(this));
 
     if (!!this.imageSrc) {
-      console.log("TODO: verify this works cross platform!!!");
       let fixPath = this.imageSrc.replace(/\\/g, "/");
 
      this.waveElement.css({
@@ -219,7 +213,6 @@ export class WaveSurferController {
   }
 
   finish() {
-    console.log('finish');
     if (this.surfer) {
       this.stopInterval();
     }

@@ -1,11 +1,5 @@
-var electron = require('electron'),
-  app = electron.app,
-  Menu = electron.Menu,
-  MenuItem = electron.MenuItem,
-  BrowserWindow = electron.BrowserWindow,
-  ipcMain = electron.ipcMain;
-var eventActions = require('./app-actions');
-
+const {app, Menu, BrowserWindow, ipcMain, webContents} = require('electron');
+const eventActions = require('./app-actions');
 
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
@@ -31,7 +25,6 @@ function buildMenu(browserWindow) {
 }
 
 
-ipcMain.on('popupAppMenuEvent', popupAppMenuEvent);
 
 function buildGlossaMenu() {
   const menu = {

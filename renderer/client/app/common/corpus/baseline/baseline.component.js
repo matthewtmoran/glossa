@@ -116,7 +116,6 @@ export const baselineComponent = {
     }
 
     enterEvent(cm) {
-      console.log('enter event called');
       let doc = cm.getDoc();
       if(!this.isDoubleClick) {
         this.isDoubleClick = true;

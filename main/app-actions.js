@@ -1,11 +1,4 @@
-var electron = require('electron'),
-  app = electron.app,
-  BrowserWindow = electron.BrowserWindow,
-  ipcMain = electron.ipcMain,
-  shell = electron.shell;
-
-
-
+const {app, BrowserWindow, ipcMain, shell, webContents} = require('electron');
 
 module.exports = {
 
@@ -27,8 +20,8 @@ module.exports = {
     BrowserWindow.getFocusedWindow().webContents.send('import:project');
   },
 
-  exportProject: function() {
-    BrowserWindow.getFocusedWindow().webContents.send('export:project');
+  exportProject: function(event) {
+    webContents.fromId(2).send('export:project');
   },
 
   toggleFullScreen: function () {
@@ -50,5 +43,13 @@ module.exports = {
 
   }
 
-
 };
+
+function getWindow(windowName) {
+  for (var i = 0; i < windowArray.length; i++) {
+    if (windowArray[i].name == windowName) {
+      return windowArray[i].window;
+    }
+  }
+  return null;
+}

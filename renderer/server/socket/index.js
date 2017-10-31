@@ -1,8 +1,7 @@
-'use strict';
 const path = require('path');
 const fs = require('fs');
 const config = require('./../config/environment/index');
-const main = require('../../../main');
+// const main = require('../../../main');
 const {app} = require('electron').remote;
 
 const User = require('./../api/user/user.model.js');
@@ -13,6 +12,7 @@ const userController = require('../api/user/user.controller');
 
 
 let connectedClients = {};
+let localClient = {};
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
@@ -28,7 +28,6 @@ module.exports = function (io) {
 
     //occurs when profile updates are broad cast and connection responds with request for avatar
     socket.on('request:avatar', onRequestAvatar);
-
 
     function onRequestAvatar() {
       User.findOne({}, (err, user) => {
@@ -52,7 +51,6 @@ module.exports = function (io) {
       });
     }
 
-
     function onTestTest(data) {
       console.log('');
       console.log('on:: test:test', data);
@@ -68,7 +66,6 @@ module.exports = function (io) {
       //keep track of connections
       connectedClients[socket.id] = {};
       connectedClients[socket.id].disconnected = false;
-      let win = main.getWindow();
       if (client.type === 'external-client') {
         //look for this conneciton in persisted data
         Connection.findOne({_id: client._id}, (err, connection) => {
@@ -170,6 +167,9 @@ module.exports = function (io) {
             }
           }
         })
+      } else if (client.type === 'local-client') {
+        localClient = client;
+        localClient.disconnect = false;
       } else {
         console.log('SOMEONE IS SNOOPING');
       }
@@ -177,36 +177,41 @@ module.exports = function (io) {
 
     //when a socket disconnects
     function disconnect(reason) {
-      let win = main.getWindow();
       console.log('on:: disconnect');
 
-      Connection.findOne({socketId: socket.id}, (err, connection) => {
-        if (err) {return console.log("could not find client on disconnect");}
-        if (!connection) {
-          return console.log('This connection does not exist');
-        }
+      if (socket.id === localClient.socketId) {
+        console.log('local-client disconnected... ');
+      } else {
+        Connection.findOne({socketId: socket.id}, (err, connection) => {
+          if (err) {return console.log("could not find client on disconnect");}
+          if (!connection) {
+            return console.log('This connection does not exist');
+          }
 
-        if (!connection.following) {
-          Connection.remove({socketId: socket.id}, (err, count) => {
-            if (err) {
-              return console.log('Error removing connection on disconnect');
-            }
-            console.log('Send:: remove:connection');
-            console.log('TODO: change to socket event');
-            win.webContents.send('remove:connection', connection);
-          })
-        } else {
-          connection.online = false;
-          connection.socketId = false;
-          const options = {returnUpdateDocs: true};
-          Connection.update({_id: connection._id}, connection, options, (err, updatedCount, updatedConnection) => {
-            if (err) {return console.log('Error updating connection on disconnect');}
-            console.log('updatedConnection:', updatedConnection);
-            console.log('SEND:: update:connection');
-            win.webContents.send('update:connection', updatedConnection || connection);
-          })
-        }
-      });
+          if (!connection.following) {
+            Connection.remove({socketId: socket.id}, (err, count) => {
+              if (err) {
+                return console.log('Error removing connection on disconnect');
+              }
+              console.log('Send:: remove:connection');
+              console.log('TODO: change to socket event');
+              win.webContents.send('remove:connection', connection);
+            })
+          } else {
+            connection.online = false;
+            connection.socketId = false;
+            const options = {returnUpdateDocs: true};
+            Connection.update({_id: connection._id}, connection, options, (err, updatedCount, updatedConnection) => {
+              if (err) {return console.log('Error updating connection on disconnect');}
+              console.log('updatedConnection:', updatedConnection);
+              console.log('SEND:: update:connection');
+              win.webContents.send('update:connection', updatedConnection || connection);
+            })
+          }
+        });
+      }
+
+
     }
 
     //when a client returns avatar data after we have requested it

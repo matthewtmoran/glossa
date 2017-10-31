@@ -1,9 +1,9 @@
 const ipcUtil = require('./util');
-const socketUtil = require('../socket-backup/socket-util');
-const udp = require('../udp');
-const main = require('../../../main');
-const config = require('../config/environment');
-const socketClient = require('../socket/socket-client');
+// const socketUtil = require('../socket-backup/socket-util');
+// const udp = require('../udp');
+// const main = require('../../../main');
+// const config = require('../config/environment');
+// const socketClient = require('../socket/socket-client');
 
 const User = require('./../api/user/user.model.js');
 
@@ -11,24 +11,34 @@ let isRefresh = false;
 let win;
 module.exports = {
   init: function (server, io) {
+    ipcUtil.on('export:project', exportProject);
+
     //called on window load
-    ipcUtil.on('window:loaded', windowLoaded);
-    ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
+    // ipcUtil.on('window:loaded', windowLoaded);
+    // ipcUtil.on('broadcast:profile-updates', onBroadcastProfileUpdates);
     //called when sharing is toggled
-    ipcUtil.on('toggle:sharing', toggleSharing);
+    // ipcUtil.on('toggle:sharing', toggleSharing);
     //called when follow user is toggled
-    ipcUtil.on('update:following', onUpdateFollowing);
-    ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
-    ipcUtil.on('combine:notebooks', onCombineNotebooks);
-    ipcUtil.on('update:session', onUpdateSession);
-    ipcUtil.on('update:hashtags', onUpdateHashtags);
-    ipcUtil.on('update:notebook-hashtags-transcriptions', onUpdateNnHtT);
-    ipcUtil.on('create:transcription', onCreateTranscription);
-    ipcUtil.on('remove:transcription', onRemoveTranscription);
+    // ipcUtil.on('update:following', onUpdateFollowing);
+    // ipcUtil.on('broadcast:Updates', onBroadcastUpdates);
+    // ipcUtil.on('combine:notebooks', onCombineNotebooks);
+    // ipcUtil.on('update:session', onUpdateSession);
+    // ipcUtil.on('update:hashtags', onUpdateHashtags);
+    // ipcUtil.on('update:notebook-hashtags-transcriptions', onUpdateNnHtT);
+    // ipcUtil.on('create:transcription', onCreateTranscription);
+    // ipcUtil.on('remove:transcription', onRemoveTranscription);
 
 
+    // ipcUtil.on('new:notebook', onNewNotebook);
 
-    ipcUtil.on('new:notebook', onNewNotebook);
+
+    function exportProject(event, data) {
+      //@@@Matt I was trying to fix export project
+      //from main
+
+
+      console.log('exportProject in server');
+    }
 
     //when a new notebook is created ipc sends this event
     function onNewNotebook(event, data) {
@@ -142,20 +152,20 @@ module.exports = {
     }
 
     //when the window is loaded we send an event so we know to start sharing events and ui updates accordingly
-    function windowLoaded() {
-      win = main.getWindow();
-      //if we are sharing
-      if (global.appData.initialState.settings.isSharing) {
-        console.log(' We are sharing');
-        //if it's not merely a refresh
-        if (!isRefresh) {
-          isRefresh = true;
-          //initial udp discovery
-          // socketServer(io, win);
-          config.localDev ? socketClient.initLocal(io, win) : udp.init(server, io, win);
-        }
-      }
-    }
+    // function windowLoaded() {
+    //   win = main.getWindow();
+    //   //if we are sharing
+    //   if (global.appData.initialState.settings.isSharing) {
+    //     console.log(' We are sharing');
+    //     //if it's not merely a refresh
+    //     if (!isRefresh) {
+    //       isRefresh = true;
+    //       //initial udp discovery
+    //       // socketServer(io, win);
+    //       config.localDev ? socketClient.initLocal(io, win) : udp.init(server, io, win);
+    //     }
+    //   }
+    // }
 
     function onUpdateSession(event, session) {
       socketUtil.saveSession(session)

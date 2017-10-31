@@ -48,7 +48,7 @@ export const notebookComponent = {
 
       this.$scope.$watch('this.isOpen', this.isOpenWatch.bind(this));
       this.$scope.$watch('this.uniqueUsers', (newValue) => {
-        // console.log('there was a change in notebook....', newValue);
+        //
       });
 
     }

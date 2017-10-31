@@ -53,9 +53,7 @@ export const settingsComponent = {
         this.currentUser = angular.copy(changes.currentUser.currentValue);
       }
       if (changes.hashtags) {
-        console.log('changes in hashtag in settgings.component');
         this.hashtags = angular.copy(changes.hashtags.currentValue);
-        console.log('this.hashtags.length');
       }
     }
 

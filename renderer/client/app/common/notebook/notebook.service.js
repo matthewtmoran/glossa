@@ -83,7 +83,6 @@ export class NotebookService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
@@ -99,7 +98,6 @@ export class NotebookService {
         return response.data;
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return false;
       });
   }
@@ -139,7 +137,6 @@ export class NotebookService {
     return this.$q.when(this.parseService.hashtags(notebook))
       .then((data) => {
         notebook.hashtags = data;
-        console.log('notebook', notebook);
         let options = {
           url:`/api/notebooks/${notebook._id}`,
           method: 'PUT'
@@ -160,7 +157,6 @@ export class NotebookService {
         }
       })
       .catch((response) => {
-        console.log('There was an error', response);
         return false;
       })
   }
@@ -194,7 +190,6 @@ export class NotebookService {
       }).then((response) => {
         return response.data;
       }).catch((response) => {
-        console.log('Error with upload', response);
         return response.data;
       });
     }
@@ -241,13 +236,11 @@ export class NotebookService {
           };
           break;
         case 'default':
-          console.log('error');
       }
       return options;
     }
 
     test(e) {
-      console.log('test', e);
     }
 
 

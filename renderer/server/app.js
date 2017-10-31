@@ -15,9 +15,9 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const remote = require('electron').remote;
 
-// const ipc = require('./ipc');
+const ipc = require('./ipc');
 // const udp = require('./udp');
-// const socketServer = require('./socket');
+const socketServer = require('./socket');
 
 app.set("view engine", "ejs");
 app.engine('.ejs', ejs);
@@ -32,8 +32,8 @@ server.listen(config.port, config.ip, function () {
   config.secondInstance ? console.log("Glossa running as secondary dev instance") : console.log('Glossa Running as main dev instance');
   config.localDev ? console.log('Bypassing udp discovery') : console.log('Using udp discovery for external applications');
   // require ipc event...
-  // ipc.init(server, io); //ipc event for communication between renderer / main process
-  // socketServer(io);
+  ipc.init(server, io); //ipc event for communication between renderer / main process
+  socketServer(io);
 });
 
 

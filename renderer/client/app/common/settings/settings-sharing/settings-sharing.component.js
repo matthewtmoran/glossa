@@ -84,7 +84,6 @@ export const settingsSharingComponent = {
     }
 
     toggleSharingConfirmed(event) {
-      console.log('toggleSharing change event');
     }
 
     confirmToggleSharing(event) {
@@ -101,7 +100,7 @@ export const settingsSharingComponent = {
         $event: event
       });
 
-      // console.log('toggleFollow in settings-sharing.componenetjs');
+      //
       // event.user.following = !event.user.following;
       // this.rootService.toggleFollow(event.user);
     }

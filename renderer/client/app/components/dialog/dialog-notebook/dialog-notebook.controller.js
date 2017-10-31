@@ -55,7 +55,6 @@ export class NotebookDialogController {
   }
 
   updateModel(event) {
-    console.log('updateModel being called', event);
     this.currentNotebook.description = event.value;
   }
     //precludes setDynamicItems

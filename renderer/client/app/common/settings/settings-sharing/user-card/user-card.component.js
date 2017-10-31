@@ -21,8 +21,6 @@ export const userCardComponent = {
 
       this.user.color = this.alphabetColors[this.colorIndex];
 
-      console.log('this.user', this.user);
-
     }
 
     toggleFollow() {

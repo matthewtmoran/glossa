@@ -2,12 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const electron = require('electron');
 const app = electron.app;
-if(require('electron-squirrel-startup')) return;
-// this should be placed at top of main.js to handle setup events quickly
-if (handleSquirrelEvent()) {
-  // squirrel event handled and app will exit in 1000ms, so don't do anything else
-  return;
-}
+
+//had to put this into a function becuase of babel error
+function preRun () {
+  if(require('electron-squirrel-startup')) {
+    return;
+  }
+  // this should be placed at top of main.js to handle setup events quickly
+  if (handleSquirrelEvent()) {
+    // squirrel event handled and app will exit in 1000ms, so don't do anything else
+    return;
+  }
+};
+preRun();
 
 function handleSquirrelEvent() {
   if (process.argv.length === 1) {
@@ -71,14 +78,12 @@ function handleSquirrelEvent() {
   }
 };
 
-
 const url = require('url');
-const AppMenu = require(path.join(__dirname, './main/app-menu'));
+const AppMenu = require('./main/app-menu');
 const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 let BrowserWindow = electron.BrowserWindow;
 let serverWindow;
-
 
 //for mac to decide what to do with window object.. to quit or hide...
 let forceQuit = false;
@@ -92,7 +97,10 @@ var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
 
 
 function createWindow() {
-  // Create the browser window.
+  serverWindow = new BrowserWindow({show: true,});
+  serverWindow.webContents.openDevTools();
+  serverWindow.loadURL(path.join('file://', __dirname, '/dist/server.html'));
+
   win = new BrowserWindow({
     show: false,
     center: true,
@@ -111,22 +119,17 @@ function createWindow() {
     title: 'Glossa',
     icon: icon //this works for windows.. for mac this will need to be defined a different way
     // icon: path.join(__dirname, 'dist/img/app-icons/mac/glossa-logo.icns') //for dev for mac
+
   });
 
   //build the menu...
   AppMenu.buildMenu(win);
-
-  serverWindow = new BrowserWindow({show: true});
-  serverWindow.webContents.openDevTools();
-  serverWindow.loadURL(path.join('file://', __dirname, '/dist/server.html'));
 
   //TODO: make external config file for electron...
   // and load the index.html of the app.
   win.loadURL(url.format({
     pathname: 'http://localhost:9000'
   }));
-
-  // win.loadURL(path.join('file://', __dirname, '/dist/index.html'));
 
   // Open the DevTools.
   win.webContents.openDevTools();
@@ -239,6 +242,10 @@ function getWindow () {
   return win;
 }
 
+function getServerWin () {
+  return serverWindow;
+}
+
 //TODO: consider deletion
 function _unref () {
   delete win[this.id]
@@ -253,6 +260,7 @@ function getForceQuit() {
 }
 
 module.exports = {
+  getServerWin: getServerWin,
   _unref: _unref,
   getWindow: getWindow,
   setReadyToGo: setReadyToGo,

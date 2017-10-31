@@ -64,7 +64,6 @@ export class ParseService {
         .then((response) => {
           resolve(response.data);
         }).catch((response) => {
-          console.log('There was an error', response);
           reject(response.data);
         });
     });
@@ -97,7 +96,6 @@ export class ParseService {
       .then((response) => {
         return response.data;
       }).catch((response) => {
-        console.log('There was an error', response);
         return response.data;
       });
   }
