@@ -5,6 +5,7 @@ const isDarwin = process.platform === 'darwin';
 const isWin10 = process.platform === 'win32';
 
 let menu;
+ipcMain.on('popupAppMenuEvent', popupAppMenuEvent);
 
 function buildMenu(browserWindow) {
   let template;
@@ -307,7 +308,6 @@ function buildExportMenuItem() {
 }
 
 function popupAppMenuEvent(invokedViaKeyboard) {
-  console.log('popupAppMenuEvent')
   // if (invokedViaKeyboard && browserWindow && !browserWindow.isDestroyed()) {
   //   try {
   //     menu.popup({x: 20, y: 15, async: true});

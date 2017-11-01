@@ -119,11 +119,11 @@ export class RootService {
           if (selectedFiles) {
             this.$http.post('/api/project/import', {projectPath: selectedFiles[0]})
               .then((response) => {
-                this.$window.location.reload();
+                // this.$window.location.reload();
                 resolve(response);
               })
               .catch((err) => {
-                this.$window.location.reload();
+                // this.$window.location.reload();
                 reject(err);
               });
           } else {

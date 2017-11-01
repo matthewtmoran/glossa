@@ -163,7 +163,6 @@ exports.destroy = function (req, res) {
  * @param res
  */
 exports.importProject = (req, res) => {
-  console.log('TODO: REMOVE ALL MEDIA FILES FROM FILE SYSTEM!!!!!!!!!');
 
   let rootPath = app.getPath('userData');
   fse.remove(path.join(rootPath, 'storage'), (err) => {
@@ -194,51 +193,28 @@ function resolvePathsAndReset() {
   return new Promise((resolve, reject) => {
     promiseArray.push(
 
-      resolveAndUpdateUser()
-        .then((data) => {
-          global.appData.initialState.user = Object.assign({}, data);
-        }),
+      resolveAndUpdateUser(),
 
-      resolveAndUpdateNotebooks()
-        .then((data) => {
-          global.appData.initialState.notebooks = data.map((nb) => {
-            return nb;
-          });
-        }),
+      resolveAndUpdateNotebooks(),
 
-      resolveAndUpdateTranscriptions()
-        .then((data) => {
-          global.appData.initialState.transcriptions = data.map((tr) => {
-            return tr;
-          });
-        }),
+      resolveAndUpdateTranscriptions(),
 
-      resolveAndUpdateConnections()
-        .then((data) => {
-          global.appData.initialState.connections = data.map((co) => {
-            return co;
-          });
-        }),
+      resolveAndUpdateConnections(),
 
       updateHashtag()
-        .then((data) => {
-          global.appData.initialState.hashtags = data.map((tag) => {
-            return tag;
-          });
-        })
 
     );
 
-    dataBaseItems.forEach((item) => {
-      promiseArray.push(
-
-        updateSingleObject(item)
-          .then((data) => {
-            global.appData.initialState[item.name] = Object.assign({}, data);
-          })
-
-      )
-    });
+    // dataBaseItems.forEach((item) => {
+    //   promiseArray.push(
+    //
+    //     updateSingleObject(item)
+    //       .then((data) => {
+    //         global.appData.initialState[item.name] = Object.assign({}, data);
+    //       })
+    //
+    //   )
+    // });
 
 
     Promise.all(promiseArray)

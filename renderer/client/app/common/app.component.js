@@ -19,7 +19,7 @@ export const appComponent = {
   },
   templateUrl,
   controller: class AppComponent {
-    constructor($scope, $state, $timeout, $q, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, IpcSerivce, $stateParams, SocketService) {
+    constructor($scope, $state, $timeout, $q, $window, $mdDialog, cfpLoadingBar, RootService, NotificationService, SettingsService, DialogService, __appData, IpcSerivce, $stateParams, SocketService) {
       'ngInject';
       this.$scope = $scope;
       this.$state = $state;
@@ -29,6 +29,7 @@ export const appComponent = {
       this.ipcSerivce = IpcSerivce;
       this.$stateParams = $stateParams;
       this.$timeout = $timeout;
+      this.$window = $window;
 
       this.__appData = __appData;
 
@@ -82,10 +83,22 @@ export const appComponent = {
         this.rootService.ipcImportProject()
           .then((response) => {
             this.$timeout(() => {
+
+                this.currentUser = this.rootService.getUser();
+                this.allConnections = this.rootService.getConnections();
+                this.hashtags = this.rootService.getHashtags();
+                this.commonTags = this.rootService.getCommonHashtags();
+                this.project = this.rootService.getProject();
+                this.settings = this.rootService.getSettings();
+                this.notebooks = this.rootService.getNotebooks();
+                this.transcriptions = this.rootService.getTranscriptions();
+
+              this.$window.location.reload();
               this.isLoading = false;
             });
           })
           .catch((err) => {
+            this.$window.location.reload();
           })
       });
       //removes sync-display
