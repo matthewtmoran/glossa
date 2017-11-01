@@ -11,6 +11,7 @@
 						<div flex="50" class="md-padding">
 							<img ng-if="$ctrl.notebookSelected.image" ngf-src="$ctrl.notebookSelected.image.path" class="thumb">
 						</div>
+
 						<div flex="50" class="md-padding">
 							<wave-surfer-preview
 									ng-if="$ctrl.notebookSelected.audio"
@@ -63,6 +64,7 @@
 
 								<wave-surfer-preview
 										flex
+										settings="$ctrl.settings"
 										url-src="$ctrl.audioPath"
 										auto-play="false">
 								</wave-surfer-preview>

@@ -29,9 +29,6 @@ export class WaveSurferController {
     this.$onDestroy = () => {
       this.cfpLoadingBar.complete();
     }
-
-
-
   }
 
   stopInterval() {
@@ -62,16 +59,9 @@ export class WaveSurferController {
     this.speedIndex = 1;
   }
 
-  $onDestroy() {
-  }
-
   responsiveWave() {
     this.surfer.empty();
     this.surfer.drawBuffer();
-  }
-
-  resetWaveSurfer() {
-    this.initWaveSurfer();
   }
 
   $onDestroy() {

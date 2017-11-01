@@ -24,6 +24,12 @@ export class AttachmentController {
     this.init()
   }
 
+  $onChanges(changes) {
+    if (changes.settings) {
+      this.settings = changes.settings.currentValue;
+    }
+  }
+
   init() {
     this.notebookService.getNotebooks()
       .then((data) => {
@@ -82,5 +88,4 @@ export class AttachmentController {
     }
   }
 
-}
-;
+};
