@@ -36,7 +36,7 @@ export const tagListComponent = {
     }
 
     exists(tag) {
-      return this.selectedHashtags.indexOf(tag._id) > -1;
+      return this.selectedHashtags.indexOf(tag) > -1;
     }
 
 

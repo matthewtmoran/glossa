@@ -138,6 +138,7 @@ export const notebookComponent = {
       }).then((data) => {
 
       }).catch(() => {
+        console.log('TODO: should we calculate tags here?')
 
       })
 
@@ -219,17 +220,14 @@ export const notebookComponent = {
 
     //toggle hashtags
     toggleHashtags(event) {
-      let idx = event.list.indexOf(event.tag._id);
-      // let idx = this.selectedHashtags.indexOf(tag._id);
-
+      let idx = event.list.indexOf(event.tag);
       if (idx > -1) {
         this.selectedHashtags.splice(idx, 1);
         this.selectedHashtags = angular.copy(this.selectedHashtags);
       } else {
-        this.selectedHashtags.push(event.tag._id);
+        this.selectedHashtags.push(event.tag);
         this.selectedHashtags = angular.copy(this.selectedHashtags);
       }
-
     }
     //select initial user to sort by
     initSelected() {

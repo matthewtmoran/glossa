@@ -12,7 +12,7 @@ router.put('/:id', controller.update);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 router.post('/search', controller.showTerm);
-router.get('/common/:nothing', controller.findCommonTags);
+router.post('/common', controller.findCommonTags);
 router.put('/decrease/:id', controller.decreaseCount);
 
 module.exports = router;

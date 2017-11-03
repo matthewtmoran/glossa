@@ -84,10 +84,19 @@ export const appComponent = {
           .then((response) => {
             this.$timeout(() => {
 
+              this.rootService.getUser()
+                .then((user) => {
+                  this.currentUser = user;
+                });
+
+              this.rootService.calculateCommonTags()
+                .then((result) => {
+                  this.commonTags = angular.copy(result);
+                });
+
                 this.currentUser = this.rootService.getUser();
                 this.allConnections = this.rootService.getConnections();
                 this.hashtags = this.rootService.getHashtags();
-                this.commonTags = this.rootService.getCommonHashtags();
                 this.project = this.rootService.getProject();
                 this.settings = this.rootService.getSettings();
                 this.notebooks = this.rootService.getNotebooks();
@@ -217,6 +226,7 @@ export const appComponent = {
 
     $onInit() {
       angular.element('.loading-spinner').fadeOut();
+
       this.selectInitialFile();
       this.simplemdeToolbar = [
         {
@@ -361,7 +371,7 @@ export const appComponent = {
           }
 
           //calculate common hashtags
-          this.rootService.getCommonHashtags()
+          this.rootService.calculateCommonTags(this.currentUser)
             .then((result) => {
               this.commonTags = angular.copy(result);
               this.cfpLoadingBar.complete();
@@ -694,11 +704,13 @@ export const appComponent = {
           if(data.hashtags) {
             this.hashtags = [...this.hashtags, ...data.hashtags];
           }
-          this.rootService.getCommonHashtags()
+
+          this.rootService.calculateCommonTags()
             .then((result) => {
               this.commonTags = angular.copy(result);
               this.cfpLoadingBar.complete();
             });
+
           this.$mdDialog.hide();
           if (this.currentUser.isSharing) {
             this.ipcSerivce.send('new:notebook', {notebook: data.notebook, user: this.currentUser});
@@ -724,10 +736,10 @@ export const appComponent = {
           if(data.hashtags) {
             this.hashtags = [...this.hashtags, ...data.hashtags];
           }
-          this.rootService.getCommonHashtags()
+
+          this.rootService.calculateCommonTags()
             .then((result) => {
               this.commonTags = angular.copy(result);
-              this.cfpLoadingBar.complete();
             });
 
 
@@ -772,6 +784,12 @@ export const appComponent = {
                 if (this.currentUser.isSharing) {
                   this.broadcastData('remove:notebook', {notebookId:data.notebookId})
                 }
+
+                this.rootService.calculateCommonTags(this.currentUser)
+                  .then((result) => {
+                    this.commonTags = angular.copy(result);
+                  });
+
               });
           }
         })
@@ -881,12 +899,10 @@ export const appComponent = {
           break;
         case 'default':
       }
-
       this.$mdDialog.show(state)
         .then((data) => {
           return data;
-        })
-        .catch((data) => {
+        }).catch((data) => {
           return data;
         });
     }
@@ -929,7 +945,7 @@ export const appComponent = {
           });
 
           this.selectInitialFile();
-          this.rootService.getCommonHashtags()
+          this.rootService.calculateCommonTags()
             .then((result) => {
               this.commonTags = angular.copy(result);
             });

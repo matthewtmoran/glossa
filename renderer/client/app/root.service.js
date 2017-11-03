@@ -158,6 +158,7 @@ export class RootService {
 
   //get user object (settings is also extracted from this data)
   getUser() {
+    console.log('getUser');
     return this.$http.get('/api/user/')
       .then((response) => {
         return response.data;
@@ -210,9 +211,21 @@ export class RootService {
   }
 
 
-  getCommonHashtags() {
-    return this.$http.get('/api/hashtags/common/123')
+  getCommonHashtags(user) {
+    return this.$http.post(`/api/hashtags/common/${user._id}`)
       .then((response) => {
+        return response.data;
+      })
+      .catch((response) => {
+        return response.data;
+      });
+  }
+
+  calculateCommonTags() {
+    console.log('calculateCommonTags being called');
+    return this.$http.post(`/api/hashtags/common`)
+      .then((response) => {
+      console.log('response:', response);
         return response.data;
       })
       .catch((response) => {

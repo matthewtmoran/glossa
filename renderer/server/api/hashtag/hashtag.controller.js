@@ -13,6 +13,7 @@ const _ = require('lodash');
 const Hashtag = require('./hashtag.model');
 const path = require('path');
 const Notebook = require('../notebook/notebook.model');
+const User = require('../user/user.model');
 const Transcription = require('../transcription/transcription.model');
 
 // Get list of things
@@ -231,12 +232,50 @@ exports.findOccurrence = function (req, res, next) {
 };
 
 exports.findCommonTags = function (req, res) {
-  Hashtag.find({occurrence: {$gt: 0}}, function (err, tags) {
-    if (err) {
-      return handleError(res, err);
-    }
-    return res.status(200).json(tags);
-  })
+  console.log('TODO: search through note books for all tags and return');
+
+  User.findOne({}, (err, user) => {
+    Notebook.find({'createdBy._id': user._id}, (err, notebooks) => {
+      notebooks.forEach((notebook) => {
+        let hashtags = [];
+        let hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
+        if (hashReg.test(notebook.description)) {
+          hashtags = notebook.description.match(hashReg).map((tag) => {
+            return tag.trim().substr(1);
+          });
+          return hashtags
+        }
+      })
+    });
+  });
+
+
+  // Hashtag.find({occurrence: {$gt: 0}}, function (err, tags) {
+  //   if (err) {
+  //     return handleError(res, err);
+  //   }
+  //   return res.status(200).json(tags);
+  // })
+};
+
+
+exports.findCommonTags = function (req, res) {
+  User.findOne({}, (err, user) => {
+    Notebook.find({'createdBy._id': user._id}, (err, notebooks) => {
+      let hashtags = [];
+      notebooks.forEach((notebook) => {
+        let hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
+        if (hashReg.test(notebook.description)) {
+          notebook.description.match(hashReg).forEach((tag) => {
+            if (hashtags.indexOf(tag.trim().substr(1)) < 0 ) {
+              hashtags.push(tag.trim().substr(1));
+            }
+          });
+        }
+      });
+      return res.status(200).json(hashtags);
+    });
+  });
 };
 
 function findTag(name) {
@@ -341,8 +380,7 @@ function normalizeNotebooks(modifiedTag) {
     Notebook.find(query, function (err, notebooks) {
       if (err) {
         reject(err)
-      }
-      ;
+      };
 
 
       notebooks.forEach(function (notebook) {
