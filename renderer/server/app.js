@@ -45,7 +45,8 @@ function exitHandler(options, err) {
   }
   if (options.cleanup) {
     console.log('cleaning...');
-    return config.localDev ? false : udp.stop();
+    console.log('TODO: udp discovery cleanup...');
+    // return config.localDev ? false : udp.stop();
   }
   if (options.exit) {
     console.log('Exit is true');

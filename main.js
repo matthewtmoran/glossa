@@ -147,7 +147,9 @@ function createWindow() {
       forceQuit = true;
     }
     if (isWin10 || forceQuit) {
+      console.log('closing windows');
       win = null;
+      serverWindow.close();
     } else {
       e.preventDefault();
       win.hide();

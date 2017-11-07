@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('./../config/environment/index');
 // const main = require('../../../main');
-const {app} = require('electron').remote;
+const {app, webContents} = require('electron').remote;
 
 const User = require('./../api/user/user.model.js');
 const Connection = require('./../api/connections/connection.model');
@@ -181,6 +181,17 @@ module.exports = function (io) {
 
       if (socket.id === localClient.socketId) {
         console.log('local-client disconnected... ');
+
+        localClient.disconnect = true;
+
+        setTimeout(() => {
+          if (localClient.disconnect) {
+            // webContents.fromId(2).send('close:window');
+            console.log("localClient has truly disconnected");
+            // process.exit();
+          }
+        }, 4000);
+
       } else {
         Connection.findOne({socketId: socket.id}, (err, connection) => {
           if (err) {return console.log("could not find client on disconnect");}
