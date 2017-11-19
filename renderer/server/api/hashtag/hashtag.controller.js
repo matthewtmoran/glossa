@@ -75,7 +75,6 @@ exports.update = function (req, res) {
     delete req.body._id;
   }
 
-  console.log('update');
 
   Hashtag.findOne({_id: req.params.id}, function (err, tag) {
     if (err) {
@@ -122,7 +121,6 @@ exports.removeTag = function (req, res) {
       let updatedObject = {};
       normalizeTranscriptions(query, tag)
         .then((updatedTranscriptions) => {
-          console.log('transcriptions normalized');
           updatedObject.transcriptions = updatedTranscriptions;
 
           normalizeNotebooksFromRemoval(query, tag)
@@ -232,7 +230,6 @@ exports.findOccurrence = function (req, res, next) {
 };
 
 exports.findCommonTags = function (req, res) {
-  console.log('TODO: search through note books for all tags and return');
 
   User.findOne({}, (err, user) => {
     Notebook.find({'createdBy._id': user._id}, (err, notebooks) => {
@@ -337,8 +334,6 @@ function normalizeNotebooksFromRemoval(query, tag) {
 
       Promise.all(newPromises)
         .then((results) => {
-          console.log('promises:', promises);
-          console.log("notebook results:", results);
           resolve(results);
         })
     });
@@ -388,7 +383,6 @@ function normalizeNotebooks(modifiedTag) {
 
         notebook.hashtags.map(function (oldTag, index) {
           if (oldTag._id === modifiedTag._id) {
-            console.log('match found');
             oldTagText = '#' + oldTag.tag;
             notebook.hashtags[index] = modifiedTag;
           }

@@ -80,7 +80,6 @@ module.exports = function (io) {
 
     //client returns 'end-handshake with data'
     function onEndHandshake(client) {
-      console.log('STEP 2  -  on:: end-handshake');
       console.log(`User ${client.name} just connected. ID = ${client._id}`);
       console.log(`User ${client.name} socketID = ${client.socketId}`);
 

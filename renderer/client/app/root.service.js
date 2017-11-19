@@ -96,6 +96,7 @@ export class RootService {
 
 
   initListeners() {
+    // this.socket
     // hand shake
     // this.socketService.on('begin:handshake', (data) => {
     //
@@ -158,7 +159,6 @@ export class RootService {
 
   //get user object (settings is also extracted from this data)
   getUser() {
-    console.log('getUser');
     return this.$http.get('/api/user/')
       .then((response) => {
         return response.data;
@@ -222,10 +222,8 @@ export class RootService {
   }
 
   calculateCommonTags() {
-    console.log('calculateCommonTags being called');
     return this.$http.post(`/api/hashtags/common`)
       .then((response) => {
-      console.log('response:', response);
         return response.data;
       })
       .catch((response) => {

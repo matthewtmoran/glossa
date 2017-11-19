@@ -114,20 +114,6 @@ export const appComponent = {
       this.ipcSerivce.on('sync-event-end', (event, data) => {
         this.cfpLoadingBar.complete();
       });
-      this.ipcSerivce.on('export:project', (event, data) => {
-        console.log('export:project from ipc event');
-
-
-
-
-
-        this.exportProject({project: this.__appData.initialState.project});
-      });
-
-      this.socketService.on('export:project', (data) => {
-        console.log('export:project');
-      });
-
       this.ipcSerivce.on('update-transcription-list', (event, data) => {
         // this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
         //if a new file was created, data contains the id of the new file
@@ -138,8 +124,6 @@ export const appComponent = {
         }
         this.cfpLoadingBar.complete();
       });
-
-
       this.ipcSerivce.on('update:synced-notebooks', (event, notebooks) => {
         let newNotebooks = [];
         notebooks.forEach((notebook) => {
@@ -197,8 +181,26 @@ export const appComponent = {
 
       this.ipcSerivce.on('remove:connection', (event, connection) => {
         this.allConnections = this.allConnections.filter(c => c._id !== connection._id)
-      })
+      });
+
+
+
+      this.socketService.on('update:connection', (connection) => {
+        this.allConnections = this.allConnections.map((con) => {
+          if (con._id !== connection._id) {
+            return con;
+          }
+          return connection;
+        })
+      });
+      
+      this.socketService.on('export:project', (data) => {
+        console.log('export:project');
+      });
     }
+
+
+
 
     $onChanges(changes) {
       if (changes.allConnections) {
@@ -376,7 +378,6 @@ export const appComponent = {
               this.commonTags = angular.copy(result);
               this.cfpLoadingBar.complete();
             });
-          this.cfpLoadingBar.complete();
         })
     }
 

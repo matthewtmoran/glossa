@@ -37,40 +37,63 @@ module.exports = function(io) {
     });
   };
   let create = function (req, res) {
-    console.log('notebook being created');
     let newNotebook = req.body.dataObj;
     newNotebook.createdAt = Date.now();
     newNotebook.updatedAt = Date.now();
-    Setting.findOne({}, (err, settings) => {
-      if (err) {
-       return console.log('error finding user');
-      }
 
-
-      Notebook.insert(newNotebook, (err, notebook) => {
+    Notebook.insert(newNotebook,(err, notebook) => {
+      Setting.findOne({}, (err, settings) => {
         if (err) {
-          return handleError(res, err);
+          return console.log('error finding user');
         }
-        console.log('notebook inserted');
         if (settings.isSharing) {
-          console.log('user is sharing');
 
           parseNotebook(notebook)
             .then((notebookWithMedia) => {
-              console.log('notebook parsed and ready to broadcast');
-              console.log('emit:: rt:new-notebook');
               io.to('externalClientsRoom').emit('rt:notebook', notebookWithMedia);
               return res.status(201).json(notebook);
             });
 
         } else {
-          console.log('user not sharing ');
           return res.status(201).json(notebook);
         }
-      });
+      })
+
 
 
     });
+
+
+    // Setting.findOne({}, (err, settings) => {
+    //   if (err) {
+    //    return console.log('error finding user');
+    //   }
+    //
+    //
+    //   Notebook.insert(newNotebook, (err, notebook) => {
+    //     if (err) {
+    //       return handleError(res, err);
+    //     }
+    //     console.log('notebook inserted');
+    //     if (settings.isSharing) {
+    //       console.log('user is sharing');
+    //
+    //       parseNotebook(notebook)
+    //         .then((notebookWithMedia) => {
+    //           console.log('notebook parsed and ready to broadcast');
+    //           console.log('emit:: rt:new-notebook');
+    //           io.to('externalClientsRoom').emit('rt:notebook', notebookWithMedia);
+    //           return res.status(201).json(notebook);
+    //         });
+    //
+    //     } else {
+    //       console.log('user not sharing ');
+    //       return res.status(201).json(notebook);
+    //     }
+    //   });
+    //
+    //
+    // });
   };
 
   let update = function (req, res) {
@@ -108,7 +131,6 @@ module.exports = function(io) {
                 return res.status(201).json(updatedDoc);
               });
           } else {
-            console.log('user not sharing ');
             return res.status(201).json(updatedDoc);
           }
         });

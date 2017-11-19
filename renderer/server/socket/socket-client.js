@@ -3,7 +3,7 @@ const fs = require('fs');
 const app = require('electron').app;
 const config = require('../config/environment');
 const ioClient = require('socket.io-client');
-const main = require('../../../main');
+// const main = require('../../../main');
 const User = require('./../api/user/user.model.js');
 
 const Notebooks = require('./../api/notebook/notebook.model.js');
@@ -23,28 +23,52 @@ let devObject = {};
 module.exports = {
   //used for testing local socket events
   initLocal: function (io, win) {
+    console.log('initLocal?');
     devObject.io = io;
     devObject.win = win;
-    let service = {
-      name: 'Glossa-' + global.appData.initialState.user._id,
-      addr: ip.address()
-    };
-    let port = !config.secondInstance ? '9090' : '9000';
-    let externalPath = 'http://' + service.addr + ':' + port;
+
+    User.findOne({}, (err, user) => {
+      let service = {
+        name: 'Glossa-' + user._id,
+        addr: ip.address()
+      };
+      let port = !config.secondInstance ? '9090' : '9000';
+      let externalPath = 'http://' + service.addr + ':' + port;
+      console.log('connecting to:', externalPath );
+
+      //if the service is not in the master list then we connect to it as a client
+      if (connectionList.indexOf(service.name) < 0) {
+        let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
+        this.connect(service, io, nodeClientSocket);
+        //handle the connection to the external socket server
+      } else {
+        // we are already connected to this service so just ignore
+        return false;
+      }
+    });
+
+
+  },
+
+
+  //we are going to connect to the server as a client so the server can interact with us
+  init: function (service, io) {
+    let nodeClientSocket;
     //if the service is not in the master list then we connect to it as a client
     if (connectionList.indexOf(service.name) < 0) {
-      // let nodeClientSocket = ioClient(externalPath, {transports: ['websocket'], upgrade: false});
-      // let nodeClientSocket = ioClient.connect(externalPath, {reconnection: true, reconnectionDelay: 1000});
-      let nodeClientSocket = ioClient(externalPath, {reconnection: true, reconnectionDelay: 1000});
-      this.connect(service, io, win, nodeClientSocket);
+      let externalPath = 'http://' + service.addr + ':' + config.port;
+
+      nodeClientSocket = require('socket.io-client')(externalPath);
       //handle the connection to the external socket server
+      this.connect(service, io, nodeClientSocket);
     } else {
       // we are already connected to this service so just ignore
       return false;
     }
   },
 
-  connect: function (service, io, win, nodeClientSocket) {
+
+  connect: function (service, io, nodeClientSocket) {
     nodeClientSocket.on('connect', onConnect);
     nodeClientSocket.on('begin-handshake', onBeginHandshake);
     nodeClientSocket.on('request:avatar', onRequestAvatar);
@@ -59,9 +83,9 @@ module.exports = {
         if (connection && connection.following) {
          notebookController.newDataReturned(notebook)
            .then((notebookReady) => {
-             win = main.getWindow();
+             // win = main.getWindow();
              console.log('--- IPC send: update:synced-notebook');
-             return win.webContents.send('update:synced-notebook', notebookReady);
+             // return win.webContents.send('update:synced-notebook', notebookReady);
            })
            .catch((err) => {
             console.log('there was an error getting new notebook', err);
@@ -200,10 +224,7 @@ module.exports = {
 
 
     function onConnect() {
-     console.log('');
      console.log('--- on:: connect');
-     console.log('');
-
      //when the connection is truly established, we add the service name ot the list.
      connectionList.push(service.name);
    }
@@ -212,7 +233,6 @@ module.exports = {
     function getNewAvatarData(connection, client) {
       //  copy data object, resolve absolute paths, save data, request avatar, normalize notebooks
       console.log('emit:: request:avatar to:: server that sent us basic changes');
-      console.log('emitting event to : ', client.socketId);
       io.to(connection.socketId).emit('request:avatar');
 
       //resolve path

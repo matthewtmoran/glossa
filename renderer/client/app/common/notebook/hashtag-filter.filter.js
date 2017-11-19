@@ -4,13 +4,30 @@ export default function () {
       if (list.length == 0) {
         return true;
       } else {
-        return parseText(notebook.description);
+
+        let tagExist = false;
+        list.forEach((tag) => {
+          if (notebook.description.indexOf(`#${tag}`) > -1 ) {
+            tagExist = true;
+            return true;
+          }
+        });
+        return tagExist;
       }
     });
   };
 }
 
-function parseText(text) {
+function parseText(text, list) {
   let hashReg = /(^|\s)(#[a-zA-Z\d-]+)/g;
-  return hashReg.test(text);
+
+  list.forEach((tag) => {
+    if (text.indexOf(`#${tag}`) > -1) {
+      console.log('Exists!');
+      console.log('Text:', text);
+      return true;
+    } else {
+      return false;
+    }
+  });
 }

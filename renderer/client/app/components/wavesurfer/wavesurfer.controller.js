@@ -197,6 +197,7 @@ export class WaveSurferController {
   }
 
   pause() {
+    console.log('pause');
     if (this.surfer) {
       this.stopInterval();
     }
@@ -209,9 +210,10 @@ export class WaveSurferController {
   }
 
   play() {
-    if (this.surfer) {
-      this.startInterval();
-    }
+    console.log('play pushed');
+    // if (this.surfer) //{
+    //   this.startInterval();
+    // }
   }
 
   resetWaveSurfer(urlSrc1, urlSrc2) {
@@ -250,11 +252,13 @@ export class WaveSurferController {
       this.surfer.setPlaybackRate(this.playbackSpeed.value);
     })
   }
+
   playPause() {
     this.$timeout(() => {
       this.surfer.playPause();
     })
   }
+
   scrubForward() {
     this.surfer.skipForward();
   }

@@ -10,7 +10,6 @@
 import _ from 'lodash';
 import path from 'path';
 import Connection from './connection.model';
-console.log('TODO: remove socketUtil');
 const socketUtil = require('../../socket-backup/socket-util');
 module.exports = (io) => {
   let index = (req, res) => {
@@ -65,7 +64,6 @@ module.exports = (io) => {
         //get our synced data (if any)
         socketUtil.syncData(updatedConnection, (data) => {
           //ask for new data and send old data list to connection
-          console.log('emit:: request:new-data to:: ', updatedConnection.socketId);
           io.to(updatedConnection.socketId).emit('request:notebook-data', data.notebooks)
         });
       }
@@ -119,7 +117,6 @@ module.exports = (io) => {
   };
 
   let updateConnection = function (connection) {
-    console.log('updateConnection calledc');
     return new Promise((resolve, reject) => {
       const options = {returnUpdatedDocs: true};
       const updated = connection;

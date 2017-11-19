@@ -1,43 +1,42 @@
-'use strict';
-
-var path = require('path');
-var _ = require('lodash');
+import path from 'path';
+import * as _ from "lodash"
 const {app} = require('electron').remote;
-process.env.NODE_ENV = process.env.NODE_ENV || 'dev-es6';
+
+window.process.env.NODE_ENV = window.process.env.NODE_ENV || 'dev-es6';
 function requiredProcessEnv(name) {
-    if (!process.env[name]) {
+    if (!window.process.env[name]) {
         throw new Error('You must set the ' + name + ' environment variable');
     }
-    return process.env[name];
+    return window.process.env[name];
 }
 
 
 // All configurations will extend these options
 // ============================================
-var all = {
-    env: process.env.NODE_ENV,
+let all = {
+    env: window.process.env.NODE_ENV,
 
     // Root path of server
     root: app.getAppPath(),
 
     // Server port
-    port: process.env.PORT || 9000,
+    port: window.process.env.PORT || 9000,
 
     // Server IP
-    ip: process.env.IP || '0.0.0.0',
+    ip: window.process.env.IP || '0.0.0.0',
 
     // Should we populate the DB with sample data?
     seedDB: false,
-    localDev: process.env.LOCAL || false,
-    secondInstance: process.env.SECOND_INSTANCE || false,
+    localDev: window.process.env.LOCAL || false,
+    secondInstance: window.process.env.SECOND_INSTANCE || false,
 
     // List of user roles
     userRoles: ['guest', 'user', 'admin'],
-    dataRootPath: process.env.SECOND_INSTANCE ? '/Glossa2' : 'Glossa',
+    dataRootPath: window.process.env.SECOND_INSTANCE ? '/Glossa2' : 'Glossa',
 };
 // Export the config object based on the NODE_ENV
 // ==============================================
 
 module.exports = _.merge(
     all,
-    require('./' + process.env.NODE_ENV + '.js') || {});
+    require('./' + window.process.env.NODE_ENV + '.js') || {});

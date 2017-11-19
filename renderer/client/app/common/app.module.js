@@ -3,7 +3,6 @@ import { appComponent } from './app.component';
 // import { audioPreview } from '../components/basic-audio-preview/basic-audio-preview.module';
 import { appNav } from './app-nav/app-nav.module';
 import { appDrawer } from './app-drawer/app-drawer.module';
-import { appSidebar } from './app-sidebar/app-sidebar.module';
 import { corpus } from './corpus/courpus.module'
 import { notebook } from './notebook/notebook.module'
 import { settings } from './settings/settings.module'
@@ -14,7 +13,6 @@ export const app = angular
   .module('common.app', [
     uiRouter,
     appNav,
-    appSidebar,
     appDrawer,
     corpus,
     notebook,

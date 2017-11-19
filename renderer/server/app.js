@@ -16,8 +16,9 @@ const io = require('socket.io')(server);
 const remote = require('electron').remote;
 
 const ipc = require('./ipc');
-// const udp = require('./udp');
+const udp = require('./udp');
 const socketServer = require('./socket');
+const socketClient = require('./socket/socket-client');
 
 app.set("view engine", "ejs");
 app.engine('.ejs', ejs);
@@ -29,30 +30,25 @@ require('./routes')(app, io); //routes
 
 server.listen(config.port, config.ip, function () {
   console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
-  config.secondInstance ? console.log("Glossa running as secondary dev instance") : console.log('Glossa Running as main dev instance');
-  config.localDev ? console.log('Bypassing udp discovery') : console.log('Using udp discovery for external applications');
-  // require ipc event...
-  ipc.init(server, io); //ipc event for communication between renderer / main process
+
+  if (config.localDev) {
+    socketClient.initLocal()
+  }
+  //ipc event for communication between renderer / main process
+  ipc.init(server, io);
   socketServer(io);
 });
 
 
 function exitHandler(options, err) {
-  console.log('exit handler from: ', options.from);
-
   if (err) {
     console.log(err.stack);
   }
   if (options.cleanup) {
-    console.log('cleaning...');
-    console.log('TODO: udp discovery cleanup...');
     // return config.localDev ? false : udp.stop();
   }
   if (options.exit) {
-    console.log('Exit is true');
-    console.log('....3 seconds delay start');
     setTimeout(function () {
-      console.log('Delay over.  Exiting.');
       process.exit();
     }, 3000);
   }

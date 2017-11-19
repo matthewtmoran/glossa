@@ -18,7 +18,6 @@ const app = require('electron').app;
 
 // Get list of things
 exports.index = function (req, res) {
-  console.log('get user called....');
   User.findOne({}, function (err, user) {
     if (err) {
       return handleError(res, err);

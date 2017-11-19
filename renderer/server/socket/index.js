@@ -16,9 +16,7 @@ let localClient = {};
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
-    console.log('on:: connection');
 
-    console.log('STEP 1 - emit:: begin-handshake');
     socket.emit('begin-handshake');
     socket.on('end-handshake', onEndHandshake);
     socket.on('disconnect', disconnect);
@@ -59,14 +57,11 @@ module.exports = function (io) {
 
     //handshake response from connected client
     function onEndHandshake(client) {
-      console.log('');
-      console.log('STEP 2  -  on:: end-handshake');
-      console.log(`User ${client.name} just connected. ID = ${client._id}`);
-      console.log(`User ${client.name} socketID = ${client.socketId}`);
       //keep track of connections
       connectedClients[socket.id] = {};
       connectedClients[socket.id].disconnected = false;
       if (client.type === 'external-client') {
+        console.log('external-client connected');
         //look for this conneciton in persisted data
         Connection.findOne({_id: client._id}, (err, connection) => {
           if (err) {return console.log('error finding connection');}
@@ -95,7 +90,8 @@ module.exports = function (io) {
               //join the external connection room to listen for broadcasts
               socket.join('externalClientsRoom');
               //send local-client new connection
-              return win.webContents.send('new:connection', newConnection);
+              return io.to(localClient.socketId).emit('new:connection', newConnection)
+              // return win.webContents.send('new:connection', newConnection);
             });
           }
           if (connection._id) {
@@ -119,7 +115,8 @@ module.exports = function (io) {
                     socket.join('externalClientsRoom');
                     //send new connection object to local-client
                     console.log('SEND:: update:connection', updatedConnection);
-                    win.webContents.send('update:connection', updatedConnection);
+                    io.to(localClient.socketId).emit('update:connection', updatedConnection)
+                    // win.webContents.send('update:connection', updatedConnection);
 
                     //get notebook data created by user
                     notebookController.getExistingNotebooks(modifiedConnection)

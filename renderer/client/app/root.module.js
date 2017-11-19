@@ -24,9 +24,8 @@ var ipcRenderer = window.require('electron').ipcRenderer;
 var shell = window.require('electron').shell;
 //open links externally by default
 
-//TODO: figure out how to make this shit modular and WORK
 angular.module('config', []);
-//needed for ui-codemirror not sure this is the best way to bind to window objet
+//needed for ui-codemirror not sure this is the best way to bind to window object
 window.CodeMirror = CodeMirror;
 
 //when the window load, call project data then bootstrap the angular application once promise resolves.
@@ -35,12 +34,14 @@ window.onload = () => {
   let $http = initInector.get('$http');
   let $timeout = initInector.get('$timeout');
   let $animate = initInector.get('$animate');
+  let port = window.process.env.PORT || 9000;
 
   $http({
-    url: 'http://localhost:9000/api/preload',
+    url: `http://localhost:${port}/api/preload`,
     method: 'GET'
   }).then((res) => {
     const appData = {};
+
     appData.initialState = res.data;
     appData.isWindows = window.process.platform === 'win32';
     angular.module('config').constant('__appData', appData);
@@ -58,7 +59,6 @@ window.onload = () => {
       window.socket.emit('end-handshake', localObject)
     });
 
-
     //bootstrap angular
     angular.bootstrap(document, [root]);
   }).catch((err) => {
@@ -70,11 +70,6 @@ window.onload = () => {
     event.preventDefault();
     shell.openExternal(this.href);
   });
-
-
-  //let the server know the window has loaded.
-  ipcRenderer.send('window:loaded', {});
-
 };
 
 //Not sure this only works if config is a string.  As a variable, it was failing hard.
@@ -153,10 +148,7 @@ export const root = angular
   .run(($rootScope, $state, $injector, $window, RootService, $mdUtil, $compile, IpcSerivce, $transitions, __appData) => {
     'ngInject';
 
-    // SocketService.init();
     if (!$window.socket) {
-      // SocketService.init();
-      console.log('initializing socket listeners');
       RootService.initListeners();
     }
 
@@ -189,7 +181,6 @@ export const root = angular
         }
       }
     });
-
     $transitions.onSuccess('*', (trans) => {
       let currentState = trans.router.stateService.current.name;
       let session = {
@@ -197,11 +188,9 @@ export const root = angular
       };
       IpcSerivce.send('update:session', session);
     });
-
     $rootScope.$on('cfpLoadingBar:started', event => {
       $mdUtil.nextTick(() => $compile(angular.element($window.document.getElementById('loading-spinner')))($rootScope));
     });
-
   })
   .name;
 

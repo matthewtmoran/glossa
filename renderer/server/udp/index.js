@@ -1,5 +1,7 @@
 const Discovery = require('udp-discovery').Discovery;
 const socketClient = require('../socket/socket-client');
+const User = require('../api/user/user.model');
+
 
 let discover;
 let serviceName;
@@ -7,40 +9,41 @@ let available;
 let userData;
 
 module.exports = {
-  init: (server, io, win) => {
+  init: (server, io) => {
     console.log('udp init');
-    serviceName = 'Glossa-' + global.appData.initialState.user._id;
     let interval = 5000; //lets just broadcast the ip every 5 seconds
 
+    User.findOne({}, (err, user) => {
+      serviceName = 'Glossa-' + user._id;
+      console.log('discover: ', discover);
 
-    console.log('discover: ', discover);
+      if (discover && discover.services && discover.services[serviceName]) {
+        console.log('resuming service');
+        discover.update(serviceName, userData, interval, true);
+      } else {
+        console.log(' making new service');
+        discover = new Discovery();
+        //basic data that will be broadcast across network to all users
+        userData = {
+          app: 'Glossa',
+          name: user.name,
+          _id: user._id,
+          avatar: user.avatar,
+          available: true
+        };
 
-    if (discover && discover.services && discover.services[serviceName]) {
-      console.log('resuming service');
-      discover.update(serviceName, userData, interval, true);
-    } else {
-      console.log(' making new service');
-      discover = new Discovery();
-      //basic data that will be broadcast across network to all users
-      userData = {
-        app: 'Glossa',
-        name: global.appData.initialState.user.name,
-        _id: global.appData.initialState.user._id,
-        avatar: global.appData.initialState.user.avatar,
-        available: true
-      };
-
-      //announce our service
-      discover.announce(serviceName, userData, interval, true);
-      discover.on('available', function (name, data, reason) {
-        console.log('service available')
-        //if it's a glossa application and the name is not the same as our name...
-        if (data.data.app === 'Glossa' && name !== serviceName) {
-          //Init socket-client
-          socketClient.init(data, io, win)
-        }
-      });
-    }
+        //announce our service
+        discover.announce(serviceName, userData, interval, true);
+        discover.on('available', function (name, data, reason) {
+          console.log('service available');
+          //if it's a glossa application and the name is not the same as our name...
+          if (data.data.app === 'Glossa' && name !== serviceName) {
+            //Init socket-client
+            socketClient.init(data, io)
+          }
+        });
+      }
+    });
   },
 
   stop: () => {
