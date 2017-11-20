@@ -3,7 +3,6 @@ const fs = require('fs');
 const app = require('electron').app;
 const config = require('../config/environment');
 const ioClient = require('socket.io-client');
-// const main = require('../../../main');
 const User = require('./../api/user/user.model.js');
 
 const Notebooks = require('./../api/notebook/notebook.model.js');
@@ -49,7 +48,6 @@ module.exports = {
 
 
   },
-
 
   //we are going to connect to the server as a client so the server can interact with us
   init: function (service, io) {
@@ -281,8 +279,5 @@ module.exports = {
       });
     }
   }
-
-
-
 
 };

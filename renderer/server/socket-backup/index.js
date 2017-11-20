@@ -118,7 +118,7 @@ module.exports = function (io) {
               }
               console.log('SEND:: new:connection');
               console.log('TODO: change to socket event');
-              socket.join('externalClientsRoom');
+              socket.join('all');
              return win.webContents.send('new:connection', newConnection);
             });
           }
@@ -141,7 +141,7 @@ module.exports = function (io) {
                   if (err) {return err;}
 
 
-                  socket.join('externalClientsRoom');
+                  socket.join('all');
                   //send new connection object to local-client
                   console.log('SEND:: update:connection', updatedConnection);
                   console.log('TODO: change to socket event');
@@ -183,7 +183,7 @@ module.exports = function (io) {
               }
               console.log('SEND:: update:connection', updatedConnection);
               console.log('TODO: change to socket event');
-              socket.join('externalClientsRoom');
+              socket.join('all');
               //send new connection object to local-client
               win.webContents.send('update:connection', updatedConnection);
 

@@ -47,7 +47,7 @@ module.exports = {
       parseNotebook(data.notebook)
         .then((notebook) => {
 
-          io.to('externalClientsRoom').emit('rt:updates', {user: data.user, notebook: notebook})
+          io.to('all').emit('rt:updates', {user: data.user, notebook: notebook})
 
         });
 
@@ -264,7 +264,7 @@ module.exports = {
         };
 
         console.log("broadcast:: send-profile-updates to:: externalClientsRoom");
-        io.to('externalClientsRoom').emit('send-profile-updates', basicProfileData)
+        io.to('all').emit('send-profile-updates', basicProfileData)
       });
     }
 
@@ -315,7 +315,7 @@ module.exports = {
           updateObject.notebooks.push(notebook);
 
           console.log('broadcast:: rt:updates to:: externalClientsRoom');
-          io.to('externalClientsRoom').emit('rt:updates', updateObject)
+          io.to('all').emit('rt:updates', updateObject)
 
         });
       } else {
@@ -329,7 +329,7 @@ module.exports = {
         updateObject.notebooks.push(notebook);
 
         console.log('broadcast:: rt:updates to:: externalClientsRoom');
-        io.to('externalClientsRoom').emit('rt:updates', updateObject)
+        io.to('all').emit('rt:updates', updateObject)
       }
 
       // //once image and audio has been encoded...

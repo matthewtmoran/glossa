@@ -114,6 +114,12 @@ export const appComponent = {
       this.ipcSerivce.on('sync-event-end', (event, data) => {
         this.cfpLoadingBar.complete();
       });
+
+
+      this.socketService.on('export:project', (data) => {
+        console.log('export:project');
+      });
+
       this.ipcSerivce.on('update-transcription-list', (event, data) => {
         // this.transcriptions = angular.copy(this.__appData.initialState.transcriptions);
         //if a new file was created, data contains the id of the new file
@@ -124,6 +130,8 @@ export const appComponent = {
         }
         this.cfpLoadingBar.complete();
       });
+
+
       this.ipcSerivce.on('update:synced-notebooks', (event, notebooks) => {
         let newNotebooks = [];
         notebooks.forEach((notebook) => {
@@ -179,28 +187,37 @@ export const appComponent = {
         this.allConnections = [connection, ...this.allConnections];
       });
 
-      this.ipcSerivce.on('remove:connection', (event, connection) => {
-        this.allConnections = this.allConnections.filter(c => c._id !== connection._id)
+
+
+      //handles event from electron main process through ipc event
+      //exports the current project
+      this.ipcSerivce.on('export:project', (event, data) => {
+        this.exportProject({project: this.__appData.initialState.project});
       });
 
 
 
+      //when connections come online
       this.socketService.on('update:connection', (connection) => {
+        let connectionExists = false;
         this.allConnections = this.allConnections.map((con) => {
           if (con._id !== connection._id) {
             return con;
           }
+          connectionExists = true;
           return connection;
-        })
+        });
+        if (!connectionExists) {
+          this.allConnections = [connection, ...this.allConnections];
+        }
       });
-      
-      this.socketService.on('export:project', (data) => {
-        console.log('export:project');
+
+      //when connections we are not following go offline
+      this.socketService.on('remove:connection', (connection) => {
+        this.allConnections = this.allConnections.filter(c => c._id !== connection._id)
       });
+
     }
-
-
-
 
     $onChanges(changes) {
       if (changes.allConnections) {

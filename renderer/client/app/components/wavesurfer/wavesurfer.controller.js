@@ -210,7 +210,6 @@ export class WaveSurferController {
   }
 
   play() {
-    console.log('play pushed');
     // if (this.surfer) //{
     //   this.startInterval();
     // }

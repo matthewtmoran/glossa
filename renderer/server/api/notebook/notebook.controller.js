@@ -50,7 +50,7 @@ module.exports = function(io) {
 
           parseNotebook(notebook)
             .then((notebookWithMedia) => {
-              io.to('externalClientsRoom').emit('rt:notebook', notebookWithMedia);
+              io.to('all').emit('rt:notebook', notebookWithMedia);
               return res.status(201).json(notebook);
             });
 
@@ -125,9 +125,8 @@ module.exports = function(io) {
           if (settings.isSharing) {
             parseNotebook(updatedDoc)
               .then((notebookWithMedia) => {
-                console.log('notebook parsed and ready to broadcast');
                 console.log('emit:: rt:new-notebook');
-                io.to('externalClientsRoom').emit('rt:notebook', notebookWithMedia);
+                io.to('all').emit('rt:notebook', notebookWithMedia);
                 return res.status(201).json(updatedDoc);
               });
           } else {

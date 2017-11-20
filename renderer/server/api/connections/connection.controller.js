@@ -10,7 +10,10 @@
 import _ from 'lodash';
 import path from 'path';
 import Connection from './connection.model';
+import NotebookController from '../notebook/notebook.controller';
 const socketUtil = require('../../socket-backup/socket-util');
+const {webContents} = require('electron').remote;
+
 module.exports = (io) => {
   let index = (req, res) => {
     Connection.find({}, function (err, connection) {
@@ -123,7 +126,6 @@ module.exports = (io) => {
       updated.updatedAt = Date.now();
       Connection.update({_id: updated._id}, updated, options, (err, updatedNum, updatedDoc) => {
         if (err) {
-          console.log('error updating connection', err);
           reject(err);
         }
         Connection.persistence.compactDatafile(); // concat db
@@ -132,13 +134,139 @@ module.exports = (io) => {
     });
   };
 
+  let normalizeIfUpdate = function (connection) {
+    // return new Promise((resolve, reject) => {
+      NotebookController().normalizeNotebooks(connection)
+        .then((updatedNotebooks) => {
+          //send local-client updated notebooks
+          console.log('TODO: socket event update:synced-notebooks FROM: server TO: client');
+
+        })
+        .catch((err) => {
+          console.log('there was an issue normalizing notebooks', err);
+        });
+    // });
+  };
+
+  let getNewOrExistingConnection = function (connection) {
+    return new Promise((resolve, reject) => {
+      findOneConnection(connection._id)
+        .then((con) => {
+          //flag to determine if we need to normalize notbooks
+          let needToNormalize = false;
+
+          //modify existing connection
+          con.online = true;
+          con.socketId = connection.socketId;
+          //if name id different we need to normalize notebooks
+          if (con.name !== connection.name) {
+            needToNormalize = true;
+            con.name = connection.name;
+          }
+
+          console.log('TODO: Add check for avatar diff....... ');
+
+          updateConnection(con)
+            .then((updatedConnection) => {
+              if (needToNormalize) {
+                normalizeIfUpdate(updatedConnection)
+              }
+              resolve(updatedConnection)
+            })
+            .catch((reason) => {
+              reject(reason);
+            })
+        })
+        .catch((reason) => {
+          if (reason === 'no connection') {
+            createNewConnection(connection)
+              .then((connection) => {
+                resolve(connection)
+              })
+              .catch((reason) => {
+                reject(reason)
+              })
+          } else {
+            reject(reason)
+          }
+        })
+    })
+  };
+
+  let findOneConnection = function(connectionId) {
+    return new Promise((resolve, reject) => {
+      Connection.findOne({_id: connectionId}, (err, connection) => {
+        if (err) {
+          return console.log('error finding connection')
+        }
+        if (!connection) {
+          return reject('no connection');
+        }
+        if (connection._id) {
+          resolve(connection);
+        }
+      });
+    });
+  };
+
+  let createNewConnection = function(connection) {
+    return new Promise((resolve, reject) => {
+      const clientData = {
+        name: connection.name,
+        _id: connection._id,
+        type: 'external-client',
+        following: false,
+        lastSync: null,
+        avatar: connection.avatar,
+        socketId: connection.socketId,
+        online: true
+      };
+      Connection.insert(clientData, (err, newConnection) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(newConnection);
+      });
+    });
+  };
+
+  let findBySocketId = function (socketId) {
+    return new Promise((resolve, reject) => {
+      Connection.findOne({socketId: socketId}, (err, connection) => {
+        if (err) {
+          return reject(err)
+        }
+        if (!connection) {
+          return reject('no connection')
+        }
+        resolve(connection);
+      })
+    })
+  };
+
+  let removeConnection = function (socketId) {
+    return new Promise((resolve, reject) => {
+      Connection.remove({socketId: socketId}, (err, count) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve('success');
+      })
+    })
+  };
+
   return {
     index: index,
     show: show,
     create: create,
     update: update,
     destroy: destroy,
-    updateConnection: updateConnection
+    updateConnection: updateConnection,
+    findOneConnection: findOneConnection,
+    createNewConnection: createNewConnection,
+    getNewOrExistingConnection: getNewOrExistingConnection,
+    findBySocketId: findBySocketId,
+    removeConnection:removeConnection
   }
 
 };
