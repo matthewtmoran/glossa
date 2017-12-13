@@ -86,7 +86,7 @@
     "start-local": "SET LOCAL=true && SET BYPASS_UDP=true && SET PORT=9000 && npm run start",
     "start-local-second": "SET LOCAL=true && SET BYPASS_UDP=true && SET PORT=9090 && SET SECOND_INSTANCE=true && npm run start",
     "package-mac": "electron-packager . --overwrite --ignore=src --platform=darwin --arch=x64 --icon=dist/img/glossa-logo.icns --prune=true --out=release-builds --version-string.CompanyName=Glossa.inc --version-string.ProductName=Glossa --version-string.ProductVersion=0.5.0",
-    "package-win": "electron-packager . --overwrite --asar=true --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds --version-string.CompanyName=Glossa.inc --version-string.ProductName=Glossa --version-string.ProductVersion=0.5.0",
+    "package-win": "electron-packager . --overwrite --asar=false --ignore=src --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --prune=true --out=release-builds --version-string.CompanyName=Glossa.inc --version-string.ProductName=Glossa --version-string.ProductVersion=0.5.0",
     "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=dist/img/glossa-logo.png --prune=true --out=release-builds --version-string.CompanyName=Glossa.inc --version-string.ProductName=Glossa --version-string.ProductVersion=0.5.0",
     "package-win-basic": "electron-packager . --ignore=src --overwrite --platform=win32 --arch=ia32 --icon=dist/img/glossa-logo.ico --out=release-builds --prune=true"
   },

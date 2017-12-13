@@ -19,6 +19,7 @@ export const userCardComponent = {
 
       this.colorIndex = Math.floor((this.user.name.charCodeAt(0) - 65) % this.alphabetColors.length);
 
+
       this.user.color = this.alphabetColors[this.colorIndex];
 
     }

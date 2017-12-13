@@ -160,7 +160,9 @@ export const appComponent = {
 
       });
 
+      //this recieves event from the client socket when notebooks are broadcasted
       this.ipcSerivce.on('update:synced-notebook', (event, notebook) => {
+        console.log('TODO: give notification before immediate push');
         let exists = false;
         this.notebooks = this.notebooks.map((nb) => {
           if (notebook._id === nb._id) {
@@ -195,8 +197,6 @@ export const appComponent = {
         this.exportProject({project: this.__appData.initialState.project});
       });
 
-
-
       //when connections come online
       this.socketService.on('update:connection', (connection) => {
         let connectionExists = false;
@@ -215,6 +215,21 @@ export const appComponent = {
       //when connections we are not following go offline
       this.socketService.on('remove:connection', (connection) => {
         this.allConnections = this.allConnections.filter(c => c._id !== connection._id)
+      });
+
+      this.socketService.on('update:synced-notebook', (notebook) => {
+        let exists = false;
+        this.notebooks = this.notebooks.map((nb) => {
+          if (notebook._id === nb._id) {
+            exists = true;
+            return notebook;
+          }
+          return nb;
+        });
+        //it should exist but just in case...
+        if (!exists) {
+          this.notebooks.push(notebook);
+        }
       });
 
     }

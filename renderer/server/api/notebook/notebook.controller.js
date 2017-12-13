@@ -112,14 +112,13 @@ module.exports = function(io) {
       updated.updatedAt = Date.now();
       // hashtags will either be array of tags or an empty array
       updated.hashtags = req.body.dataObj.hashtags || [];
+
       Notebook.update({_id: updated._id}, updated, options, function (err, updatedNum, updatedDoc) {
         if (err) {
           return handleError(res, err);
         }
 
         Notebook.persistence.compactDatafile(); // concat db
-
-
         Setting.findOne({}, (err, settings) => {
           if (err) {}
           if (settings.isSharing) {

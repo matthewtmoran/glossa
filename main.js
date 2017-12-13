@@ -97,7 +97,7 @@ var icon = path.join(__dirname, 'src/img/app-icons/win/glossa-logo.ico');
 
 
 function createWindow() {
-  serverWindow = new BrowserWindow({show: true,});
+  serverWindow = new BrowserWindow({show: false,});
   serverWindow.webContents.openDevTools();
   serverWindow.loadURL(path.join('file://', __dirname, '/dist/server.html'));
 
@@ -127,17 +127,32 @@ function createWindow() {
 
   //TODO: make external config file for electron...
   // and load the index.html of the app.
-  win.loadURL(url.format({
-    pathname: 'http://localhost:9000'
-  }));
+
+
+  serverWindow.on('ready-to-show', ()=> {
+    serverWindow.show();
+    win.loadURL(url.format({
+      pathname: 'http://localhost:9000'
+    }));
+  });
 
   // Open the DevTools.
-  win.webContents.openDevTools();
 
-  win.once('ready-to-show', () => {
-    // ipcListeners.initIpcListeners();
-    win.show()
+  // win.once('ready-to-show', () => {
+  //   // ipcListeners.initIpcListeners();
+  //   win.show()
+  // });
+
+  win.on('ready-to-show', ()=> {
+    win.webContents.openDevTools();
+    win.show();
   });
+
+  win.on('crashed', (event)=> {
+    console.log('Client window crashed', event);
+  });
+
+
 
   // Emitted when the window is closed.
   win.on('close', (e) => {

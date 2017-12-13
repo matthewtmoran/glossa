@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const config = require('./../config/environment/index');
+const socketClient = require('./socket-client');
 // const main = require('../../../main');
 const {app, webContents} = require('electron').remote;
 
@@ -55,6 +56,10 @@ module.exports = function (io) {
       connectedClients[socket.id] = {};
       connectedClients[socket.id].disconnected = false;
       if (newOnlineUser.type === 'external-client') {
+        //for local instance testing only
+        if (newOnlineUser.isLocal) {
+          socketClient.connectToMockClient(io);
+        }
 
         //creates new connection or update existing
         connectionController.getNewOrExistingConnection(newOnlineUser)
@@ -154,13 +159,13 @@ module.exports = function (io) {
     //when a client returns avatar data after we have requested it
     function onReturnAvatar(avatarData) {
       console.log('');
-      console.log('on:: return:avatar ');
+      console.log('on:: return:avatar (SOCKET SERVER)');
       //writes the avatar data to the file system
       //the text data should already be updated by this point
       userController.writeAvatar(avatarData)
         .then((avatarDataNoBuffer) => {
           console.log('The avatar should be updated and written to FS successfully');
-          main.getWindow().webContents.send('avatar-returned', avatarDataNoBuffer.userId);
+          webContents.fromId(2).send('avatar-returned', avatarDataNoBuffer.userId);
         })
         .catch((err) => {
           console.log('there was an issue writing avatar image to fs', err)
@@ -172,12 +177,11 @@ module.exports = function (io) {
       notebookController.newDataReturned(data.notebook)
         .then((notebook) => {
           console.log('IPC send:: update:synced-notebook');
-          win.webContents.send('update:synced-notebook', notebook);
+          io.to(localClient.socketId).emit('update:synced-notebook', notebook);
         })
         .catch((err) => {
           console.log('Error updating new data', err);
-          console.log('IPC send:: sync-event-end to:: local-window');
-          win.webContents.send('sync-event-end');
+          // win.webContents.send('sync-event-end');
         });
     }
   });

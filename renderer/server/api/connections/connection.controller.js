@@ -9,10 +9,11 @@
 
 import _ from 'lodash';
 import path from 'path';
+import fs from 'fs';
 import Connection from './connection.model';
 import NotebookController from '../notebook/notebook.controller';
 const socketUtil = require('../../socket-backup/socket-util');
-const {webContents} = require('electron').remote;
+const {app, webContents} = require('electron').remote;
 
 module.exports = (io) => {
   let index = (req, res) => {
@@ -50,18 +51,22 @@ module.exports = (io) => {
         return res.status(201).json({remove: true, _id: connection._id});
       }));
     }
+
+    //create our own update and created at fields
     connection.createdAt = Date.now();
     connection.updatedAt = Date.now();
+
     const options = {returnUpdatedDocs: true};
+
     Connection.update({_id: connection._id}, connection, options, (err, updatedCount, updatedConnection) => {
       if (err) {
         return handleError(res, err);
       }
       //even when new connection is created, update our one source of truth...
       if (updatedConnection.following) {
-
         //request avatar from newly followed connection
-        console.log('emit:: request:avatar to:: connection we followed');
+
+        console.log(`emit:: request:avatar to:: ${updatedConnection.name}`);
         io.to(updatedConnection.socketId).emit('request:avatar');
 
         //get our synced data (if any)
@@ -69,6 +74,15 @@ module.exports = (io) => {
           //ask for new data and send old data list to connection
           io.to(updatedConnection.socketId).emit('request:notebook-data', data.notebooks)
         });
+      } else {
+        if (updatedConnection.avatar && updatedConnection.avatar.path) {
+          //remove avatar
+          fs.unlink(path.join(app.getPath('userData'),updatedConnection.avatar.path), (err) => {
+            if (err) {
+              console.log('there was an error', err);
+            }
+          });
+        }
       }
       return res.status(201).json(updatedConnection);
     });

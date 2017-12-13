@@ -14,7 +14,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const User = require('./user.model');
 const Notebooks = require('./../notebook/notebook.model');
-const app = require('electron').app;
+const { app }= require('electron').remote;
 
 // Get list of things
 exports.index = function (req, res) {
@@ -50,6 +50,17 @@ exports.create = function (req, res) {
     }
     return res.status(201).json(c);
   });
+};
+
+exports.find = () => {
+  return new Promise((resolve, reject) => {
+    User.findOne({}, (err, user) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(user);
+    })
+  })
 };
 
 // Updates an existing user in the DB.

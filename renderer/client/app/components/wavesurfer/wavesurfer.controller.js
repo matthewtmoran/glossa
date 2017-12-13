@@ -159,6 +159,7 @@ export class WaveSurferController {
       });
 
       this.surfer.on('error', ()=>{
+        console.log('Error with wave surfer');
       });
 
       //on pause event
@@ -197,7 +198,6 @@ export class WaveSurferController {
   }
 
   pause() {
-    console.log('pause');
     if (this.surfer) {
       this.stopInterval();
     }

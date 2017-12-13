@@ -22,6 +22,8 @@ import io from 'socket.io-client';
 const electron = window.require('electron');
 var ipcRenderer = window.require('electron').ipcRenderer;
 var shell = window.require('electron').shell;
+
+
 //open links externally by default
 
 angular.module('config', []);

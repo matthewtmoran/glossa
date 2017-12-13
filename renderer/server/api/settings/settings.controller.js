@@ -21,6 +21,17 @@ exports.index = function(req, res) {
     });
 };
 
+exports.find = () => {
+    console.log('find called');
+    return new Promise((resolve, reject) => {
+      Settings.findOne({}, (err, settings) => {
+        if(err) { return reject(err) }
+        console.log('settings:', settings);
+        resolve(settings);
+      });
+    });
+};
+
 // Get a single thing
 exports.show = function(req, res) {
     Settings.findOne({_id:req.params.id}, function (err, settings) {

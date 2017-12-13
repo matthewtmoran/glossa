@@ -7,7 +7,7 @@
 		</div>
 
 		<div ng-if="$ctrl.user.avatar && $ctrl.user.following" >
-			<img ng-src="{{$ctrl.user.avatar.path}}" class="md-avatar">
+			<img ng-src="{{$ctrl.user.avatar.path}}" onError="" class="md-avatar">
 		</div>
 	</div>
 	<div class="user-name-container">
