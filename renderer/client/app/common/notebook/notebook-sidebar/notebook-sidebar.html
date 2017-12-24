@@ -1,0 +1,21 @@
+<md-content class="left-side" >
+
+	<user-list
+			all-connections="$ctrl.allConnections"
+			selected="$ctrl.selected"
+			current-user="$ctrl.currentUser"
+			on-exists="$ctrl.exists($event)"
+			on-toggle="$ctrl.toggle($event)">
+	</user-list>
+
+	<md-divider></md-divider>
+
+	<tag-list
+			common-tags="$ctrl.commonTags"
+	        selected-hashtags="$ctrl.selectedHashtags"
+	        on-toggle-hashtags="$ctrl.toggleHashtags($event)"
+	        on-tag-manage="$ctrl.onTagManage()"
+	></tag-list>
+
+
+</md-content>

@@ -1,0 +1,15 @@
+<h3>Common Tags</h3>
+<md-button ng-click="$ctrl.tagManageDialog()" class="md-raised tag-btn">Tag Management</md-button>
+<md-list>
+	<md-list-item  class="chip-item"
+	               ng-repeat="tag in $ctrl.commonTags | orderBy: '-occurrence'"
+	               ng-class="$ctrl.exists(tag, $ctrl.selectedHashtags) ? 'active-chip' : 'non-active' "
+	               flex>
+		<md-chip class="chip-container" md-ink-ripple ng-click="$ctrl.toggleHashtags(tag, $ctrl.selectedHashtags)" >
+						<span>
+							<span class="chip-icon">#</span>
+							<span class="chip-text">{{tag}}</span>
+						</span>
+		</md-chip>
+	</md-list-item>
+</md-list>

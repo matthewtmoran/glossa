@@ -1,0 +1,20 @@
+<h3>Users</h3>
+<md-list>
+	<md-list-item>
+		<div class="online-status online-notification"></div>
+		<md-checkbox aria-label="{{$ctrl.currentUser.name}} Checkbox" ng-checked="$ctrl.exists($ctrl.currentUser, $ctrl.selected)" ng-click="$ctrl.toggle($ctrl.currentUser, $ctrl.selected)">
+			{{ $ctrl.currentUser.name }} (You)
+		</md-checkbox>
+	</md-list-item>
+	<md-list-item ng-repeat="user in $ctrl.allConnections  | filter: { following: true } ">
+
+		<div class="online-status" ng-class="user.online ? 'online-notification' : 'offline-notification'"></div>
+
+		<md-checkbox aria-label="{{user.name}} Checkbox"
+		             ng-checked="$ctrl.exists(user, $ctrl.selected)"
+		             ng-click="$ctrl.toggle(user, $ctrl.selected)">
+			{{ user.name }}
+		</md-checkbox>
+
+	</md-list-item>
+</md-list>

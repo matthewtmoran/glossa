@@ -1,0 +1,34 @@
+<md-card class="notebook-card" flex layout-fill layout="column">
+	<md-card-header ng-if="!$ctrl.isCorpus" class="card-title" flex="12">
+		<md-card-avatar ng-if="$ctrl.notebook.createdBy.avatar" alt="">
+			<img class="md-user-avatar"  ng-src="{{$ctrl.notebook.createdBy.avatar.path}}"/>
+		</md-card-avatar>
+		<md-card-header-text class="title-text ">
+			<span class="md-title">{{$ctrl.notebook.createdBy.name}}</span>
+		</md-card-header-text>
+		<md-divider></md-divider>
+	</md-card-header>
+
+	<md-card-content class="card-content" flex>
+		<div ng-if="$ctrl.notebook.image" class="md-media-lg card-image">
+			<img ng-src="{{$ctrl.notebook.image.path}}" class="md-card-image" alt="">
+		</div>
+
+		<audio-preview ng-if="$ctrl.notebook.postType === 'audio'" url-src="$ctrl.notebook.audio.path"></audio-preview>
+
+
+		<div class="card-text inner-padding">
+			<div ng-if="$ctrl.previewText" ng-bind-html="$ctrl.previewText"></div>
+		</div>
+	</md-card-content>
+
+	<md-divider></md-divider>
+	<md-card-actions flex=10 layout="row" layout-align="end bottom">
+		<md-button ng-if="$ctrl.isCorpus" ng-click="$ctrl.disconnectNotebook()">Disconnect</md-button>
+
+		<md-button ng-if="$ctrl.notebook.createdBy._id === $ctrl.currentUser._id" ng-click="$ctrl.viewDetails()">View</md-button>
+		<md-button ng-if="$ctrl.notebook.createdBy._id !== $ctrl.currentUser._id" ng-click="$ctrl.viewPreview()">View</md-button>
+
+	</md-card-actions>
+
+</md-card>

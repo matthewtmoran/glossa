@@ -1,0 +1,56 @@
+<div id="notebook-container" layout="row" flex ng-cloak>
+
+
+	<notebook-sidebar
+		all-connections="$ctrl.allConnections"
+		common-tags="$ctrl.commonTags"
+	    current-user="$ctrl.currentUser"
+		selected-hashtags="$ctrl.selectedHashtags"
+		on-toggle-hashtags="$ctrl.toggleHashtags($event)"
+	    on-exists="$ctrl.exists($event)"
+	    on-toggle="$ctrl.toggle($event)"
+	    on-tag-manage="$ctrl.tagManageDialog()"
+		selected="$ctrl.selected">
+	</notebook-sidebar>
+
+	<md-content flex="75" class="notebook-list" layout-padding>
+		<md-progress-circular class="notebook-loader fade-out" ng-hide="!$ctrl.isLoading" md-diameter="50"></md-progress-circular>
+		<md-button class="md-raised update-btn" ng-if="$ctrl.newNotebooks.length" ng-click="$ctrl.showNewUpdates($event)">
+			<span>{{$ctrl.newNotebooks.length}} updates are available.</span>
+			<span>View changes</span>
+			<md-icon class="">update</md-icon>
+		</md-button>
+		<notebook-list layout="column"
+		               selected="$ctrl.selected"
+		               selected-hashtags="$ctrl.selectedHashtags"
+			           current-user="$ctrl.currentUser"
+			           hashtags="$ctrl.hashtags"
+			           notebooks="$ctrl.notebooks"
+			           settings="$ctrl.settings"
+			           search-text="$ctrl.searchText"
+			           on-view-details="$ctrl.viewDetails($event)"
+			           on-view-preview="$ctrl.viewPreview($event)">
+		</notebook-list>
+	</md-content>
+
+	<md-fab-speed-dial
+			ng-hide="$ctrl.hidden"
+			md-direction="up"
+			md-open="metaVm.isOpen"
+			class="md-scale md-fab-bottom-right "
+			ng-class="{ 'md-hover-full': $ctrl.hover }"
+			ng-mouseenter="$ctrl.isOpen = true"
+			ng-mouseleave="$ctrl.isOpen = false">
+		<md-fab-trigger>
+			<md-button aria-label="menu" class="md-fab md-grey-fab">
+				<md-icon aria-label="menu">add</md-icon>
+			</md-button>
+		</md-fab-trigger>
+		<md-fab-actions>
+			<md-button ng-repeat="item in $ctrl.items" class="md-fab md-raised md-mini" ng-click="$ctrl.viewDetails($event, item.type)">
+				<md-icon>{{item.icon}}</md-icon>
+			</md-button>
+		</md-fab-actions>
+	</md-fab-speed-dial>
+
+</div>
